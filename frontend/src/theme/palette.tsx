@@ -97,6 +97,16 @@ const PURPLE = {
   name:'purple'
 };
 
+const PINK = {
+  lighter: '#f48ba0',
+  light: '#ee5d7b',
+  main: '#e11d47',
+  dark: '#bd1143',
+  darker: '#86003c',
+  contrastText: '#fff',
+  name:'pink'
+}
+
 const palette = {
   common: { black: '#000', white: '#fff' }, 
   primary: PRIMARY,
@@ -106,6 +116,7 @@ const palette = {
   warning: WARNING,
   error: ERROR,
   grey: GREY,
+  pink: PINK,
   divider: alpha(GREY[500], 0.24),
   text: {
     primary: GREY[800],
@@ -128,6 +139,7 @@ const palette = {
     hoverOpacity: 0.08,
     disabledOpacity: 0.48,
   },
+  mode:'light'
 };
 
 const paletteDark = {
@@ -139,6 +151,7 @@ const paletteDark = {
   warning: WARNING,
   error: ERROR,
   grey: GREY,
+  pink: PINK,
   divider: alpha(GREY[500], 0.24),
   text: {
     primary: 'rgb(255, 255, 255)',
@@ -162,7 +175,8 @@ const paletteDark = {
     disabledOpacity: 0.48,
     borderBottom:'1px dashed rgb(46, 50, 54)'
   },
+  mode:'dark'
 };
 
 export default palette;
-export {paletteDark, GREY, PRIMARY, SECONDARY, INFO, SUCCESS, WARNING, ERROR, GREEN, PURPLE};
+export {paletteDark, GREY, PRIMARY, SECONDARY, INFO, SUCCESS, WARNING, ERROR, GREEN, PURPLE, PINK};

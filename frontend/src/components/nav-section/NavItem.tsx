@@ -1,7 +1,7 @@
 import { NavLink as RouterLink } from 'react-router-dom';
 // @mui
 import { Box, List, ListItemText, ListSubheader, Button} from '@mui/material';
-import { useTheme, alpha } from '@mui/material/styles';
+import { useTheme, alpha, CustomThemeOptions } from '@mui/material/styles';
 //
 import { StyledNavItem, StyledNavItemIcon } from './styles';
 
@@ -13,12 +13,14 @@ interface Item{
     info: string,
   }
 }
+
 export default function NavItem({ item }:Item) {
   const { title, path, icon, info } = item;
-  const theme = useTheme();
+  const theme = useTheme() as any;
 
   return (
     <StyledNavItem
+      theme={theme}
       component={RouterLink}
       to={path}
       target={info}

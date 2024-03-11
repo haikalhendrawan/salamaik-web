@@ -6,8 +6,8 @@ import { Box, Link } from '@mui/material';
 
 // ----------------------------------------------------------------------
 interface Logo{
-  sx:SxProps,
-  disabledLink:boolean,
+  sx?:SxProps,
+  disabledLink?:boolean,
 }
 
 

@@ -7,10 +7,32 @@ interface BlurProps{
   blur?: number;
   opacity?: number;
   imgUrl?: string; 
+  
+}
+
+interface BlurTypes{
+  position?: string, 
+  backgroundImage?: string,
+  '&:before'?: {
+    position: string,
+    top: number,
+    left: number,
+    zIndex: number,
+    content: string,
+    width: string,
+    height: string,
+    backdropFilter: string,
+    WebkitBackdropFilter: string,
+    backgroundColor: string | any,
+  },    
+  backdropFilter?: string,
+  WebkitBackdropFilter?: string,
+  backgroundColor?: string | any,
+
 }
 
 
-export function bgBlur(props:BlurProps) {
+export function bgBlur(props:BlurProps): any {
   const color = props?.color || '#000000';
   const blur = props?.blur || 6;
   const opacity = props?.opacity || 0.8;

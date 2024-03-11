@@ -1,8 +1,14 @@
 import SimpleBar from 'simplebar-react';
 // @mui
-import { alpha, styled } from '@mui/material/styles';
+import { alpha, styled, SxProps} from '@mui/material/styles';
 
 // ----------------------------------------------------------------------
+
+interface StyledScrollbarProps{
+  timeout?: number,
+  clickOnTrack?: boolean,
+  sx: any
+}
 
 export const StyledRootScrollbar = styled('div')(() => ({
   flexGrow: 1,
@@ -10,7 +16,7 @@ export const StyledRootScrollbar = styled('div')(() => ({
   overflow: 'hidden',
 }));
 
-export const StyledScrollbar = styled(SimpleBar)(({ theme }) => ({
+export const StyledScrollbar = styled(SimpleBar)<StyledScrollbarProps>(({ theme }) => ({
   maxHeight: '100%',
   '& .simplebar-scrollbar': {
     '&:before': {

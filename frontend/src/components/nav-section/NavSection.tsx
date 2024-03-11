@@ -8,13 +8,11 @@ import { StyledNavItem, StyledNavItemIcon } from './styles';
 import NavItem from "./NavItem";
 
 // ----------------------------------------------------------------------
-
-NavSection.propTypes = {
-  data: PropTypes.array,
-  header:PropTypes.string
-};
-
-export default function NavSection({ data = [], ...other}) {
+interface NavSectionProp{
+  data: any[]
+  header?: string
+}
+export default function NavSection({ data = [], ...other}:NavSectionProp) {
   return (
     <Box {...other}>
       <List 

@@ -31,7 +31,7 @@ interface Item{
 
 export default function NavItemNested({ item, onClick, open, close }: NavItemNested) {
   const { title, path, icon, info, menu } = item;
-  const theme = useTheme();
+  const theme = useTheme() as any;
   const location = useLocation();
   const [isActive, setIsActive] = useState(false);
   
@@ -48,6 +48,7 @@ export default function NavItemNested({ item, onClick, open, close }: NavItemNes
   return (
     <>
     <StyledNavItemNested
+      theme={theme}
       component={RouterLink}
       to={path}
       target={info}

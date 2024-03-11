@@ -1,10 +1,23 @@
 // @mui
-import { styled } from '@mui/material/styles';
+import { styled, CustomThemeOptions, SxProps } from '@mui/material/styles';
 import { ListItemIcon, ListItemButton } from '@mui/material';
 
 // ----------------------------------------------------------------------
+interface ThemeProp{
+  theme: CustomThemeOptions
+}
 
-export const StyledNavItem = styled((props) => <ListItemButton disableGutters {...props} />)(({ theme }) => ({
+interface ChildrenProp{
+  children?: any,
+  component?: any,
+  to?: string,
+  target?: string,
+  sx?: SxProps,
+  onClick?: any
+}
+
+
+export const StyledNavItem = styled((props: ChildrenProp) => <ListItemButton disableGutters {...props} />)(({ theme }: ThemeProp) => ({
   ...theme.typography.body2,
   height: 48,
   position: 'relative',
@@ -13,7 +26,7 @@ export const StyledNavItem = styled((props) => <ListItemButton disableGutters {.
   borderRadius: theme.shape.borderRadius,
 }));
 
-export const StyledNavItemNested = styled((props) => <ListItemButton disableGutters {...props}  />)(({ theme }) => ({
+export const StyledNavItemNested = styled((props: ChildrenProp) => <ListItemButton disableGutters {...props}  />)(({ theme }: ThemeProp) => ({
   ...theme.typography.body2,
   height: 48,
   width:'100%',
@@ -32,7 +45,7 @@ export const StyledNavItemIcon = styled(ListItemIcon)({
   justifyContent: 'center',
 });
 
-export const StyledSubNavItemIcon = styled((props) => <ListItemIcon {...props} />)(({ theme }) => ({
+export const StyledSubNavItemIcon = styled((props: ChildrenProp) => <ListItemIcon {...props} />)(({ theme } : ThemeProp) => ({
   width: 16,
   height: 16,
   display: 'flex',

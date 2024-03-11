@@ -1,5 +1,4 @@
 import {useState} from "react";
-import PropTypes from 'prop-types';
 import { NavLink as RouterLink } from 'react-router-dom';
 // @mui
 import { Box, List, ListItemText, ListSubheader, Button, Collapse, ListItemButton} from '@mui/material';
@@ -12,12 +11,12 @@ import SvgColor from "../svg-color/SvgColor";
 
 // ----------------------------------------------------------------------
 
-NavSectionNested.propTypes = {
-  data: PropTypes.array,
-  header:PropTypes.string
-};
+interface NavSectionNestedProp{
+  data: any[]
+  header?: string
+}
 
-export default function NavSectionNested({ data = [], ...other}) {
+export default function NavSectionNested({ data = [], ...other}: NavSectionNestedProp) {
   const [open, setOpen] = useState(false);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {

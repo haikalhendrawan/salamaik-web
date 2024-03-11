@@ -20,33 +20,7 @@ export interface CustomShadows{
 }
 
 // ----------------------------------------------------------------------
-export type Shadows = [
-  string,
-  string,
-  string,
-  string,
-  string,
-  string,
-  string,
-  string,
-  string,
-  string,
-  string,
-  string,
-  string,
-  string,
-  string,
-  string,
-  string,
-  string,
-  string,
-  string,
-  string,
-  string,
-  string,
-  string,
-  string,
-]
+export type Shadows = string[]
 
 // ----------------------------------------------------------------------
 interface TypographyVariant {

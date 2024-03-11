@@ -5,7 +5,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import Router from './routes';
 // provider
 import ThemeProvider from './theme';
-// import {AuthProvider} from './context/AuthProvider';
+import {AuthProvider} from './context/AuthProvider';
 // components
 import { StyledChart } from './components/chart';
 import ScrollToTop from './components/scroll-to-top';
@@ -18,7 +18,9 @@ function App() {
         <ThemeProvider>
           <ScrollToTop />
           <StyledChart />
+          <AuthProvider>
             <Router />
+          </AuthProvider>
         </ThemeProvider>
       </BrowserRouter>
     </HelmetProvider>

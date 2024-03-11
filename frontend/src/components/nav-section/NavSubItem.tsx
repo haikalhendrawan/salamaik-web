@@ -19,7 +19,7 @@ interface NavSubItem{
 
 export default function NavSubItem({ item, open }:NavSubItem) {
   const { title, path, icon, info } = item;
-  const theme = useTheme();
+  const theme = useTheme() as any;
   const location = useLocation();
   const [isActive, setIsActive] = useState(false);
 
@@ -29,6 +29,7 @@ export default function NavSubItem({ item, open }:NavSubItem) {
 
   return (
     <StyledNavItem
+      theme={theme}
       component={RouterLink}
       to={path}
       target={info}
@@ -49,7 +50,7 @@ export default function NavSubItem({ item, open }:NavSubItem) {
       }
     >
 
-      <StyledSubNavItemIcon sx={{ml:1}}>{isActive?icon:null}</StyledSubNavItemIcon>
+      <StyledSubNavItemIcon theme={theme} sx={{ml:1}}>{isActive?icon:null}</StyledSubNavItemIcon>
 
       <ListItemText disableTypography primary={title}  />
 

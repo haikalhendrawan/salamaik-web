@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import { forwardRef, ReactNode } from 'react';
 // @mui
 import { Box } from '@mui/material';
@@ -6,7 +5,7 @@ import {SxProps} from '@mui/material/styles';
 
 // ----------------------------------------------------------------------
 interface SvgColor {
-  src: ReactNode;
+  src: string;
   sx?: SxProps;
 }
 
@@ -28,9 +27,5 @@ const SvgColor = forwardRef(({ src, sx, ...other }: SvgColor, ref) => (
   />
 ));
 
-SvgColor.propTypes = {
-  src: PropTypes.string,
-  sx: PropTypes.object,
-};
 
 export default SvgColor;
