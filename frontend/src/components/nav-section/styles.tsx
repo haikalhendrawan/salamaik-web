@@ -1,10 +1,10 @@
 // @mui
-import { styled, CustomThemeOptions, SxProps } from '@mui/material/styles';
-import { ListItemIcon, ListItemButton } from '@mui/material';
+import { styled, SxProps } from '@mui/material/styles';
+import { ListItemIcon, ListItemButton, ThemeOptions } from '@mui/material';
 
 // ----------------------------------------------------------------------
 interface ThemeProp{
-  theme: CustomThemeOptions
+  theme: any
 }
 
 interface ChildrenProp{

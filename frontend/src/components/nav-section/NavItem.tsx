@@ -1,7 +1,7 @@
 import { NavLink as RouterLink } from 'react-router-dom';
 // @mui
 import { Box, List, ListItemText, ListSubheader, Button} from '@mui/material';
-import { useTheme, alpha, CustomThemeOptions } from '@mui/material/styles';
+import { useTheme, alpha} from '@mui/material/styles';
 //
 import { StyledNavItem, StyledNavItemIcon } from './styles';
 

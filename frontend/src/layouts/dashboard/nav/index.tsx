@@ -12,7 +12,7 @@ import Scrollbar from '../../../components/scrollbar';
 import NavSection from '../../../components/nav-section';
 import NavSectionNested from '../../../components/nav-section/NavSectionNested';
 //
-import navConfig, {navConfig2, navConfig3, navConfig4, navConfig5} from './config';
+import {navSupervisi, navHome, navMonitoring, navAdmin} from './config';
 
 // ----------------------------------------------------------------------
 
@@ -52,15 +52,15 @@ export default function Nav({ openNav, onCloseNav }: NavType) {
         '& .simplebar-content': { height: 1, display: 'flex', flexDirection: 'column' },
       }}
     >
-      <Box sx={{ px: 2.5, py: 3, display: 'inline-flex' }}>
-        <Logo />
+      <Box sx={{ px: 2.5, py: 0, display: 'inline-flex' }}> 
+        <Logo /> {/* py 3 utk short logo*/}
       </Box>
 
-      <NavSection data={navConfig3}  />
-      <NavSection data={navConfig}  header={"MONEV TIK KPPN"} />
-      <NavSection data={navConfig2} header={"UTILITY"} />
-      {auth?.role===2?(<NavSectionNested data={navConfig5} header={"ADMIN"} />) :null}
-      <NavSection data={navConfig4} header={"OTHER"} />
+      <NavSection data={navHome}  />
+      <NavSection data={navSupervisi}  header={"SUPERVISI KPPN"} />
+      <NavSection data={navMonitoring} header={"MONITORING"} />
+      {auth?.role===2?(<NavSectionNested data={navAdmin} header={"ADMIN"} />) :null}
+      <NavSectionNested data={navAdmin} header={"ADMIN"} />
 
       <Box sx={{ flexGrow: 1 }} />
 

@@ -3,54 +3,37 @@ import SvgColor from '../../../components/svg-color';
 
 // ----------------------------------------------------------------------
 
-const icon = (name: string) => <SvgColor src={`/assets/icons/navbar/${name}.svg`} sx={{ width: 1, height: 1 }} />
+const icon = (name: string) => <SvgColor src={`/icon/${name}.svg`} sx={{ width: 1, height: 1 }} />
 
 
-const navConfig = [
+const navSupervisi = [
   {
-    title: 'Data TIK',
+    title: 'Kertas Kerja',
     path: '/iasset',
-    icon: icon('solar-database-bold'),
+    icon: icon('solar--clipboard-list-bold-duotone'),
   },
   {
-    title: 'Worksheet',
+    title: 'Output',
     path: '/worksheet',
-    icon: icon('solar-document'),
+    icon: icon('solar--folder-open-bold-duotone'),
   },
 
 ];
 
-const navConfig2 = [
-  {
-    title: 'Log Book TIK',
-    path: '/logbook',
-    icon: icon('solar-notebook'),
-  },
-  {
-    title: 'Monitoring',
-    path: '/monitoring',
-    icon: icon('solar-telescope'), 
-  },
-  // {
-  //   title: 'Topology',
-  //   path: '/topology',
-  //   icon: icon('solar-usb'),
-  // },
-];
 
-const navConfig5 = [
+const navAdmin = [
   {
     title: 'Reference',
     path: '/admin',
     icon: icon('solar-user-check'),
     menu:[
       {
-        title: 'User Management',
-        path: '/admin/user',
+        title: 'User',
+        path: '/home',
         icon: icon('dot-mark'),
       },
       {
-        title: 'Worksheet Data',
+        title: 'Kertas Kerja',
         path: '/admin/worksheet',
         icon: icon('dot-mark'),
       },
@@ -58,22 +41,21 @@ const navConfig5 = [
   },
 ];
 
-const navConfig4 = [
+const navMonitoring = [
   {
-    title: 'Panduan',
+    title: 'Dashboard Salamaik',
     path: 'https://drive.google.com/file/d/1Z_ozqch3MV2IKWNFPDfCeafP0MPexJtO/view?usp=sharing',
-    icon: icon('help-outline'),
-    info: 'blank'
+    icon: icon('solar--chart-bold-duotone'),
+    info: 'solar--folder-open-bold-duotone'
   },
 ];
 
-const navConfig3 = [
+const navHome = [
   {
     title: 'Home',
-    path: '/app',
+    path: '/home',
     icon: icon('home-bold-duotone'),
   },
 ];
 
-export default navConfig;
-export {navConfig2, navConfig3, navConfig4, navConfig5};
+export {navSupervisi, navHome, navMonitoring, navAdmin};

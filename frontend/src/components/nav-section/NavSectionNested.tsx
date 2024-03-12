@@ -38,7 +38,7 @@ export default function NavSectionNested({ data = [], ...other}: NavSectionNeste
         </ListSubheader>:null
         }
       >
-        {data.map((item, index) => (
+        {data.map((item, index: number) => (
           <NavItemNested key={index} item={item} onClick={handleClick} open={open} close={handleClose}/>
         ))}
 

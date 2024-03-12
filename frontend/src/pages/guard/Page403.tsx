@@ -22,7 +22,7 @@ export default function Page403() {
   return (
     <>
       <Helmet>
-        <title> Unauthorized </title>
+        <title> Salamaik | Unauthorized </title>
       </Helmet>
 
       <Container>

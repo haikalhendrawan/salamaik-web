@@ -83,9 +83,9 @@ export default function NavItemNested({ item, onClick, open, close }: NavItemNes
     </StyledNavItemNested>
 
     {menu?.map((item:Item, index:number) => (
-      <Collapse in={open} timeout="auto" unmountOnExit>
+      <Collapse key={index} in={open} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
-          <NavSubItem key={index} item={item} />
+          <NavSubItem  item={item} />
         </List>
       </Collapse>
     ))}
