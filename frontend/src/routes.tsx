@@ -9,6 +9,7 @@ import PersistLogin from "./layouts/auth/PersistLogin";
 //pages
 import TestPage from './pages/TestPage';
 import LoginPage from './pages/LoginPage';
+import WorksheetPage from "./pages/WorksheetPage";
 
 // ----------------------------------------------------
 
@@ -20,7 +21,8 @@ export default function Router() {
 
     {/* <Route element={<PersistLogin/>}> */}
       <Route path="/" element={<RequireAuthLayout allowedRoles={[1]}/> }>
-        <Route path="home" element={<TestPage/>} />
+        <Route path="home" element={<TestPage />} />
+        <Route path='worksheet' element={<WorksheetPage />} />
       </Route>
     {/* </Route> */}
 

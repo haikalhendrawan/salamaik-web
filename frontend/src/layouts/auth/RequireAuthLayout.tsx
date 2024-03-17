@@ -65,7 +65,7 @@ export default function RequireAuthLayout({allowedRoles}: RqAuthLayoutProp) {
       <Header onOpenNav={() => setOpen(true)} />
       <Nav openNav={open} onCloseNav={() => setOpen(false)} />
       <Main>
-        <Page403 />
+        <Outlet />
         <Footer />
       </Main>
     </StyledRoot>)

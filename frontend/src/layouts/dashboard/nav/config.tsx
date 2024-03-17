@@ -9,12 +9,12 @@ const icon = (name: string) => <SvgColor src={`/icon/${name}.svg`} sx={{ width: 
 const navSupervisi = [
   {
     title: 'Kertas Kerja',
-    path: '/iasset',
+    path: '/worksheet',
     icon: icon('solar--clipboard-list-bold-duotone'),
   },
   {
-    title: 'Output',
-    path: '/worksheet',
+    title: 'Matriks',
+    path: '/matrix',
     icon: icon('solar--folder-open-bold-duotone'),
   },
 
