@@ -88,7 +88,7 @@ export default function LoginPage() {
             
             <Stack direction="column" justifyContent="center" alignItems="center" spacing={0} sx={{bottom:10, position:'fixed', width:'38%'}}>
                 {/* <Typography variant='body2'>Modul Monev TIK</Typography> */}
-                <Typography variant='body2'>Copyright © 2023 Kanwil DJPb Prov Sumbar</Typography>
+                <Typography variant='body2'>Copyright © 2024 Kanwil DJPb Prov Sumbar</Typography>
             </Stack>
           </StyledContent>
         </Container>

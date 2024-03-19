@@ -47,7 +47,7 @@ const ColorSwitcher = () => {
 									<IconButton onClick={() => handleColorClick(PURPLE)}><Iconify icon={"carbon:dot-mark"} sx={{color:'#9c27b0', borderRadius:'50%', backgroundColor: bgColor==='purple'?theme.palette.action.selected:null}} /></IconButton>
 							</Stack>
 							<Stack direction="row" spacing={2}>
-									<IconButton onClick={() => handleColorClick(PINK)}><Iconify icon={"carbon:dot-mark"} sx={{color:PINK.main, borderRadius:'50%', backgroundColor: bgColor==='pink'?theme.palette.action.selected:null}} /></IconButton>
+									<IconButton onClick={() => handleColorClick(PINK)}><Iconify icon={"carbon:dot-mark"} sx={{color:theme.palette.pink.main, borderRadius:'50%', backgroundColor: bgColor==='error'?theme.palette.action.selected:null}} /></IconButton>
 									<IconButton onClick={() => handleColorClick(WARNING)}><Iconify icon={"carbon:dot-mark"} sx={{color:WARNING.main, borderRadius:'50%', backgroundColor: bgColor==='warning'?theme.palette.action.selected:null}} /></IconButton>
 									<IconButton onClick={() => handleColorClick(PRIMARY)}><Iconify icon={"bx:reset"}/></IconButton>
 							</Stack>

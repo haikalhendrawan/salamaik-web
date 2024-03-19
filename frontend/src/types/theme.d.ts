@@ -1,4 +1,4 @@
-import { ThemeOptions } from '@material-ui/core/styles';
+import { ThemeOptions} from '@material-ui/core/styles';
 
 interface CustomShadows{
   z1: string,
@@ -71,6 +71,7 @@ success: Color,
 warning: Color,
 error: Color,
 grey: Color,
+pink:Color,
 divider: string,
 text: Color,
 background: Color,
@@ -107,6 +108,7 @@ declare module '@mui/material/styles'{
     typography: Typography,
     customShadows: CustomShadows
   } 
+
 }
 
 declare module '@emotion/react'{

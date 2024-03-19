@@ -1,6 +1,6 @@
 import { forwardRef, ReactNode } from 'react';
 // @mui
-import { CustomThemeOptions, ThemeOptions, SxProps, useTheme } from '@mui/material/styles';
+import { ThemeOptions, SxProps, useTheme } from '@mui/material/styles';
 import { Box } from '@mui/material';
 //
 import { StyledLabel } from './styles';
@@ -8,12 +8,12 @@ import { StyledLabel } from './styles';
 // ----------------------------------------------------------------------
 
 interface Label{
-  sx: SxProps,
-  endIcon: ReactNode,
-  children: ReactNode,
-  startIcon: ReactNode,
-  variant: string,
-  color: string,
+  sx?: SxProps,
+  endIcon?: ReactNode,
+  children?: ReactNode,
+  startIcon?: ReactNode,
+  variant?: string,
+  color?: string,
 }
 const Label = forwardRef(({ children, color = 'default', variant = 'soft', startIcon, endIcon, sx, ...other }:Label, ref) => {
   const theme = useTheme() as any;
