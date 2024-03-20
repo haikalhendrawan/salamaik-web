@@ -2,11 +2,12 @@ import { Helmet } from 'react-helmet-async';
 import { useState } from 'react';
 import Iconify from '../components/iconify/Iconify';
 import LinearProgressWithLabel from '../components/linear-progress-with-label/LinearProgressWithLabel';
+import ScrollToTopButton from '../components/scrollToTopButton/ScrollToTopButton';
 //sections
 import WorksheetInfo from '../sections/worksheet/component/WorksheetInfo';
 import WorksheetCard from '../sections/worksheet/component/WorksheetCard';
 // @mui
-import { Container, Stack, Typography, Box, Button, Tabs, Tab, Grid } from '@mui/material';
+import { Container, Stack, Typography, Box, Button, Tabs, Tab, Grid, Fab} from '@mui/material';
 
 
 // ----------------------------------------------------------------------
@@ -16,11 +17,6 @@ export default function WorksheetPage() {
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => { // setiap tab komponen berubah
     setTabValue(newValue);
-  };
-
-  const override=  {
-    display: "block",
-    margin: "0 auto",
   };
 
   return (
@@ -45,7 +41,7 @@ export default function WorksheetPage() {
           </Stack>
 
           <Grid container spacing={2}>
-            <Grid item xs={12} md={8}>
+            <Grid item xs={12} md={12}>
               <Grid container spacing={2}>
                 <WorksheetCard 
                   id={1} 
@@ -80,11 +76,10 @@ export default function WorksheetPage() {
               <WorksheetInfo />
             </Grid>
           </Grid>
-          
 
-          
-          
       </Container>
+
+      <ScrollToTopButton />
     </>
   );
 }

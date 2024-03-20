@@ -43,7 +43,7 @@ export default function WorksheetInfo(props: WorksheetInfoProps){
   return(
     <Card>
       <CardHeader title={"Worksheet Info"}  subheader="Metadata kertas kerja" />
-        <CardContent sx={{fontSize:14}}>
+        <CardContent sx={{fontSize:12}}>
           <Grid container spacing={2}>
           {infoRows.map((row, index) => {
             return(

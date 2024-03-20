@@ -4,7 +4,7 @@ import { useMemo, useState, createContext, useEffect } from 'react';
 import { CssBaseline} from '@mui/material';
 import { ThemeProvider as MUIThemeProvider, createTheme, StyledEngineProvider, Theme, ThemeOptions} from '@mui/material/styles';
 import { CustomThemeOptions } from '../types/theme';
-import { idID } from '@mui/material/locale';
+import { idID, zhCN } from '@mui/material/locale';
 //
 import palette, {paletteDark, GREY, PRIMARY, SECONDARY, INFO, SUCCESS, WARNING, ERROR} from './palette';
 import shadows from './shadows';
