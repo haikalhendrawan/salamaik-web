@@ -8,6 +8,7 @@ import { Container, Stack, Typography, Box, Avatar,  Grid, IconButton, Card} fro
 import { useTheme } from '@mui/material/styles';
 //sections
 import ProfileTab from '../sections/profile/ProfileTab';
+import General from '../sections/profile/General';
 
 
 export default function ProfilePage(){
@@ -42,7 +43,7 @@ export default function ProfilePage(){
         </Stack>
 
         <Grid container spacing={2} >
-         
+         <General />
         </Grid>
 
       </Container>
