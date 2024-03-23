@@ -1,7 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import { useState } from 'react';
 import Iconify from '../components/iconify/Iconify';
-import LinearProgressWithLabel from '../components/linear-progress-with-label/LinearProgressWithLabel';
 import ScrollToTopButton from '../components/scrollToTopButton/ScrollToTopButton';
 //sections
 import WorksheetInfo from '../sections/worksheet/component/WorksheetInfo';

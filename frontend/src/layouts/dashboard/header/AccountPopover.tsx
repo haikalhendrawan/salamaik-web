@@ -92,7 +92,7 @@ export default function AccountPopover() {
           }),
         }}
       >
-        <Avatar key={avatarKey} src={auth?.image?`${''}/avatar/${auth.image}?${new Date().getTime()}`:`${''}/avatar/default.png`} alt="photoURL" />
+        <Avatar key={avatarKey} src={'/avatar/default-male.png'} alt="photoURL" />
       </IconButton>
 
       <Popover
