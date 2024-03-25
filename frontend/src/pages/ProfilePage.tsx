@@ -27,7 +27,7 @@ export default function ProfilePage(){
       </Helmet>
 
       <Container>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={3}>
           <Stack direction='row' spacing={1} alignItems="center">
             <IconButton onClick={handleBack}>
               <Iconify icon={"eva:arrow-ios-back-outline"} />

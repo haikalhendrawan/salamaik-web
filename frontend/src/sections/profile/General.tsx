@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Iconify from '../../components/iconify/Iconify';
 import Label from '../../components/label/Label';
 // @mui
-import { Container, Stack, Typography, Box, Avatar,  Grid, IconButton, Card} from '@mui/material';
+import { Container, Stack, Typography, Box, FormControl,  Grid, IconButton, Card, TextField, CardContent} from '@mui/material';
 import { useTheme, styled } from '@mui/material/styles';
 
 // -----------------------------------------------------------------------
@@ -71,6 +71,11 @@ const BackdropIcon = styled(Iconify)(({theme}) => ({
   zIndex: 1
 }));
 
+const StyledInput = styled(TextField)(({theme}) => ({
+  fontSize:10,
+  typography:'body2',
+}));
+
 
 //------------------------------------------------------------------------
 export default function General(){
@@ -122,7 +127,24 @@ export default function General(){
 
     <Grid item xs={12} sm={6} md={8}>
       <Card sx={{height:550}}>
-        B
+        <Box sx={{height:'100%'}}>
+          <FormControl sx={{width:'100%'}}>
+            <StyledInput name="name" label="Nama Pegawai"  required />
+          </FormControl>
+          <FormControl sx={{width:'100%'}}>
+            <StyledInput name="name" label="Nama Pegawai"  required />
+          </FormControl>
+          <FormControl sx={{width:'100%'}}>
+            <StyledInput name="name" label="Nama Pegawai"  required />
+          </FormControl>
+          <FormControl sx={{width:'100%'}}>
+            <StyledInput name="name" label="Nama Pegawai"  required />
+          </FormControl>
+          <FormControl sx={{width:'100%'}}>
+            <StyledInput name="name" label="Nama Pegawai"  required />
+          </FormControl>
+        </Box>
+
       </Card>
     </Grid>
   </>
