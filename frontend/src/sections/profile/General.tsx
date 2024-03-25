@@ -72,8 +72,20 @@ const BackdropIcon = styled(Iconify)(({theme}) => ({
 }));
 
 const StyledInput = styled(TextField)(({theme}) => ({
-  fontSize:10,
   typography:'body2',
+  '& .MuiInputBase-input': {
+    fontSize: 14,
+    height:'50%',
+    borderRadius:'12px'
+  },
+  "& .MuiInputLabel-root": {
+    fontSize: "14px"
+  },
+  "& .MuiInputLabel-shrink": {
+    fontSize: '1rem',
+    fontWeight: 600,
+    color: 'rgb(99, 115, 129)'
+  }
 }));
 
 
@@ -127,22 +139,38 @@ export default function General(){
 
     <Grid item xs={12} sm={6} md={8}>
       <Card sx={{height:550}}>
-        <Box sx={{height:'100%'}}>
-          <FormControl sx={{width:'100%'}}>
-            <StyledInput name="name" label="Nama Pegawai"  required />
-          </FormControl>
-          <FormControl sx={{width:'100%'}}>
-            <StyledInput name="name" label="Nama Pegawai"  required />
-          </FormControl>
-          <FormControl sx={{width:'100%'}}>
-            <StyledInput name="name" label="Nama Pegawai"  required />
-          </FormControl>
-          <FormControl sx={{width:'100%'}}>
-            <StyledInput name="name" label="Nama Pegawai"  required />
-          </FormControl>
-          <FormControl sx={{width:'100%'}}>
-            <StyledInput name="name" label="Nama Pegawai"  required />
-          </FormControl>
+        <Box sx={{height:'100%',display: 'flex', alignItems:'start', justifyContent:'center', mt:5}}>
+          <Stack direction='row' spacing={2} sx={{width:'100%'}} justifyContent={'center'}>
+            <Stack direction='column' spacing={2} sx={{width:'45%'}}>
+              <FormControl sx={{width:'100%', height:'50%'}}>
+                <StyledInput name="name" label="Nama Pegawai" />
+              </FormControl>
+              <FormControl sx={{width:'100%', height:'50%'}}>
+                <StyledInput name="email" label="Email"  />
+              </FormControl>
+              <FormControl sx={{width:'100%', height:'50%'}}>
+                <StyledInput name="uuid" label="UUID" disabled/>
+              </FormControl>
+              <FormControl sx={{width:'100%', height:'50%'}}>
+                <StyledInput name="role" label="Role"  />
+              </FormControl>
+            </Stack>
+            <Stack direction='column' spacing={2} sx={{width:'45%'}}>
+              <FormControl sx={{width:'100%'}}>
+                <StyledInput name="nip" label="NIP"  />
+              </FormControl>
+              <FormControl sx={{width:'100%'}}>
+                <StyledInput name="unit" label="Unit" />
+              </FormControl>
+              <FormControl sx={{width:'100%'}}>
+                <StyledInput name="name" label="Nama Pegawai" />
+              </FormControl>
+              <FormControl sx={{width:'100%'}}>
+                <StyledInput name="periode" label="Periode" />
+              </FormControl>
+            </Stack>
+          </Stack>
+          
         </Box>
 
       </Card>
