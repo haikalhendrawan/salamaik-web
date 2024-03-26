@@ -3,16 +3,17 @@ import Iconify from '../../components/iconify/Iconify';
 // @mui
 import { Box,Tabs, Tab} from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-//sections
+// ------------------------------------------------
+interface ProfileTabProps{
+  tabValue:number,
+  setTabValue:(newValue:0 | 1) => void
+}
 
-
-
-export default function ProfileTab(){
+// --------------------------------------------------
+export default function ProfileTab({tabValue, setTabValue}: ProfileTabProps){
   const theme = useTheme();
 
-  const [tabValue, setTabValue] = useState(0); // ganti menu komponen supervisi
-
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => { // setiap tab komponen berubah
+  const handleTabChange = (event: React.SyntheticEvent, newValue: 0 | 1) => { // setiap tab komponen berubah
     setTabValue(newValue);
   };
   return(

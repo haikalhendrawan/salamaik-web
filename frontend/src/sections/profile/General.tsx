@@ -1,10 +1,9 @@
-import { Helmet } from 'react-helmet-async';
 import { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Iconify from '../../components/iconify/Iconify';
 import Label from '../../components/label/Label';
+import ProfilePicUpload from '../../components/profilePicUpload';
 // @mui
-import { Container, Stack, Typography, Box, FormControl,  Grid, IconButton, Card, TextField, CardContent} from '@mui/material';
+import { Stack, Typography, Box, FormControl,  Grid, IconButton, Card, TextField, Button, Slide, Grow} from '@mui/material';
 import { useTheme, styled } from '@mui/material/styles';
 
 // -----------------------------------------------------------------------
@@ -32,7 +31,6 @@ const ImageButton = styled(IconButton)(({theme}) => ({
   mx:'auto',
   cursor: 'pointer', 
   p:0, 
-  backgroundImage: `url('/avatar/default-male.png')`, 
   backgroundSize: 'cover', 
 }));
 
@@ -75,17 +73,26 @@ const StyledInput = styled(TextField)(({theme}) => ({
   typography:'body2',
   '& .MuiInputBase-input': {
     fontSize: 14,
-    height:'50%',
-    borderRadius:'12px'
+    height:'1.4375em',
+    borderRadius:'12px',
   },
   "& .MuiInputLabel-root": {
-    fontSize: "14px"
+    fontSize: "13px"
   },
   "& .MuiInputLabel-shrink": {
     fontSize: '1rem',
     fontWeight: 600,
-    color: 'rgb(99, 115, 129)'
   }
+}));
+
+const UserDataContainer = styled(Box)(({theme}) => ({
+  height:'100%',
+  display: 'flex', 
+  flexDirection:'column', 
+  alignItems:'start', 
+  justifyContent:'start', 
+  marginTop:theme.spacing(5),
+  gap:theme.spacing(3)
 }));
 
 
@@ -100,80 +107,75 @@ export default function General(){
   }
 
   return (
-    <>
+  <>
     <Grid item xs={12} sm={6} md={4}>
-      <Card sx={{height:500}}>
-        <Stack
-          direction="column"
-          justifyContent="center"
-          alignItems="center"
-          spacing={2}
-          sx={{ width: 1, height: "100%" }}
-        >
-          <input accept='image/*' type='file' style={{display:'none'}} ref={fileInputRef} tabIndex={-1} />
-          <ImageBox>
-            <ImageButton onClick={handleClick}>
-              <ImageBackdrop className="backdrop" />
-              <BackdropTypography variant="body2">Upload</BackdropTypography>
-              <BackdropIcon icon={"solar:camera-bold"} />
-            </ImageButton>
-          </ImageBox>
+      <Slide direction="right" in mountOnEnter unmountOnExit>
+        <Card sx={{height:500}}>
+          <Stack direction="column" justifyContent="center" alignItems="center" spacing={2} sx={{ width: 1, height: "100%" }}>
+            <input accept='image/*' type='file' style={{display:'none'}} ref={fileInputRef} tabIndex={-1} />
+            <ProfilePicUpload onClick={handleClick} imageUrl='/avatar/default-male.png' />
 
-          <Stack direction="column"justifyContent="center"alignItems="center">
-            <Typography variant='body2' color={theme.palette.text.disabled}>
-              Muhammad Haikal Putra Hendrawan
-            </Typography>
+            <Stack direction="column"justifyContent="center"alignItems="center">
+              <Typography variant='body2' color={theme.palette.text.disabled}>
+                Muhammad Haikal Putra Hendrawan
+              </Typography>
+              <Typography variant='body2' color={theme.palette.text.disabled} sx={{mt:0}}>
+                199904082021011001
+              </Typography>
+            </Stack>
+
+            <Label color='success'>Active User</Label>
             <Typography variant='body2' color={theme.palette.text.disabled} sx={{mt:0}}>
-              199904082021011001
+                Role: Admin Kanwil
             </Typography>
+
           </Stack>
-
-          <Label color='success'>Active User</Label>
-          <Typography variant='body2' color={theme.palette.text.disabled} sx={{mt:0}}>
-              Role: Admin Kanwil
-          </Typography>
-
-        </Stack>
-      </Card>
+        </Card>
+      </Slide>
     </Grid>
 
     <Grid item xs={12} sm={6} md={8}>
-      <Card sx={{height:550}}>
-        <Box sx={{height:'100%',display: 'flex', alignItems:'start', justifyContent:'center', mt:5}}>
-          <Stack direction='row' spacing={2} sx={{width:'100%'}} justifyContent={'center'}>
-            <Stack direction='column' spacing={2} sx={{width:'45%'}}>
-              <FormControl sx={{width:'100%', height:'50%'}}>
-                <StyledInput name="name" label="Nama Pegawai" />
-              </FormControl>
-              <FormControl sx={{width:'100%', height:'50%'}}>
-                <StyledInput name="email" label="Email"  />
-              </FormControl>
-              <FormControl sx={{width:'100%', height:'50%'}}>
-                <StyledInput name="uuid" label="UUID" disabled/>
-              </FormControl>
-              <FormControl sx={{width:'100%', height:'50%'}}>
-                <StyledInput name="role" label="Role"  />
-              </FormControl>
+      <Slide direction="right" in mountOnEnter unmountOnExit>
+        <Card sx={{height:425}}>
+          <UserDataContainer>
+            <Stack direction='row' spacing={2} sx={{width:'100%'}} justifyContent={'center'}>
+              <Stack direction='column' spacing={3} sx={{width:'45%'}}>
+                <FormControl>
+                  <StyledInput name="name" label="Nama Pegawai" />
+                </FormControl>
+                <FormControl>
+                  <StyledInput name="email" label="Email"  />
+                </FormControl>
+                <FormControl>
+                  <StyledInput name="uid" label="UID" disabled/>
+                </FormControl>
+                <FormControl>
+                  <StyledInput name="role" label="Role"  />
+                </FormControl>
+              </Stack>
+              <Stack direction='column' spacing={3} sx={{width:'45%'}}>
+                <FormControl>
+                  <StyledInput name="nip" label="NIP"  />
+                </FormControl>
+                <FormControl>
+                  <StyledInput name="unit" label="Unit" />
+                </FormControl>
+                <FormControl>
+                  <StyledInput name="name" label="Nama Pegawai" />
+                </FormControl>
+                <FormControl>
+                  <StyledInput name="periode" label="Periode" />
+                </FormControl>
+              </Stack>
             </Stack>
-            <Stack direction='column' spacing={2} sx={{width:'45%'}}>
-              <FormControl sx={{width:'100%'}}>
-                <StyledInput name="nip" label="NIP"  />
-              </FormControl>
-              <FormControl sx={{width:'100%'}}>
-                <StyledInput name="unit" label="Unit" />
-              </FormControl>
-              <FormControl sx={{width:'100%'}}>
-                <StyledInput name="name" label="Nama Pegawai" />
-              </FormControl>
-              <FormControl sx={{width:'100%'}}>
-                <StyledInput name="periode" label="Periode" />
-              </FormControl>
-            </Stack>
-          </Stack>
-          
-        </Box>
 
-      </Card>
+            <Stack sx={{width:'100%', pr:3}} direction='row' spacing={2} flex={'row'} justifyContent={'end'}>
+              <Button variant='contained' sx={{borderRadius:'8px'}}>Save Changes</Button>
+              <Button variant='contained' sx={{borderRadius:'8px', backgroundColor:theme.palette.common.white, color:theme.palette.common.black}}>Reset</Button>
+            </Stack>
+          </UserDataContainer>
+        </Card>
+      </Slide>
     </Grid>
   </>
   )
