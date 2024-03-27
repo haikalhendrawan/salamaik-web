@@ -92,7 +92,7 @@ export default function General(){
               </Stack>
             </Stack>
 
-            <Stack sx={{width:'100%', pr:3}} direction='row' spacing={2} flex={'row'} justifyContent={'end'}>
+            <Stack sx={{width:'100%', pr:3, mt:1}} direction='row' spacing={2} flex={'row'} justifyContent={'end'}>
               <Button variant='contained' sx={{borderRadius:'8px'}}>Save Changes</Button>
               <Button variant='contained' sx={{borderRadius:'8px', backgroundColor:theme.palette.common.white, color:theme.palette.common.black}}>Reset</Button>
             </Stack>

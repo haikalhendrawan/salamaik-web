@@ -16,6 +16,7 @@ import {
   ListItemText,
   ListItemAvatar,
   ListItemButton,
+  Paper,
 } from '@mui/material';
 // utils
 import { fToNow } from '../../../utils/formatTime';
@@ -111,13 +112,11 @@ export default function NotificationsPopover() {
         onClose={handleClose}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        PaperProps={{
-          sx: {
-            mt: 1.5,
-            ml: 0.75,
-            width: 360,
-          },
-        }}
+        slotProps={
+          {
+            paper:{sx:{mt:1.5, ml:0.75, width:360, borderRadius:'12px'}}
+          }
+        }
       >
         <Box sx={{ display: 'flex', alignItems: 'center', py: 2, px: 2.5 }}>
           <Box sx={{ flexGrow: 1 }}>

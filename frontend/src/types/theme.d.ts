@@ -47,6 +47,7 @@ subtitle1: TypographyVariant;
 subtitle2: TypographyVariant;
 body1: TypographyVariant;
 body2: TypographyVariant;
+body3:TypographyVariant;
 caption: TypographyVariant;
 overline: TypographyVariant;
 button: TypographyVariant;
@@ -109,10 +110,25 @@ declare module '@mui/material/styles'{
     customShadows: CustomShadows
   } 
 
+  export interface TypographyVariants {
+    body3: React.CSSProperties;
+  }
+
+  // allow configuration using `createTheme`
+  export interface TypographyVariantsOptions {
+    body3?: React.CSSProperties;
+  }
+
 }
 
 declare module '@emotion/react'{
   export interface Theme extends CustomThemeOptions{}
+}
+
+declare module '@mui/material/Typography' {
+  export interface TypographyPropsVariantOverrides {
+    body3: true;
+  }
 }
 
 

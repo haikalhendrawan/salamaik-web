@@ -95,6 +95,10 @@ const typography = {
     lineHeight: 1.5,
     fontSize: pxToRem(12),
   },
+  body3:{
+    lineHeight: 22 / 14,
+    fontSize: pxToRem(14),
+  },
   overline: {
     fontWeight: 700,
     lineHeight: 1.5,

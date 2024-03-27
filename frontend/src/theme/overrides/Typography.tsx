@@ -10,6 +10,9 @@ export default function Typography(theme:any) {
         gutterBottom: {
           marginBottom: theme.spacing(1),
         },
+        body3:{
+          color:theme.palette.text.secondary
+        }
       },
     },
   };
