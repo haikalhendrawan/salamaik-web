@@ -9,16 +9,19 @@ import { useTheme } from '@mui/material/styles';
 import ProfileTab from '../sections/profile/ProfileTab';
 import General from '../sections/profile/General';
 import Security from '../sections/profile/Security';
+import Stats from '../sections/profile/Stats';
 // ----------------------------------------------------
 
 interface SelectSection{
   0:JSX.Element,
-  1:JSX.Element
+  1:JSX.Element,
+  2:JSX.Element
 }
 
 const selectSection:SelectSection = {
   0:<General />,
-  1:<Security />
+  1:<Security />,
+  2:<Stats />
 }
 
 export default function ProfilePage(){

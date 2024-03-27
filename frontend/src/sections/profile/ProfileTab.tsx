@@ -6,7 +6,7 @@ import { useTheme } from '@mui/material/styles';
 // ------------------------------------------------
 interface ProfileTabProps{
   tabValue:number,
-  setTabValue:(newValue:0 | 1) => void
+  setTabValue:(newValue:0 | 1 | 2) => void
 }
 
 // --------------------------------------------------

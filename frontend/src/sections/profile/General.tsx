@@ -2,89 +2,12 @@ import { useState, useRef } from 'react';
 import Iconify from '../../components/iconify/Iconify';
 import Label from '../../components/label/Label';
 import ProfilePicUpload from '../../components/profilePicUpload';
+import StyledTextField from '../../components/styledTextField';
 // @mui
 import { Stack, Typography, Box, FormControl,  Grid, IconButton, Card, TextField, Button, Slide, Grow} from '@mui/material';
 import { useTheme, styled } from '@mui/material/styles';
 
 // -----------------------------------------------------------------------
-const ImageBox = styled(Box)(({ theme }) => ({
-  borderRadius:'50%', 
-  height:'144px', 
-  width:'144px', 
-  p:'8px', 
-  border:'1px dashed rgba(145, 158, 171, 0.2)',
-  position: 'relative', 
-  '&:hover .MuiTypography-root': { 
-    color: 'white' 
-  },
-  '&:hover .MuiBox-root': { 
-    color: 'white' 
-  },
-  '&:hover .backdrop': { 
-    opacity: 0.5
-  }
-}));
-
-const ImageButton = styled(IconButton)(({theme}) => ({
-  width:'100%', 
-  height:'100%', 
-  mx:'auto',
-  cursor: 'pointer', 
-  p:0, 
-  backgroundSize: 'cover', 
-}));
-
-const ImageBackdrop = styled(Box)(({theme}) => ({
-  position: 'absolute',
-  top: 0,
-  left: 0,
-  width: '100%',
-  height: '100%',
-  backgroundColor: 'black',
-  opacity: 0, 
-  borderRadius: '50%', 
-  zIndex: 0, 
-  transition: 'opacity 0.3s ease'
-}));
-
-const BackdropTypography = styled(Typography)(({theme}) => ({
-  color: 'transparent', 
-  position: 'absolute', 
-  top: '60%', 
-  left: '50%', 
-  transform: 'translate(-50%, -50%)', 
-  transition: 'color 0.3s ease', 
-  pointerEvents: 'none',
-  zIndex: 1
-}));
-
-const BackdropIcon = styled(Iconify)(({theme}) => ({
-  color: 'transparent', 
-  position: 'absolute', 
-  top: '45%', 
-  left: '50%', 
-  transform: 'translate(-50%, -50%)', 
-  transition: 'color 0.3s ease', 
-  pointerEvents: 'none',
-  zIndex: 1
-}));
-
-const StyledInput = styled(TextField)(({theme}) => ({
-  typography:'body2',
-  '& .MuiInputBase-input': {
-    fontSize: 14,
-    height:'1.4375em',
-    borderRadius:'12px',
-  },
-  "& .MuiInputLabel-root": {
-    fontSize: "13px"
-  },
-  "& .MuiInputLabel-shrink": {
-    fontSize: '1rem',
-    fontWeight: 600,
-  }
-}));
-
 const UserDataContainer = styled(Box)(({theme}) => ({
   height:'100%',
   display: 'flex', 
@@ -141,30 +64,30 @@ export default function General(){
             <Stack direction='row' spacing={2} sx={{width:'100%'}} justifyContent={'center'}>
               <Stack direction='column' spacing={3} sx={{width:'45%'}}>
                 <FormControl>
-                  <StyledInput name="name" label="Nama Pegawai" />
+                  <StyledTextField name="name" label="Nama Pegawai" />
                 </FormControl>
                 <FormControl>
-                  <StyledInput name="email" label="Email"  />
+                  <StyledTextField name="email" label="Email"  />
                 </FormControl>
                 <FormControl>
-                  <StyledInput name="uid" label="UID" disabled/>
+                  <StyledTextField name="uid" label="UID" disabled/>
                 </FormControl>
                 <FormControl>
-                  <StyledInput name="role" label="Role"  />
+                  <StyledTextField name="role" label="Role"  />
                 </FormControl>
               </Stack>
               <Stack direction='column' spacing={3} sx={{width:'45%'}}>
                 <FormControl>
-                  <StyledInput name="nip" label="NIP"  />
+                  <StyledTextField name="nip" label="NIP"  />
                 </FormControl>
                 <FormControl>
-                  <StyledInput name="unit" label="Unit" />
+                  <StyledTextField name="unit" label="Unit" />
                 </FormControl>
                 <FormControl>
-                  <StyledInput name="name" label="Nama Pegawai" />
+                  <StyledTextField name="name" label="Nama Pegawai" />
                 </FormControl>
                 <FormControl>
-                  <StyledInput name="periode" label="Periode" />
+                  <StyledTextField name="periode" label="Periode" />
                 </FormControl>
               </Stack>
             </Stack>

@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Iconify from '../../components/iconify/Iconify';
 import Label from '../../components/label/Label';
+import StyledTextField from '../../components/styledTextField';
 // @mui
 import { Stack,Box, FormControl,  Grid, IconButton, Card, TextField, InputAdornment, Button, Slide, Grow} from '@mui/material';
 import { useTheme, styled } from '@mui/material/styles';
@@ -16,21 +17,6 @@ const ResetPassContainer = styled(Box)(({theme}) => ({
   gap:theme.spacing(3)
 }));
 
-const StyledInput = styled(TextField)(({theme}) => ({
-  typography:'body2',
-  '& .MuiInputBase-input': {
-    fontSize: 14,
-    height:'1.4375em',
-    borderRadius:'12px',
-  },
-  "& .MuiInputLabel-root": {
-    fontSize: "13px"
-  },
-  "& .MuiInputLabel-shrink": {
-    fontSize: '1rem',
-    fontWeight: 600,
-  }
-}));
 
 // ---------------------------------------------------------
 
@@ -48,7 +34,7 @@ export default function Security(){
             <ResetPassContainer>
               <Stack direction='column' spacing={2} sx={{width:'100%', px:5}} justifyContent={'center'}>
                 <FormControl>
-                  <StyledInput 
+                  <StyledTextField
                     name="oldpassword" 
                     label="Old Password" 
                     type={showPassword ? 'text' : 'password'} 
@@ -63,7 +49,7 @@ export default function Security(){
                     }}/>
                 </FormControl>
                 <FormControl>
-                  <StyledInput 
+                  <StyledTextField
                     name="newpassword" 
                     label="New Password"
                     type={showPassword ? 'text' : 'password'}
@@ -78,7 +64,7 @@ export default function Security(){
                     }} />
                 </FormControl>
                 <FormControl>
-                  <StyledInput 
+                  <StyledTextField 
                     name="confirmpassword" 
                     label="Confirm Password"
                     type={showPassword ? 'text' : 'password'}
