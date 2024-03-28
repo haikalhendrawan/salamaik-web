@@ -29,7 +29,7 @@ const navAdmin = [
     menu:[
       {
         title: 'User',
-        path: '/home',
+        path: '/admin/user',
         icon: icon('dot-mark'),
       },
       {

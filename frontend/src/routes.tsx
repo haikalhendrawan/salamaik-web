@@ -12,6 +12,10 @@ import LoginPage from './pages/LoginPage';
 import WorksheetPage from "./pages/WorksheetPage";
 import ProfilePage from "./pages/ProfilePage";
 
+// admin
+import UserRef from "./pages/admin/UserRef";
+import WorksheetRef from "./pages/admin/WorksheetRef";
+
 // ----------------------------------------------------
 
 export default function Router() {
@@ -25,6 +29,13 @@ export default function Router() {
         <Route path="home" element={<TestPage />} />
         <Route path='worksheet' element={<WorksheetPage />} />
         <Route path='profile' element={<ProfilePage />} />
+      </Route>
+    {/* </Route> */}
+
+    {/* <Route element={<PersistLogin/>}> */}
+      <Route path="/admin" element={<RequireAuthLayout allowedRoles={[1]}/> }>
+        <Route path="user" element={<UserRef />} />
+        <Route path='worksheet' element={<WorksheetRef />} />
       </Route>
     {/* </Route> */}
 
