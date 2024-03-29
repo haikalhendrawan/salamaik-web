@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
 // @mui
 import { styled, alpha, useTheme } from '@mui/material/styles';
-import { Toolbar, Tooltip, IconButton, OutlinedInput, InputAdornment, FormControl, InputLabel, MenuItem, Stack } from '@mui/material';
+import { Toolbar, Tabs, Tab, OutlinedInput, InputAdornment, FormControl, InputLabel, MenuItem, Stack } from '@mui/material';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 // component
 import Iconify from '../../../components/iconify';
@@ -17,7 +17,7 @@ const StyledRoot = styled(Toolbar)(({ theme }) => ({
 }));
 
 const StyledSearch = styled(OutlinedInput)(({ theme }) => ({
-  width: 240,
+  width: 300,
   transition: theme.transitions.create(['box-shadow', 'width'], {
     easing: theme.transitions.easing.easeInOut,
     duration: theme.transitions.duration.shorter,
@@ -30,7 +30,21 @@ const StyledSearch = styled(OutlinedInput)(({ theme }) => ({
     borderWidth: `1px !important`,
     borderColor: `${alpha(theme.palette.grey[500], 0.32)} !important`,
   },
+  '& .MuiInputBase-input': {
+    fontSize: 14,
+  }
 }));
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width:240,
+    },
+  },
+};
 
 // ----------------------------------------------------------------------
 
@@ -43,14 +57,18 @@ interface UserRefTableToolbarProps {
 
 // -------------------------------------------------------------
 interface SelectItemType {
-  jenis: string;
+  unit: string;
   value: number;
-  color: 'success'  | 'error';
 }
 
 const selectItem: SelectItemType[] = [
-  {jenis:'Done', value:1, color:'success'},
-  {jenis:'On progress', value:0, color:'error'},
+  {unit:'Kanwil DJPb Sumbar', value:7},
+  {unit:'KPPN Padang', value:1},
+  {unit:'KPPN Bukittinggi', value:2},
+  {unit:'KPPN Solok', value:3},
+  {unit:'KPPN Lubuk Sikaping', value:4},
+  {unit:'KPPN Sijunjung', value:5},
+  {unit:'KPPN Painan', value:6},
 ]
 
 // -------------------------------------------------------------------
@@ -59,57 +77,50 @@ export default function UserRefTableToolbar({filterName, onFilterName, onFilterS
   const [open, setOpen] = useState(false); // open dan close filter icon
   const theme = useTheme();
 
+
+  const filterUnit = useState(null);
+
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     setOpen(prev => !prev);
   };
-
 
   return (
     <StyledRoot
       onClick={()=>{setOpen(false)}}
     >
 
-      <StyledSearch
-        value={filterName}
-        onChange={onFilterName}
-        placeholder="Search user..."
-        startAdornment={
-          <InputAdornment position="start">
-            <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled', width: 20, height: 20 }} />
-          </InputAdornment>
-        }
-      />
+      <Stack direction="row" spacing={2}>
+        <FormControl sx={{ m: 1, minWidth: 120 }}>
+          <InputLabel id="unit-select-label" sx={{typography:'body2'}}>Unit</InputLabel>
+          <Select 
+            labelId="unit-select-label" 
+            id="unit-select" 
+            sx={{width:'200px', typography:'body2'}} 
+            label="status" 
+            onChange={onFilterStatus}
+            onClick={(event)=>{event.stopPropagation()}}
+            MenuProps={MenuProps}
+            >
+              <MenuItem sx={{typography:'body2', color:theme.palette.primary.main}} onClick={(event)=>{event.stopPropagation()}} value={0}>All Unit</MenuItem>
+              {selectItem.map((item, index) => {
+                return(<MenuItem key={index} onClick={(event)=>{event.stopPropagation()}} sx={{typography:'body2'}} value={item.value}>{item.unit}</MenuItem>)
+              })}
+          </Select>
+        </FormControl>
 
-        <div>
-        <Tooltip title="Filter status">
-          <IconButton onClick={handleClick} sx={{zIndex:2}}>
-            <Iconify icon="ic:round-filter-list" />
-          </IconButton>
-        </Tooltip>
-      {open && (
-        <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-            <InputLabel id="demo-simple-select-label" sx={{typography:'body2'}}>Status</InputLabel>
-            <Select 
-              labelId="simple-select-label" 
-              id="simple-select" 
-              value={filterStatus} 
-              sx={{width:'140px', typography:'body2'}} 
-              label="status" 
-              onChange={onFilterStatus}
-              onClick={(event)=>{event.stopPropagation()}}
-              >
-                <MenuItem sx={{typography:'body2'}} onClick={(event)=>{event.stopPropagation()}} value={0}>All</MenuItem>
-                {selectItem.map((item, index) => {
-                  return(<MenuItem key={index} onClick={(event)=>{event.stopPropagation()}}sx={{typography:'body2', color:theme.palette[item.color].main}} value={item.value}>{item.jenis}</MenuItem>)
-                })}
-            </Select>
-          </FormControl>
-      )} 
-        </div>
-      
+        <StyledSearch
+          placeholder="Search user..."
+          startAdornment={
+            <InputAdornment position="start">
+              <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled', width: 20, height: 20 }} />
+            </InputAdornment>
+          }
+        />
 
+      </Stack>
       
     </StyledRoot>
   );
 }
+

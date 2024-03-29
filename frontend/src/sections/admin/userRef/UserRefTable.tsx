@@ -1,7 +1,7 @@
 import { useState } from 'react';
 // @mui
-import {Card, Table, Stack, Paper, Avatar, Button, Popover, Checkbox, TableRow, MenuItem, TableBody, TableCell,
-    Container, Typography, IconButton, TableContainer, TablePagination} from '@mui/material';
+import {Card, Table, Stack, Paper, Avatar, Button, ListItemText, TableRow, Tooltip, TableBody, TableCell,
+    Container, Typography, IconButton, TableContainer, TablePagination, styled, List} from '@mui/material';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 // hooks
 import useAxiosJWT from "../../../hooks/useAxiosJWT";
@@ -18,23 +18,24 @@ import {descendingComparator, getComparator, applySortFilter} from './utils';
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'id', label: 'No', alignRight: false },
-  { id: 'avatarUrl', label: 'Date', alignRight: false },
   { id: 'name', label: 'Nama', alignRight: false },
-  { id: 'company', label: 'Hostname', alignRight: false },
-  { id: 'isVerified', label: 'Kendala', alignRight: false },
+  { id: 'company', label: 'Unit', alignRight: false },
   { id: 'status', label: 'Status', alignRight: false },
-  { id: 'role', label: 'Penyelesaian', alignRight: false },
-  { id: '' },
+  { id: 'isVerified', label: 'Role', alignRight: false },
+  { id: 'role', label: 'Action', alignRight: false },
 ];
 
-const selectTahun = {
-  0:2022,
-  1:2023,
-  2:2024,
-  3:2025,
-  4:2026
-}
+
+const StyledButton = styled(Button)(({ theme }) => ({
+  display: 'inline-flex',   
+  alignItems: 'center', 
+  justifyContent: 'center', 
+  paddingRight: 0,
+  paddingLeft: 0,
+  minHeight: '30px',
+  minWidth: '30px',
+  borderRadius: '12px',
+}));  
 
 // ----------------------------------------------------------------------
 interface UserRefTableProps{
@@ -49,7 +50,7 @@ export default function UserRefTable({users}: UserRefTableProps) {
 
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
 
-  const [orderBy, setOrderBy] = useState<string>('no');
+  const [orderBy, setOrderBy] = useState<string>('name');
 
   const [filterName, setFilterName] = useState<string>('');
 
@@ -100,7 +101,7 @@ export default function UserRefTable({users}: UserRefTableProps) {
   
   return (
     <>
-      <Container>
+
         <Card>
           <UserRefTableToolbar 
             filterName={filterName} 
@@ -123,32 +124,51 @@ export default function UserRefTable({users}: UserRefTableProps) {
                     const {id, avatarUrl, name, company, isVerified, status, role} = row;
                     return (
                       <TableRow hover key={index} tabIndex={-1}>
-                        <TableCell align="left">{id}</TableCell>
-
-                        <TableCell align="left">{name}</TableCell>
+                         <TableCell component="th" scope="row" >
+                            <Stack direction="row" alignItems="center" spacing={2}>
+                              <Avatar alt={name} src={avatarUrl} />
+                              <List disablePadding dense>
+                                <ListItemText>
+                                  <Typography variant="body2" noWrap>Muhammad Haikal Putra H</Typography>
+                                  <Typography variant="body3" noWrap>haikal.hendrawan@kemenkeu.go.id</Typography>
+                                </ListItemText>
+                              </List>
+                            </Stack>
+                          </TableCell>
 
                         <TableCell align="left">{company}</TableCell>
 
-                        <TableCell align="left">{isVerified}</TableCell>
-
-                        <TableCell align="justify">{ status}</TableCell>
-
                         <TableCell align="left">
                           <Label 
-                            color={'success'} 
+                            color={status==='active'?'success':'error'} 
                             sx={{cursor:'pointer'}}
                           >
-                            {role}
+                            {status}
                           </Label>
                         </TableCell>
 
-                        <TableCell align="justify">{status}</TableCell>
+                        <TableCell align="justify">{ role }</TableCell>
 
-                        <TableCell align="right">
-                          <IconButton size="large" color="inherit">
-                            <Iconify icon={'eva:more-vertical-fill'} />
-                          </IconButton>
+                        <TableCell align="justify">
+                          <Stack direction='row' spacing={1}>
+                            <Tooltip title='approve'>
+                              <StyledButton aria-label="approve" variant='contained' size='small' color='success'>
+                                <Iconify icon="solar:check-circle-bold-duotone"/>
+                              </StyledButton>
+                            </Tooltip>
+                            <Tooltip title='edit'>
+                              <StyledButton aria-label="edit" variant='contained' size='small' color='warning'>
+                                <Iconify icon="solar:pen-bold-duotone"/>
+                              </StyledButton>
+                            </Tooltip>
+                            <Tooltip title='delete'>
+                              <StyledButton aria-label="delete" variant='contained' size='small' color='white'>
+                                <Iconify icon="solar:trash-bin-trash-bold"/>
+                              </StyledButton>
+                            </Tooltip>
+                          </Stack>
                         </TableCell>
+
                       </TableRow>
                     );
                   })}
@@ -196,7 +216,7 @@ export default function UserRefTable({users}: UserRefTableProps) {
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
         </Card>
-      </Container>
+
 
 
     </>

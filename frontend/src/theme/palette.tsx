@@ -107,6 +107,16 @@ const PINK = {
   name:'pink'
 }
 
+const WHITE = {
+  lighter: '#fff',
+  light: '#fff',
+  main: '#fff',
+  dark: GREY[300],
+  darker: GREY[400],
+  contrastText: GREY[800],
+  name:'white'  
+}
+
 const palette = {
   common: { black: '#000', white: '#fff' }, 
   primary: PRIMARY,
@@ -117,6 +127,7 @@ const palette = {
   error: ERROR,
   grey: GREY,
   pink: PINK,
+  white:WHITE,
   divider: alpha(GREY[500], 0.24),
   text: {
     primary: GREY[800],
@@ -152,6 +163,7 @@ const paletteDark = {
   error: ERROR,
   grey: GREY,
   pink: PINK,
+  white:WHITE,
   divider: alpha(GREY[500], 0.24),
   text: {
     primary: 'rgb(255, 255, 255)',

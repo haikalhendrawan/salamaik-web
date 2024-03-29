@@ -72,7 +72,8 @@ success: Color,
 warning: Color,
 error: Color,
 grey: Color,
-pink:Color,
+pink: Color,
+white: Color,
 divider: string,
 text: Color,
 background: Color,
@@ -128,6 +129,13 @@ declare module '@emotion/react'{
 declare module '@mui/material/Typography' {
   export interface TypographyPropsVariantOverrides {
     body3: true;
+  }
+}
+
+declare module '@mui/material/Button' {
+  interface ButtonPropsColorOverrides {
+    pink: true;
+    white: true;
   }
 }
 
