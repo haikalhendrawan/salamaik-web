@@ -1,9 +1,13 @@
+/**
+ *option yang perlu di pass saat membuat chart
+ *
+ */
+
 import merge from 'lodash/merge';
 // @mui
 import { useTheme, alpha } from '@mui/material/styles';
 
 // ----------------------------------------------------------------------
-
 export default function useChart(options: any) {
   const theme = useTheme();
 

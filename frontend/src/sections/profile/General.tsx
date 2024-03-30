@@ -36,7 +36,7 @@ export default function General(){
         <Card sx={{height:500}}>
           <Stack direction="column" justifyContent="center" alignItems="center" spacing={2} sx={{ width: 1, height: "100%" }}>
             <input accept='image/*' type='file' style={{display:'none'}} ref={fileInputRef} tabIndex={-1} />
-            <ProfilePicUpload onClick={handleClick} imageUrl='/avatar/default-male.png' />
+            <ProfilePicUpload onClick={handleClick} imageUrl='/avatar/default-female.png' />
 
             <Stack direction="column"justifyContent="center"alignItems="center">
               <Typography variant='body2' color={theme.palette.text.disabled}>

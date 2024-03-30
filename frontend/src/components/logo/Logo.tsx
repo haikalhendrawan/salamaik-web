@@ -1,3 +1,8 @@
+/**
+ * component untuk logo kiri atas
+ * 
+ */
+
 import { forwardRef } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 // @mui

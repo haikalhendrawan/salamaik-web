@@ -1,3 +1,9 @@
+/**
+ * bukan scroll to top button
+ * utk mencegah not scroll to top saat navigasi antar page
+ * utk scroll to top button di component scrollToTopButton
+ */
+
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 

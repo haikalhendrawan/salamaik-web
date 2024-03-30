@@ -14,7 +14,7 @@ import ProfilePage from "./pages/ProfilePage";
 
 // admin
 import UserRef from "./pages/admin/UserRef";
-import WorksheetRef from "./pages/admin/WorksheetRef";
+import WorksheetRefPage from "./pages/admin/WorksheetRefPage";
 
 // ----------------------------------------------------
 
@@ -35,7 +35,7 @@ export default function Router() {
     {/* <Route element={<PersistLogin/>}> */}
       <Route path="/admin" element={<RequireAuthLayout allowedRoles={[1]}/> }>
         <Route path="user" element={<UserRef />} />
-        <Route path='worksheet' element={<WorksheetRef />} />
+        <Route path='worksheet' element={<WorksheetRefPage />} />
       </Route>
     {/* </Route> */}
 

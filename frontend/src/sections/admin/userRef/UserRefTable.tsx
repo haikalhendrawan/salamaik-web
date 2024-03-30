@@ -43,7 +43,6 @@ users: any[]
 }
 
 export default function UserRefTable({users}: UserRefTableProps) {
-  
   const [open, setOpen] = useState<HTMLButtonElement | null>(null);
 
   const [page, setPage] = useState<number>(0);

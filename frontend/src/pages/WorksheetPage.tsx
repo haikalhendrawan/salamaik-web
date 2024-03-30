@@ -32,10 +32,9 @@ export default function WorksheetPage() {
           <Stack direction="row" alignItems="center" justifyContent="center " mb={5} >
             <Tabs value={tabValue} onChange={handleTabChange}> 
               <Tab icon={<Iconify icon="lucide:briefcase-business" />} label="Treasurer" value={0} />
-              <Tab icon={<Iconify icon="lucide:castle" />} label="PF, RKKD, SM " value={1} />
+              <Tab icon={<Iconify icon="lucide:castle" />} label="PF, RKKD, SM" value={1} />
               <Tab icon={<Iconify icon="lucide:badge-dollar-sign" />} label="Financial Advisor" value={2} />
               <Tab icon={<Iconify icon="lucide:tower-control" />} label="Tata Kelola Internal" value={3} />
-              {/* <Tab icon={<Iconify icon="material-symbols:send" />} label="Kirim" value={4} /> */}
             </Tabs>
           </Stack>
 
@@ -63,9 +62,9 @@ export default function WorksheetPage() {
                   description={`Berdasarkan data Satker yang belum merealisasikan anggarannya mendekati akhir bulan, Melakukan konfirmasi kepada KPPN terkait upaya pencegahan deviasi tersebut
                   <br/><br/>
                   <b>-Nilai 10</b>:  apabila ada upaya peminimalisiran atas deviasi (misal surat pemberitahuan ke Satker, rekapitulasi monitoring realisasi anggaran di tiap bulan atau
-                    dilakukannya bimbingan/konsultasi kepada satker, dan ada dokumen pembuktian/pendukung yang jelas) <br/>
-                    <b>-Nilai 5</b>: apabila ada upaya peminimalisiran deviasi, namun tidak ditemukan dokumen pembuktian/pendukung<br/>
-                    <b>-Nilai 0</b>: Tidak ada keterangan dari KPPN yang mampu menunjukan upaya peminimalisiran<br/>`}
+                    dilakukannya bimbingan/konsultasi kepada satker, dan ada dokumen pembuktian/pendukung yang jelas) <br/> <br/>
+                    <b>-Nilai 5</b>: apabila ada upaya peminimalisiran deviasi, namun tidak ditemukan dokumen pembuktian/pendukung<br/> <br/>
+                    <b>-Nilai 0</b>: Tidak ada keterangan dari KPPN yang mampu menunjukan upaya peminimalisiran<br/> <br/>`}
                   num={1}
                   dateUpdated={new Date()}
                 />

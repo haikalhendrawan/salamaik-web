@@ -1,3 +1,8 @@
+/**
+ * simple scrollbar utk div yang terlalu panjang
+ */
+
+
 import { memo, ReactNode } from 'react';
 // @mui
 import { Box, SxProps } from '@mui/material';

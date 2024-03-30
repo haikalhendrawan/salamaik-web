@@ -43,16 +43,16 @@
   // ------------------------------------------------------------
   function WorksheetCard(props: WorksheetCardProps) {
     const theme = useTheme();
+
     const [value, setValue] = useState<string>('');
+
     const [selectValue, setSelectValue] = useState<number>(0);
+
     const [selectValue2, setSelectValue2] = useState<number>(1);
-
-
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       setValue(event.target.value)
     }
-
 
     return(
         <Grid item xs={12} sm={12} md={12}>

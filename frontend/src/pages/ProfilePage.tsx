@@ -1,9 +1,16 @@
+/**
+ * @Section param
+ * 0: general tab
+ * 1: security tab
+ * 2: stats tab
+ */
+
 import { Helmet } from 'react-helmet-async';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Iconify from '../components/iconify/Iconify';
 // @mui
-import { Container, Stack, Typography, Box, Avatar,  Grid, IconButton, Card} from '@mui/material';
+import { Container, Stack, Typography, Box, Avatar, Grid, IconButton, Card} from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 //sections
 import ProfileTab from '../sections/profile/ProfileTab';
@@ -11,29 +18,22 @@ import General from '../sections/profile/General';
 import Security from '../sections/profile/Security';
 import Stats from '../sections/profile/Stats';
 // ----------------------------------------------------
-
-interface SelectSection{
-  0:JSX.Element,
-  1:JSX.Element,
-  2:JSX.Element
-}
-
-const selectSection:SelectSection = {
-  0:<General />,
-  1:<Security />,
-  2:<Stats />
-}
-
 export default function ProfilePage(){
   const theme = useTheme();
 
   const navigate = useNavigate();
 
-  const [tabValue, setTabValue] = useState<keyof SelectSection>(0);
+  const [tabValue, setTabValue] = useState< 0 | 1| 2 >(0);
 
   const handleBack = () => {
     navigate(-1)
   };
+
+  const SELECT_SECTION: JSX.Element[] = [
+    <General />,
+    <Security />,
+    <Stats />
+  ];
 
   return (
     <>
@@ -58,7 +58,7 @@ export default function ProfilePage(){
         </Stack>
 
         <Grid container spacing={2} >
-          {selectSection[tabValue]}
+          {SELECT_SECTION[tabValue]}
         </Grid>
 
       </Container>

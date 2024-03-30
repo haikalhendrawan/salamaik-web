@@ -33,7 +33,7 @@ export default function ThemeProvider({ children }:ThemeProvider) {
       shape: { borderRadius: 6 },
       typography,
       shadows: shadows(),
-      customShadows: customShadows()
+      customShadows: customShadows(),
     }),[mode, primaryColor]
   ) as CustomThemeOptions;
 

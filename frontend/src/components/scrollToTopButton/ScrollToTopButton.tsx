@@ -1,9 +1,11 @@
+/**
+ * Komponen utk scroll to top
+ */
+
 import {useCallback} from "react";
 import {Box, Fab, useScrollTrigger, Zoom, Tooltip} from "@mui/material";
 import Iconify from "../iconify";
 // --------------------------------------------------------------------
-
-
 export default function ScrollToTopButton(){
 
   const trigger = useScrollTrigger({

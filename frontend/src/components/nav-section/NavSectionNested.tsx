@@ -1,3 +1,8 @@
+/**
+ * gabungan menu dan header
+ * ex: header Supervisi KPPN with dropdown
+ */
+
 import {useState} from "react";
 import { NavLink as RouterLink } from 'react-router-dom';
 // @mui

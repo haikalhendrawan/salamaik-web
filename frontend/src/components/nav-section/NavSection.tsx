@@ -1,3 +1,8 @@
+/**
+ * gabungan menu dan header
+ * ex: header Supervisi KPPN with multiple menu
+ */
+
 import PropTypes from 'prop-types';
 import { NavLink as RouterLink } from 'react-router-dom';
 // @mui

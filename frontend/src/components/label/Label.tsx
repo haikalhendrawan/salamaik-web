@@ -1,3 +1,9 @@
+/**
+ *component label atau chip. Usually digunakan utk show status active or not
+ *
+ */
+
+
 import { forwardRef, ReactNode } from 'react';
 // @mui
 import { ThemeOptions, SxProps, useTheme } from '@mui/material/styles';
@@ -15,6 +21,7 @@ interface Label{
   variant?: string,
   color?: string,
 }
+
 const Label = forwardRef(({ children, color = 'default', variant = 'soft', startIcon, endIcon, sx, ...other }:Label, ref) => {
   const theme = useTheme() as any;
 

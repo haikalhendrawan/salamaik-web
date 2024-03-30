@@ -16,6 +16,7 @@ export default function ProfileTab({tabValue, setTabValue}: ProfileTabProps){
   const handleTabChange = (event: React.SyntheticEvent, newValue: 0 | 1) => { // setiap tab komponen berubah
     setTabValue(newValue);
   };
+  
   return(
     <Box sx={{ width: '100%', height:'50px' }}>
       <Tabs 

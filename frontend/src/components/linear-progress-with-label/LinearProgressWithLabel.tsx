@@ -1,3 +1,9 @@
+/**
+ * component progress bar dengan label % 
+ * utk nunjukin progress pengisian kertas kerja
+ */
+
+
 import {Tooltip, Box, LinearProgress, Typography} from '@mui/material';
 
 

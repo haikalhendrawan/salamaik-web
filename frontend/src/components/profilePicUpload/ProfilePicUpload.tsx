@@ -1,8 +1,11 @@
+/**
+ * Komponen buat upload profile picture
+ * bentuk box yang clickable. Utk hidden input perlu dibuat manual diluar komponen
+ */
+
 import { Stack, Typography, Box, FormControl,  Grid, IconButton, Card, TextField, Button, Slide, Grow} from '@mui/material';
 import { useTheme, styled } from '@mui/material/styles';
 import Iconify from '../iconify/Iconify';
-
-
 // ----------------------------------------------------------------
 const ImageBox = styled(Box)(({ theme }) => ({
   borderRadius:'50%', 

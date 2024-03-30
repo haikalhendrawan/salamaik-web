@@ -1,3 +1,8 @@
+/**
+ *component icon. perlu specify height scr manual
+ *
+ */
+
 import { forwardRef } from 'react';
 // icons
 import { Icon } from '@iconify/react';

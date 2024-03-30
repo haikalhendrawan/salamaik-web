@@ -1,3 +1,8 @@
+/**
+ * Komponen digunakan utk show icon, tapi from local files bukan melalui iconify
+ * lebih cepet load, but perlu download icon satu2
+ */
+
 import { forwardRef, ReactNode } from 'react';
 // @mui
 import { Box } from '@mui/material';

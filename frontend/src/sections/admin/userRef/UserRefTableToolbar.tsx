@@ -1,11 +1,11 @@
 import React, {useState, useEffect} from 'react';
-import PropTypes from 'prop-types';
 // @mui
 import { styled, alpha, useTheme } from '@mui/material/styles';
-import { Toolbar, Tabs, Tab, OutlinedInput, InputAdornment, FormControl, InputLabel, MenuItem, Stack } from '@mui/material';
+import { Toolbar, Tabs, Tab, OutlinedInput, InputAdornment, FormControl, InputLabel, MenuItem, Stack,} from '@mui/material';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 // component
 import Iconify from '../../../components/iconify';
+import Label from '../../../components/label';
 
 // ----------------------------------------------------------------------
 
@@ -75,52 +75,90 @@ const selectItem: SelectItemType[] = [
 
 export default function UserRefTableToolbar({filterName, onFilterName, onFilterStatus, filterStatus}: UserRefTableToolbarProps) {
   const [open, setOpen] = useState(false); // open dan close filter icon
+
   const theme = useTheme();
 
-
   const filterUnit = useState(null);
+
+  const [tabValue, setTabValue] = useState(0);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     setOpen(prev => !prev);
   };
 
+  const handleTabChange = (event: React.SyntheticEvent, newValue: 0 | 1) => { // setiap tab komponen berubah
+    setTabValue(newValue);
+  };
+
   return (
-    <StyledRoot
-      onClick={()=>{setOpen(false)}}
-    >
-
-      <Stack direction="row" spacing={2}>
-        <FormControl sx={{ m: 1, minWidth: 120 }}>
-          <InputLabel id="unit-select-label" sx={{typography:'body2'}}>Unit</InputLabel>
-          <Select 
-            labelId="unit-select-label" 
-            id="unit-select" 
-            sx={{width:'200px', typography:'body2'}} 
-            label="status" 
-            onChange={onFilterStatus}
-            onClick={(event)=>{event.stopPropagation()}}
-            MenuProps={MenuProps}
-            >
-              <MenuItem sx={{typography:'body2', color:theme.palette.primary.main}} onClick={(event)=>{event.stopPropagation()}} value={0}>All Unit</MenuItem>
-              {selectItem.map((item, index) => {
-                return(<MenuItem key={index} onClick={(event)=>{event.stopPropagation()}} sx={{typography:'body2'}} value={item.value}>{item.unit}</MenuItem>)
-              })}
-          </Select>
-        </FormControl>
-
-        <StyledSearch
-          placeholder="Search user..."
-          startAdornment={
-            <InputAdornment position="start">
-              <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled', width: 20, height: 20 }} />
-            </InputAdornment>
-          }
+    <>
+      <Tabs 
+        value={tabValue} 
+        onChange={handleTabChange} 
+        sx={{
+          "& button.Mui-selected": { color: theme.palette.text.primary },
+          "& .MuiTabs-flexContainer": {height:'48px',width:'721px'},
+          "& button.MuiTab-root": {minHeight: 30},
+        }}
+        TabIndicatorProps={{ sx: {bgcolor: theme.palette.text.primary}}}
+      > 
+        <Tab 
+          icon={<Label sx={{color: theme.palette.text.primary, cursor:'pointer'}}>20</Label>} 
+          label="All" 
+          iconPosition="end"  
+          value={0} 
         />
+        <Tab 
+          icon={<Label color={'success'} sx={{cursor:'pointer'}}>10</Label>} 
+          label="Active" 
+          iconPosition="end"  
+          value={1} 
+        />
+        <Tab 
+          icon={<Label color={'error'} sx={{cursor:'pointer'}}>5</Label>} 
+          label="Inactive" 
+          iconPosition="end"  
+          value={2} 
+        />
+      </Tabs>
 
-      </Stack>
-      
-    </StyledRoot>
+
+      <StyledRoot
+        onClick={()=>{setOpen(false)}}
+      >
+        <Stack direction="row" spacing={2}>
+          <FormControl sx={{ m: 1, minWidth: 120 }}>
+            <InputLabel id="unit-select-label" sx={{typography:'body2'}}>Unit</InputLabel>
+            <Select 
+              labelId="unit-select-label" 
+              id="unit-select" 
+              sx={{width:'200px', typography:'body2'}} 
+              label="status" 
+              onChange={onFilterStatus}
+              onClick={(event)=>{event.stopPropagation()}}
+              MenuProps={MenuProps}
+              >
+                <MenuItem sx={{typography:'body2', color:theme.palette.primary.main}} onClick={(event)=>{event.stopPropagation()}} value={0}>All Unit</MenuItem>
+                {selectItem.map((item, index) => {
+                  return(<MenuItem key={index} onClick={(event)=>{event.stopPropagation()}} sx={{typography:'body2'}} value={item.value}>{item.unit}</MenuItem>)
+                })}
+            </Select>
+          </FormControl>
+
+          <StyledSearch
+            placeholder="Search user..."
+            startAdornment={
+              <InputAdornment position="start">
+                <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled', width: 20, height: 20 }} />
+              </InputAdornment>
+            }
+          />
+
+        </Stack>
+        
+      </StyledRoot>
+    </>
   );
 }
 

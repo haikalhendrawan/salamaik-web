@@ -1,8 +1,15 @@
+/**
+ * styling MUI text field
+ * ganti ukuran label, dan input
+ * ganti border size
+ * always spellcheck false, krn gatau knp localization MUI not working (TODO)
+ */
+
 import {TextField} from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 
- const StyledTextField = styled(TextField)(({theme}) => ({
+const StyledText = styled(TextField)(({theme}) => ({
   typography:'body2',
   '& .MuiInputBase-input': {
     fontSize: 14,
@@ -18,4 +25,9 @@ import { styled } from '@mui/material/styles';
   }
 }));
 
-export default StyledTextField 
+
+export default function StyledTextField({...props}) {
+  return (
+    <StyledText inputProps={{spellCheck:'false'}} {...props} />
+  )
+}
