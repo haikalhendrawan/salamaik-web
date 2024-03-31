@@ -29,9 +29,11 @@ export default function UserRef () {
           </Button>
         </Stack>
 
-        {/* Table here */}
+        
         <UserRefTable users={users} />
+
         <UserRefAddModal modalOpen={modalOpen} modalClose={handleClose} />
+        
         {/* <UserRefEditModal modalOpen={modalOpen} modalClose={handleClose} /> */}
       
       </Container>

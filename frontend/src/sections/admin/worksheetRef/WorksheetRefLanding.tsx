@@ -63,7 +63,7 @@ export default function WorksheetRefLanding({changeSection}: WorksheetRefLanding
       <Slide direction="right" in mountOnEnter unmountOnExit>
         <Card sx={{minHeight:480, display:'flex', flexDirection:'column', gap:theme.spacing(1)}}>
           <div>
-            <Grid container xs={12} sm={12} md={12} spacing={2} direction='row' alignItems='start' justifyContent='center' sx={{height:'40%', p:3, pb:0}}>
+            <Grid container spacing={2} direction='row' alignItems='start' justifyContent='center' sx={{height:'40%', p:3, pb:0}}>
               <Grid item xs={6} sm={4} md={4}>
                 <Typography variant='h6'>Dasar Hukum</Typography>
                 <Typography variant='body3'>Referensi dasar hukum pembinaan</Typography>
@@ -158,7 +158,7 @@ export default function WorksheetRefLanding({changeSection}: WorksheetRefLanding
           </div>
 
           <div>
-            <Grid container xs={12} sm={12} md={12} spacing={2} direction='row' alignItems='start' justifyContent='center' sx={{height:'40%', p:3, pb:0}}>
+            <Grid container spacing={2} direction='row' alignItems='start' justifyContent='center' sx={{height:'40%', p:3, pb:0}}>
               <Grid item xs={6} sm={4} md={4}>
                 <Typography variant='h6'>Kertas Kerja</Typography>
                 <Typography variant='body3'>Atur referensi Kertas Kerja seperti jenis pertanyaan, dokumen, kriteria nilai, dll.</Typography>
@@ -232,7 +232,7 @@ export default function WorksheetRefLanding({changeSection}: WorksheetRefLanding
           </div>
 
           <div>
-            <Grid container xs={12} sm={12} md={12} spacing={2} direction='row' alignItems='start' justifyContent='center' sx={{height:'40%', p:3,mb:3}}>
+            <Grid container spacing={2} direction='row' alignItems='start' justifyContent='center' sx={{height:'40%', p:3,mb:3}}>
               <Grid item xs={6} sm={4} md={4}>
                 <Typography variant='h6'>Periode</Typography>
                 <Typography variant='body3'>Atur periodisasi kertas kerja, time period pembinaan, dll.</Typography>

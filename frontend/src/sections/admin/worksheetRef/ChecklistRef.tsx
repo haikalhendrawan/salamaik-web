@@ -6,9 +6,11 @@ import Iconify from '../../../components/iconify';
 import StyledTextField from '../../../components/styledTextField/StyledTextField';
 //----------------------------------------------------
 interface ChecklistRefProps {
-  changeSection: (section: number) => void;
+  section: number,
+  addState: boolean,
+  resetAddState: () => void,
 }
-export default function ChecklistRef({changeSection}: ChecklistRefProps) {
+export default function ChecklistRef({section, addState, resetAddState}: ChecklistRefProps) {
   const theme = useTheme();
 
   return (

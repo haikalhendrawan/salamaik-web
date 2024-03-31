@@ -6,9 +6,11 @@ import Iconify from '../../../components/iconify';
 import StyledTextField from '../../../components/styledTextField/StyledTextField';
 //----------------------------------------------------
 interface PeriodRefProps {
-  changeSection: (section: number) => void;
+  section: number,
+  addState: boolean,
+  resetAddState: () => void,
 }
-export default function PeriodRef({changeSection}: PeriodRefProps) {
+export default function PeriodRef({section, addState, resetAddState}: PeriodRefProps) {
   const theme = useTheme();
 
   return (

@@ -9,12 +9,11 @@
  * 6: periode
  */
 
-import {useState, useRef} from'react';
+import {useState, useEffect} from'react';
 import {Container, Stack, Button, Box, Typography, Grid, Slide, Card, 
           FormControl, Tooltip, IconButton, Breadcrumbs, Link} from '@mui/material';
 import { useTheme, styled } from '@mui/material/styles';
 import Iconify from '../../components/iconify';
-import ScrollToTop from '../../components/scroll-to-top/ScrollToTop';
 import WorksheetRefLanding from "../../sections/admin/worksheetRef/WorksheetRefLanding";
 import ChecklistRef from '../../sections/admin/worksheetRef/ChecklistRef';
 import KomponenRef from '../../sections/admin/worksheetRef/KomponenRef';
@@ -29,6 +28,12 @@ export default function WorksheetRefPage() {
 
   const [section, setSection] = useState<number>(0);
 
+  const [addState, setAddState] = useState<boolean>(false); // utk add modal
+
+  const resetAddState = () => {
+    setAddState(false);
+  };
+
   const handleChangeSection = (section: number) => {
     setSection(section);
     window.scrollTo(0, 0); // agar scroll ke atas setiap change section
@@ -36,12 +41,12 @@ export default function WorksheetRefPage() {
 
   const SELECT_SECTION: JSX.Element[] = [
     <WorksheetRefLanding changeSection={handleChangeSection} />,
-    <ChecklistRef changeSection={handleChangeSection} />,
-    <KomponenRef changeSection={handleChangeSection} />,
-    <SubKomponenRef changeSection={handleChangeSection} />,
-    <SubSubKomponenRef changeSection={handleChangeSection} />,
-    <BatchRef changeSection={handleChangeSection} />,
-    <PeriodRef changeSection={handleChangeSection} />,
+    <ChecklistRef section={section} addState={addState} resetAddState={resetAddState} />,
+    <KomponenRef section={section} addState={addState} resetAddState={resetAddState} />,
+    <SubKomponenRef section={section} addState={addState} resetAddState={resetAddState} />,
+    <SubSubKomponenRef section={section} addState={addState} resetAddState={resetAddState} />,
+    <BatchRef section={section} addState={addState} resetAddState={resetAddState} />,
+    <PeriodRef section={section} addState={addState} resetAddState={resetAddState} />,
   ];
 
   const SECTION_NAME: string[] = [
@@ -54,12 +59,16 @@ export default function WorksheetRefPage() {
     'Periode',
   ];
 
+
   return (
     <>
       <Container maxWidth="xl">
         <Stack direction="column" justifyContent="space-between" sx={{mb: 5}}>
           <Stack direction='row' spacing={1} alignItems="center">
-            <IconButton sx={{display:section===0?'none':'flex'}} onClick={() => handleChangeSection(0)}>
+            <IconButton 
+              sx={{display:section===0?'none':'flex'}} 
+              onClick={() => handleChangeSection(0)}
+            >
               <Iconify icon={"eva:arrow-ios-back-outline"} />
             </IconButton> 
             <Typography variant="h4" gutterBottom>
@@ -70,7 +79,12 @@ export default function WorksheetRefPage() {
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{display:section===0?'none':'flex'}}>
             <Stack direction='row' spacing={2} sx={{ml:6}}>
               <Breadcrumbs aria-label="breadcrumb">
-                <Link underline="hover" color="inherit" sx={{cursor:'pointer'}} onClick={() => handleChangeSection(0)}>
+                <Link 
+                  underline="hover" 
+                  color="inherit" 
+                  sx={{cursor:'pointer'}} 
+                  onClick={() => handleChangeSection(0)}
+                >
                   Ref Kertas Kerja
                 </Link>
                 <Typography color="text.primary">
@@ -78,7 +92,11 @@ export default function WorksheetRefPage() {
                 </Typography>
               </Breadcrumbs>
             </Stack>
-              <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} disabled>
+              <Button 
+                variant="contained" 
+                startIcon={<Iconify icon="eva:plus-fill" />} 
+                onClick={() => setAddState(true)}
+                >
                 Add
               </Button>
           </Stack>

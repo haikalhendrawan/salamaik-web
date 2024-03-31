@@ -6,9 +6,11 @@ import Iconify from '../../../components/iconify';
 import StyledTextField from '../../../components/styledTextField/StyledTextField';
 //----------------------------------------------------
 interface BatchRefProps {
-  changeSection: (section: number) => void;
+  section: number,
+  addState: boolean,
+  resetAddState: () => void,
 }
-export default function BatchRef({changeSection}: BatchRefProps) {
+export default function BatchRef({section, addState, resetAddState}: BatchRefProps) {
   const theme = useTheme();
 
   return (

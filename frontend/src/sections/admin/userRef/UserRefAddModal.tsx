@@ -77,37 +77,37 @@ export default function UserRefAddModal({modalOpen, modalClose}: UserRefEditModa
                   </Grid>
 
                   <Grid item xs={12} sm={6} md={8}>
-                      <UserDataContainer>
-                        <Stack direction='row' spacing={2} sx={{width:'100%'}} justifyContent={'center'}>
-                          <Stack direction='column' spacing={3} sx={{width:'45%'}}>
-                            <FormControl>
-                              <StyledTextField name="name" label="Nama Pegawai" />
-                            </FormControl>
-                            <FormControl>
-                              <StyledTextField name="email" label="Email"  />
-                            </FormControl>
-                            <FormControl>
-                              <StyledTextField name="role" label="Role"  />
-                            </FormControl>
-                          </Stack>
-                          <Stack direction='column' spacing={3} sx={{width:'45%'}}>
-                            <FormControl>
-                              <StyledTextField name="nip" label="NIP"  />
-                            </FormControl>
-                            <FormControl>
-                              <StyledTextField name="unit" label="Unit" />
-                            </FormControl>
-                            <FormControl>
-                              <StyledTextField name="gender" label="Gender" />
-                            </FormControl>
-                          </Stack>
+                    <UserDataContainer>
+                      <Stack direction='row' spacing={2} sx={{width:'100%'}} justifyContent={'center'}>
+                        <Stack direction='column' spacing={3} sx={{width:'45%'}}>
+                          <FormControl>
+                            <StyledTextField name="name" label="Nama Pegawai" />
+                          </FormControl>
+                          <FormControl>
+                            <StyledTextField name="email" label="Email"  />
+                          </FormControl>
+                          <FormControl>
+                            <StyledTextField name="role" label="Role"  />
+                          </FormControl>
                         </Stack>
+                        <Stack direction='column' spacing={3} sx={{width:'45%'}}>
+                          <FormControl>
+                            <StyledTextField name="nip" label="NIP"  />
+                          </FormControl>
+                          <FormControl>
+                            <StyledTextField name="unit" label="Unit" />
+                          </FormControl>
+                          <FormControl>
+                            <StyledTextField name="gender" label="Gender" />
+                          </FormControl>
+                        </Stack>
+                      </Stack>
 
-                        <Stack sx={{width:'100%', pr:3, mt:1}} direction='row' spacing={2} flex={'row'} justifyContent={'end'}>
-                          <Button variant='contained' sx={{borderRadius:'8px'}}>Save Changes</Button>
-                          <Button variant='contained' sx={{borderRadius:'8px', backgroundColor:theme.palette.common.white, color:theme.palette.common.black}}>Reset</Button>
-                        </Stack>
-                      </UserDataContainer>
+                      <Stack sx={{width:'100%', pr:3, mt:1}} direction='row' spacing={2} flex={'row'} justifyContent={'end'}>
+                        <Button variant='contained' sx={{borderRadius:'8px'}}>Save Changes</Button>
+                        <Button variant='contained' sx={{borderRadius:'8px', backgroundColor:theme.palette.common.white, color:theme.palette.common.black}}>Reset</Button>
+                      </Stack>
+                    </UserDataContainer>
                   </Grid>
                 </Grid>  
                 

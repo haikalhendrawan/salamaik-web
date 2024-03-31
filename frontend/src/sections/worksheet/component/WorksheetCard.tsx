@@ -26,7 +26,6 @@
       width: 1,
       });
 
-
   interface WorksheetCardProps{
     id: number,
     title: string,
@@ -113,7 +112,16 @@
 
                     <Grid item xs={3.5}>  
                         <FormControl sx={{width:'100%', height:'100%'}}>
-                          <TextField name="catatankppn" size='small' value={value} onChange={handleChange} multiline minRows={4} maxRows={4}  inputProps={{sx: {fontSize: 12}, spellCheck: false,}} />
+                          <TextField 
+                            name="catatankppn" 
+                            size='small' 
+                            value={value} 
+                            onChange={handleChange} 
+                            multiline 
+                            minRows={4} 
+                            maxRows={4}  
+                            inputProps={{sx: {fontSize: 12}, spellCheck: false,}} 
+                          />
                         </FormControl>
                     </Grid>
                 </Grid>
