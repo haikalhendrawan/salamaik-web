@@ -6,18 +6,8 @@ import Iconify from '../../../components/iconify';
 import Label from '../../../components/label';
 import Scrollbar from '../../../components/scrollbar';
 import StyledTextField from '../../../components/styledTextField/StyledTextField';
+import StyledButton from '../../../components/styledButton/StyledButton';
 // ---------------------------------------------------
-const StyledButton = styled(Button)(({ theme }) => ({
-  display: 'inline-flex',   
-  alignItems: 'center', 
-  justifyContent: 'center', 
-  paddingRight: 0,
-  paddingLeft: 0,
-  minHeight: '30px',
-  minWidth: '30px',
-  borderRadius: '12px',
-}));  
-
 const TABLE_HEAD = [
   { id: 'id', label: 'Id', alignRight: false },
   { id: 'komponen', label: 'Nama Komponen', alignRight: false },
