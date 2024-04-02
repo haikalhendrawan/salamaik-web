@@ -154,7 +154,7 @@ const style = {
   borderRadius:'12px',
 };
 
-const UserDataContainer = styled(Box)(({theme}) => ({
+const FormDataContainer = styled(Box)(({theme}) => ({
 height:'100%',
 display: 'flex', 
 flexDirection:'column', 
@@ -240,7 +240,7 @@ function KomponenRefModal({modalOpen, modalClose, addState, editID, data}: Kompo
                 Komponen
               </Typography>
 
-                  <UserDataContainer>
+                  <FormDataContainer>
                     <Stack direction='row' spacing={2} sx={{width:'100%'}} justifyContent={'start'}>
                       <Stack direction='column' spacing={3} sx={{width:'45%'}}>
                         <FormControl>
@@ -283,7 +283,7 @@ function KomponenRefModal({modalOpen, modalClose, addState, editID, data}: Kompo
                         Reset
                       </Button>
                     </Stack>
-                  </UserDataContainer>
+                  </FormDataContainer>
 
             </Paper>
           </Scrollbar>

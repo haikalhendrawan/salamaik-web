@@ -1,14 +1,10 @@
 import {useState, useEffect, useRef} from'react';
-import {Stack, Button, Box, Typography, Table, Card, Modal, FormControl, Paper, InputLabel, TableSortLabel,
-  Tooltip, TableHead, Grow, TableBody, TableRow, TableCell, Select, MenuItem, Tabs, Tab, TableContainer} from '@mui/material';
+import { Card,  Grow, Tabs, Tab} from '@mui/material';
 import { useTheme, styled } from '@mui/material/styles';
-import Iconify from '../../../../components/iconify';
 import Label from '../../../../components/label';
-import Scrollbar from '../../../../components/scrollbar';
-import StyledTextField from '../../../../components/styledTextField/StyledTextField';
-import StyledButton from '../../../../components/styledButton/StyledButton';
 import ChecklistRefTable from './ChecklistRefTable';
 import ChecklistRefModal from './ChecklistRefModal';
+import ChecklistFileModal from './ChecklistFileModal';
 //----------------------------------------------------
 interface ChecklistData{
   id: number,
@@ -39,18 +35,30 @@ export default function ChecklistRef({section, addState, resetAddState}: Checkli
 
   const [open, setOpen] = useState<boolean>(false); // for edit modal
 
-  const [editID, setEditID] = useState<number | null>(null);
+  const [editID, setEditID] = useState<number | null>(null); // for edit modal
+
+  const [openFile, setOpenFile] = useState<boolean>(false); // for preview file modal
+
+  const [file, setFile] = useState<string | undefined>(''); // for preview file modal
 
   const [tabValue, setTabValue] = useState(0);
 
-  const handleOpen = (id: number) => {
+  const handleOpen = (id: number) => { // for edit modal
     setOpen(true);
     setEditID(id);
   };
 
-  const handleClose = () => {
+  const handleClose = () => { // for edit modal
     setOpen(false);
     resetAddState();
+  };
+
+  const handleOpenFile = () => {
+    setOpenFile(true);
+  };
+
+  const handleCloseFile = () => {
+    setOpenFile(false)
   };
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: 0 | 1) => { // setiap tab komponen berubah
@@ -116,6 +124,7 @@ export default function ChecklistRef({section, addState, resetAddState}: Checkli
           <ChecklistRefTable 
             tableData={TABLE_DATA}
             handleOpen={handleOpen}
+            fileOpen={handleOpenFile}
           />
         </Card>
       </Grow>
@@ -127,6 +136,12 @@ export default function ChecklistRef({section, addState, resetAddState}: Checkli
         editID={editID}
         data={TABLE_DATA}
       /> 
+
+      <ChecklistFileModal
+        open={openFile}
+        modalClose={handleCloseFile}
+        file={'https://jdih.kemenkeu.go.id/download/a321969c-4ce0-4073-81ce-df35023750b1/PER_1_PB_2023-Perubahan%20Atas%20PERDIRJEN%20No.PER-24_PB_2019%20tentang%20Pedoman%20Pembinaan%20&%20Supervisi%20Pelaksanaan%20Tugas%20KPPN.pdf'}
+      />
     </>
   )
 }

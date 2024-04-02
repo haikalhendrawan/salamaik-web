@@ -156,7 +156,7 @@ const style = {
   borderRadius:'12px',
 };
 
-const UserDataContainer = styled(Box)(({theme}) => ({
+const FormDataContainer = styled(Box)(({theme}) => ({
 height:'100%',
 display: 'flex', 
 flexDirection:'column', 
@@ -247,7 +247,7 @@ function SubSubKomponenRefModal({modalOpen, modalClose, addState, editID, data}:
                 Sub Komponen
               </Typography>
 
-                  <UserDataContainer>
+                  <FormDataContainer>
                     <Stack direction='row' spacing={2} sx={{width:'100%'}} justifyContent={'start'}>
                       <Stack direction='column' spacing={3} sx={{width:'45%'}}>
                         <FormControl>
@@ -313,7 +313,7 @@ function SubSubKomponenRefModal({modalOpen, modalClose, addState, editID, data}:
                         Reset
                       </Button>
                     </Stack>
-                  </UserDataContainer>
+                  </FormDataContainer>
 
             </Paper>
           </Scrollbar>

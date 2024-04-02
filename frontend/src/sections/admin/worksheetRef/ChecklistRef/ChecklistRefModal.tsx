@@ -21,7 +21,7 @@ const style = {
   borderRadius:'12px',
 };
 
-const UserDataContainer = styled(Box)(({theme}) => ({
+const FormDataContainer = styled(Box)(({theme}) => ({
   height:'100%',
   display: 'flex', 
   flexDirection:'column', 
@@ -138,8 +138,8 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
                 Checklist
               </Typography>
 
-                  <UserDataContainer>
-                    <Stack direction='row' spacing={2} sx={{width:'100%'}} justifyContent={'start'}>
+                  <FormDataContainer>
+                    <Stack direction='row' spacing={2} sx={{width:'100%'}} justifyContent={'center'}>
                       <Stack direction='column' spacing={3} sx={{width:'45%'}}>
                         <FormControl>
                           <StyledTextField 
@@ -148,49 +148,6 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
                             multiline
                             minRows={2}
                             value={ addState? addValue.checklist : editValue.checklist}
-                            onChange={addState? handleChangeAdd : handleChangeEdit}
-                          />
-                        </FormControl>
-                        
-                        <FormControl>
-                          <InputLabel id="standardisasi-kppn-label" sx={{typography:'body2'}}>Standardisasi KPPN</InputLabel>
-                          <Select 
-                            name="standardisasiKPPN" 
-                            label='Standardisasi KPPN'
-                            labelId="standardisasi-kppn-label"
-                            value={addState? addValue.standardisasiKPPN : editValue.standardisasiKPPN}
-                            sx={{typography:'body2', fontSize:14, height:'100%'}}
-                          >
-                            <MenuItem key={0} sx={{fontSize:14}} value={0}>Ya</MenuItem>
-                            <MenuItem key={1} sx={{fontSize:14}} value={1}>Tidak</MenuItem>
-                          </Select>
-                        </FormControl>
-
-                        <FormControl>
-                          <InputLabel id="subkomponen-select-label" sx={{typography:'body2'}}>Sub Komponen</InputLabel>
-                          <Select 
-                            name="subkomponen" 
-                            label='Sub Komponen'
-                            labelId="subkomponen-select-label"
-                            value={addState? addValue.subkomponen : editValue.subkomponen}
-                            sx={{typography:'body2', fontSize:14, height:'100%'}}
-                          >
-                            <MenuItem key={0} sx={{fontSize:14}} value={0}>Sub Komponen A</MenuItem>
-                            <MenuItem key={1} sx={{fontSize:14}} value={1}>Sub Komponen B</MenuItem>
-                            <MenuItem key={2} sx={{fontSize:14}} value={2}>Sub Komponen C</MenuItem>
-                            <MenuItem key={3} sx={{fontSize:14}} value={3}>Sub Komponen D</MenuItem>
-                          </Select>
-                        </FormControl>
-
-                      </Stack>
-                      <Stack direction='column' spacing={3} sx={{width:'45%'}}>
-                        <FormControl>
-                          <StyledTextField 
-                            name="kriteria" 
-                            label="Header Kriteria"
-                            multiline
-                            minRows={2}
-                            value={ addState? addValue.kriteria : editValue.kriteria}
                             onChange={addState? handleChangeAdd : handleChangeEdit}
                           />
                         </FormControl>
@@ -210,7 +167,7 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
                             <MenuItem key={3} sx={{fontSize:14}} value={3}>Tata Kelola Internal</MenuItem>
                           </Select>
                         </FormControl>
-                       
+
                         <FormControl>
                           <InputLabel id="subkomponen-select-label" sx={{typography:'body2'}}>Sub Sub Komponen</InputLabel>
                           <Select 
@@ -224,6 +181,49 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
                             <MenuItem key={1} sx={{fontSize:14}} value={1}>Sub Sub Komponen B</MenuItem>
                             <MenuItem key={2} sx={{fontSize:14}} value={2}>Sub Sub Komponen C</MenuItem>
                             <MenuItem key={3} sx={{fontSize:14}} value={3}>Sub Sub Komponen D</MenuItem>
+                          </Select>
+                        </FormControl>
+
+                      </Stack>
+                      <Stack direction='column' spacing={3} sx={{width:'45%'}}>
+                        <FormControl>
+                          <StyledTextField 
+                            name="kriteria" 
+                            label="Header Kriteria"
+                            multiline
+                            minRows={2}
+                            value={ addState? addValue.kriteria : editValue.kriteria}
+                            onChange={addState? handleChangeAdd : handleChangeEdit}
+                          />
+                        </FormControl>
+                       
+                        <FormControl>
+                          <InputLabel id="subkomponen-select-label" sx={{typography:'body2'}}>Sub Komponen</InputLabel>
+                          <Select 
+                            name="subkomponen" 
+                            label='Sub Komponen'
+                            labelId="subkomponen-select-label"
+                            value={addState? addValue.subkomponen : editValue.subkomponen}
+                            sx={{typography:'body2', fontSize:14, height:'100%'}}
+                          >
+                            <MenuItem key={0} sx={{fontSize:14}} value={0}>Sub Komponen A</MenuItem>
+                            <MenuItem key={1} sx={{fontSize:14}} value={1}>Sub Komponen B</MenuItem>
+                            <MenuItem key={2} sx={{fontSize:14}} value={2}>Sub Komponen C</MenuItem>
+                            <MenuItem key={3} sx={{fontSize:14}} value={3}>Sub Komponen D</MenuItem>
+                          </Select>
+                        </FormControl>
+
+                        <FormControl>
+                          <InputLabel id="standardisasi-kppn-label" sx={{typography:'body2'}}>Standardisasi KPPN</InputLabel>
+                          <Select 
+                            name="standardisasiKPPN" 
+                            label='Standardisasi KPPN'
+                            labelId="standardisasi-kppn-label"
+                            value={addState? addValue.standardisasiKPPN : editValue.standardisasiKPPN}
+                            sx={{typography:'body2', fontSize:14, height:'100%'}}
+                          >
+                            <MenuItem key={0} sx={{fontSize:14}} value={0}>Ya</MenuItem>
+                            <MenuItem key={1} sx={{fontSize:14}} value={1}>Tidak</MenuItem>
                           </Select>
                         </FormControl>
                       </Stack>
@@ -245,7 +245,7 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
                         Reset
                       </Button>
                     </Stack>
-                  </UserDataContainer>
+                  </FormDataContainer>
 
             </Paper>
           </Scrollbar>
