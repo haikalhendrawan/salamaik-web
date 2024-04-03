@@ -20,7 +20,8 @@ interface Label{
   startIcon?: ReactNode,
   variant?: string,
   color?: string,
-}
+  onClick?:() => void
+};
 
 const Label = forwardRef(({ children, color = 'default', variant = 'soft', startIcon, endIcon, sx, ...other }:Label, ref) => {
   const theme = useTheme() as any;
