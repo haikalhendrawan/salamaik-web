@@ -2,11 +2,11 @@ import {useState, useEffect} from'react';
 import {Stack, Button, Box, Typography, Table, Card, Modal, FormControl, Paper, Grid, TableSortLabel,
           Tooltip, TableHead, Grow, TableBody, TableRow, TableCell} from '@mui/material';
 import { useTheme, styled } from '@mui/material/styles';
-import Iconify from '../../../components/iconify';
-import Label from '../../../components/label';
-import Scrollbar from '../../../components/scrollbar';
-import StyledTextField from '../../../components/styledTextField/StyledTextField';
-import StyledButton from '../../../components/styledButton/StyledButton';
+import Iconify from '../../../../components/iconify';
+import Label from '../../../../components/label';
+import Scrollbar from '../../../../components/scrollbar';
+import StyledTextField from '../../../../components/styledTextField/StyledTextField';
+import StyledButton from '../../../../components/styledButton/StyledButton';
 // ---------------------------------------------------
 const TABLE_HEAD = [
   { id: 'id', label: 'Id', alignRight: false },

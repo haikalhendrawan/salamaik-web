@@ -1,5 +1,5 @@
 import {useState, useEffect, useRef} from'react';
-import {Stack, Button, Box, Typography, Table, Card, Modal, FormControl, Paper, InputLabel, TableSortLabel,
+import {Stack, Button, Box, Typography, Table, IconButton, TableSortLabel,
   Tooltip, TableHead, Grow, TableBody, TableRow, TableCell, Select, MenuItem, Tabs, Tab, TableContainer} from '@mui/material';
 import { useTheme, styled } from '@mui/material/styles';
 import Iconify from '../../../../components/iconify';
@@ -107,9 +107,25 @@ export default function ChecklistRefTable({tableData, handleOpen, fileOpen}: Che
 
                   <TableCell align="justify" sx={{fontSize:12}}>{row.kriteria}</TableCell>
 
-                  <TableCell align="center" sx={{width:'10%'}}>
-                    <Stack direction='row' spacing={1}>
-                      <StyledButton aria-label="10" variant='contained' size='small' color='success' onClick={() => handleEditOpsi(row.id)}>
+                  <TableCell align="center">
+                    <Stack direction='row' spacing={1} alignContent="center" alignItems="center" justifyContent="center">
+                      <Label color={'success'} sx={{cursor: 'pointer'}} onClick={() => handleEditOpsi(row.id)}>
+                        10
+                      </Label>
+                      <Label color={'warning'} sx={{cursor: 'pointer'}} onClick={() => handleEditOpsi(row.id)}>
+                        7
+                      </Label>
+                      <Label color={'warning'} sx={{cursor: 'pointer'}} onClick={() => handleEditOpsi(row.id)}>
+                        5
+                      </Label>
+                      <Label color={'pink'} sx={{cursor: 'pointer'}} onClick={() => handleEditOpsi(row.id)}>
+                        0
+                      </Label>
+                      <IconButton onClick={() => handleEditOpsi(row.id)}>
+                        <Iconify sx={{color:theme.palette.grey[500]}} icon="solar:add-circle-bold"/>
+                      </IconButton>
+
+                      {/* <StyledButton aria-label="10" variant='contained' size='small' color='success' onClick={() => handleEditOpsi(row.id)}>
                         10
                       </StyledButton>
 
@@ -117,23 +133,29 @@ export default function ChecklistRefTable({tableData, handleOpen, fileOpen}: Che
                         7
                       </StyledButton>
 
-                      {/* <StyledButton aria-label="5" variant='contained' size='small' color='warning' onClick={handleAddOpsi}>
+                      <StyledButton aria-label="5" variant='contained' size='small' color='warning' onClick={handleAddOpsi}>
                         5
-                      </StyledButton> */}
+                      </StyledButton>
 
                       <StyledButton aria-label="5" variant='contained' size='small' color='pink' onClick={() => handleEditOpsi(row.id)}>
                         0
-                      </StyledButton>
+                      </StyledButton>  */}
 
-                      <StyledButton aria-label="5" variant='contained' size='small' color='white' onClick={() => handleEditOpsi(row.id)}>
+                      {/* <StyledButton aria-label="5" variant='contained' size='small' color='white' onClick={() => handleEditOpsi(row.id)}>
                         <Iconify icon="solar:add-circle-bold-duotone"/>
-                      </StyledButton>
+                      </StyledButton>  */}
                     </Stack>
                   </TableCell>
 
                   <TableCell align="center" >
-                    <Stack direction='row' spacing={1}>
-                      <StyledButton 
+                    <Stack direction='row' spacing={0}>
+                      <IconButton color='secondary' onClick={fileOpen}>
+                        <Iconify icon="solar:file-bold-duotone"/>
+                      </IconButton>
+                      <IconButton>
+                        <Iconify sx={{color:theme.palette.grey[500]}} icon="solar:add-circle-bold"/>
+                      </IconButton>
+                      {/* <StyledButton 
                         aria-label="10" 
                         variant='contained' 
                         size='small' 
@@ -143,13 +165,13 @@ export default function ChecklistRefTable({tableData, handleOpen, fileOpen}: Che
                         <Iconify icon="solar:file-bold-duotone"/>
                       </StyledButton>
 
-                      {/* <StyledButton aria-label="7" variant='contained' size='small' color='secondary'>
+                      <StyledButton aria-label="7" variant='contained' size='small' color='secondary'>
                         <Iconify icon="solar:file-bold-duotone"/>
-                      </StyledButton> */}
+                      </StyledButton> 
 
                       <StyledButton aria-label="5" variant='contained' size='small' color='white'>
                         <Iconify icon="solar:add-circle-bold-duotone"/>
-                      </StyledButton>
+                      </StyledButton> */}
                     </Stack>
                   </TableCell>
 
