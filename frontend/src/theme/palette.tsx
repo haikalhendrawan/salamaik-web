@@ -98,8 +98,8 @@ const PURPLE = {
 };
 
 const PINK = {
-  lighter: '#f48ba0',
-  light: '#ee5d7b',
+  lighter: '#fde3e8',
+  light: '#f9b9c6',
   main: '#e11d47',
   dark: '#bd1143',
   darker: '#86003c',
