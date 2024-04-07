@@ -99,7 +99,7 @@ const PURPLE = {
 
 const PINK = {
   lighter: '#fde3e8',
-  light: '#f9b9c6',
+  light: '#f48ba0',
   main: '#e11d47',
   dark: '#bd1143',
   darker: '#86003c',

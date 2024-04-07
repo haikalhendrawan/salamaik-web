@@ -22,7 +22,7 @@ interface ThemeProvider{
 }
 
 export default function ThemeProvider({ children }:ThemeProvider) {
-  const [mode, setMode] = useState('dark');
+  const [mode, setMode] = useState('light');
   const [primaryColor, setPrimaryColor] = useState('primary'); 
   const currentColor = localStorage.getItem('color') || null;
   const themeOptions = useMemo(() => ({

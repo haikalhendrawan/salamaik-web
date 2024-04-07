@@ -6,14 +6,13 @@
 
 import {Tooltip, Box, LinearProgress, Typography} from '@mui/material';
 
-
+// -----------------------------------------------------------------
 interface LinearProgressWithLabelProps {
   value: number;
   tooltip: string;
 }
 
-
-
+// -----------------------------------------------------------------
 export default function LinearProgressWithLabel(props : LinearProgressWithLabelProps) {
   return (
     <Tooltip title={props.tooltip}>

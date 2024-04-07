@@ -139,5 +139,12 @@ declare module '@mui/material/Button' {
   }
 }
 
+declare module '@mui/material/IconButton' {
+  interface IconButtonPropsColorOverrides {
+    pink: true;
+    white: true;
+  }
+}
+
 
 export {}
