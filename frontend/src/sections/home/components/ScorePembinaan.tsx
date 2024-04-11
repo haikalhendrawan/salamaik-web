@@ -1,20 +1,17 @@
 import {useState} from "react";
 import {Card, Typography, Grid, Box, Tabs, Tab, CardContent, Stack, IconButton, Slide} from '@mui/material';
 import {styled, useTheme} from '@mui/material/styles';
-import Iconify from "../../components/iconify";
-import RadialChart from "../../components/radialChart";
+import Iconify from "../../../components/iconify";
 // ----------------------------------------------
-interface KPPNScoreProps {
+interface ScorePembinaanProps {
   header: string,
-  number: number,
-  footer: string,
-  icon: string,
-  color: string
+  selfScore: number,
+  kanwilScore: number
 };
 
 // ----------------------------------------------
 
-export default function KPPNScore({header, number, footer, icon, color}: KPPNScoreProps){
+export default function ScorePembinaan({header, selfScore, kanwilScore}: ScorePembinaanProps){
   const theme = useTheme();
 
   const [value, setValue] = useState<number>(0);
@@ -29,7 +26,7 @@ export default function KPPNScore({header, number, footer, icon, color}: KPPNSco
                 <Typography variant="subtitle2">{header}</Typography>
 
                 <Slide direction="left" in={value===0}>
-                  <Typography variant="body2" color={theme.palette.text.secondary} sx={{display:value===0?'block':'none'}}>{ footer }</Typography>
+                  <Typography variant="body2" color={theme.palette.text.secondary} sx={{display:value===0?'block':'none'}}>Berdasarkan Self Assessment</Typography>
                 </Slide>
 
                 <Slide direction="left" in={value===1}>
@@ -52,11 +49,11 @@ export default function KPPNScore({header, number, footer, icon, color}: KPPNSco
               </IconButton>
               
               <Slide direction="left" in={value===0}>
-               <Typography variant="h2" sx={{display:value===0?'block':'none'}} color='primary'>{number}</Typography>
+               <Typography variant="h2" sx={{display:value===0?'block':'none'}} color='primary'>{selfScore}</Typography>
               </Slide>
 
               <Slide direction="left" in={value===1}>
-               <Typography variant="h2" sx={{display:value===1?'block':'none'}} color='primary'>8.65</Typography>
+               <Typography variant="h2" sx={{display:value===1?'block':'none'}} color='primary'>{kanwilScore}</Typography>
               </Slide>
               
               <IconButton

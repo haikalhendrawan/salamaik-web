@@ -5,6 +5,8 @@ import ScrollToTopButton from '../components/scrollToTopButton/ScrollToTopButton
 //sections
 import WorksheetInfo from '../sections/worksheet/component/WorksheetInfo';
 import WorksheetCard from '../sections/worksheet/component/WorksheetCard';
+import PreviewFileModal from '../components/previewFileModal/PreviewFileModal';
+import InstructionPopover from '../sections/worksheet/component/InstructionPopover';
 // @mui
 import { Container, Stack, Typography, Box, Button, Tabs, Tab, Grid, Fab} from '@mui/material';
 
@@ -17,6 +19,32 @@ export default function WorksheetPage() {
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => { // setiap tab komponen berubah
     setTabValue(newValue);
   };
+
+  const [open, setOpen] = useState<boolean>(false); // for preview file modal
+
+  const [file, setFile] = useState<string | undefined>('https://jdih.kemenkeu.go.id/download/a321969c-4ce0-4073-81ce-df35023750b1/PER_1_PB_2023-Perubahan%20Atas%20PERDIRJEN%20No.PER-24_PB_2019%20tentang%20Pedoman%20Pembinaan%20&%20Supervisi%20Pelaksanaan%20Tugas%20KPPN.pdf'); // for preview file modal
+
+  const handleOpenFile = () => {
+    setOpen(true);
+  };
+
+  const handleCloseFile = () => {
+    setOpen(false)
+  };
+
+  const [openInstruction, setOpenInstruction] = useState<boolean>(false);
+
+  const [anchorEl, setAnchorEl] = useState<EventTarget & HTMLButtonElement | null>(null);
+
+  const handleOpenInstruction = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    setOpenInstruction(true);
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseInstruction = () => {
+    setOpenInstruction(false)
+  };
+
 
   return (
     <>
@@ -31,10 +59,10 @@ export default function WorksheetPage() {
 
           <Stack direction="row" alignItems="center" justifyContent="center " mb={5} >
             <Tabs value={tabValue} onChange={handleTabChange}> 
-              <Tab icon={<Iconify icon="lucide:briefcase-business" />} label="Treasurer" value={0} />
-              <Tab icon={<Iconify icon="lucide:castle" />} label="PF, RKKD, SM" value={1} />
-              <Tab icon={<Iconify icon="lucide:badge-dollar-sign" />} label="Financial Advisor" value={2} />
-              <Tab icon={<Iconify icon="lucide:tower-control" />} label="Tata Kelola Internal" value={3} />
+              <Tab icon={<Iconify icon="solar:safe-2-bold-duotone" />} label="Treasurer" value={0} />
+              <Tab icon={<Iconify icon="solar:buildings-2-bold-duotone" />} label="PF, RKDD, SM" value={1} />
+              <Tab icon={<Iconify icon="solar:wallet-money-bold" />} label="Financial Advisor" value={2} />
+              <Tab icon={<Iconify icon="solar:incognito-bold-duotone" />} label="Tata Kelola Internal" value={3} />
             </Tabs>
           </Stack>
 
@@ -55,6 +83,10 @@ export default function WorksheetPage() {
                   Nilai deviasi lebih dari 10%`}
                   num={1}
                   dateUpdated={new Date()}
+                  modalOpen={handleOpenFile}
+                  modalClose={handleCloseFile}
+                  file={file}
+                  openInstruction={handleOpenInstruction}
                 />
                 <WorksheetCard 
                   id={2} 
@@ -65,17 +97,25 @@ export default function WorksheetPage() {
                     dilakukannya bimbingan/konsultasi kepada satker, dan ada dokumen pembuktian/pendukung yang jelas) <br/> <br/>
                     <b>-Nilai 5</b>: apabila ada upaya peminimalisiran deviasi, namun tidak ditemukan dokumen pembuktian/pendukung<br/> <br/>
                     <b>-Nilai 0</b>: Tidak ada keterangan dari KPPN yang mampu menunjukan upaya peminimalisiran<br/> <br/>`}
-                  num={1}
+                  num={2}
                   dateUpdated={new Date()}
+                  modalOpen={handleOpenFile}
+                  modalClose={handleCloseFile}
+                  file={file}
+                  openInstruction={handleOpenInstruction}
                 />
               </Grid>
             </Grid>
-            <Grid item xs={12} md={4}>
+            {/* <Grid item xs={12} md={4}>
               <WorksheetInfo />
-            </Grid>
+            </Grid> */}
           </Grid>
 
       </Container>
+
+      <PreviewFileModal open={open} modalClose={handleCloseFile} file={file} />
+
+      <InstructionPopover open={openInstruction} anchorEl={anchorEl} handleClose={handleCloseInstruction} />
 
       <ScrollToTopButton />
     </>

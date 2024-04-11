@@ -1,20 +1,23 @@
 import {useState} from "react";
 import {Card, Typography, Grid, FormControl, CardContent, Stack, LinearProgress, Box, Tooltip} from '@mui/material';
 import {styled, useTheme} from '@mui/material/styles';
-import Scrollbar from "../../components/scrollbar/Scrollbar";
+import Scrollbar from "../../../components/scrollbar/Scrollbar";
 // import LinearProgressWithLabel from "../../components/linear-progress-with-label/LinearProgressWithLabel";
 // ----------------------------------------------
-interface ProgressKomponenProps {
+interface dataLabel{
+  id?: number,
+  text: string,
+  value: number,
+}
+
+interface ProgressHorizontalProps {
   header: string,
-  number: number,
-  footer: string,
-  icon: string,
-  color: string
+  data: dataLabel[]
 };
 
 // ----------------------------------------------
 
-export default function ProgressKomponen({header, number, footer, icon, color}: ProgressKomponenProps){
+export default function ProgressHorizontal({header, data}:ProgressHorizontalProps){
   const theme = useTheme();
 
   return(
@@ -28,10 +31,9 @@ export default function ProgressKomponen({header, number, footer, icon, color}: 
             '& .simplebar-content': { height: 1, display: 'flex', flexDirection: 'column' },
           }}>
             <Stack direction={'column'} spacing={0}>
-              <LinearProgressWithLabel value={80} tooltip={'20/20 diselesaikan'} text={'Treasurer'}></LinearProgressWithLabel>
-              <LinearProgressWithLabel value={27.5} tooltip={'20/20 diselesaikan'} text={'PF, RKKD, SM'}></LinearProgressWithLabel>
-              <LinearProgressWithLabel value={46.5} tooltip={'20/20 diselesaikan'} text={'Financial Advisor'}></LinearProgressWithLabel>
-              <LinearProgressWithLabel value={92} tooltip={'20/20 diselesaikan'} text={'Tata Kelola Internal'}></LinearProgressWithLabel>
+              {data?.map((item) => (
+                <LinearProgressWithLabel value={item.value}  text={item.text}></LinearProgressWithLabel>
+              ))}
             </Stack>
           </Scrollbar>
 
@@ -44,7 +46,6 @@ export default function ProgressKomponen({header, number, footer, icon, color}: 
 // ------------------------------------------------------------------------------------
 interface LinearProgressWithLabelProps {
   value: number;
-  tooltip: string;
   text: string
 }
 

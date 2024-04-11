@@ -1,10 +1,10 @@
 import {useState} from "react";
 import {Card, Typography, Grid, Box, Tabs, Tab, CardContent, Stack} from '@mui/material';
 import {styled, useTheme} from '@mui/material/styles';
-import Iconify from "../../components/iconify";
-import RadialChart from "../../components/radialChart/RadialChart";
+import Iconify from "../../../components/iconify";
+import RadialChart from "../../../components/radialChart/RadialChart";
 // ----------------------------------------------
-interface ProgressKPPNProps {
+interface ProgressPembinaanProps {
   header: string,
   number: number,
   footer: string,
@@ -14,7 +14,7 @@ interface ProgressKPPNProps {
 
 // ----------------------------------------------
 
-export default function ProgressKPPN({header, number, footer, icon, color}: ProgressKPPNProps){
+export default function ProgressPembinaan({header, number, footer, icon, color}: ProgressPembinaanProps){
   const theme = useTheme();
 
   return(
