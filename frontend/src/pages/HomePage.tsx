@@ -15,7 +15,7 @@ export default function HomePage() {
   return (
     <>
       <Helmet>
-        <title> Dashboard | Salamaik  </title>
+        <title> Salamaik | Home  </title>
       </Helmet>
 
       <Container maxWidth="xl">

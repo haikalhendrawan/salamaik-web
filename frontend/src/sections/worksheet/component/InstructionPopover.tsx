@@ -13,14 +13,14 @@ const style = {
   flexDirection:'column'
 };
 
-interface InstructionPopoverProps{
+interface InstructionPopperProps{
   open: boolean,
   anchorEl: EventTarget & HTMLButtonElement | null,
   handleClose: () => void
 };
 
 // ---------------------------------------------------------------------------------------------
-export default function InstructionPopover({open, anchorEl, handleClose}: InstructionPopoverProps){
+export default function InstructionPopover({open, anchorEl, handleClose}: InstructionPopperProps){
   const theme = useTheme();
 
   return(

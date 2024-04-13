@@ -14,8 +14,9 @@ import { StyledRootScrollbar, StyledScrollbar } from './styles';
 interface Scrollbar{
   children: ReactNode;
   sx?: SxProps;  
-}
+};
 
+// ----------------------------------------------------------------------
 function Scrollbar({ children, sx, ...other }: Scrollbar) {
   const userAgent = typeof navigator === 'undefined' ? 'SSR' : navigator.userAgent;
 

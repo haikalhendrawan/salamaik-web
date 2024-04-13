@@ -104,7 +104,7 @@ export default function KanwilView(){
             {label: 'KPPN Padang', value: 9.77},
             {label: 'KPPN Bukittinggi', value: 9.67},
             {label: 'KPPN Solok', value: 9.55},
-            {label: 'KPPN Lubuk Sikaping', value: 9.44},
+            {label: ['KPPN Lubuk','Sikaping'], value: 9.44},
             {label: 'KPPN Sijunjung', value: 9.42},
             {label: 'KPPN Painan', value: 9.40},
           ]}

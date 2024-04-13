@@ -8,7 +8,7 @@ interface StyledScrollbarProps{
   timeout?: number,
   clickOnTrack?: boolean,
   sx: any
-}
+};
 
 export const StyledRootScrollbar = styled('div')(() => ({
   flexGrow: 1,

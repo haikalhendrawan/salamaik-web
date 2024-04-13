@@ -14,8 +14,6 @@ interface WelcomeCardProps {
   color?: string;
   sx?: object;
 };
-
-
 // ----------------------------------------------------------------------
 
 export default function WelcomeCard({ title, total, icon, color = 'primary', sx, ...other }: WelcomeCardProps) {
@@ -39,7 +37,7 @@ export default function WelcomeCard({ title, total, icon, color = 'primary', sx,
 
           <Stack direction={'row'}>
             <Box sx={{borderRadius:'16px', alignItems:'center', my:'auto' }}>
-              <img src="/image/sapiens.svg" style={{borderRadius:'12px', maxHeight:'300px'}} alt='abc'/>
+              <img src="/image/Other 10.png" style={{borderRadius:'12px', maxHeight:'300px'}} alt='welcome image'/>
             </Box>
           </Stack>
         </Stack> 

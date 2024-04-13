@@ -46,7 +46,7 @@ export default function DasarHukum({ title, subheader, ...other }: DasarHukumPro
         <Stack direction='row'>
           <Button 
             variant='contained' 
-            endIcon={<Iconify icon={'solar:file-bold-duotone'}/> }
+            endIcon={<Iconify icon={'solar:book-2-bold-duotone'}/> }
             onClick={handleOpenFile}
           >
             Open

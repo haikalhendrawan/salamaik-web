@@ -68,7 +68,7 @@ export default function ImageSlider({images, title, height}: ImageSliderProps) {
         <Slider ref={slider} {...settings}>
           {images?.map((item, index) => (
             <Box key={index} sx={{width:'100%', height:'100%', color:theme.palette.common.black}}>
-              <img src={`/image/${item}`} style={{width:'100%', height:height, objectFit: 'cover'}} alt={item}/>
+              <img src={`/image/${item}`} style={{width:'100%', height:height, objectFit: 'cover'}} alt={item} loading="lazy"/>
             </Box> 
             ))
           }

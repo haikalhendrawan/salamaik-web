@@ -16,16 +16,16 @@
     ];
 
   const VisuallyHiddenInput = styled('input')({
-      clip: 'rect(0 0 0 0)',
-      clipPath: 'inset(50%)',
-      height: 1,
-      overflow: 'hidden',
-      position: 'absolute',
-      bottom: 0,
-      left: 0,
-      whiteSpace: 'nowrap',
-      width: 1,
-      });
+    clip: 'rect(0 0 0 0)',
+    clipPath: 'inset(50%)',
+    height: 1,
+    overflow: 'hidden',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    whiteSpace: 'nowrap',
+    width: 1,
+  });
 
   interface WorksheetCardProps{
     id: number,
@@ -240,7 +240,7 @@
                     </Grid>
                 </Grid>
 
-                <Divider sx={{ borderStyle: 'dashed', mt:2 }}/>
+                <Divider sx={{ borderStyle: 'dashed', mt: 3 }}/>
 
           </Card>
         </Grid> 

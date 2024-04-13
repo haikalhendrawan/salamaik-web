@@ -16,7 +16,7 @@ export default function UserRef () {
 
   return (
     <>
-      <Container maxWidth="xl">
+      <Container>
 
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Stack direction='row' spacing={2}>

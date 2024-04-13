@@ -6,7 +6,7 @@ import { styled } from '@mui/material/styles';
 import Header from '../dashboard/header';
 import Nav from '../dashboard/nav';
 import Footer from '../dashboard/footer';
-import {useAuth} from "../../hooks/useAuth"; 
+// import {useAuth} from "../../hooks/useAuth"; 
 import Page403 from '../../pages/guard/Page403'; 
 
 // ----------------------------------------------------------------------
@@ -36,10 +36,11 @@ const Main = styled('div')(({ theme }) => ({
 // ----------------------------------------------------------------------
 interface RqAuthLayoutProp{
   allowedRoles: any[]
-} 
+}; 
 
+// ----------------------------------------------------------------------
 export default function RequireAuthLayout({allowedRoles}: RqAuthLayoutProp) {
-  const {auth} = useAuth() as AuthType;  //  { username: xxx, role:xxx, accessToken, msg:xxx}
+  // const {auth} = useAuth() as AuthType;  //  { username: xxx, role:xxx, accessToken, msg:xxx}
   const [open, setOpen] = useState(false);
   const location = useLocation();
 
@@ -47,7 +48,7 @@ export default function RequireAuthLayout({allowedRoles}: RqAuthLayoutProp) {
   //   return <Navigate to="/login" state={{from:location}} replace />
   // }
 
-  // if (allowedRoles.includes(auth.role)){
+  // if (allowedRoles.includes(role)){
   //   return (
   //   <StyledRoot> 
   //     <Header onOpenNav={() => setOpen(true)} />
@@ -59,7 +60,7 @@ export default function RequireAuthLayout({allowedRoles}: RqAuthLayoutProp) {
   //   </StyledRoot>)
   // }
   
-  // return <Navigate to="/404" state={{from:location}} replace /> // if user sudah login, tapi allowed role tidak termasuk
+  // return <Navigate to="/403" state={{from:location}} replace /> // if user sudah login, tapi allowed role tidak termasuk
   return (
     <StyledRoot> 
       <Header onOpenNav={() => setOpen(true)} />

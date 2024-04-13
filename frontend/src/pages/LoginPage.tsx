@@ -58,7 +58,7 @@ export default function LoginPage() {
   return (
     <>
       <Helmet>
-        <title> Login | MonevTI</title>
+        <title> Salamaik | Login</title>
       </Helmet>
 
       <StyledRoot>

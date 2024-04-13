@@ -8,13 +8,13 @@ import LinearProgressWithLabel from "../../../components/linear-progress-with-la
 // import useWorksheet from "../useWorksheet";
 
 // --------------------------------------------------------
-interface WorksheetInfoProps {
+interface KomponenProgressProps {
   batch?: any;
   checklist?: any;
   tabValue?: number;
 }
 
-export default function WorksheetInfo(props: WorksheetInfoProps){
+export default function KomponenProgress(props: KomponenProgressProps){
 
   // const {batch, checklist, tabValue} = props;
   const theme = useTheme();
@@ -42,7 +42,7 @@ export default function WorksheetInfo(props: WorksheetInfoProps){
 
   return(
     <Card>
-      <CardHeader title={"Data Kertas Kerja"}  subheader="Metadata kertas kerja" />
+      <CardHeader title={"Komponen Treasurer"}  subheader="4 subkomponen" />
         <CardContent sx={{fontSize:12}}>
           <Grid container spacing={2}>
           {infoRows.map((row, index) => {
