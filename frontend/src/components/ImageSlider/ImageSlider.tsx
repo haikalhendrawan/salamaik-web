@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import Slider from "react-slick";
-import { Card, Grid, IconButton, Button, Stack, Box, Typography } from "@mui/material";
+import { Card, Grid, IconButton, Button, Stack, Box, Typography, Skeleton } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import Iconify from "../iconify/Iconify";
 import "slick-carousel/slick/slick.css";
@@ -55,6 +55,12 @@ export default function ImageSlider({images, title, height}: ImageSliderProps) {
     },
   };
 
+  const [imageLoaded, setImageLoaded] = useState(false);
+
+  const handleImageLoad = () => {
+    setImageLoaded(true);
+  };
+
   const toIndex = (slideCounter: number, length: number, currCircle: number, circleIndex: number) => {
     const difference = circleIndex - currCircle;
     return (slideCounter + difference) % length
@@ -62,13 +68,20 @@ export default function ImageSlider({images, title, height}: ImageSliderProps) {
 
 
   return (
-
       <Card style={{height:height, objectFit: 'cover', overflow:'hidden', position:'relative'}}>
-
         <Slider ref={slider} {...settings}>
+          {
+            imageLoaded
+            ? null
+            :(
+              <Box key={0} sx={{width:'100%', height:'100%', color:theme.palette.common.black}}>
+                <Skeleton variant="rounded" style={{width:'100%', height:height, objectFit: 'cover'}} />
+              </Box> 
+              )
+          }
           {images?.map((item, index) => (
-            <Box key={index} sx={{width:'100%', height:'100%', color:theme.palette.common.black}}>
-              <img src={`/image/${item}`} style={{width:'100%', height:height, objectFit: 'cover'}} alt={item} loading="lazy"/>
+            <Box key={index+1} sx={{width:'100%', height:'100%', color:theme.palette.common.black}}>
+              <img onLoad={handleImageLoad} src={`/image/${item}`} style={{width:'100%', height:height, objectFit: 'cover'}} alt={item} loading="lazy"/>
             </Box> 
             ))
           }

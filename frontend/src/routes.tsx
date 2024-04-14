@@ -14,6 +14,7 @@ import ProfilePage from "./pages/ProfilePage";
 import WorksheetLanding from "./sections/worksheet/WorksheetLanding";
 import WorksheetKPPN from "./sections/worksheet/WorksheetKPPN";
 import Page403 from "./pages/guard/Page403";
+import MatrixPage from "./pages/MatrixPage";
 
 // admin
 import UserRef from "./pages/admin/UserRef";
@@ -39,8 +40,8 @@ export default function Router() {
     {/* <Route element={<PersistLogin/>}> */}
       <Route path="/" element={<RequireAuthLayout allowedRoles={[1]}/> }>
         <Route path="home" element={<HomePage />} />
-        <Route path='worksheet' element={<WorksheetPage />} />
         <Route path='profile' element={<ProfilePage />} />
+        <Route path='matrix' element={<MatrixPage />} />
       </Route>
     {/* </Route> */}
 

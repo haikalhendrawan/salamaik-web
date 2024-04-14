@@ -66,7 +66,7 @@ export default function WorksheetLanding() {
               header='KPPN Sijunjung'
               subheader='88% complete'
               lastUpdate="Apr 12, 2022"
-              image='kppn-sijunjung.jpg'
+              image='kppn-sijunjung.png'
               kppn={'077'}
             />
           </Grid>
