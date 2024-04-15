@@ -4,7 +4,7 @@ import {styled, useTheme} from '@mui/material/styles';
 import Iconify from "../../../components/iconify";
 import RadialChart from "../../../components/radialChart/RadialChart";
 // ----------------------------------------------
-interface ProgressPembinaanProps {
+interface FollowUpProgressProps {
   header: string,
   number: number,
   footer: string,
@@ -14,7 +14,7 @@ interface ProgressPembinaanProps {
 
 // ----------------------------------------------
 
-export default function ProgressPembinaan({header, number, footer, icon, color}: ProgressPembinaanProps){
+export default function FollowUpProgress({header, number, footer, icon, color}: FollowUpProgressProps){
   const theme = useTheme();
 
   return(
@@ -32,7 +32,7 @@ export default function ProgressPembinaan({header, number, footer, icon, color}:
           <Grid item xs={12} sm={6} md={7}>
             <RadialChart 
               chart={{
-                labels:['20/20'],
+                labels:['20'],
                 colors:theme.palette.primary.main,
                 toColor:theme.palette.primary.dark,  
                 series:[number]

@@ -1,5 +1,5 @@
 import {useState, useEffect} from'react';
-import {Stack, Toolbar, Typography, Table, Card, CardHeader, TableSortLabel,
+import {Stack, Toolbar, Typography, Table, Card, TableContainer, TableSortLabel,
           Tooltip, TableHead, Grow, TableBody, TableRow, TableCell} from '@mui/material';
 import { useTheme, styled } from '@mui/material/styles';
 import Label from '../../../components/label';
@@ -62,6 +62,78 @@ const TABLE_DATA: MatrixTableData[] = [
     tindakLanjut: null,
     statusTL: null
   },
+  {
+    id:2, 
+    komponen:'Treasurer', 
+    subKomponen: 'Penyaluran atas Beban APBN', 
+    hasil: 'Prosedur pengelolaan data supplier telah sesuai ketentuan yang berlaku', 
+    permasalahan: null,
+    rekomendasi: null,
+    peraturan: 'PP 61 Tahun 2010, Kertas Kerja PER-1/PB/2023',
+    pic: null,
+    tindakLanjut: null,
+    statusTL: null
+  },
+  {
+    id:2, 
+    komponen:'Treasurer', 
+    subKomponen: 'Penyaluran atas Beban APBN', 
+    hasil: 'Prosedur pengelolaan data supplier telah sesuai ketentuan yang berlaku', 
+    permasalahan: null,
+    rekomendasi: null,
+    peraturan: 'PP 61 Tahun 2010, Kertas Kerja PER-1/PB/2023',
+    pic: null,
+    tindakLanjut: null,
+    statusTL: null
+  },
+  {
+    id:2, 
+    komponen:'Treasurer', 
+    subKomponen: 'Penyaluran atas Beban APBN', 
+    hasil: 'Prosedur pengelolaan data supplier telah sesuai ketentuan yang berlaku', 
+    permasalahan: null,
+    rekomendasi: null,
+    peraturan: 'PP 61 Tahun 2010, Kertas Kerja PER-1/PB/2023',
+    pic: null,
+    tindakLanjut: null,
+    statusTL: null
+  },
+  {
+    id:2, 
+    komponen:'Treasurer', 
+    subKomponen: 'Penyaluran atas Beban APBN', 
+    hasil: 'Prosedur pengelolaan data supplier telah sesuai ketentuan yang berlaku', 
+    permasalahan: null,
+    rekomendasi: null,
+    peraturan: 'PP 61 Tahun 2010, Kertas Kerja PER-1/PB/2023',
+    pic: null,
+    tindakLanjut: null,
+    statusTL: null
+  },
+  {
+    id:2, 
+    komponen:'Treasurer', 
+    subKomponen: 'Penyaluran atas Beban APBN', 
+    hasil: 'Prosedur pengelolaan data supplier telah sesuai ketentuan yang berlaku', 
+    permasalahan: null,
+    rekomendasi: null,
+    peraturan: 'PP 61 Tahun 2010, Kertas Kerja PER-1/PB/2023',
+    pic: null,
+    tindakLanjut: null,
+    statusTL: null
+  },
+  {
+    id:2, 
+    komponen:'Treasurer', 
+    subKomponen: 'Penyaluran atas Beban APBN', 
+    hasil: 'Prosedur pengelolaan data supplier telah sesuai ketentuan yang berlaku', 
+    permasalahan: null,
+    rekomendasi: null,
+    peraturan: 'PP 61 Tahun 2010, Kertas Kerja PER-1/PB/2023',
+    pic: null,
+    tindakLanjut: null,
+    statusTL: null
+  },
 ];
 
 // ----------------------------------------------------------------------------------
@@ -80,8 +152,8 @@ export default function MatrixTable() {
       
       <Grow in>
         <Card sx={{height:'auto', display:'flex', flexDirection:'column', gap:theme.spacing(1), mb: 1}}>
-
-          <Table>
+          <TableContainer sx={{ maxHeight: 480 }}>
+          <Table stickyHeader>
             <TableHead>
               <TableRow>
                 {TABLE_HEAD.map((headCell) => (
@@ -131,6 +203,7 @@ export default function MatrixTable() {
 
             </TableBody>
           </Table>
+          </TableContainer>
         </Card>
       </Grow>
 
