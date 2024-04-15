@@ -5,17 +5,18 @@ import { Box, Stack, AppBar, Toolbar, IconButton} from '@mui/material';
 import { bgBlur } from '../../../utils/cssStyles';
 // components
 import Iconify from '../../../components/iconify';
+import Logo from '../../../components/logo/Logo';
 //
-import Searchbar from './Searchbar';
-import AccountPopover from './AccountPopover';
-import NotificationsPopover from './NotificationsPopover';
-import CurrentDate from './CurrentDate';
-import ThemeSwitcher from './ThemeSwitcher';
-import ColorSwitcher from './ColorSwitcher';
+import Searchbar from '../../dashboard/header/Searchbar';
+import AccountPopover from '../../dashboard/header/AccountPopover';
+import NotificationsPopover from '../../dashboard/header/NotificationsPopover';
+import CurrentDate from '../../dashboard/header/CurrentDate';
+import ThemeSwitcher from '../../dashboard/header/ThemeSwitcher';
+import ColorSwitcher from '../../dashboard/header/ColorSwitcher';
 
 // ----------------------------------------------------------------------
 
-const NAV_WIDTH = 280;
+const NAV_WIDTH = 0;
 
 const HEADER_MOBILE = 64;
 
@@ -48,6 +49,10 @@ export default function Header({ onOpenNav }: HeaderType) {
     <StyledRoot>
       {/* <LinearProgress /> */}
       <StyledToolbar>
+        <Box sx={{ width: '200px', height: '100px', pt: 1 }}> 
+          <Logo sx={{height:'100%'}} /> {/* py 3 utk short logo*/}
+        </Box>
+
         <IconButton
           onClick={onOpenNav}
           sx={{

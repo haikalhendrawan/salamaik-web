@@ -112,7 +112,7 @@ export default function RadialChart(props: RadialChartProps) {
     ],
   };
 
-  const delayedSetHover = debounce((value) => setIsHover(value), 200);
+  const delayedSetHover = debounce((value: any) => setIsHover(value), 200);
 
   return (
     <>
@@ -138,15 +138,4 @@ export default function RadialChart(props: RadialChartProps) {
       </Box>
     </>
   );
-}
-
-function formatAsCurrency(value: number) {
-  // Implement your currency formatting logic here
-  // For example, you can use Intl.NumberFormat API
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD', // Change this based on your currency
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format(value);
 }

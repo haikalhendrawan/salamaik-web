@@ -15,10 +15,13 @@ import WorksheetLanding from "./sections/worksheet/WorksheetLanding";
 import WorksheetKPPN from "./sections/worksheet/WorksheetKPPN";
 import Page403 from "./pages/guard/Page403";
 import MatrixPage from "./pages/MatrixPage";
+import FollowUpPage from "./pages/FollowUpPage";
 
 // admin
 import UserRef from "./pages/admin/UserRef";
 import WorksheetRefPage from "./pages/admin/WorksheetRefPage";
+import HorizontalLayout from "./layouts/horizontal/HorizontalLayout";
+import MatrixDetail from "./sections/matrix/MatrixDetail";
 
 
 // ----------------------------------------------------
@@ -41,7 +44,6 @@ export default function Router() {
       <Route path="/" element={<RequireAuthLayout allowedRoles={[1]}/> }>
         <Route path="home" element={<HomePage />} />
         <Route path='profile' element={<ProfilePage />} />
-        <Route path='matrix' element={<MatrixPage />} />
       </Route>
     {/* </Route> */}
 
@@ -55,6 +57,22 @@ export default function Router() {
       </Route>
     </Route>
     {/* </Route> */}
+
+    <Route path="/matrix" >
+      <Route element={<RequireAuthLayout allowedRoles={[2]} />}>
+        <Route index element={<MatrixPage />} />
+      </Route>
+
+      <Route element={<HorizontalLayout /> }>
+        <Route path="detail" element={<MatrixDetail />} />
+      </Route>
+    </Route>
+
+    <Route path="/followUp" >
+      <Route element={<RequireAuthLayout allowedRoles={[2]} />}>
+        <Route index element={<FollowUpPage />} />
+      </Route>
+    </Route>
 
     {/* <Route element={<PersistLogin/>}> */}
       <Route path="/admin" element={<RequireAuthLayout allowedRoles={[1]}/> }>

@@ -10,12 +10,17 @@ const navSupervisi = [
   {
     title: 'Kertas Kerja',
     path: '/worksheet',
-    icon: icon('solar--clipboard-list-bold-duotone'),
+    icon: icon('solar--ruler-pen-bold-duotone'),
+  },
+  {
+    title: 'Tindak Lanjut',
+    path: '/followUp',
+    icon: icon('solar--rocket-2-bold-duotone'),
   },
   {
     title: 'Matriks',
     path: '/matrix',
-    icon: icon('solar--folder-open-bold-duotone'),
+    icon: icon('solar--clipboard-list-bold-duotone'),
   },
 
 ];

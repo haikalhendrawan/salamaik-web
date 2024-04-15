@@ -5,21 +5,20 @@ import { Outlet } from 'react-router-dom';
 import { Container, Stack, Typography, Tabs, Tab, Grid, Paper, IconButton, Box, LinearProgress} from '@mui/material';
 import {useTheme, styled} from '@mui/material/styles';
 //sections
-import MatrixLanding from '../sections/matrix/MatrixLanding';
-import MatrixDetail from '../sections/matrix/MatrixDetail';
+
 
 // -----------------------------------------------------------------------
 
 
 // ----------------------------------------------------------------------
 
-export default function MatrixPage() {
+export default function FollowUpPage() {
   const theme = useTheme();
 
   return (
     <>
       <Container maxWidth="xl">
-        <MatrixLanding />
+        
       </Container>
     </>
   );

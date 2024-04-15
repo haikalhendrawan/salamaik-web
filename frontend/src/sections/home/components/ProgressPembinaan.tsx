@@ -21,7 +21,7 @@ export default function ProgressPembinaan({header, number, footer, icon, color}:
     <Card sx={{height:'200px', borderRadius:'16px'}}>
       <CardContent>
         <Grid container>
-          <Grid item xs={12} sm={6} md={6}>
+          <Grid item xs={12} sm={6} md={5}>
             <Stack direction='column'>
               <Typography variant="subtitle2">{header}</Typography>
 
@@ -29,7 +29,7 @@ export default function ProgressPembinaan({header, number, footer, icon, color}:
             </Stack>
 
           </Grid>
-          <Grid item xs={12} sm={6} md={6}>
+          <Grid item xs={12} sm={6} md={7}>
             <RadialChart 
               chart={{
                 labels:['20'],

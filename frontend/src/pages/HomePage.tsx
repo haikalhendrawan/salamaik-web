@@ -26,8 +26,8 @@ export default function HomePage() {
 
           <Grid item xs={12} md={4}>
             <PhotoGallery 
-              title='Galeri Kanwil KPPN' 
-              images={['01.jpg', '02.jpg', '03.jpg', '04.jpg', 'book.png', 'ws-scenery.png']}
+              title='Galeri Salamaik' 
+              images={['01.jpg', '02.jpg', '03.jpg', '04.jpg']}
               height={'300px'} 
             /> 
           </Grid>

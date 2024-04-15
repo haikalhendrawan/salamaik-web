@@ -3,10 +3,6 @@ import { Outlet } from 'react-router-dom';
 // @mui
 import { styled } from '@mui/material/styles';
 import Header from './header';
-import Nav from './nav';
-
-
-// ----------------------------------------------------------------------
 
 const APP_BAR_MOBILE = 64;
 const APP_BAR_DESKTOP = 92;
@@ -30,17 +26,11 @@ const Main = styled('div')(({ theme }) => ({
   },
 }));
 
-// ----------------------------------------------------------------------
-
-export default function DashboardLayout() {
-  const [open, setOpen] = useState(false);
+export default function HorizontalLayout(){
 
   return (
     <StyledRoot>
-      <Header onOpenNav={() => setOpen(true)} />
-
-      <Nav openNav={open} onCloseNav={() => setOpen(false)} />
-
+      <Header />
       <Main>
         <Outlet />
       </Main>

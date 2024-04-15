@@ -124,7 +124,7 @@ export default function ImageSlider({images, title, height}: ImageSliderProps) {
             opacity: 0.8, 
             boxShadow: '0 0 10px 10px #000'
               }}>
-          <Typography variant='body1' sx={{color:theme.palette.common.white, pl:2}}> {title} </Typography>
+          <Typography variant='body1' sx={{color:theme.palette.common.white, fontWeight: 'bold', pl:2}}> {title} </Typography>
         </Stack>
 
         <Stack direction='row' sx={{zIndex:9999, position: 'absolute', top:10, right:10}} spacing={0}>
