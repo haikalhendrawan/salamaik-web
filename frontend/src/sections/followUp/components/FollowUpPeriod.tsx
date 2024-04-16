@@ -23,13 +23,13 @@ export default function FollowUpPeriod({header, open, close}:FollowUpPeriodProps
 
             <Grid container spacing={1}>
               <Grid item xs={4} key={0}>
-                <Stack direction='column' spacing={1}>
+                <Stack direction='column' spacing={1} textAlign={'center'}>
                   <Label color="success" sx={{fontSize:12}}> Open Period </Label>
-                  <Typography variant='body2' fontSize='12' sx={{pl: 1}}>
+                  <Typography variant='body2' fontSize='12'>
                     {new Date(open).toLocaleDateString('en-GB')}
                   </Typography>
                   <Label color="error" sx={{fontSize:12}}> Close Period </Label>
-                  <Typography variant='body2' fontSize='12' sx={{pl: 1}}>
+                  <Typography variant='body2' fontSize='12'>
                     {new Date(close).toLocaleDateString('en-GB')}
                   </Typography>
                 </Stack>
