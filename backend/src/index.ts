@@ -1,18 +1,28 @@
 import express, {Request, Response} from 'express';
 import path from "path";
-import * as dotenv from "dotenv";
-dotenv.config({path: path.resolve(__dirname, '../.env')});
+import "dotenv/config"; 
+import pool from '../config/db';
 
 const app = express();
 
 app.use(express.json());
 
-app.get('/home', (req: Request, res: Response) => {
-  res.send('Hello World');
+app.get('/checklist', async(req: Request, res: Response) => {
+  try{
+    const result = await pool.query("SELECT * FROM checklist_ref");
+    res.json(result.rows[0]);
+  }catch(err){
+    console.log(err)
+    res.json(err)
+  }
 });
 
 app.get('/', (req: Request, res: Response) => {
   res.json({msg:"Hello World"});
+});
+
+app.get('/check', (req: Request, res: Response) => {
+  res.json({msg:"check home"});
 });
 
 

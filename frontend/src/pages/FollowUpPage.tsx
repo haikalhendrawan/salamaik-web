@@ -17,9 +17,7 @@ export default function FollowUpPage() {
 
   return (
     <>
-      <Container maxWidth="xl">
-        <FollowUpLanding />
-      </Container>
+      <FollowUpLanding />
     </>
   );
 };

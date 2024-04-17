@@ -154,12 +154,13 @@ export default function MatrixTable() {
         <Card sx={{height:'auto', display:'flex', flexDirection:'column', gap:theme.spacing(1), mb: 1}}>
           <TableContainer sx={{ maxHeight: 480 }}>
           <Table stickyHeader>
-            <TableHead>
-              <TableRow>
+            <TableHead >
+              <TableRow >
                 {TABLE_HEAD.map((headCell) => (
                   <TableCell
                     key={headCell.id}
                     align={headCell.alignRight ? 'right' : 'left'}
+                    sx={{backgroundColor: theme.palette.grey[200]}}
                   >
                     <TableSortLabel hideSortIcon>
                       {headCell.label}

@@ -22,6 +22,7 @@ import UserRef from "./pages/admin/UserRef";
 import WorksheetRefPage from "./pages/admin/WorksheetRefPage";
 import HorizontalLayout from "./layouts/horizontal/HorizontalLayout";
 import MatrixDetail from "./sections/matrix/MatrixDetail";
+import FollowUpKPPN from "./sections/followUp/FollowUpKPPN";
 
 
 // ----------------------------------------------------
@@ -71,6 +72,9 @@ export default function Router() {
     <Route path="/followUp" >
       <Route element={<RequireAuthLayout allowedRoles={[2]} />}>
         <Route index element={<FollowUpPage />} />
+      </Route>
+      <Route path="kppn" element={<RequireAuthLayout allowedRoles={[1, 2]} />}>
+        <Route index element={<FollowUpKPPN />} />
       </Route>
     </Route>
 

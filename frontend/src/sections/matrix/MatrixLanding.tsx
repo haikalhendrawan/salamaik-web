@@ -37,7 +37,8 @@ export default function MatrixLanding() {
               <ProgressPembinaan 
                 header={`Progress Kertas Kerja`}
                 number={40.3}
-                footer={`s.d. 20 Mei 2024`}
+                footer={`20 Mei 2024`}
+                detail={`20/20`}
                 icon={`mdi:cash-register`}
                 color={theme.palette.primary.main}
               />

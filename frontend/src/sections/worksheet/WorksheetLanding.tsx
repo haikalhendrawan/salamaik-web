@@ -27,7 +27,7 @@ export default function WorksheetLanding() {
               subheader='67% complete'
               lastUpdate="Last Update: Apr 12, 2022"
               image='kppn-padang.png'
-              kppn={'010'}
+              link={`/worksheet/kppn?id=010`}
             />
           </Grid>
 
@@ -37,7 +37,7 @@ export default function WorksheetLanding() {
               subheader='24% complete'
               lastUpdate="Last Update: Mei 19, 2022"
               image='kppn-bukittinggi.jpg'
-              kppn={'011'}
+              link={`/worksheet/kppn?id=011`}
             />
           </Grid>
 
@@ -47,7 +47,7 @@ export default function WorksheetLanding() {
               subheader='100% complete'
               lastUpdate="Last Update: Apr 16, 2022"
               image='kppn-solok.jpg'
-              kppn={'090'}
+              link={`/worksheet/kppn?id=090`}
             />
           </Grid>
 
@@ -57,7 +57,7 @@ export default function WorksheetLanding() {
               subheader='5% complete'
               lastUpdate="Last Update: Mei 12, 2022"
               image='kppn-lubuk-sikaping.jpg'
-              kppn={'091'}
+              link={`/worksheet/kppn?id=091`}
             />
           </Grid>
 
@@ -67,7 +67,7 @@ export default function WorksheetLanding() {
               subheader='88% complete'
               lastUpdate="Apr 12, 2022"
               image='kppn-sijunjung.png'
-              kppn={'077'}
+              link={`/worksheet/kppn?id=077`}
             />
           </Grid>
 
@@ -77,7 +77,7 @@ export default function WorksheetLanding() {
               subheader='12% complete'
               lastUpdate="Apr 12, 2022"
               image='kppn-painan.jpg'
-              kppn={'142'}
+              link={`/worksheet/kppn?id=142`}
             />
           </Grid>
         </Grid>

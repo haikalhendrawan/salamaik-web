@@ -6,7 +6,7 @@ import Iconify from "../../../components/iconify";
 interface ScorePembinaanProps {
   header: string,
   selfScore: number,
-  kanwilScore: number
+  kanwilScore: number,
 };
 
 // ----------------------------------------------

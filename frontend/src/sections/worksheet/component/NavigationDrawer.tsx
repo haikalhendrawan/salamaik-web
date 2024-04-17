@@ -23,12 +23,12 @@ const DrawerPaper = {
   borderRadius: '8px',
   display:'flex',
   flexDirection:'column',
-  position: 'fixed', bottom: 100, right: 0, top: 'unset', left: 'unset'
+  position: 'fixed', bottom: 50, right: 0, top: 'unset', left: 'unset'
 };
 
 const DrawerButton = styled(Button)({
   position: "absolute",
-  top:100,
+  top:150,
   right: '360px',
   zIndex: 1,
   borderRadius:'12px 0px 0px 12px',
@@ -67,10 +67,9 @@ export default function NavigationDrawer(){
       <Tooltip title="Drawer" placement="left">
         <Box
           role="presentation"
-          // Place the button in the bottom right corner.
           sx={{
             position: "fixed",
-            bottom: 500,
+            bottom: 400,
             right: 0,
             zIndex: 1,
           }}
@@ -201,7 +200,7 @@ export default function NavigationDrawer(){
 					</Slide>
 				)}
 			</Popper>
-      </Backdrop>
+    </Backdrop>
     
   </>
   )

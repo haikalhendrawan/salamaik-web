@@ -8,13 +8,14 @@ interface FollowUpProgressProps {
   header: string,
   number: number,
   footer: string,
+  detail: string,
   icon: string,
   color: string
 };
 
 // ----------------------------------------------
 
-export default function FollowUpProgress({header, number, footer, icon, color}: FollowUpProgressProps){
+export default function FollowUpProgress({header, number, footer, detail, icon, color}: FollowUpProgressProps){
   const theme = useTheme();
 
   return(
@@ -32,7 +33,7 @@ export default function FollowUpProgress({header, number, footer, icon, color}: 
           <Grid item xs={12} sm={6} md={7}>
             <RadialChart 
               chart={{
-                labels:['20'],
+                labels:[detail],
                 colors:theme.palette.primary.main,
                 toColor:theme.palette.primary.dark,  
                 series:[number]

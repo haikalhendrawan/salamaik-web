@@ -4,9 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "concurrently \"tsc --project ./tsconfig.build.json --watch\" \"nodemon ./dist/index.js\" ",
-    "build": "tsc --project '../tsconfig.build.json'",
-    "start": "npm run build &&  node --trace-warnings ./dist/index.js"
+    "build": "tsc",
+    "start": "nodemon"
   },
   "author": "haikal h",
   "license": "ISC",
@@ -20,6 +19,7 @@
     "express-rate-limit": "^7.2.0",
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^6.9.11",
+    "pg": "^8.11.5",
     "ts-node": "^10.9.2",
     "uuid": "^9.0.1"
   },
@@ -30,6 +30,7 @@
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/nodemailer": "^6.4.14",
+    "@types/pg": "^8.11.5",
     "@types/uuid": "^9.0.8",
     "concurrently": "^8.2.2",
     "typescript": "^5.4.2"

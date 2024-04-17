@@ -8,7 +8,8 @@ import WorksheetCard from './component/WorksheetCard';
 import InstructionPopover from './component/InstructionPopover';
 import NavigationDrawer from "./component/NavigationDrawer";
 // @mui
-import { Container, Stack, Typography, Tabs, Tab, Grid, Paper, IconButton, Box, LinearProgress} from '@mui/material';
+import { Container, Stack, Typography, Tabs, Tab, Grid, Paper, 
+        IconButton, Breadcrumbs, Link} from '@mui/material';
 import {useTheme, styled} from '@mui/material/styles';
 // -----------------------------------------------------------------------
 const SubkomponenDivider = styled(Paper)(({theme}) => ({
@@ -81,17 +82,19 @@ export default function WorksheetKPPN() {
       </Helmet>
 
       <Container>
-        <Stack direction='row' spacing={1} alignItems="center" sx={{ mb: 5 }}> 
-          <IconButton  
-            onClick={() => navigate(-1)}
-          >
-            <Iconify icon={"eva:arrow-ios-back-outline"} />
-          </IconButton> 
-          <Typography variant="h4" >
-            {`KPPN ${id!==null ? SELECT_KPPN[id]:null}`}
-          </Typography>
-        </Stack>
+        <Stack direction="column" justifyContent="space-between" sx={{mb: 5}}>
+          <Stack direction='row' spacing={1} alignItems="center">
+            <IconButton  
+              onClick={() => navigate(-1)}
+            >
+              <Iconify icon={"eva:arrow-ios-back-outline"} />
+            </IconButton> 
+            <Typography variant="h4" >
+              {`KPPN ${id!==null ? SELECT_KPPN[id]:null}`}
+            </Typography>
+          </Stack>
 
+        </Stack>
 
         <Stack direction="row" alignItems="center" justifyContent="center " mb={5} >
           <Tabs value={tabValue} onChange={handleTabChange}> 
@@ -101,14 +104,6 @@ export default function WorksheetKPPN() {
             <Tab icon={<Iconify icon="solar:incognito-bold-duotone" />} label="Tata Kelola Internal" value={3} />
           </Tabs>
         </Stack>
-
-        {/* <Stack direction={'column'} spacing={0} width={'90%'} sx={{mx: 'auto'}}>
-          <LinearProgressWithLabel value={60.3}  text={'Overall Progress'}></LinearProgressWithLabel>
-        </Stack>
-        <Stack direction={'column'} spacing={0} width={'90%'} sx={{mx: 'auto', mb:2}}>
-          <LinearProgressWithLabel value={90.3}  text={'Komponen Treasurer'}></LinearProgressWithLabel>
-        </Stack> */}
-
 
         <Grid container spacing={2}>
           <Grid item xs={12} md={12}>
@@ -180,34 +175,3 @@ export default function WorksheetKPPN() {
   );
 };
 
-
-// ---------------------------------------------------------------------------
-interface LinearProgressWithLabelProps {
-  value: number;
-  text: string
-};
-
-function LinearProgressWithLabel(props : LinearProgressWithLabelProps) {
-  return (
-
-      <>
-      <Stack direction='column' spacing={0}>
-
-        <Box sx={{ display: 'flex', alignItems: 'center', m:0 }}>
-          <Box sx={{ width:'15%', mb: 0.5 }}>
-            <Typography variant="body3">{props.text}</Typography>
-          </Box>
-          <Box sx={{ width: '70%', mr: 1, ml: 2 }}>
-            <LinearProgress variant="determinate" {...props} sx={{borderRadius:'12px'}} />
-          </Box>
-          <Box sx={{ width:'10%' }}>
-            <Typography variant="body2" color="text.secondary" noWrap>
-              {`${Math.round(props.value,)}%`}
-            </Typography>
-          </Box>
-        </Box>
-      </Stack>
-      
-      </>
-  );
-};

@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {Card, Typography, Grid, Box, Tabs, Tab, CardContent, Stack} from '@mui/material';
+import {Card, Typography, Grid, IconButton, CardContent, Stack} from '@mui/material';
 import {styled, useTheme} from '@mui/material/styles';
 import Iconify from "../../../components/iconify";
 import RadialChart from "../../../components/radialChart/RadialChart";
@@ -8,14 +8,17 @@ interface ProgressPembinaanProps {
   header: string,
   number: number,
   footer: string,
+  detail: string,
   icon: string,
   color: string
 };
 
 // ----------------------------------------------
 
-export default function ProgressPembinaan({header, number, footer, icon, color}: ProgressPembinaanProps){
+export default function ProgressPembinaan({header, number, footer, detail, icon, color}: ProgressPembinaanProps){
   const theme = useTheme();
+
+  const [value, setValue] = useState<number>(0);
 
   return(
     <Card sx={{height:'200px', borderRadius:'16px'}}>
@@ -30,14 +33,16 @@ export default function ProgressPembinaan({header, number, footer, icon, color}:
 
           </Grid>
           <Grid item xs={12} sm={6} md={7}>
-            <RadialChart 
-              chart={{
-                labels:['20/20'],
-                colors:theme.palette.primary.main,
-                toColor:theme.palette.primary.dark,  
-                series:[number]
+            <Stack direction={'row'} alignItems="center"> 
+              <RadialChart 
+                chart={{
+                  labels:[detail],
+                  colors:theme.palette.primary.main,
+                  toColor:theme.palette.primary.dark,  
+                  series:[number]
                 }} 
               />
+            </Stack>
           </Grid>
         </Grid>
       </CardContent>
