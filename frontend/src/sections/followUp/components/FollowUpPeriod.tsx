@@ -37,11 +37,9 @@ export default function FollowUpPeriod({header, open, close}:FollowUpPeriodProps
 
               <Grid item xs={8} key={1}>
                 <Box sx={{justifyContent:'center'}} dir="ltr" >
-                  <img src='/image/Other 03.png' style={{height:'150px', margin: 'auto', marginTop: -25}} />
+                  <img src='/image/Other 15.png' style={{height:'200px', margin: 'auto', marginTop: -50, marginLeft: 30}} />
                 </Box>
               </Grid>
-
-
             </Grid>
 
         </Stack>

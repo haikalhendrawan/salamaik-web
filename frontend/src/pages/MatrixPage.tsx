@@ -18,7 +18,7 @@ export default function MatrixPage() {
 
   return (
     <>
-      <Container maxWidth="xl">
+      <Container>
         <MatrixLanding />
       </Container>
     </>

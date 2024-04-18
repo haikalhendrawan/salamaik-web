@@ -28,7 +28,7 @@ const MENU_OPTIONS: Array<MenuOptionType> = [
   //   icon: 'eva:settings-2-fill',
   // },
   {
-    label: 'Smt 2 2023',
+    label: 'Smt 1 2024',
     icon: 'mdi:calendar',
     link: '',
     component:NavLink
@@ -119,10 +119,10 @@ export default function AccountPopover() {
       >
         <Box sx={{ my: 1.5, px: 2.5 }}>
           <Typography variant="subtitle2" noWrap>
-            {auth?.name}
+            {auth?.name || 'User'}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-            {auth?.email}
+            {auth?.email || 'user@kemenkeu.go.id'}
           </Typography>
         </Box>
 

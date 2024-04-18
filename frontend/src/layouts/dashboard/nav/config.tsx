@@ -13,16 +13,15 @@ const navSupervisi = [
     icon: icon('solar--ruler-pen-bold-duotone'),
   },
   {
-    title: 'Tindak Lanjut',
-    path: '/followUp',
-    icon: icon('solar--rocket-2-bold-duotone'),
-  },
-  {
     title: 'Matriks',
     path: '/matrix',
     icon: icon('solar--clipboard-list-bold-duotone'),
   },
-
+  {
+    title: 'Tindak Lanjut',
+    path: '/followUp',
+    icon: icon('solar--rocket-2-bold-duotone'),
+  },
 ];
 
 
@@ -48,7 +47,7 @@ const navAdmin = [
 
 const navMonitoring = [
   {
-    title: 'Dashboard Salamaik',
+    title: 'Riwayat Pembinaan',
     path: 'https://drive.google.com/file/d/1Z_ozqch3MV2IKWNFPDfCeafP0MPexJtO/view?usp=sharing',
     icon: icon('solar--chart-bold-duotone'),
     info: 'solar--folder-open-bold-duotone'
