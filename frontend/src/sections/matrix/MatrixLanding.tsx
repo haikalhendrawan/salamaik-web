@@ -1,72 +1,88 @@
+import {useEffect, useRef} from "react";
+import { Helmet } from 'react-helmet-async';
 // @mui
-import { Container, Stack, Typography, Tabs, Tab, Grid, Paper, IconButton, Box, LinearProgress} from '@mui/material';
-import {useTheme, styled} from '@mui/material/styles';
+import { useTheme } from '@mui/material/styles';
+import { Grid, Container, Typography, LinearProgress, Button, Box } from '@mui/material';
 // sections
-import ScorePembinaan from '../home/components/ScorePembinaan';
-import ProgressPembinaan from '../home/components/ProgressPembinaan';
-import RekapitulasiNilaiTable from './components/RekapitulasiNilaiTable';
-import MatrixGateway from './components/MatrixGateway';
+import KPPNSelectionCard from "./components/KPPNSelectionCard";
+// ----------------------------------------------------------------------
 
 export default function MatrixLanding() {
   const theme = useTheme();
 
   return (
     <>
-      <Typography variant="h4" gutterBottom sx={{ mb: 5 }}>
+      <Helmet>
+        <title> Salamaik | Matrix  </title>
+      </Helmet>
+
+      <Typography variant="h4" sx={{ mb: 5 }}>
         Matriks
       </Typography>
-      
-      <Stack direction='row'>
-        <Grid container spacing={4}>
-          {/* <Grid item xs={4}>
-            <ProgressPembinaan 
-              header={`Progress Kertas Kerja`}
-              number={40.3}
-              footer={`s.d. 20 Mei 2024`}
-              icon={`mdi:cash-register`}
-              color={theme.palette.primary.main}
-            />
-          </Grid> */}
-          <Grid item xs={5}>
-            <Stack direction='column' spacing={2}>
-              <ScorePembinaan
-                header={`Nlai Kinerja KPPN (avg)`}
-                selfScore={9.77}
-                kanwilScore={9.45} 
-              />
-              <ProgressPembinaan 
-                header={`Progress Kertas Kerja`}
-                number={40.3}
-                footer={`20 Mei 2024`}
-                detail={`20/20`}
-                icon={`mdi:cash-register`}
-                color={theme.palette.primary.main}
-              />
-            </Stack>
-           
-          </Grid>
-          <Grid item xs={7}>
-            <MatrixGateway
-              title='Detail Matriks'
-              subheader='Lihat matriks Pembinaan dan Supervisi' 
-            />
-          </Grid>
-          {/* <Grid item xs={4}>
-            <AmountTemuan
-              header={`Jumlah Permasalahan`}
-              subheader={`(non-final)`}
-              temuan={7}
-            />
-          </Grid> */}
-          <Grid item xs={12}>
-            <RekapitulasiNilaiTable />
-          </Grid>
+      <Grid container spacing={4}>
+        <Grid item xs={12} md={6}>
+          <KPPNSelectionCard
+            header='KPPN Padang'
+            subheader='67% complete'
+            lastUpdate="Last Update: Apr 12, 2022"
+            image='kppn-padang.png'
+            link={`/matrix/kppn?id=010`}
+          />
         </Grid>
-        
-        
-      </Stack>
+
+        <Grid item xs={12} md={6}>
+          <KPPNSelectionCard
+            header='KPPN Bukittinggi'
+            subheader='24% complete'
+            lastUpdate="Last Update: Mei 19, 2022"
+            image='kppn-bukittinggi.jpg'
+            link={`/matrix/kppn?id=011`}
+          />
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <KPPNSelectionCard
+            header='KPPN Solok'
+            subheader='100% complete'
+            lastUpdate="Last Update: Apr 16, 2022"
+            image='kppn-solok.jpg'
+            link={`/matrix/kppn?id=090`}
+          />
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <KPPNSelectionCard
+            header='KPPN Lubuk Sikaping'
+            subheader='5% complete'
+            lastUpdate="Last Update: Mei 12, 2022"
+            image='kppn-lubuk-sikaping.jpg'
+            link={`/matrix/kppn?id=091`}
+          />
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <KPPNSelectionCard
+            header='KPPN Sijunjung'
+            subheader='88% complete'
+            lastUpdate="Apr 12, 2022"
+            image='kppn-sijunjung.png'
+            link={`/matrix/kppn?id=077`}
+          />
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <KPPNSelectionCard
+            header='KPPN Painan'
+            subheader='12% complete'
+            lastUpdate="Apr 12, 2022"
+            image='kppn-painan.jpg'
+            link={`/matrix/kppn?id=142`}
+          />
+        </Grid>
+      </Grid>
 
     </>
-  )
-
+  );
 }
+
+

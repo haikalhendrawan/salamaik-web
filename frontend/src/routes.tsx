@@ -15,6 +15,7 @@ import WorksheetLanding from "./sections/worksheet/WorksheetLanding";
 import WorksheetKPPN from "./sections/worksheet/WorksheetKPPN";
 import Page403 from "./pages/guard/Page403";
 import MatrixPage from "./pages/MatrixPage";
+import MatrixKPPN from "./sections/matrix/MatrixKPPN";
 import FollowUpPage from "./pages/FollowUpPage";
 
 // admin
@@ -63,7 +64,9 @@ export default function Router() {
       <Route element={<RequireAuthLayout allowedRoles={[2]} />}>
         <Route index element={<MatrixPage />} />
       </Route>
-
+      <Route path="kppn" element={<RequireAuthLayout allowedRoles={[1, 2]} />}>
+        <Route index element={<MatrixKPPN />} />
+      </Route>
       <Route element={<HorizontalLayout /> }>
         <Route path="detail" element={<MatrixDetail />} />
       </Route>

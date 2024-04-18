@@ -2,14 +2,14 @@ import { Helmet } from 'react-helmet-async';
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 // @mui
-import { Container, Stack, Typography, Grid, IconButton, Breadcrumbs, Link} from '@mui/material';
+import { Container, Stack, Typography, Tabs, Tab, Grid, Paper, IconButton, Box, LinearProgress} from '@mui/material';
 import {useTheme, styled} from '@mui/material/styles';
 import Iconify from '../../components/iconify/Iconify';
 // sections
-import FollowUpProgress from './components/FollowUpProgress';
-import AmountTemuan from './components/AmountTemuan';
-import FollowUpPeriod from './components/FollowUpPeriod';
-import FollowUpTable from './components/FollowUpTable';
+import ScorePembinaan from '../home/components/ScorePembinaan';
+import ProgressPembinaan from '../home/components/ProgressPembinaan';
+import RekapitulasiNilaiTable from './components/RekapitulasiNilaiTable';
+import MatrixGateway from './components/MatrixGateway';
 // --------------------------------------------------------------
 const SELECT_KPPN: {[key: string]: string} = {
   '010': 'Padang',
@@ -21,15 +21,14 @@ const SELECT_KPPN: {[key: string]: string} = {
 };
 
 // --------------------------------------------------------------
-export default function FollowUpKPPN() {
+export default function MatrixKPPN() {
   const theme = useTheme();
 
   const navigate = useNavigate();
-  
+
   const params = new URLSearchParams(useLocation().search);
 
   const id= params.get('id');
-
   return (
     <>
       <Container maxWidth='xl'>
@@ -48,40 +47,55 @@ export default function FollowUpKPPN() {
         
         <Stack direction='row'>
           <Grid container spacing={4}>
-            <Grid item xs={4}>
-              <AmountTemuan
-                header={`Jumlah Permasalahan`}
-                subheader={`Periode Semester 1 Tahun 2024 (Non-final)`}
-                temuan={7}
-              />
-            </Grid>
-            <Grid item xs={4}>
-              <FollowUpProgress
-                header={`Progress Tindak Lanjut`}
+            {/* <Grid item xs={4}>
+              <ProgressPembinaan 
+                header={`Progress Kertas Kerja`}
                 number={40.3}
-                footer={`3/7 diselesaikan`}
-                detail={'3/7'}
+                footer={`s.d. 20 Mei 2024`}
                 icon={`mdi:cash-register`}
                 color={theme.palette.primary.main}
               />
+            </Grid> */}
+            <Grid item xs={5}>
+              <Stack direction='column' spacing={2}>
+                <ScorePembinaan
+                  header={`Nlai Kinerja KPPN`}
+                  selfScore={9.77}
+                  kanwilScore={9.45} 
+                />
+                <ProgressPembinaan 
+                  header={`Progress Kertas Kerja`}
+                  number={40.3}
+                  footer={`20 Mei 2024`}
+                  detail={`20/20`}
+                  icon={`mdi:cash-register`}
+                  color={theme.palette.primary.main}
+                />
+              </Stack>
+            
             </Grid>
-            <Grid item xs={4}>
-              <FollowUpPeriod
-                header={'Periode Tindak Lanjut'}
-                open={'01-01-2024'}
-                close={'05-01-2024'}
+            <Grid item xs={7}>
+              <MatrixGateway
+                title='Detail Matriks'
+                subheader='Lihat matriks Pembinaan dan Supervisi' 
               />
             </Grid>
-
+            {/* <Grid item xs={4}>
+              <AmountTemuan
+                header={`Jumlah Permasalahan`}
+                subheader={`(non-final)`}
+                temuan={7}
+              />
+            </Grid> */}
             <Grid item xs={12}>
-              <FollowUpTable />
+              <RekapitulasiNilaiTable />
             </Grid>
-
           </Grid>
           
           
         </Stack>
       </Container>
+      
     </>
   )
 
