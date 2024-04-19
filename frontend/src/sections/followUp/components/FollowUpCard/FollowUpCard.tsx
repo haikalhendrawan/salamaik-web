@@ -82,7 +82,7 @@ export default function FollowUpCard(props: FollowUpCardProps) {
                   <Grid item xs={1.5}>
                     <Typography variant="body2"> Nilai</Typography>
                   </Grid>
-                  
+
                   <Grid item xs={2.5}>
                     <Typography variant="body2">  Catatan Kanwil </Typography>
                   </Grid>
@@ -97,199 +97,195 @@ export default function FollowUpCard(props: FollowUpCardProps) {
               <Divider  flexItem/>  
 
               <Grid container sx={{mt:0, maxHeight:'160px', textAlign:'center',  justifyContent:'center'}} spacing={1}>  {/* Table Body */}
-                  <Grid item xs={5} >
-                    <Scrollbar  sx={{
-                      height: 140,
-                      '& .simplebar-content': { height: 1, display: 'flex', flexDirection: 'column' },
-                      pl:4,
-                      pr:4
-                    }}>
-                      <Box>
-                        <Typography variant="body2" sx={{mr:1, fontSize:12}} dangerouslySetInnerHTML={{__html:props.description}} textAlign={'justify'}/>
-                      </Box> 
-                    </Scrollbar>
-                  </Grid>
+                <Grid item xs={5} >
+                  <Scrollbar  sx={{
+                    height: 140,
+                    '& .simplebar-content': { height: 1, display: 'flex', flexDirection: 'column' },
+                    pl:4,
+                    pr:4
+                  }}>
+                    <Box>
+                      <Typography variant="body2" sx={{mr:1, fontSize:12}} dangerouslySetInnerHTML={{__html:props.description}} textAlign={'justify'}/>
+                    </Box> 
+                  </Scrollbar>
+                </Grid>
 
-                  <Grid item xs={1.5}> 
-                    <Stack direction='column' spacing={2}>
-                      <Stack direction='column' spacing={1}>
-                        <Typography variant='body3' sx={{fontSize:12}} textAlign={'left'}>Bukti Dukung :</Typography>
-                        <Stack direction='row' spacing={1}>
-                          <Tooltip title='file 1'>
-                            <span>
-                              <StyledButton 
-                                aria-label="edit" 
-                                variant='contained' 
-                                size='small' 
-                                color='secondary'
-                                onClick={props.modalOpen}
-                              >
-                                <Iconify icon="solar:file-bold-duotone"/>
-                              </StyledButton>
-                            </span>
-                          </Tooltip>
+                <Grid item xs={1.5}> 
+                  <Stack direction='column' spacing={2}>
+                    <Stack direction='column' spacing={1}>
+                      <Typography variant='body3' sx={{fontSize:12}} textAlign={'left'}>Bukti Dukung :</Typography>
+                      <Stack direction='row' spacing={1}>
+                        <Tooltip title='file 1'>
+                          <span>
+                            <StyledButton 
+                              aria-label="edit" 
+                              variant='contained' 
+                              size='small' 
+                              color='secondary'
+                              onClick={props.modalOpen}
+                            >
+                              <Iconify icon="solar:file-bold-duotone"/>
+                            </StyledButton>
+                          </span>
+                        </Tooltip>
 
-                          <Tooltip title='file 2'>
-                            <span>
-                              <StyledButton 
-                                aria-label="edit" 
-                                variant='contained' 
-                                size='small' 
-                                color='secondary'
-                                onClick={props.modalOpen}
-                              >
-                                <Iconify icon="solar:file-bold-duotone"/>
-                              </StyledButton>
-                            </span>
-                          </Tooltip>
+                        <Tooltip title='file 2'>
+                          <span>
+                            <StyledButton 
+                              aria-label="edit" 
+                              variant='contained' 
+                              size='small' 
+                              color='secondary'
+                              onClick={props.modalOpen}
+                            >
+                              <Iconify icon="solar:file-bold-duotone"/>
+                            </StyledButton>
+                          </span>
+                        </Tooltip>
 
-                          <input accept='image/*,.pdf,.zip,.rar' type='file' style={{display:'none'}} ref={addFileRef} tabIndex={-1} />
-                          <Tooltip title='Add file'>
-                            <span>
-                              <StyledButton aria-label="delete" variant='contained' size='small' color='white' onClick={openUploadFile}>
-                                <Iconify sx={{color:theme.palette.grey[500]}} icon="solar:add-circle-bold"/>
-                              </StyledButton>
-                            </span>
-                          </Tooltip>
-                        </Stack>
+                        <input accept='image/*,.pdf,.zip,.rar' type='file' style={{display:'none'}} ref={addFileRef} tabIndex={-1} />
+                        <Tooltip title='Add file'>
+                          <span>
+                            <StyledButton aria-label="delete" variant='contained' size='small' color='white' onClick={openUploadFile}>
+                              <Iconify sx={{color:theme.palette.grey[500]}} icon="solar:add-circle-bold"/>
+                            </StyledButton>
+                          </span>
+                        </Tooltip>
                       </Stack>
-                      
-                      <Stack direction='column' spacing={1}>
-                        <Typography variant='body3' sx={{fontSize:12}} textAlign={'left'}>Petunjuk :</Typography>
-                        <Stack direction='row' spacing={1}>
-                          <Tooltip title='Instruksi'>
-                            <span>
-                              <StyledButton 
-                                aria-label="instruksi" 
-                                variant='contained' 
-                                size='small' 
-                                color='white' 
-                                onClick={(e) => props.openInstruction(e)}
-                              >
-                                <Iconify sx={{color:theme.palette.grey[500]}} icon="solar:info-circle-bold"/>
-                              </StyledButton>
-                            </span>
-                          </Tooltip>
-                          <Tooltip title='Contoh Bukti Dukung'>
-                            <span>
-                              <StyledButton 
-                                aria-label="edit" 
-                                variant='contained' 
-                                size='small' 
-                                color='warning'
-                              >
-                                <Iconify icon="solar:file-bold-duotone"/>
-                              </StyledButton>
-                            </span>
-                          </Tooltip>
-                        </Stack>
-                      </Stack>
-                      
-                    </Stack>   
-                  </Grid>
-
-                  <Grid item xs={1.5} > 
-                    <Stack direction='column' spacing={2} sx={{px: 2}}>
-                      <Stack direction='column' spacing={1} >
-                        <Typography variant='body3' sx={{fontSize:12}} textAlign={'left'}>Nilai KPPN :</Typography>
-                        <FormControl sx={{width:'100%', height:'100%'}}>
-                          <Select 
-                            required 
-                            name="kondisi" 
-                            disabled
-                            value={selectValue2}  
-                            size='small' 
-                            sx={{typography:'body2', fontSize:12,}}
-                          >
-                            <MenuItem key={0} sx={{fontSize:12}} value={0}>10</MenuItem>
-                            <MenuItem key={1} sx={{fontSize:12}} value={1}>5</MenuItem>
-                            <MenuItem key={2} sx={{fontSize:12}} value={2}>0</MenuItem>
-                          </Select>
-                        </FormControl>
-                      </Stack>
-                      
-                      <Stack direction='column' spacing={1}>
-                        <Typography variant='body3' sx={{fontSize:12}} textAlign={'left'}>Nilai Kanwil :</Typography>
-                        <FormControl sx={{width:'100%', height:'100%'}}>
-                          <Select 
-                            required 
-                            name="kondisi" 
-                            value={selectValue2}  
-                            size='small' 
-                            sx={{typography:'body2', fontSize:12}}
-                          >
-                            <MenuItem key={0} sx={{fontSize:12}} value={0}>10</MenuItem>
-                            <MenuItem key={1} sx={{fontSize:12}} value={1}>5</MenuItem>
-                            <MenuItem key={2} sx={{fontSize:12}} value={2}>0</MenuItem>
-                          </Select>
-                        </FormControl>
-                      </Stack>
-                      
-                    </Stack>    
+                    </Stack>
                     
-                  </Grid>
-
-                  <Grid item xs={2.5}>  
-                    <FormControl sx={{width:'100%', height:'100%', pr:1, pt:0.5}}>
-                      <TextField 
-                        name="catatankppn" 
-                        size='small' 
-                        value={value} 
-                        onChange={handleChange} 
-                        multiline 
-                        minRows={6} 
-                        maxRows={6}
-                        sx={{width:'100%', height:'100%'}}  
-                        inputProps={{sx: {fontSize: 12, width:'100%', height:'100%'}, spellCheck: false,}} 
-                      />
-                    </FormControl>
-                  </Grid>
-
-                  <Grid item xs={1.5}>  
-                    <Stack direction='column' spacing={3}>
-                      <Stack direction='column' spacing={1}>
-                        <Typography variant='body3' sx={{fontSize:12}} textAlign={'left'}>Status :</Typography>
-                          <Stack direction='row' spacing={1}>
-                            <Label color='success'> Approved</Label>
-                          </Stack>
+                    <Stack direction='column' spacing={1}>
+                      <Typography variant='body3' sx={{fontSize:12}} textAlign={'left'}>Petunjuk :</Typography>
+                      <Stack direction='row' spacing={1}>
+                        <Tooltip title='Instruksi'>
+                          <span>
+                            <StyledButton 
+                              aria-label="instruksi" 
+                              variant='contained' 
+                              size='small' 
+                              color='white' 
+                              onClick={(e) => props.openInstruction(e)}
+                            >
+                              <Iconify sx={{color:theme.palette.grey[500]}} icon="solar:info-circle-bold"/>
+                            </StyledButton>
+                          </span>
+                        </Tooltip>
+                        <Tooltip title='Contoh Bukti Dukung'>
+                          <span>
+                            <StyledButton 
+                              aria-label="edit" 
+                              variant='contained' 
+                              size='small' 
+                              color='warning'
+                            >
+                              <Iconify icon="solar:file-bold-duotone"/>
+                            </StyledButton>
+                          </span>
+                        </Tooltip>
                       </Stack>
-                      
-                      <Stack direction='column' spacing={1}>
-                        <Typography variant='body3' sx={{fontSize:12}} textAlign={'left'}>Action :</Typography>
-                        <Stack direction='row' spacing={1}>
-                          <Tooltip title='Approve'>
-                            <span>
-                              <StyledButton 
-                                aria-label="instruksi" 
-                                variant='contained' 
-                                size='small' 
-                                color='success' 
-                              >
-                                <Iconify icon="solar:check-circle-bold-duotone"/>
-                              </StyledButton>
-                            </span>
-                          </Tooltip>
-                          <Tooltip title='Tolak'>
-                            <span>
-                              <StyledButton 
-                                aria-label="edit" 
-                                variant='contained' 
-                                size='small' 
-                                color='error'
-                              >
-                                <Iconify icon="solar:close-circle-bold"/>
-                              </StyledButton>
-                            </span>
-                          </Tooltip>
-                        </Stack>
-                      </Stack>
-                      
-                    </Stack>   
-                  </Grid>
+                    </Stack>
+                    
+                  </Stack>   
+                </Grid>
 
-
-
+                <Grid item xs={1.5} > 
+                  <Stack direction='column' spacing={2} sx={{px: 2}}>
+                    <Stack direction='column' spacing={1} >
+                      <Typography variant='body3' sx={{fontSize:12}} textAlign={'left'}>Nilai KPPN :</Typography>
+                      <FormControl sx={{width:'100%', height:'100%'}}>
+                        <Select 
+                          required 
+                          name="kondisi" 
+                          disabled
+                          value={selectValue2}  
+                          size='small' 
+                          sx={{typography:'body2', fontSize:12,}}
+                        >
+                          <MenuItem key={0} sx={{fontSize:12}} value={0}>10</MenuItem>
+                          <MenuItem key={1} sx={{fontSize:12}} value={1}>5</MenuItem>
+                          <MenuItem key={2} sx={{fontSize:12}} value={2}>0</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Stack>
+                    
+                    <Stack direction='column' spacing={1}>
+                      <Typography variant='body3' sx={{fontSize:12}} textAlign={'left'}>Nilai Kanwil :</Typography>
+                      <FormControl sx={{width:'100%', height:'100%'}}>
+                        <Select 
+                          required 
+                          name="kondisi" 
+                          value={selectValue2}  
+                          size='small' 
+                          sx={{typography:'body2', fontSize:12}}
+                        >
+                          <MenuItem key={0} sx={{fontSize:12}} value={0}>10</MenuItem>
+                          <MenuItem key={1} sx={{fontSize:12}} value={1}>5</MenuItem>
+                          <MenuItem key={2} sx={{fontSize:12}} value={2}>0</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Stack>
+                    
+                  </Stack>    
                   
+                </Grid>
+
+                <Grid item xs={2.5}>  
+                  <FormControl sx={{width:'100%', height:'100%', pr:1, pt:0.5}}>
+                    <TextField 
+                      name="catatankppn" 
+                      size='small' 
+                      value={value} 
+                      onChange={handleChange} 
+                      multiline 
+                      minRows={6} 
+                      maxRows={6}
+                      sx={{width:'100%', height:'100%'}}  
+                      inputProps={{sx: {fontSize: 12, width:'100%', height:'100%'}, spellCheck: false,}} 
+                    />
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={1.5}>  
+                  <Stack direction='column' spacing={3}>
+                    <Stack direction='column' spacing={1}>
+                      <Typography variant='body3' sx={{fontSize:12}} textAlign={'left'}>Status :</Typography>
+                        <Stack direction='row' spacing={1}>
+                          <Label color='success'> Approved</Label>
+                        </Stack>
+                    </Stack>
+                    
+                    <Stack direction='column' spacing={1}>
+                      <Typography variant='body3' sx={{fontSize:12}} textAlign={'left'}>Action :</Typography>
+                      <Stack direction='row' spacing={1}>
+                        <Tooltip title='Approve'>
+                          <span>
+                            <StyledButton 
+                              aria-label="instruksi" 
+                              variant='contained' 
+                              size='small' 
+                              color='success' 
+                            >
+                              <Iconify icon="solar:check-circle-bold-duotone"/>
+                            </StyledButton>
+                          </span>
+                        </Tooltip>
+                        <Tooltip title='Tolak'>
+                          <span>
+                            <StyledButton 
+                              aria-label="edit" 
+                              variant='contained' 
+                              size='small' 
+                              color='error'
+                            >
+                              <Iconify icon="solar:close-circle-bold"/>
+                            </StyledButton>
+                          </span>
+                        </Tooltip>
+                      </Stack>
+                    </Stack>
+                    
+                  </Stack>   
+                </Grid>    
               </Grid>
 
               <Divider sx={{ borderStyle: 'dashed', mt: 3 }}/>
