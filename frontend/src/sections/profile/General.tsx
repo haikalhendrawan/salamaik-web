@@ -40,7 +40,7 @@ export default function General(){
 
             <Stack direction="column"justifyContent="center"alignItems="center">
               <Typography variant='body2' color={theme.palette.text.disabled}>
-                Muhammad Haikal Putra Hendrawan
+                User
               </Typography>
               <Typography variant='body2' color={theme.palette.text.disabled} sx={{mt:0}}>
                 199904082021011001
@@ -64,30 +64,30 @@ export default function General(){
             <Stack direction='row' spacing={2} sx={{width:'100%'}} justifyContent={'center'}>
               <Stack direction='column' spacing={3} sx={{width:'45%'}}>
                 <FormControl>
-                  <StyledTextField name="name" label="Nama Pegawai" />
+                  <StyledTextField name="name" defaultValue='User' label="Nama Pegawai" />
                 </FormControl>
                 <FormControl>
-                  <StyledTextField name="email" label="Email"  />
+                  <StyledTextField name="email" defaultValue='User@kemenkeu.go.id' label="Email"  />
                 </FormControl>
                 <FormControl>
-                  <StyledTextField name="uid" label="UID" disabled/>
+                  <StyledTextField name="uid" defaultValue='12AB-QWEN-03PE-003M' label="UID" disabled/>
                 </FormControl>
                 <FormControl>
-                  <StyledTextField name="role" label="Role"  />
+                  <StyledTextField name="role" defaultValue='Admin Kanwil' label="Role"  />
                 </FormControl>
               </Stack>
               <Stack direction='column' spacing={3} sx={{width:'45%'}}>
                 <FormControl>
-                  <StyledTextField name="nip" label="NIP"  />
+                  <StyledTextField name="nip" defaultValue='199904082021011001' label="NIP"  />
                 </FormControl>
                 <FormControl>
-                  <StyledTextField name="unit" label="Unit" />
+                  <StyledTextField name="unit" defaultValue='Kanwil DJPb Sumbar' label="Unit" />
                 </FormControl>
                 <FormControl>
-                  <StyledTextField name="name" label="Nama Pegawai" />
+                  <StyledTextField name="name" defaultValue='User' label="Nama Pegawai" />
                 </FormControl>
                 <FormControl>
-                  <StyledTextField name="periode" label="Periode" />
+                  <StyledTextField name="periode" defaultValue='Smt 1 2024' label="Periode" />
                 </FormControl>
               </Stack>
             </Stack>

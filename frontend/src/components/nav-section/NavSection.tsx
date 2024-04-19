@@ -16,7 +16,8 @@ import NavItem from "./NavItem";
 interface NavSectionProp{
   data: any[]
   header?: string
-}
+};
+
 export default function NavSection({ data = [], ...other}:NavSectionProp) {
   return (
     <Box {...other}>

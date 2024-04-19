@@ -92,7 +92,7 @@ export default function AccountPopover() {
           }),
         }}
       >
-        <Avatar key={avatarKey} src={'/avatar/default-male.png'} alt="photoURL" />
+        <Avatar key={avatarKey} src={'/avatar/default-female.png'} alt="photoURL" />
       </IconButton>
 
       <Popover

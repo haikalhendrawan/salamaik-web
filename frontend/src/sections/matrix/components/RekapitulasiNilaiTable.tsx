@@ -32,10 +32,10 @@ interface RekapitulasiNilaiData{
 };
 
 const TABLE_DATA: RekapitulasiNilaiData[] = [
-  {id:1, komponen:'Treasurer', totalKomponen: 14, bilanganPembagi:20, averageScore:10, bobot: 20, weightedScore: 22.5},
-  {id:2, komponen:'Pengelola Fiskal, Representasi Kemenkeu di Daerah, dan Special Mission', totalKomponen: 14, bilanganPembagi:20, averageScore:10, bobot: 20, weightedScore: 22.5},
-  {id:3, komponen:'Financial Advisor', totalKomponen: 14, bilanganPembagi:20, averageScore:10, bobot: 20, weightedScore: 22.5},
-  {id:4, komponen:'Tata Kelola Internal', totalKomponen: 14, bilanganPembagi:20, averageScore:10, bobot: 20, weightedScore: 22.5},
+  {id:1, komponen:'Treasurer', totalKomponen: 140, bilanganPembagi:14, averageScore:10, bobot: 20, weightedScore: 20},
+  {id:2, komponen:'Pengelola Fiskal, Representasi Kemenkeu di Daerah, dan Special Mission', totalKomponen: 100, bilanganPembagi:10, averageScore:10, bobot: 30, weightedScore: 30},
+  {id:3, komponen:'Financial Advisor', totalKomponen: 210, bilanganPembagi:21, averageScore:10, bobot: 20, weightedScore: 20},
+  {id:4, komponen:'Tata Kelola Internal', totalKomponen: 150, bilanganPembagi:15, averageScore:10, bobot: 30, weightedScore: 30},
 ];
 
 // ----------------------------------------------------------------------------------
@@ -96,7 +96,7 @@ export default function RekapitulasiNilaiTable() {
                   Nilai Akhir
                 </TableCell>
                 <TableCell align='left' sx={{fontWeight:'bold', backgroundColor: theme.palette.warning.main}}>
-                  9.43
+                  10.00
                 </TableCell>
               </TableRow>
             </TableBody>

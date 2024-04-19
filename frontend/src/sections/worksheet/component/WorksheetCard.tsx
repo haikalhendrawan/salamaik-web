@@ -93,7 +93,7 @@ export default function WorksheetCard(props: WorksheetCardProps) {
               <Grid container sx={{mt:0, maxHeight:'160px', textAlign:'center',  justifyContent:'center'}} spacing={1}>  {/* Table Body */}
                   <Grid item xs={6} >
                     <Scrollbar  sx={{
-                      height: 140,
+                      height: 150,
                       '& .simplebar-content': { height: 1, display: 'flex', flexDirection: 'column' },
                       pl:4,
                       pr:4

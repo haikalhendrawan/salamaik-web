@@ -159,40 +159,57 @@ export default function WorksheetKPPN() {
                 file={file}
                 openInstruction={handleOpenInstruction}
               />
+
+              <Grid item xs={12} sm={12} md={12}>
+                <Stack direction='row'>
+                  <SubkomponenDivider>
+                    Subkomponen : Penyaluran Belanja atas Beban APBN
+                  </SubkomponenDivider>
+
+                  {/* <IconButton aria-label="edit" size='small' color='primary'>
+                    <Iconify icon="solar:round-arrow-up-bold"/>
+                  </IconButton>
+
+                  <IconButton aria-label="edit" size='small' color='primary'>
+                    <Iconify icon="solar:round-arrow-down-bold"/>
+                  </IconButton> */}
+                </Stack>
+              </Grid>
+
               <WorksheetCard 
-                id={2} 
-                title={'Upaya meminimalisir terjadinya deviasi RPD pada Satker'} 
-                description={`Berdasarkan data Satker yang belum merealisasikan anggarannya mendekati akhir bulan, Melakukan konfirmasi kepada KPPN terkait upaya pencegahan deviasi tersebut
-                <br/><br/>
-                <b>-Nilai 10</b>:  apabila ada upaya peminimalisiran atas deviasi (misal surat pemberitahuan ke Satker, rekapitulasi monitoring realisasi anggaran di tiap bulan atau
-                  dilakukannya bimbingan/konsultasi kepada satker, dan ada dokumen pembuktian/pendukung yang jelas) <br/> <br/>
-                  <b>-Nilai 5</b>: apabila ada upaya peminimalisiran deviasi, namun tidak ditemukan dokumen pembuktian/pendukung<br/> <br/>
-                  <b>-Nilai 0</b>: Tidak ada keterangan dari KPPN yang mampu menunjukan upaya peminimalisiran<br/> <br/>`}
-                num={2}
+                id={3} 
+                title={'Prosedur Penerbitan SP2D'} 
+                description={`Berdasarkan 10 uji sampling pelaksanaan SOP Penerbitan SP2D
+                  <br/><br/>
+                  <b>-Nilai 10</b>:  tidak ada penyimpangan/ketidaksesuaian dengan prosedur dalam SOP Penerbitan SP2D <br/> <br/>
+                  <b>-Nilai 7</b>: ditemukan penyimpangan prosedur SOP Penerbitan SP2D, maksimal 1 langkah prosedur (ada pertimbangan KPPN kenapa ketidaksesuaian terjadi)<br/> <br/>
+                  <b>-Nilai 5</b>: ditemukan ketidaksesuaian Prosedur SOP Penerbitan SP2D 1 s.d. 5 langkah prosedur<br/> <br/>
+                  <b>-Nilai 0</b>: ditemukan ketidaksesuaian Prosedur SOP Penerbitan SP2D lebih dari 5 langkah prosedur<br/> <br/>`}
+                num={3}
                 dateUpdated={new Date()}
                 modalOpen={handleOpenFile}
                 modalClose={handleCloseFile}
                 file={file}
                 openInstruction={handleOpenInstruction}
               />
-                            <WorksheetCard 
-                id={2} 
-                title={'Upaya meminimalisir terjadinya deviasi RPD pada Satker'} 
-                description={`Berdasarkan data Satker yang belum merealisasikan anggarannya mendekati akhir bulan, Melakukan konfirmasi kepada KPPN terkait upaya pencegahan deviasi tersebut
-                <br/><br/>
-                <b>-Nilai 10</b>:  apabila ada upaya peminimalisiran atas deviasi (misal surat pemberitahuan ke Satker, rekapitulasi monitoring realisasi anggaran di tiap bulan atau
-                  dilakukannya bimbingan/konsultasi kepada satker, dan ada dokumen pembuktian/pendukung yang jelas) <br/> <br/>
-                  <b>-Nilai 5</b>: apabila ada upaya peminimalisiran deviasi, namun tidak ditemukan dokumen pembuktian/pendukung<br/> <br/>
-                  <b>-Nilai 0</b>: Tidak ada keterangan dari KPPN yang mampu menunjukan upaya peminimalisiran<br/> <br/>`}
-                num={2}
+              <WorksheetCard 
+                id={4} 
+                title={'Ketepatan waktu penyelesaian tagihan'} 
+                description={`Terhadap penyelesaian tagihan yang telah menjadi SP2D, memastikan bahwa KPPN melakukan proses penerbitan SP2D sesuai dengan Tata Cara Pembayaran APBN
+                  <br/><br/>
+                  <b>-Nilai 10</b>:  Penerbitan SP2D (dibawah jam 12 setempat) lebih dari satu jam berjumlah 0,1 s.d. 10% dari total SP2D <br/> <br/>
+                  <b>-Nilai 7</b>:  Penerbitan SP2D (dibawah jam 12 setempat) lebih dari satu jam berjumlah 10% s.d. 25% dari total SP2D <br/> <br/>
+                  <b>-Nilai 5</b>: Penerbitan SP2D (dibawah jam 12 setempat) lebih dari satu jam berjumlah 25% s.d. 50% dari total SP2D <br/> <br/>
+                  <b>-Nilai 0</b>: Penerbitan SP2D (dibawah jam 12 setempat) berjumlah lebih dari  50% dari total SP2D <br/> <br/>`}
+                num={4}
                 dateUpdated={new Date()}
                 modalOpen={handleOpenFile}
                 modalClose={handleCloseFile}
                 file={file}
                 openInstruction={handleOpenInstruction}
               />
-                            <WorksheetCard 
-                id={2} 
+              <WorksheetCard 
+                id={5} 
                 title={'Upaya meminimalisir terjadinya deviasi RPD pada Satker'} 
                 description={`Berdasarkan data Satker yang belum merealisasikan anggarannya mendekati akhir bulan, Melakukan konfirmasi kepada KPPN terkait upaya pencegahan deviasi tersebut
                 <br/><br/>
@@ -200,7 +217,7 @@ export default function WorksheetKPPN() {
                   dilakukannya bimbingan/konsultasi kepada satker, dan ada dokumen pembuktian/pendukung yang jelas) <br/> <br/>
                   <b>-Nilai 5</b>: apabila ada upaya peminimalisiran deviasi, namun tidak ditemukan dokumen pembuktian/pendukung<br/> <br/>
                   <b>-Nilai 0</b>: Tidak ada keterangan dari KPPN yang mampu menunjukan upaya peminimalisiran<br/> <br/>`}
-                num={2}
+                num={5}
                 dateUpdated={new Date()}
                 modalOpen={handleOpenFile}
                 modalClose={handleCloseFile}

@@ -12,15 +12,15 @@ import { StyledNavItem, StyledNavItemIcon } from './styles';
 
 interface Item{
   item: {
-    title: string,
-    path: string,
-    icon: any,
-    info: string,
+    title?: string,
+    path?: string,
+    icon?: any,
+    target?: string,
   }
 }
 
 export default function NavItem({ item }:Item) {
-  const { title, path, icon, info } = item;
+  const { title, path, icon, target } = item;
   const theme = useTheme() as any;
 
   return (
@@ -28,7 +28,7 @@ export default function NavItem({ item }:Item) {
       theme={theme}
       component={RouterLink}
       to={path}
-      target={info}
+      target={target}
       sx={
         localStorage.getItem('mode')==='dark'?
         {

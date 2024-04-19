@@ -24,6 +24,13 @@ const navSupervisi = [
   },
 ];
 
+const navMonitoring = [
+  {
+    title: 'Riwayat Pembinaan',
+    path: '/history',
+    icon: icon('solar--chart-bold-duotone'),
+  },
+];
 
 const navAdmin = [
   {
@@ -45,14 +52,7 @@ const navAdmin = [
   },
 ];
 
-const navMonitoring = [
-  {
-    title: 'Riwayat Pembinaan',
-    path: '/history',
-    icon: icon('solar--chart-bold-duotone'),
-    info: 'solar--folder-open-bold-duotone'
-  },
-];
+
 
 const navHome = [
   {

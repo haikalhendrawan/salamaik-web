@@ -31,7 +31,7 @@ const StyledAccount = styled('div')(({ theme }) => ({
 interface NavType{
   openNav: boolean
   onCloseNav: any
-}
+};
 
 export default function Nav({ openNav, onCloseNav }: NavType) {
   const { pathname } = useLocation();
