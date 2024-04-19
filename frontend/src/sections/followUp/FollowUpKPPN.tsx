@@ -33,17 +33,15 @@ export default function FollowUpKPPN() {
   return (
     <>
       <Container maxWidth='xl'>
-        <Stack direction="column" justifyContent="space-between" sx={{mb: 5}}>
-            <Stack direction='row' spacing={1} alignItems="center">
-              <IconButton  
-                onClick={() => navigate(-1)}
-              >
-                <Iconify icon={"eva:arrow-ios-back-outline"} />
-              </IconButton> 
-              <Typography variant="h4" >
-                {`KPPN ${id!==null ? SELECT_KPPN[id]:null}`}
-              </Typography>
-            </Stack>
+        <Stack direction='row' spacing={1} alignItems="center" sx={{mb: 5}}>
+          <IconButton  
+            onClick={() => navigate(-1)}
+          >
+            <Iconify icon={"eva:arrow-ios-back-outline"} />
+          </IconButton> 
+          <Typography variant="h4" >
+            {`KPPN ${id!==null ? SELECT_KPPN[id]:null}`}
+          </Typography>
         </Stack>
         
         <Stack direction='row'>

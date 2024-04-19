@@ -22,7 +22,6 @@ export default function MatrixDetail() {
 
       <MatrixTable />
     </Container>
-
     </>
   )
 

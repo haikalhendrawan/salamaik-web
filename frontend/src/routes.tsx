@@ -24,6 +24,7 @@ import WorksheetRefPage from "./pages/admin/WorksheetRefPage";
 import RequireAuthHorizontalLayout from "./layouts/horizontal/RequireAuthHorizontalLayout";
 import MatrixDetail from "./sections/matrix/MatrixDetail";
 import FollowUpKPPN from "./sections/followUp/FollowUpKPPN";
+import FollowUpDetail from "./sections/followUp/FollowUpDetail";
 
 
 // ----------------------------------------------------
@@ -80,7 +81,7 @@ export default function Router() {
         <Route index element={<FollowUpKPPN />} />
       </Route>
       <Route element={<RequireAuthHorizontalLayout allowedRoles={[1, 2]}/>}>
-        <Route path="detail" element={<MatrixDetail />} />
+        <Route path="detail" element={<FollowUpDetail />} />
       </Route>
     </Route>
 

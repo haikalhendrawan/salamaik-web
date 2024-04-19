@@ -3,10 +3,10 @@ import axios from "axios";
 import { Container, Stack, Typography, Grid, Card, CardHeader, IconButton, Tooltip, Select, MenuItem, InputLabel,
           FormControl, TextField, Button, Divider, Badge, Box} from '@mui/material';
 import {useTheme, styled} from '@mui/material/styles';
-import Iconify from "../../../components/iconify";
-import Label from "../../../components/label";
-import Scrollbar from "../../../components/scrollbar/Scrollbar";
-import StyledButton from "../../../components/styledButton/StyledButton";
+import Iconify from "../../../../components/iconify";
+import Label from "../../../../components/label";
+import Scrollbar from "../../../../components/scrollbar/Scrollbar";
+import StyledButton from "../../../../components/styledButton/StyledButton";
 
 // ------------------------------------------------------------
 const selectKondisi = [
@@ -27,7 +27,7 @@ const VisuallyHiddenInput = styled('input')({
   width: 1,
 });
 
-interface WorksheetCardProps{
+interface FollowUpCardProps{
   id: number,
   title: string,
   description: string,
@@ -45,8 +45,8 @@ interface HeadPropInterface{
   dateUpdated: Date
 };
 
-  // ------------------------------------------------------------
-export default function WorksheetCard(props: WorksheetCardProps) {
+// ------------------------------------------------------------
+export default function FollowUpCard(props: FollowUpCardProps) {
   const theme = useTheme();
 
   const [value, setValue] = useState<string>('');
@@ -246,7 +246,6 @@ export default function WorksheetCard(props: WorksheetCardProps) {
       </Grid> 
       ) 
 }
-
 
 // ------------------------------------------------------------------------------------------------------
 

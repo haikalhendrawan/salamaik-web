@@ -5,13 +5,6 @@ import { useTheme, styled } from '@mui/material/styles';
 import Label from '../../../components/label';
 import MatrixTableToolbar from './MatrixTableToolbar';
 // ---------------------------------------------------
-const StyledRoot = styled(Toolbar)(({ theme }) => ({
-  height: 72,
-  display: 'flex',
-  justifyContent: 'space-between',
-  padding: theme.spacing(0, 1, 0, 3),
-}));
-
 const TABLE_HEAD = [
   { id: 'no', label: 'No', alignRight: false },
   { id: 'komponen', label: 'Komponen Supervisi', alignRight: false },

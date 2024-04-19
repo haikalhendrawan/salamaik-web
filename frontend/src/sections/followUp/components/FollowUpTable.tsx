@@ -1,6 +1,7 @@
 import {useState, useEffect} from'react';
+import { Link } from 'react-router-dom';
 import {Stack, Toolbar, Typography, Table, Card, CardHeader, TableSortLabel,
-          Tooltip, TableHead, Grow, TableBody, TableRow, TableCell, Button} from '@mui/material';
+        TableHead, Grow, TableBody, TableRow, TableCell, Button} from '@mui/material';
 import { useTheme, styled } from '@mui/material/styles';
 import Label from '../../../components/label';
 import Iconify from '../../../components/iconify/Iconify';
@@ -22,7 +23,7 @@ const StyledButton = styled(Button)(({ theme }) => ({
   paddingRight: 0,
   paddingLeft: 0,
   borderRadius: '8px'
-}));  
+})) as typeof Button;  
 
 const TABLE_HEAD = [
   { id: 'no', label: 'No', alignRight: false },
@@ -98,13 +99,13 @@ export default function FollowUpTable() {
             <TableBody>
               {TABLE_DATA.map((row) => 
                 <TableRow hover key={row.id} tabIndex={-1}>
-                  <TableCell align="justify">{row.id}</TableCell>
+                  <TableCell align="justify" sx={{fontSize: '13px'}}>{row.id}</TableCell>
 
-                  <TableCell align="left">{row.komponen}</TableCell>
+                  <TableCell align="left" sx={{fontSize: '13px'}}>{row.komponen}</TableCell>
 
-                  <TableCell align="left">{row.checklist}</TableCell>
+                  <TableCell align="left" sx={{fontSize: '13px'}}>{row.checklist}</TableCell>
 
-                  <TableCell align="left">{`${row.finding}`}</TableCell>
+                  <TableCell align="left" sx={{fontSize: '13px'}}>{`${row.finding}`}</TableCell>
 
                   <TableCell align="left">
                     {row.status===0
@@ -113,16 +114,18 @@ export default function FollowUpTable() {
                     }
                   </TableCell>
 
-                  <TableCell align="left">
+                  <TableCell align="left" sx={{fontSize: '13px'}}>
                     {`${row.pic}`}
                   </TableCell> 
 
                   <TableCell align="left">
                     <Stack>
-                      <StyledButton 
+                      <StyledButton
                         endIcon={<Iconify icon="eva:arrow-ios-forward-outline" />} 
                         variant="contained" 
                         color="warning"
+                        component={Link}  
+                        to={`/followUp/detail?id=010`}
                       >
                         Follow Up
                       </StyledButton>
@@ -136,14 +139,15 @@ export default function FollowUpTable() {
         </Card>
       </Grow>
 
-      <Stack direction='column' spacing={1} sx={{pl: 2}}>
-        <Typography variant='body2' fontWeight='bold' sx={{fontSize: '12px'}}>*Status:</Typography>
-        <Typography variant='body2' sx={{fontSize: '12px'}}>1. Belum: belum ditindaklanjuti KPPN (belum terhitung progress)</Typography>
-        <Typography variant='body2' sx={{fontSize: '12px'}}>2. Process: proses verifikasi Kanwil </Typography>
-        <Typography variant='body2' sx={{fontSize: '12px'}}>3. Reject: tindak lanjut ditolak Kanwil </Typography>
-        <Typography variant='body2' sx={{fontSize: '12px'}}>4. Approved: tindak lanjut disetujui Kanwil </Typography>
-      </Stack>
-
+      <Grow in>
+        <Stack direction='column' spacing={1} sx={{pl: 2}}>
+          <Typography variant='body2' fontWeight='bold' sx={{fontSize: '12px'}}>*Status:</Typography>
+          <Typography variant='body2' sx={{fontSize: '12px'}}>1. Belum: belum ditindaklanjuti KPPN (belum terhitung progress)</Typography>
+          <Typography variant='body2' sx={{fontSize: '12px'}}>2. Process: proses verifikasi Kanwil </Typography>
+          <Typography variant='body2' sx={{fontSize: '12px'}}>3. Reject: tindak lanjut ditolak Kanwil </Typography>
+          <Typography variant='body2' sx={{fontSize: '12px'}}>4. Approved: tindak lanjut disetujui Kanwil </Typography>
+        </Stack>
+      </Grow>
     </>
   )
 }
