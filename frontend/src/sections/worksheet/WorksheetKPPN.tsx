@@ -159,6 +159,54 @@ export default function WorksheetKPPN() {
                 file={file}
                 openInstruction={handleOpenInstruction}
               />
+              <WorksheetCard 
+                id={2} 
+                title={'Upaya meminimalisir terjadinya deviasi RPD pada Satker'} 
+                description={`Berdasarkan data Satker yang belum merealisasikan anggarannya mendekati akhir bulan, Melakukan konfirmasi kepada KPPN terkait upaya pencegahan deviasi tersebut
+                <br/><br/>
+                <b>-Nilai 10</b>:  apabila ada upaya peminimalisiran atas deviasi (misal surat pemberitahuan ke Satker, rekapitulasi monitoring realisasi anggaran di tiap bulan atau
+                  dilakukannya bimbingan/konsultasi kepada satker, dan ada dokumen pembuktian/pendukung yang jelas) <br/> <br/>
+                  <b>-Nilai 5</b>: apabila ada upaya peminimalisiran deviasi, namun tidak ditemukan dokumen pembuktian/pendukung<br/> <br/>
+                  <b>-Nilai 0</b>: Tidak ada keterangan dari KPPN yang mampu menunjukan upaya peminimalisiran<br/> <br/>`}
+                num={2}
+                dateUpdated={new Date()}
+                modalOpen={handleOpenFile}
+                modalClose={handleCloseFile}
+                file={file}
+                openInstruction={handleOpenInstruction}
+              />
+                            <WorksheetCard 
+                id={2} 
+                title={'Upaya meminimalisir terjadinya deviasi RPD pada Satker'} 
+                description={`Berdasarkan data Satker yang belum merealisasikan anggarannya mendekati akhir bulan, Melakukan konfirmasi kepada KPPN terkait upaya pencegahan deviasi tersebut
+                <br/><br/>
+                <b>-Nilai 10</b>:  apabila ada upaya peminimalisiran atas deviasi (misal surat pemberitahuan ke Satker, rekapitulasi monitoring realisasi anggaran di tiap bulan atau
+                  dilakukannya bimbingan/konsultasi kepada satker, dan ada dokumen pembuktian/pendukung yang jelas) <br/> <br/>
+                  <b>-Nilai 5</b>: apabila ada upaya peminimalisiran deviasi, namun tidak ditemukan dokumen pembuktian/pendukung<br/> <br/>
+                  <b>-Nilai 0</b>: Tidak ada keterangan dari KPPN yang mampu menunjukan upaya peminimalisiran<br/> <br/>`}
+                num={2}
+                dateUpdated={new Date()}
+                modalOpen={handleOpenFile}
+                modalClose={handleCloseFile}
+                file={file}
+                openInstruction={handleOpenInstruction}
+              />
+                            <WorksheetCard 
+                id={2} 
+                title={'Upaya meminimalisir terjadinya deviasi RPD pada Satker'} 
+                description={`Berdasarkan data Satker yang belum merealisasikan anggarannya mendekati akhir bulan, Melakukan konfirmasi kepada KPPN terkait upaya pencegahan deviasi tersebut
+                <br/><br/>
+                <b>-Nilai 10</b>:  apabila ada upaya peminimalisiran atas deviasi (misal surat pemberitahuan ke Satker, rekapitulasi monitoring realisasi anggaran di tiap bulan atau
+                  dilakukannya bimbingan/konsultasi kepada satker, dan ada dokumen pembuktian/pendukung yang jelas) <br/> <br/>
+                  <b>-Nilai 5</b>: apabila ada upaya peminimalisiran deviasi, namun tidak ditemukan dokumen pembuktian/pendukung<br/> <br/>
+                  <b>-Nilai 0</b>: Tidak ada keterangan dari KPPN yang mampu menunjukan upaya peminimalisiran<br/> <br/>`}
+                num={2}
+                dateUpdated={new Date()}
+                modalOpen={handleOpenFile}
+                modalClose={handleCloseFile}
+                file={file}
+                openInstruction={handleOpenInstruction}
+              />
             </Grid>
           </Grid>
 

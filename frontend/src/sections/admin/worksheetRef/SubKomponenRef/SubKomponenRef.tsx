@@ -23,6 +23,135 @@ interface SubKomponenData{
   numChecklist?: number,
 }
 
+interface SubKomponenData2{
+  subcomponent_ID: string,
+  subcomponent_title: string,
+  component_ID: string,
+}
+
+const TABLE_DATA2 = [
+  {
+      "subcomponent_ID": "1",
+      "subcomponent_title": "Likuiditas Keuangan di Daerah",
+      "component_ID": "1"
+  },
+  {
+      "subcomponent_ID": "2",
+      "subcomponent_title": "Penyaluran Belanja atas Beban APBN",
+      "component_ID": "1"
+  },
+  {
+      "subcomponent_ID": "3",
+      "subcomponent_title": ". Pemantauan dan Evaluasi Kinerja Aggaran Satuan Kerja dan Reviu Pelaksanaan Anggaran Satker K/L/ dan BLU",
+      "component_ID": "1"
+  },
+  {
+      "subcomponent_ID": "4",
+      "subcomponent_title": "Pengelolaan Rekening & Penerimaan Negara",
+      "component_ID": "1"
+  },
+  {
+      "subcomponent_ID": "5",
+      "subcomponent_title": "Akuntabilitas Pelaporan Keuangan",
+      "component_ID": "1"
+  },
+  {
+      "subcomponent_ID": "6",
+      "subcomponent_title": "Quality Assurance Pengelolaan APBN Satker",
+      "component_ID": "1"
+  },
+  {
+      "subcomponent_ID": "7",
+      "subcomponent_title": "FGD / Sharing Session / Sosialisasi kepada Stakeholder",
+      "component_ID": "2"
+  },
+  {
+      "subcomponent_ID": "8",
+      "subcomponent_title": "Data Analytics",
+      "component_ID": "2"
+  },
+  {
+      "subcomponent_ID": "9",
+      "subcomponent_title": "Amplikasi Dampak Treasury pada Perekonomian Daerah",
+      "component_ID": "2"
+  },
+  {
+      "subcomponent_ID": "10",
+      "subcomponent_title": "Kolaborasi Kementerian Keuangan Satu (Kemenkeu Satu)",
+      "component_ID": "2"
+  },
+  {
+      "subcomponent_ID": "11",
+      "subcomponent_title": "Pemberdayaan UMKM",
+      "component_ID": "2"
+  },
+  {
+      "subcomponent_ID": "12",
+      "subcomponent_title": "Layanan Pengguna",
+      "component_ID": "3"
+  },
+  {
+      "subcomponent_ID": "13",
+      "subcomponent_title": "Penyaluran Transfer Ke Daerah dan Dana Desa",
+      "component_ID": "3"
+  },
+  {
+      "subcomponent_ID": "14",
+      "subcomponent_title": "Pengelolaan Data Kredit Program di Daerah",
+      "component_ID": "3"
+  },
+  {
+      "subcomponent_ID": "15",
+      "subcomponent_title": "Kinerja Organisasi",
+      "component_ID": "4"
+  },
+  {
+      "subcomponent_ID": "16",
+      "subcomponent_title": "Penguatan Kapasitas Perbendaharaan",
+      "component_ID": "4"
+  },
+  {
+      "subcomponent_ID": "17",
+      "subcomponent_title": "Manajemen SDM",
+      "component_ID": "4"
+  },
+  {
+      "subcomponent_ID": "18",
+      "subcomponent_title": "Komunikasi dan Koordinasi Pimpinan",
+      "component_ID": "4"
+  },
+  {
+      "subcomponent_ID": "19",
+      "subcomponent_title": "Manajemen Keuangan",
+      "component_ID": "4"
+  },
+  {
+      "subcomponent_ID": "20",
+      "subcomponent_title": "Tata Usaha dan Rumah Tangga",
+      "component_ID": "4"
+  },
+  {
+      "subcomponent_ID": "21",
+      "subcomponent_title": "Kepatuhan Internal",
+      "component_ID": "4"
+  },
+  {
+      "subcomponent_ID": "22",
+      "subcomponent_title": "Peningkatan Kualitas Pelayanan Publik",
+      "component_ID": "4"
+  },
+  {
+      "subcomponent_ID": "23",
+      "subcomponent_title": "Inovasi",
+      "component_ID": "4"
+  },
+  {
+      "subcomponent_ID": "24",
+      "subcomponent_title": "Prestasi",
+      "component_ID": "4"
+  }
+]
+
 const TABLE_DATA: SubKomponenData[] = [
   {id:1, subkomponen:'Pengelolaan Anggaran dan kebijaan yang aktual bagi pemeringah stempat dan perangkat', komponen:0, numChecklist:10},
   {id:2, subkomponen:'Pengelolaan APBD', komponen:1, numChecklist:34},
@@ -85,17 +214,17 @@ export default function SubKomponenRef({section, addState, resetAddState}: SubKo
               </TableRow>
             </TableHead>
             <TableBody>
-              {TABLE_DATA.map((row) => 
+              {TABLE_DATA2.map((row: any) => 
                 <TableRow hover key={0} tabIndex={-1}>
-                  <TableCell align="justify">{row.id}</TableCell>
+                  <TableCell align="justify">{row.subcomponent_ID}</TableCell>
 
-                  <TableCell align="left">{row.subkomponen}</TableCell>
+                  <TableCell align="left">{row.subcomponent_title}</TableCell>
 
                   <TableCell align="left">
-                    {row.komponen}
+                    {row.component_ID}
                   </TableCell>
 
-                  <TableCell align="center">{row.numChecklist}</TableCell>
+                  <TableCell align="center">{row.component_ID}</TableCell>
 
                   <TableCell align="justify">
                     <Stack direction='row' spacing={1}>

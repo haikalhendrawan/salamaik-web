@@ -71,27 +71,33 @@ export default function FollowUpCard(props: FollowUpCardProps) {
             <CardHeader title={<Head num={props.num} title={props.title} dateUpdated={props.dateUpdated} />} sx={{backgroundColor:theme.palette.background.default, color:theme.palette.text.primary,  height:'67px', pl:1, pt:0}}/> 
 
               <Grid container sx={{mt:1, mb:1, textAlign:'center', justifyContent:'center', color:theme.palette.text.secondary}} spacing={0}>  {/* Kepala Table */}
-                  <Grid item xs={6}>
-                      <Typography variant="body2" sx={{mr:1}}> Kriteria </Typography>
+                  <Grid item xs={5}>
+                    <Typography variant="body2" sx={{mr:1}}> Kriteria </Typography>
                   </Grid>
 
                   <Grid item xs={1.5}>
-                      <Typography variant="body2"> Dokumen </Typography>
+                    <Typography variant="body2"> Dokumen </Typography>
                   </Grid>
 
                   <Grid item xs={1.5}>
-                      <Typography variant="body2"> Nilai</Typography>
+                    <Typography variant="body2"> Nilai</Typography>
+                  </Grid>
+                  
+                  <Grid item xs={2.5}>
+                    <Typography variant="body2">  Catatan Kanwil </Typography>
                   </Grid>
 
-                  <Grid item xs={3}>
-                      <Typography variant="body2"> Catatan Kanwil </Typography>
+                  <Grid item xs={1.5}>
+                    <Typography variant="body2"> Status Tindak Lanjut </Typography>
                   </Grid>
+
+
               </Grid>
 
               <Divider  flexItem/>  
 
               <Grid container sx={{mt:0, maxHeight:'160px', textAlign:'center',  justifyContent:'center'}} spacing={1}>  {/* Table Body */}
-                  <Grid item xs={6} >
+                  <Grid item xs={5} >
                     <Scrollbar  sx={{
                       height: 140,
                       '& .simplebar-content': { height: 1, display: 'flex', flexDirection: 'column' },
@@ -183,7 +189,7 @@ export default function FollowUpCard(props: FollowUpCardProps) {
                   </Grid>
 
                   <Grid item xs={1.5} > 
-                    <Stack direction='column' spacing={2}>
+                    <Stack direction='column' spacing={2} sx={{px: 2}}>
                       <Stack direction='column' spacing={1} >
                         <Typography variant='body3' sx={{fontSize:12}} textAlign={'left'}>Nilai KPPN :</Typography>
                         <FormControl sx={{width:'100%', height:'100%'}}>
@@ -223,7 +229,7 @@ export default function FollowUpCard(props: FollowUpCardProps) {
                     
                   </Grid>
 
-                  <Grid item xs={3}>  
+                  <Grid item xs={2.5}>  
                     <FormControl sx={{width:'100%', height:'100%', pr:1, pt:0.5}}>
                       <TextField 
                         name="catatankppn" 
@@ -238,6 +244,52 @@ export default function FollowUpCard(props: FollowUpCardProps) {
                       />
                     </FormControl>
                   </Grid>
+
+                  <Grid item xs={1.5}>  
+                    <Stack direction='column' spacing={3}>
+                      <Stack direction='column' spacing={1}>
+                        <Typography variant='body3' sx={{fontSize:12}} textAlign={'left'}>Status :</Typography>
+                          <Stack direction='row' spacing={1}>
+                            <Label color='success'> Approved</Label>
+                          </Stack>
+                      </Stack>
+                      
+                      <Stack direction='column' spacing={1}>
+                        <Typography variant='body3' sx={{fontSize:12}} textAlign={'left'}>Action :</Typography>
+                        <Stack direction='row' spacing={1}>
+                          <Tooltip title='Approve'>
+                            <span>
+                              <StyledButton 
+                                aria-label="instruksi" 
+                                variant='contained' 
+                                size='small' 
+                                color='success' 
+                              >
+                                <Iconify icon="solar:check-circle-bold-duotone"/>
+                              </StyledButton>
+                            </span>
+                          </Tooltip>
+                          <Tooltip title='Tolak'>
+                            <span>
+                              <StyledButton 
+                                aria-label="edit" 
+                                variant='contained' 
+                                size='small' 
+                                color='error'
+                              >
+                                <Iconify icon="solar:close-circle-bold"/>
+                              </StyledButton>
+                            </span>
+                          </Tooltip>
+                        </Stack>
+                      </Stack>
+                      
+                    </Stack>   
+                  </Grid>
+
+
+
+                  
               </Grid>
 
               <Divider sx={{ borderStyle: 'dashed', mt: 3 }}/>

@@ -48,7 +48,7 @@ const navAdmin = [
 const navMonitoring = [
   {
     title: 'Riwayat Pembinaan',
-    path: 'https://drive.google.com/file/d/1Z_ozqch3MV2IKWNFPDfCeafP0MPexJtO/view?usp=sharing',
+    path: '/history',
     icon: icon('solar--chart-bold-duotone'),
     info: 'solar--folder-open-bold-duotone'
   },

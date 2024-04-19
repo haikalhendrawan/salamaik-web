@@ -128,8 +128,8 @@ export default function UserRefTable({users}: UserRefTableProps) {
                               <Avatar alt={name} src={avatarUrl} />
                               <List disablePadding dense>
                                 <ListItemText>
-                                  <Typography variant="body2" noWrap>Muhammad Haikal Putra H</Typography>
-                                  <Typography variant="body3" noWrap>haikal.hendrawan@kemenkeu.go.id</Typography>
+                                  <Typography variant="body2" noWrap>User</Typography>
+                                  <Typography variant="body3" noWrap>user1@kemenkeu.go.id</Typography>
                                 </ListItemText>
                               </List>
                             </Stack>

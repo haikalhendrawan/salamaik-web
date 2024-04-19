@@ -25,6 +25,7 @@ import RequireAuthHorizontalLayout from "./layouts/horizontal/RequireAuthHorizon
 import MatrixDetail from "./sections/matrix/MatrixDetail";
 import FollowUpKPPN from "./sections/followUp/FollowUpKPPN";
 import FollowUpDetail from "./sections/followUp/FollowUpDetail";
+import SupervisionHistoryPage from "./pages/SupervisionHistoryPage";
 
 
 // ----------------------------------------------------
@@ -47,6 +48,7 @@ export default function Router() {
       <Route path="/" element={<RequireAuthLayout allowedRoles={[1]}/> }>
         <Route path="home" element={<HomePage />} />
         <Route path='profile' element={<ProfilePage />} />
+        <Route path='history' element={<SupervisionHistoryPage />} />
       </Route>
     {/* </Route> */}
 

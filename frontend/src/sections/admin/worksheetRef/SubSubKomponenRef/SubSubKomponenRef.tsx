@@ -26,11 +26,134 @@ interface SubSubKomponenData{
 }
 
 const TABLE_DATA: SubSubKomponenData[] = [
-  {id:1, subsubkomponen:'KPPN menyelenggarakan', subkomponen:0, komponen:0, numChecklist:10},
-  {id:2, subsubkomponen:'ada opsi KPPN', subkomponen:1, komponen:1, numChecklist:34},
-  {id:3, subsubkomponen:'Digipay', subkomponen:2, komponen:2, numChecklist:5,},
-  {id:4, subsubkomponen:'anggaran sudah terkelola di KPPN dengan mekanisme', subkomponen:3, komponen:3, numChecklist:17},
+  {id:1, subsubkomponen:'RPD Satuan Kerja', subkomponen:0, komponen:0, numChecklist:10},
+  {id:2, subsubkomponen:'Penyelesaian Tagihan', subkomponen:1, komponen:1, numChecklist:34},
+  {id:3, subsubkomponen:'Pengelolaan Data Kontrak dan Data Supplier', subkomponen:2, komponen:2, numChecklist:5,},
+  {id:4, subsubkomponen:'Support data dan hubungan kelembagaan Satker dalam rangka analisis RPA, SR, KFR', subkomponen:3, komponen:3, numChecklist:17},
 ];
+
+const TABLE_DATA2 = [
+  {
+      "subsubcomponent_ID": "1",
+      "subsubcomponent_title": "RPD Satuan Kerja",
+      "component_ID": "1",
+      "subcomponent_ID": "1"
+  },
+  {
+      "subsubcomponent_ID": "2",
+      "subsubcomponent_title": "Penyelesaian Tagihan",
+      "component_ID": "1",
+      "subcomponent_ID": "2"
+  },
+  {
+      "subsubcomponent_ID": "3",
+      "subsubcomponent_title": "Pengelolaan Data Kontrak dan Data Supplier",
+      "component_ID": "1",
+      "subcomponent_ID": "2"
+  },
+  {
+      "subsubcomponent_ID": "4",
+      "subsubcomponent_title": "Support data dan hubungan kelembagaan Satker dalam rangka analisis RPA, SR, KFR",
+      "component_ID": "1",
+      "subcomponent_ID": "3"
+  },
+  {
+      "subsubcomponent_ID": "5",
+      "subsubcomponent_title": "Simplifikasi Pelaksanaan Anggaran melalui Digitalisai Pembayaran",
+      "component_ID": "1",
+      "subcomponent_ID": "3"
+  },
+  {
+      "subsubcomponent_ID": "6",
+      "subsubcomponent_title": "Evaluasi Pelaksanaan Anggaran Satker K/L, BLU, BLUD",
+      "component_ID": "1",
+      "subcomponent_ID": "3"
+  },
+  {
+      "subsubcomponent_ID": "7",
+      "subsubcomponent_title": "Tata Kelola Konfirmasi Penerimaan Negara",
+      "component_ID": "1",
+      "subcomponent_ID": "4"
+  },
+  {
+      "subsubcomponent_ID": "8",
+      "subsubcomponent_title": "Tata Kelola Rekening  Satuan Kerja",
+      "component_ID": "1",
+      "subcomponent_ID": "4"
+  },
+  {
+      "subsubcomponent_ID": "9",
+      "subsubcomponent_title": "Verifikasi LPJ Bendahara Satker",
+      "component_ID": "1",
+      "subcomponent_ID": "5"
+  },
+  {
+      "subsubcomponent_ID": "10",
+      "subsubcomponent_title": "Penyusunan Laporan UAKBUN Daerah",
+      "component_ID": "1",
+      "subcomponent_ID": "5"
+  },
+  {
+      "subsubcomponent_ID": "11",
+      "subsubcomponent_title": "Pembinaan Kompetensi Teknis Pejabat Perbendaharaan Satker",
+      "component_ID": "1",
+      "subcomponent_ID": "6"
+  },
+  {
+      "subsubcomponent_ID": "12",
+      "subsubcomponent_title": "Customer Service Officer",
+      "component_ID": "3",
+      "subcomponent_ID": "12"
+  },
+  {
+      "subsubcomponent_ID": "13",
+      "subsubcomponent_title": "Asistensi Digitalisasi Pembayaran (KKP,Digipay, VA)",
+      "component_ID": "3",
+      "subcomponent_ID": "12"
+  },
+  {
+      "subsubcomponent_ID": "14",
+      "subsubcomponent_title": "Asistensi dan Evaluasi Aplikasi SAKTI",
+      "component_ID": "3",
+      "subcomponent_ID": "12"
+  },
+  {
+      "subsubcomponent_ID": "15",
+      "subsubcomponent_title": "Asistensi Penyusunan Laporan Keuangan",
+      "component_ID": "3",
+      "subcomponent_ID": "12"
+  },
+  {
+      "subsubcomponent_ID": "16",
+      "subsubcomponent_title": "Pedampingan dan Layanan Konsultasi Keuangan Daerah",
+      "component_ID": "3",
+      "subcomponent_ID": "12"
+  },
+  {
+      "subsubcomponent_ID": "17",
+      "subsubcomponent_title": "Pelaksanaan Penyaluran Transfer Ke Daerag dan Dana Desa",
+      "component_ID": "3",
+      "subcomponent_ID": "13"
+  },
+  {
+      "subsubcomponent_ID": "18",
+      "subsubcomponent_title": "Evaluasi DAK Fisik dan Dana Desa",
+      "component_ID": "3",
+      "subcomponent_ID": "13"
+  },
+  {
+      "subsubcomponent_ID": "19",
+      "subsubcomponent_title": "Akurasi Data Kredit Program",
+      "component_ID": "3",
+      "subcomponent_ID": "14"
+  },
+  {
+      "subsubcomponent_ID": "20",
+      "subsubcomponent_title": "Survei Lapangan Debitur",
+      "component_ID": "3",
+      "subcomponent_ID": "14"
+  }
+]
 
 interface SubSubKomponenRefProps {
   section: number,
@@ -86,19 +209,19 @@ export default function SubSubKomponenRef({section, addState, resetAddState}: Su
               </TableRow>
             </TableHead>
             <TableBody>
-              {TABLE_DATA.map((row) => 
-                <TableRow hover key={row.id} tabIndex={-1}>
-                  <TableCell align="justify">{row.id}</TableCell>
+              {TABLE_DATA2.map((row) => 
+                <TableRow hover key={row.subsubcomponent_ID} tabIndex={-1}>
+                  <TableCell align="justify">{row.subsubcomponent_ID}</TableCell>
 
-                  <TableCell align="left">{row.subsubkomponen}</TableCell>
+                  <TableCell align="left">{row.subsubcomponent_title}</TableCell>
 
-                  <TableCell align="left">{row.subkomponen}</TableCell>
+                  <TableCell align="left">{row.subcomponent_ID}</TableCell>
 
                   <TableCell align="left">
-                    {row.komponen}
+                    {row.component_ID}
                   </TableCell>
 
-                  <TableCell align="center">{row.numChecklist}</TableCell>
+                  <TableCell align="center">{row.component_ID}</TableCell>
 
                   <TableCell align="justify">
                     <Stack direction='row' spacing={1}>
@@ -109,7 +232,7 @@ export default function SubSubKomponenRef({section, addState, resetAddState}: Su
                             variant='contained' 
                             size='small' 
                             color='warning'
-                            onClick={() => handleOpen(row.id)}
+                            onClick={() => handleOpen(parseInt(row.subsubcomponent_ID))}
                           >
                             <Iconify icon="solar:pen-bold-duotone"/>
                           </StyledButton>
