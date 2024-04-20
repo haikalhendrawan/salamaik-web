@@ -10,6 +10,7 @@ import ScorePembinaan from '../home/components/ScorePembinaan';
 import ProgressPembinaan from '../home/components/ProgressPembinaan';
 import RekapitulasiNilaiTable from './components/RekapitulasiNilaiTable';
 import MatrixGateway from './components/MatrixGateway';
+import SelectionTab from './components/SelectionTab';
 // --------------------------------------------------------------
 const SELECT_KPPN: {[key: string]: string} = {
   '010': 'Padang',
@@ -29,44 +30,41 @@ export default function MatrixKPPN() {
   const params = new URLSearchParams(useLocation().search);
 
   const id= params.get('id');
+
+  const [tabValue, setTabValue] = useState(0); // ganti menu komponen supervisi
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => { // setiap tab komponen berubah
+    setTabValue(newValue);
+  };
+
   return (
     <>
+      <Helmet>
+        <title> Salamaik | Matrix </title>
+      </Helmet>
+      
       <Container maxWidth='xl'>
-        <Stack direction="column" justifyContent="space-between" sx={{mb: 5}}>
-            <Stack direction='row' spacing={1} alignItems="center">
-              <IconButton  
-                onClick={() => navigate(-1)}
-              >
-                <Iconify icon={"eva:arrow-ios-back-outline"} />
-              </IconButton> 
-              <Typography variant="h4" >
-                {`KPPN ${id!==null ? SELECT_KPPN[id]:null}`}
-              </Typography>
-            </Stack>
+        <Stack direction='row' spacing={1} sx={{mb: 5}} maxWidth={'100%'}>
+          <Typography variant="h4">
+            {`Matriks`}
+          </Typography>
         </Stack>
+
+        <SelectionTab tab={tabValue} changeTab={handleTabChange} />
         
         <Stack direction='row'>
           <Grid container spacing={4}>
-            {/* <Grid item xs={4}>
-              <ProgressPembinaan 
-                header={`Progress Kertas Kerja`}
-                number={40.3}
-                footer={`s.d. 20 Mei 2024`}
-                icon={`mdi:cash-register`}
-                color={theme.palette.primary.main}
-              />
-            </Grid> */}
             <Grid item xs={5}>
               <Stack direction='column' spacing={2}>
                 <ScorePembinaan
-                  header={`Nlai Kinerja KPPN`}
+                  header={`Nlai Kinerja KPPN Padang`}
                   selfScore={9.77}
                   kanwilScore={9.45} 
                 />
                 <ProgressPembinaan 
                   header={`Progress Kertas Kerja`}
                   number={40.3}
-                  footer={`20 Mei 2024`}
+                  footer={`KPPN Padang`}
                   detail={`20/20`}
                   icon={`mdi:cash-register`}
                   color={theme.palette.primary.main}
@@ -76,17 +74,11 @@ export default function MatrixKPPN() {
             </Grid>
             <Grid item xs={7}>
               <MatrixGateway
-                title='Detail Matriks'
+                title='Detail Matriks KPPN Padang'
                 subheader='Lihat matriks Pembinaan dan Supervisi' 
               />
             </Grid>
-            {/* <Grid item xs={4}>
-              <AmountTemuan
-                header={`Jumlah Permasalahan`}
-                subheader={`(non-final)`}
-                temuan={7}
-              />
-            </Grid> */}
+
             <Grid item xs={12}>
               <RekapitulasiNilaiTable />
             </Grid>

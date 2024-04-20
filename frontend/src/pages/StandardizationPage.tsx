@@ -5,19 +5,19 @@ import { Outlet } from 'react-router-dom';
 import { Container, Stack, Typography, Tabs, Tab, Grid, Paper, IconButton, Box, LinearProgress} from '@mui/material';
 import {useTheme, styled} from '@mui/material/styles';
 //sections
-import MatrixKPPN from '../sections/matrix/MatrixKPPN';
+import StandardizationLanding from '../sections/standardization/StandardizationLanding';
 
 // -----------------------------------------------------------------------
 
 
 // ----------------------------------------------------------------------
 
-export default function MatrixPage() {
+export default function StandardizationPage() {
   const theme = useTheme();
 
   return (
     <>
-      <MatrixKPPN/>
+      <StandardizationLanding/>
     </>
   );
 };

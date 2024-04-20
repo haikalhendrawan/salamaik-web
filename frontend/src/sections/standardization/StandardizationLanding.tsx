@@ -6,11 +6,10 @@ import { Container, Stack, Typography, Grid, IconButton, Breadcrumbs, Link} from
 import {useTheme, styled} from '@mui/material/styles';
 import Iconify from '../../components/iconify/Iconify';
 // sections
-import FollowUpProgress from './components/FollowUpProgress';
-import AmountTemuan from './components/AmountTemuan';
-import FollowUpPeriod from './components/FollowUpPeriod';
-import FollowUpTable from './components/FollowUpTable';
 import SelectionTab from './components/SelectionTab';
+import StandardizationTable from './components/StandardizationTable';
+import DocumentShort from './components/DocumentShort';
+import AmountShort from './components/AmountShort';
 // --------------------------------------------------------------
 const SELECT_KPPN: {[key: string]: string} = {
   '010': 'Padang',
@@ -22,7 +21,7 @@ const SELECT_KPPN: {[key: string]: string} = {
 };
 
 // --------------------------------------------------------------
-export default function FollowUpKPPN() {
+export default function StandardizationLanding() {
   const theme = useTheme();
 
   const navigate = useNavigate();
@@ -40,51 +39,42 @@ export default function FollowUpKPPN() {
   return (
     <>
       <Helmet>
-        <title> Salamaik | Tindak Lanjut </title>
+        <title> Salamaik | Standardisasi KPPN </title>
       </Helmet>
 
       <Container maxWidth='xl'>
         <Stack direction='row' spacing={1} sx={{mb: 5}} maxWidth={'100%'}>
           <Typography variant="h4">
-            {`Tindak Lanjut`}
+            {`Standardisasi KPPN`}
           </Typography>
         </Stack>
 
         <SelectionTab tab={tabValue} changeTab={handleTabChange} />
 
-        <Stack direction='row'>
-          <Grid container spacing={4}>
-            <Grid item xs={4}>
-              <AmountTemuan
-                header={`Jumlah Permasalahan KPPN Padang`}
-                subheader={`Semester 1 2024 (Non-final)`}
-                temuan={7}
-              />
-            </Grid>
-            <Grid item xs={4}>
-              <FollowUpProgress
-                header={`Progress Tindak Lanjut`}
-                number={40.3}
-                footer={`KPPN Padang`}
-                detail={'3/7'}
-                icon={`mdi:cash-register`}
-                color={theme.palette.primary.main}
-              />
-            </Grid>
-            <Grid item xs={4}>
-              <FollowUpPeriod
-                header={'Periode Tindak Lanjut'}
-                open={'01-01-2024'}
-                close={'05-01-2024'}
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <FollowUpTable />
-            </Grid>
-
+        <Grid container spacing={4} sx={{mb: 4}}>
+          <Grid item xs={4}>
+            <AmountShort header='Jumlah Kekurangan Dokumen' subheader='Per 20 Mei 2024' short={4} />
           </Grid>
+
+          <Grid item xs={4}>
+            <DocumentShort header='Monitoring Kekurangan Per KPPN' subheader='KPPN Padang' image='/image/Other 12.png'/>
+          </Grid>
+
+          <Grid item xs={4}>
+            <DocumentShort header='Monitoring Kekurangan' subheader='Seluruh KPPN' image='/image/Other 09.png'/>
+          </Grid>
+
+        </Grid>
+
+        <Stack direction='column' spacing={4}>
+          <StandardizationTable />
+
+          <StandardizationTable />
+
+          <StandardizationTable />
         </Stack>
+
+        
       </Container>
     </>
   )

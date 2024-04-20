@@ -10,12 +10,12 @@ const navSupervisi = [
   {
     title: 'Kertas Kerja',
     path: '/worksheet',
-    icon: icon('solar--ruler-pen-bold-duotone'),
+    icon: icon('solar--clipboard-list-bold-duotone'),
   },
   {
     title: 'Matriks',
     path: '/matrix',
-    icon: icon('solar--clipboard-list-bold-duotone'),
+    icon: icon('solar--presentation-graph-bold-duotone'),
   },
   {
     title: 'Tindak Lanjut',
@@ -26,9 +26,9 @@ const navSupervisi = [
 
 const navMonitoring = [
   {
-    title: 'Riwayat Pembinaan',
-    path: '/history',
-    icon: icon('solar--chart-bold-duotone'),
+    title: 'Standardisasi KPPN',
+    path: '/standard',
+    icon: icon('solar--palette-round-bold-duotone'),
   },
 ];
 

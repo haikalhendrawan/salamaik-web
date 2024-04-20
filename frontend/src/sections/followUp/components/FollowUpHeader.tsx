@@ -66,7 +66,7 @@ export default function FollowUpHeader() {
             </TableHead>
             <TableBody>
               {TABLE_DATA.map((row) => 
-                <TableRow hover key={row.id} tabIndex={-1}>
+                <TableRow key={row.id} tabIndex={-1}>
 
                   <TableCell align="left" >
                     <Typography variant='body2' fontWeight={'bold'} sx={{fontSize: '12px'}}>{row.komponen}</Typography>

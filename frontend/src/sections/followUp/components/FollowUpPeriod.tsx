@@ -1,6 +1,6 @@
 import {useState} from "react";
 import {Card, Typography, Grid, FormControl, CardContent, Stack, LinearProgress, Box, Tooltip} from '@mui/material';
-import {styled, useTheme} from '@mui/material/styles';
+import {styled, useTheme, alpha} from '@mui/material/styles';
 import Scrollbar from "../../../components/scrollbar/Scrollbar";
 import Label from "../../../components/label/Label";
 // ----------------------------------------------
@@ -15,6 +15,10 @@ interface FollowUpPeriodProps {
 export default function FollowUpPeriod({header, open, close}:FollowUpPeriodProps){
   const theme = useTheme();
 
+  const primaryLight = theme.palette.primary.lighter;
+
+  const primaryDark = theme.palette.primary.light;
+
   return(
     <Card sx={{height:'200px', borderRadius:'16px'}}>
       <CardContent>
@@ -24,11 +28,11 @@ export default function FollowUpPeriod({header, open, close}:FollowUpPeriodProps
             <Grid container spacing={1}>
               <Grid item xs={4} key={0}>
                 <Stack direction='column' spacing={1} textAlign={'center'}>
-                  <Label color="success" sx={{fontSize:12}}> Open Period </Label>
-                  <Typography variant='body2' fontSize='12'>
+                  <Label color='success' sx={{fontSize:12}}> Open Period </Label>
+                  <Typography variant='body2' fontSize='12' >
                     {new Date(open).toLocaleDateString('en-GB')}
                   </Typography>
-                  <Label color="error" sx={{fontSize:12}}> Close Period </Label>
+                  <Label color='error' sx={{fontSize:12}}> Close Period </Label>
                   <Typography variant='body2' fontSize='12'>
                     {new Date(close).toLocaleDateString('en-GB')}
                   </Typography>

@@ -3,15 +3,15 @@ import {Card, Typography, Grid, Box, Tabs, Tab, CardContent, Stack, IconButton, 
 import {styled, useTheme, alpha} from '@mui/material/styles';
 import Iconify from "../../../components/iconify";
 // ----------------------------------------------
-interface AmountTemuanProps {
+interface AmountShortProps {
   header: string,
   subheader: string,
-  temuan: number
+  short: number
 };
 
 // ----------------------------------------------
 
-export default function AmountTemuan({header, subheader, temuan}: AmountTemuanProps){
+export default function AmountShort({header, subheader, short}: AmountShortProps){
   const theme = useTheme();
 
   const primaryLight = theme.palette.primary.lighter;
@@ -40,7 +40,7 @@ export default function AmountTemuan({header, subheader, temuan}: AmountTemuanPr
             <Stack direction={'row'} alignItems="center"> 
               
               <Slide direction="left" in>
-               <Typography variant="h2" color='primary'>{temuan}</Typography>
+               <Typography variant="h2" color='primary'>{short}</Typography>
               </Slide>
 
             </Stack>

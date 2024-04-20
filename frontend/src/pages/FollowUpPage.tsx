@@ -5,7 +5,7 @@ import { Outlet } from 'react-router-dom';
 import { Container, Stack, Typography, Tabs, Tab, Grid, Paper, IconButton, Box, LinearProgress} from '@mui/material';
 import {useTheme, styled} from '@mui/material/styles';
 //sections
-import FollowUpLanding from '../sections/followUp/FollowUpLanding';
+import FollowUpKPPN from '../sections/followUp/FollowUpKPPN';
 
 // -----------------------------------------------------------------------
 
@@ -17,7 +17,7 @@ export default function FollowUpPage() {
 
   return (
     <>
-      <FollowUpLanding />
+      <FollowUpKPPN />
     </>
   );
 };
