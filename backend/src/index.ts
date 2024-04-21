@@ -1,11 +1,15 @@
 import express, {Request, Response} from 'express';
 import path from "path";
 import "dotenv/config"; 
-import pool from '../config/db';
+import pool from './config/db';
+
+//routes
+import notifRoute from './routes/notifRoute';
 
 const app = express();
 
 app.use(express.json());
+app.use(notifRoute);
 
 app.get('/checklist', async(req: Request, res: Response) => {
   try{
@@ -19,10 +23,6 @@ app.get('/checklist', async(req: Request, res: Response) => {
 
 app.get('/', (req: Request, res: Response) => {
   res.json({msg:"Hello World"});
-});
-
-app.get('/check', (req: Request, res: Response) => {
-  res.json({msg:"check home"});
 });
 
 
