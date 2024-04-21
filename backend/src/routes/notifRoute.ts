@@ -1,12 +1,12 @@
 import express from "express";
-import { getNotif, getNotifById, addNotif, assignNotif, updateNotif } from "../controller/notif.controller";
+import * as notifController from "../controller/notif.controller";
 
 const router = express.Router(); 
 
-router.get("/getNotif", getNotif);
-router.get("/getNotifById", getNotifById);
-router.post("/addNotif", addNotif);
-router.post("/assignNotif", assignNotif);
-router.post("/updateNotif", updateNotif);
+router.get("/getNotif", notifController.getNotif);
+router.get("/getNotifById", notifController.getNotifById);
+router.post("/addNotif", notifController.addNotif);
+router.post("/assignNotif", notifController.assignNotif);
+router.post("/updateNotif", notifController.updateNotif);
 
 export default router

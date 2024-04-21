@@ -8,7 +8,7 @@ import pool from "../config/db";
  * @method getNotifById [get seluruh notification per user] => return notif_junction[]
  * @method addNotif [create referensi notification baru] => return void
  * @method assignNotif [assign notification ke user] => return void
- * @method updateNotif [update status notification read] => return void
+ * @method updateNotif [update status notification to read] => return void
  */
 
 class Notif{
@@ -25,7 +25,7 @@ class Notif{
 
   async getNotifById(id: string){
     try{
-      const q = ` SELECT *, notif.messsage, notif.title, notif.created_at, notif.categories
+      const q = ` SELECT *, notif.message, notif.title, notif.created_at, notif.categories
                   FROM notif_junction
                   INNER JOIN notif
                   ON notif_junction.notif_id = notif.id 
@@ -76,15 +76,18 @@ class Notif{
     }
   } 
 
-  async updateNotif(notifJunctionID: number){
+  async updateNotif(userID: string, notifJunctionID: number){
     try{
+      const updateTime = new Date(Date.now()).toISOString();
       const q = ` UPDATE notif_junction
-                  SET status = $1
-                  WHERE id = $2 
+                  SET status = $1, completed_at = $2
+                  WHERE junction_id = $3 AND receiver_id = $4
                   RETURNING *`;
-      const result = await pool.query(q, [1, notifJunctionID]);
+      const result = await pool.query(q, [1, updateTime, notifJunctionID, userID]);
+      console.log(updateTime)
       return result.rows[0]
     }catch(err){
+      console.log(err);
       return err
     }
   }

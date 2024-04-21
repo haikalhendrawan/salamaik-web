@@ -50,8 +50,9 @@ const assignNotif = async(req: Request, res: Response) => {
 
 const updateNotif = async(req: Request, res: Response) => {
   try{
-    const {notifID} = req.body;
-    const result = await notif.updateNotif(notifID);
+    const userID = USER;
+    const {junctionID} = req.body;
+    const result = await notif.updateNotif(userID, junctionID);
     return res.status(200).json(result)
   }catch(err){
     console.log(err);
