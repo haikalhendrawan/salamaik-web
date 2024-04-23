@@ -25,11 +25,12 @@ class Notif{
 
   async getNotifById(id: string){
     try{
-      const q = ` SELECT *, notif.message, notif.title, notif.created_at, notif.categories
+      const q = ` SELECT notif_junction.*, notif.message, notif.title, notif.created_at, notif.categories
                   FROM notif_junction
                   INNER JOIN notif
                   ON notif_junction.notif_id = notif.id 
-                  WHERE receiver_id = $1`;
+                  WHERE receiver_id = $1
+                  ORDER BY notif_junction.junction_id DESC`;
       const result = await pool.query(q, [id]);
       return result.rows
     }catch(err){
@@ -84,14 +85,12 @@ class Notif{
                   WHERE junction_id = $3 AND receiver_id = $4
                   RETURNING *`;
       const result = await pool.query(q, [1, updateTime, notifJunctionID, userID]);
-      console.log(updateTime)
       return result.rows[0]
     }catch(err){
       console.log(err);
       return err
     }
   }
-
 };
 
 const notif = new Notif();

@@ -1,23 +1,9 @@
-import PropTypes from 'prop-types';
 import { noCase } from 'change-case';
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 // @mui
-import {
-  Box,
-  List,
-  Badge,
-  Button,
-  Avatar,
-  Tooltip,
-  Divider,
-  Popover,
-  Typography,
-  IconButton,
-  ListItemText,
-  ListItemAvatar,
-  ListItemButton,
-  Paper,
-} from '@mui/material';
+import {Box, List, Badge, Button, Avatar, Tooltip, Divider, Popover, 
+          Typography, IconButton, ListItemText, ListItemAvatar, ListItemButton, Paper} from '@mui/material';
 // utils
 import { fToNow } from '../../../utils/formatTime';
 // components
@@ -27,33 +13,26 @@ import Scrollbar from '../../../components/scrollbar';
 import useAxiosJWT from "../../../hooks/useAxiosJWT";
 
 // ----------------------------------------------------------------------
-
-
-
-// Data notification dari API: 
-// {assigned_at:xxx, completed_at:xxx, creator_fk_id:xx, notif_created_at:xxx, notif_fk_id:xxx, notif_id:xxx, 
-//   notif_junction_id:xxx,notif_type:xxx, notif_msg:xxx, notif_title:xxx, receiver_fk_id:xxx, status:xxx }
 interface Notif{
-  assigned_at:Date, 
-  completed_at:Date, 
-  creator_fk_id:string | number, 
-  notif_created_at:Date, 
-  notif_fk_id:string | number, 
-  notif_id:string | number, 
-  notif_junction_id:string | number,
-  notif_type:string | number, 
-  notif_msg:string, 
-  notif_title:string, 
-  receiver_fk_id:string | number, 
-  status:string | number
+  junction_id: number,
+  notif_id: number,
+  creator_id: string,
+  receiver_id: string,
+  status: number,
+  completed_at: string | null,
+  assigned_at: string,
+  message: string | null,
+  title: string | null,
+  created_at: string,
+  categories: number | null,
 }
 
 export default function NotificationsPopover() {
   const axiosJWT = useAxiosJWT();
 
-  const [notifications, setNotifications] = useState<Notif[]>([]);
+  const [notifications, setNotifications] = useState<Notif[] | []>([]);
 
-  const totalUnRead = notifications?.filter((item: Notif) => item?.status===0).length;
+  const totalUnread = notifications?.filter((item: Notif) => item?.status===0).length;
 
   const [open, setOpen] = useState<HTMLButtonElement | null>(null);
 
@@ -65,19 +44,23 @@ export default function NotificationsPopover() {
     setOpen(null);
   };
 
-  const handleMarkAllAsRead = () => {
-    setNotifications(
-      notifications.map((notification) => ({
-        ...notification,
-        status : 1
-      }))
-    );
+  const handleMarkAllAsRead = async() => {
+    notifications?.map(async(item) => {
+      try{
+        const response = await axios.post('http://localhost:8080/updateNotif', {junctionID:item.junction_id});
+        console.log(response.data);
+        getNotif();
+      }catch(err){
+        console.log(err)
+      }
+    })
   };
 
   const getNotif= async()=>{
     try{
-    const response = await axiosJWT.get("/getNotif"); 
-    setNotifications(response.data);     
+      const response = await axios.get("http://localhost:8080/getNotifById"); 
+      setNotifications(response.data);
+      console.log(response.data);
     }catch(err){
       console.log(err);
     }
@@ -85,7 +68,7 @@ export default function NotificationsPopover() {
 
   const handleHover = async(notifId: string | number) => {
     try{
-      const response = await axiosJWT.post('/updateNotif', {notifJunctionId:notifId})
+      const response = await axios.post('http://localhost:8080/updateNotif', {junctionID:notifId})
       console.log(response.data);
       getNotif();
     }catch(err){
@@ -93,15 +76,15 @@ export default function NotificationsPopover() {
     }
   }
 
-  // useEffect( () => {
-  //   getNotif(); 
-  // }, []);
+  useEffect( () => {
+    getNotif(); 
+  }, []);
 
 
   return (
     <>
       <IconButton color={open ? 'primary' : 'default'} onClick={handleOpen} sx={{ width: 40, height: 40 }}>
-        <Badge badgeContent={totalUnRead} color="error">
+        <Badge badgeContent={totalUnread} color="error">
           <Iconify icon="eva:bell-fill" />
         </Badge>
       </IconButton>
@@ -122,11 +105,11 @@ export default function NotificationsPopover() {
           <Box sx={{ flexGrow: 1 }}>
             <Typography variant="subtitle1">Notifications</Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              You have {totalUnRead} unread messages
+              You have {totalUnread} unread messages
             </Typography>
           </Box>
 
-          {totalUnRead > 0 && (
+          {totalUnread > 0 && (
             <Tooltip title=" Mark all as read">
               <IconButton color="primary" onClick={handleMarkAllAsRead}>
                 <Iconify icon="eva:done-all-fill" />
@@ -140,21 +123,23 @@ export default function NotificationsPopover() {
         <Scrollbar sx={{ height: { xs: 340, sm: 'auto' } }}>
           <List
             disablePadding
-            onClick={handleMarkAllAsRead}
           >
-            {notifications?.slice(0, 5).map((notification) => (
-              <NotificationItem  key={notification.notif_id} notification={notification} onMouseEnter={handleHover}/>
+            {notifications?.slice(0, 5).map((notification, index) => (
+              <NotificationItem  
+                key={index+1} 
+                notification={notification} 
+                onMouseEnter={() => handleHover(notification.junction_id)}/>
             ))}
           </List>
         </Scrollbar>
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 
-        <Box sx={{ p: 1 }}>
+        {/* <Box sx={{ p: 1 }}>
           <Button fullWidth disableRipple>
             View All
           </Button>
-        </Box>
+        </Box> */}
       </Popover>
     </>
   );
@@ -163,18 +148,13 @@ export default function NotificationsPopover() {
 // ----------------------------------------------------------------------
 
 interface NotifItemPropType{
-  key: string | number,
   notification: Notif,
   onMouseEnter: (notifId: string | number) => void
 }
 
-// Data notification dari API: 
-// {assigned_at:xxx, completed_at:xxx, creator_fk_id:xx, notif_created_at:xxx, notif_fk_id:xxx, notif_id:xxx, 
-//   notif_junction_id:xxx, notif_msg:xxx, notif_title:xxx, receiver_fk_id:xxx, status:xxx }
-
-function NotificationItem({ key, notification, onMouseEnter }: NotifItemPropType) {
+function NotificationItem({ notification, onMouseEnter }: NotifItemPropType) {
   const { avatar, title } = renderContent(notification);
-  const {notif_junction_id:notifId, status} = notification;
+  const {junction_id:notifId, status} = notification;
 
   const handleMouseEnter = () => {
     status===0 && onMouseEnter(notifId)
@@ -208,7 +188,7 @@ function NotificationItem({ key, notification, onMouseEnter }: NotifItemPropType
             }}
           >
             <Iconify icon="eva:clock-outline" sx={{ mr: 0.5, width: 16, height: 16 }} />
-            {fToNow(notification.assigned_at)}
+            {fToNow(new Date(notification.assigned_at))}
           </Typography>
         }
       />
@@ -221,33 +201,22 @@ function NotificationItem({ key, notification, onMouseEnter }: NotifItemPropType
 function renderContent(notification:Notif) {
   const title = (
     <Typography variant="subtitle2">
-      {notification.notif_title}
+      {notification.title}
       <Typography component="span" variant="body2" sx={{ color: 'text.secondary' }}>
-        &nbsp; {noCase(notification.notif_msg)}
+        &nbsp; {notification.message?noCase(notification.message):null}
       </Typography>
     </Typography>
   );
 
-  // if (notification.type === 'order_placed') {
-  //   return {
-  //     avatar: <img alt={notification.title} src="/assets/icons/ic_notification_package.svg" />,
-  //     title,
-  //   };
-  // }
-  // if (notification.type === 'mail') {
-  //   return {
-  //     avatar: <img alt={notification.title} src="/assets/icons/ic_notification_mail.svg" />,
-  //     title,
-  //   };
-  // }
-  // if (notification.type === 'chat_message') {
-  //   return {
-  //     avatar: <img alt={notification.title} src="/assets/icons/ic_notification_chat.svg" />,
-  //     title,
-  //   };
-  // }
+  const avatar = (
+    <img 
+      alt={notification.title ?? ''} 
+      src={notification.categories===0?"/icon/ic_notification_mail.svg":"/icon/ic_notification_package.svg"}
+    />
+  );
+
   return {
-    avatar: <img alt={notification.notif_title} src="/assets/icons/ic_notification_mail.svg" /> ,
+    avatar,
     title,
   };
 }

@@ -19,18 +19,29 @@ import SvgColor from "../svg-color/SvgColor";
 interface NavSectionNestedProp{
   data: any[]
   header?: string
-}
+};
 
+interface OpenSection{
+  [key: number]: boolean
+};
+
+// ----------------------------------------------------------------------
 export default function NavSectionNested({ data = [], ...other}: NavSectionNestedProp) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState<OpenSection>({});
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setOpen(prev => !prev);
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>, index: number) => {
+    setOpen((prevOpen) => ({
+      ...prevOpen,
+      [index]: !prevOpen[index],
+    }));
     event.preventDefault();
   };
 
-  const handleClose = () => {
-    setOpen(false);
+  const handleClose = (event: React.MouseEvent<HTMLButtonElement>, index: number) => {
+    setOpen({
+      ...open,
+      [index]:false,
+    });
   }
 
   return (
@@ -44,7 +55,13 @@ export default function NavSectionNested({ data = [], ...other}: NavSectionNeste
         }
       >
         {data.map((item, index: number) => (
-          <NavItemNested key={index} item={item} onClick={handleClick} open={open} close={handleClose}/>
+          <NavItemNested 
+            key={index} 
+            item={item} 
+            onClick={(e:React.MouseEvent<HTMLButtonElement>) => handleClick(e, index)} 
+            open={open[index] ?? false} 
+            // close={(e:React.MouseEvent<HTMLButtonElement>) => handleClose(e, index)}
+          />
         ))}
 
       </List>

@@ -35,17 +35,29 @@ const navMonitoring = [
 const navAdmin = [
   {
     title: 'Reference',
-    path: '/admin',
+    path: '/reference',
     icon: icon('solar-user-check'),
     menu:[
       {
         title: 'User',
-        path: '/admin/user',
+        path: '/reference/user',
         icon: icon('dot-mark'),
       },
       {
         title: 'Kertas Kerja',
-        path: '/admin/worksheet',
+        path: '/reference/worksheet',
+        icon: icon('dot-mark'),
+      },
+    ]
+  },
+  {
+    title: 'Interface',
+    path: '/interface',
+    icon: icon('solar--diploma-verified-bold-duotone'),
+    menu:[
+      {
+        title: 'Notification',
+        path: '/interface/notification',
         icon: icon('dot-mark'),
       },
     ]

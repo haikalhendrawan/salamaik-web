@@ -1,13 +1,11 @@
 import {useState} from'react';
 import {Container, Stack, IconButton, Typography, Button} from '@mui/material';
 import Iconify from '../../components/iconify';
-import UserRefTable from '../../sections/admin/userRef/UserRefTable';
-import UserRefAddModal from '../../sections/admin/userRef/UserRefAddModal';
-import UserRefEditModal from '../../sections/admin/userRef/UserRefEditModal';
-import {users} from '../../mock/user';
+import NotifAddModal from '../../sections/admin/notifInterface/NotifAddModal';
+// -----------------------------------------------------------------------
 
 
-export default function UserRef () {
+export default function NotifInterfacePage () {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
 
   const handleClose = () => {
@@ -21,22 +19,17 @@ export default function UserRef () {
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Stack direction='row' spacing={2}>
             <Typography variant="h4" gutterBottom>
-              User List
+              Notifications
             </Typography>
           </Stack>
           <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={() => setModalOpen(true)}>
             Add
           </Button>
         </Stack>
-
-        
-        <UserRefTable users={users} />
-
-        <UserRefAddModal modalOpen={modalOpen} modalClose={handleClose} />
-        
-        {/* <UserRefEditModal modalOpen={modalOpen} modalClose={handleClose} /> */}
       
       </Container>
+
+      <NotifAddModal modalOpen={modalOpen} modalClose={handleClose} />  
     </>
 
   );

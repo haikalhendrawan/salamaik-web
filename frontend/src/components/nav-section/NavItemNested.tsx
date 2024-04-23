@@ -25,7 +25,6 @@ interface NavItemNested{
   },
   onClick?: any,
   open?: any,
-  close?: any,
 }
 
 interface Item{
@@ -34,17 +33,11 @@ interface Item{
   icon: ReactNode,
 }
 
-export default function NavItemNested({ item, onClick, open, close }: NavItemNested) {
+export default function NavItemNested({ item, onClick, open}: NavItemNested) {
   const { title, path, icon, info, menu } = item;
   const theme = useTheme() as any;
   const location = useLocation();
   const [isActive, setIsActive] = useState(false);
-  
-  useEffect(() => { 
-    if (!isActive) {
-      close(); 
-    }
-  }, [isActive]);
 
   useEffect(() => {
     setIsActive(location.pathname.includes(path));
