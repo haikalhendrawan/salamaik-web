@@ -15,7 +15,7 @@ class Notif{
 
   async getNotif(){
     try{
-      const q = "SELECT * FROM notif";
+      const q = "SELECT * FROM notif ORDER BY id DESC";
       const result = await pool.query(q);
       return result.rows
     }catch(err){
@@ -63,9 +63,12 @@ class Notif{
         const q2 = `INSERT INTO notif_junction (notif_id, creator_id, receiver_id) 
                     VALUES ($1, $2, $3) 
                     RETURNING *`;
-        const result = await client.query(q2, [notifID, userID, receiverID.id]);
-        return result.rows[0]
+        const result2 = await client.query(q2, [notifID, userID, receiverID.id]);
+        return result2.rows[0]
       }));
+
+      const q3 = `UPDATE notif SET published = $1 WHERE id = $2`;
+      await pool.query(q3, [1, notifID]);
 
       await client.query('COMMIT');
       return response
@@ -91,7 +94,18 @@ class Notif{
       return err
     }
   }
-};
+
+  async deleteNotif(notifID: number){
+    try{
+      const q = ` DELETE FROM notif WHERE id = $1 `;
+      const result = await pool.query(q, [notifID]);
+      return result.rows[0]
+    }catch(err){
+      console.log(err);
+      return err
+    }
+  }
+}
 
 const notif = new Notif();
 

@@ -8,5 +8,6 @@ router.get("/getNotifById", notifController.getNotifById);
 router.post("/addNotif", notifController.addNotif);
 router.post("/assignNotif", notifController.assignNotif);
 router.post("/updateNotif", notifController.updateNotif);
+router.post("/deleteNotif", notifController.deleteNotif);
 
 export default router

@@ -60,5 +60,17 @@ const updateNotif = async(req: Request, res: Response) => {
   }
 }
 
+const deleteNotif = async (req: Request, res: Response) => {
+  try{
+    const userID = USER;
+    const {notifID} = req.body;
+    const result = await notif.deleteNotif(notifID);
+    return res.status(200).json(result)
+  }catch(err){
+    console.log(err);
+    return res.status(500).json(err)
+  }
+}
 
-export {getNotif, getNotifById, addNotif, assignNotif, updateNotif};
+
+export {getNotif, getNotifById, addNotif, assignNotif, updateNotif, deleteNotif};

@@ -6,6 +6,7 @@
     "baseUrl": "src",
     "moduleResolution": "NodeNext",
     "sourceMap": true,
+    "strict": true,
     "typeRoots": ["./node_modules/@types", "./src/types"],
   },
   "ts-node": {
