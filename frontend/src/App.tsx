@@ -6,6 +6,7 @@ import Router from './routes';
 // provider
 import ThemeProvider from './theme';
 import {AuthProvider} from './context/AuthProvider';
+import { LoadingProvider } from './hooks/useLoading';
 // components
 import { StyledChart } from './components/chart';
 import ScrollToTop from './components/scroll-to-top';
@@ -19,7 +20,9 @@ function App() {
           <ScrollToTop />
           <StyledChart />
           <AuthProvider>
-            <Router />
+            <LoadingProvider>
+              <Router />
+            </LoadingProvider>            
           </AuthProvider>
         </ThemeProvider>
       </BrowserRouter>

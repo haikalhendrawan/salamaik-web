@@ -1,8 +1,10 @@
 import {useEffect, useRef} from "react";
 import { Helmet } from 'react-helmet-async';
 // @mui
-import { useTheme } from '@mui/material/styles';
-import { Grid, Container, Typography, LinearProgress, Button, Box } from '@mui/material';
+import { useTheme, alpha } from '@mui/material/styles';
+import { Grid, Container, Typography, Backdrop } from '@mui/material';
+import PuffLoader from 'react-spinners/PuffLoader';
+import useLoading from "../hooks/useLoading";
 // sections
 import WelcomeCard from "../sections/home/components/WelcomeCard";
 import PhotoGallery from "../sections/home/components/PhotoGallery";
@@ -11,6 +13,18 @@ import KanwilView from "../sections/home/KanwilView";
 
 export default function HomePage() {
   const theme = useTheme();
+
+  const {isLoading, setIsLoading} = useLoading();
+
+  useEffect(() => {
+    setIsLoading(true);
+
+    const id = setTimeout(() => {
+      setIsLoading(false);
+    }, 3000);
+
+    return () => clearTimeout(id)
+  }, []);
 
   return (
     <>
