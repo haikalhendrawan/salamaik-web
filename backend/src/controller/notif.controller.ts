@@ -22,7 +22,7 @@ const getNotifById = async (req: Request, res: Response) => {
     console.log(err);
     return res.status(500).json(err)
   }
-}
+};
 
 const addNotif = async(req: Request, res: Response) => {
   try{
@@ -34,7 +34,7 @@ const addNotif = async(req: Request, res: Response) => {
     console.log(err);
     return res.status(500).json(err)
   }
-}
+};
 
 const assignNotif = async(req: Request, res: Response) => { 
   try{
@@ -46,7 +46,7 @@ const assignNotif = async(req: Request, res: Response) => {
     console.log(err);
     return res.status(500).json(err)
   }
-}
+};
 
 const updateNotif = async(req: Request, res: Response) => {
   try{
@@ -58,7 +58,7 @@ const updateNotif = async(req: Request, res: Response) => {
     console.log(err);
     return res.status(500).json(err)
   }
-}
+};
 
 const deleteNotif = async (req: Request, res: Response) => {
   try{
@@ -70,7 +70,7 @@ const deleteNotif = async (req: Request, res: Response) => {
     console.log(err);
     return res.status(500).json(err)
   }
-}
+};
 
 
 export {getNotif, getNotifById, addNotif, assignNotif, updateNotif, deleteNotif};
