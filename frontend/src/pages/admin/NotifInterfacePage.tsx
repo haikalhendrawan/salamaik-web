@@ -6,6 +6,7 @@ import Iconify from '../../components/iconify';
 import NotifAddModal from '../../sections/admin/notifInterface/NotifAddModal';
 import NotifTable from '../../sections/admin/notifInterface/NotifTable';
 import useSnackbar from '../../hooks/display/useSnackbar';
+import useLoading from '../../hooks/display/useLoading';
 // -----------------------------------------------------------------------
 interface Notif{
   id: number,
@@ -25,6 +26,8 @@ export default function NotifInterfacePage () {
 
   const { openSnackbar } = useSnackbar();
 
+  const {setIsLoading} = useLoading();
+
   const handleClose = () => {
     setModalOpen(false);
   };
@@ -34,6 +37,7 @@ export default function NotifInterfacePage () {
       const response = await axiosJWT.post(`/addNotif`, {title, message, categories});
       setModalOpen(false);
       getNotif();
+      openSnackbar("Notification has been added", "success");
     }catch(err: any){
       openSnackbar(JSON.stringify(err.response.data.message), "error");
     }
@@ -41,21 +45,25 @@ export default function NotifInterfacePage () {
 
   const getNotif= async()=>{
     try{
+      setIsLoading(true);
       const response = await axiosJWT.get(`/getNotif`); 
       setNotifications(response.data);
-      console.log(response.data);
     }catch(err){
       openSnackbar("Failed to fetch notifications", "error");
+      setIsLoading(false);
+    }finally{
+      setIsLoading(false);
     }
   };
 
   const assignNotif = async(notifID: number) => {
     try{
       const response = await axiosJWT.post("/assignNotif", {notifID: notifID});
-      getNotif();
+      await getNotif();
       window.location.reload(); 
-    }catch(err){
-      console.log(err);
+      openSnackbar("Notification has been assigned", "success");
+    }catch(err: any){
+      openSnackbar(`Fail to assign notification, Err:${err.response.message}`, "success");
     }
   };
 
@@ -63,8 +71,9 @@ export default function NotifInterfacePage () {
     try{
       const response = await axiosJWT.post("/deleteNotif", {notifID: notifID});
       getNotif();
-    }catch(err){
-      console.log(err);
+      openSnackbar("Notification has been deleted", "success");
+    }catch(err: any){
+      openSnackbar(`Fail to assign notification, Err:${err.response.message}`, "success");
     }
   };
 

@@ -7,8 +7,12 @@ import cookieParser from 'cookie-parser';
 //routes
 import notifRoute from './routes/notifRoute';
 import authRoute from './routes/authRoute';
+import unitRoute from './routes/unitRoute';
+import roleRoute from './routes/roleRoute';
+import periodRoute from './routes/periodRoute';
 //middleware
 import errorHandler from './middleware/errorHandler';
+// ------------------------------------------------------------
 
 const app = express();
 app.use(cors({
@@ -18,6 +22,9 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 app.use(authRoute);
+app.use(unitRoute);
+app.use(roleRoute);
+app.use(periodRoute);
 app.use(notifRoute);
 app.use(errorHandler);
 

@@ -1,12 +1,15 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Iconify from '../../components/iconify/Iconify';
 import Label from '../../components/label/Label';
 import ProfilePicUpload from '../../components/profilePicUpload';
 import StyledTextField from '../../components/styledTextField';
+import useLoading from '../../hooks/display/useLoading';
+import useSnackbar from '../../hooks/display/useSnackbar';
+import { useAuth } from '../../hooks/useAuth';
+import useAxiosJWT from '../../hooks/useAxiosJWT';
 // @mui
 import { Stack, Typography, Box, FormControl,  Grid, IconButton, Card, TextField, Button, Slide, Grow} from '@mui/material';
 import { useTheme, styled } from '@mui/material/styles';
-
 // -----------------------------------------------------------------------
 const UserDataContainer = styled(Box)(({theme}) => ({
   height:'100%',
@@ -25,9 +28,48 @@ export default function General(){
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const { auth } = useAuth() as AuthType;
+
+  const {setIsLoading} = useLoading();
+
+  const {openSnackbar} = useSnackbar();
+
+  const axiosJWT = useAxiosJWT();
+
+  const [refValue, setRefValue] = useState({
+    role: '',
+    unit: '',
+    period: ''  
+  });
+
   const handleClick = () => {
     fileInputRef.current?fileInputRef.current.click():null
-  }
+  };
+
+  useEffect(() => {
+    const getData = async () => {
+      try{
+        setIsLoading(true);
+        const response1 = await axiosJWT.get('/getRoleById');
+        const response2 = await axiosJWT.get('/getUnitById');
+        const response3 = await axiosJWT.get('/getPeriodById');
+        setRefValue({
+          role: response1.data.rows[0].title,
+          unit: response2.data.rows[0].name,
+          period: response3.data.rows[0].name
+        });
+
+        setIsLoading(false);
+      }catch(err){
+        openSnackbar('Failed to fetch user data', 'error');
+        setIsLoading(false);
+      }finally{
+        setIsLoading(false);
+      }
+    }
+
+    getData();
+  }, [])
 
   return (
   <>
@@ -36,20 +78,27 @@ export default function General(){
         <Card sx={{height:500}}>
           <Stack direction="column" justifyContent="center" alignItems="center" spacing={2} sx={{ width: 1, height: "100%" }}>
             <input accept='image/*' type='file' style={{display:'none'}} ref={fileInputRef} tabIndex={-1} />
-            <ProfilePicUpload onClick={handleClick} imageUrl='/avatar/default-female.png' />
+            <ProfilePicUpload 
+              onClick={handleClick} 
+              imageUrl={auth?.picture || '/avatar/default-female.png'}
+            />
 
             <Stack direction="column"justifyContent="center"alignItems="center">
               <Typography variant='body2' color={theme.palette.text.disabled}>
-                User
+                {auth?.name}
               </Typography>
               <Typography variant='body2' color={theme.palette.text.disabled} sx={{mt:0}}>
-                199904082021011001
+                {auth?.username}
               </Typography>
             </Stack>
 
-            <Label color='success'>Active User</Label>
+            {auth?.status === 1 
+              ?<Label color='success'>Active User</Label>
+              :<Label color='warning'>Pending User</Label>
+            }
+            
             <Typography variant='body2' color={theme.palette.text.disabled} sx={{mt:0}}>
-                Role: Admin Kanwil
+              { refValue?.role }
             </Typography>
 
           </Stack>

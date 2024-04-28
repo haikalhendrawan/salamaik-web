@@ -10,7 +10,7 @@ type JwtPayloadType = {
   name: string;
   email: string;
   picture: string;
-  kppn: number;
+  kppn: string;
   role: number;
   period: number;
 }
@@ -39,6 +39,7 @@ class Auth{
           kppn: result.rows[0].kppn,
           role: result.rows[0].role,
           period: result.rows[0].period,
+          status: result.rows[0].status
         };
         return authInfo
       }else{

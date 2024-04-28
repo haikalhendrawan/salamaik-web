@@ -30,7 +30,7 @@ export default function Stats(){
       <Grid item xs={12} sm={12} md={12}>
         <Slide direction="right" in mountOnEnter unmountOnExit>
           <Card sx={{height:480}}>
-            <Grid container xs={12} sm={12} md={12} spacing={2} direction='row' alignItems='start' justifyContent='center' sx={{height:'40%', p:3, mb:3}}>
+            <Grid container spacing={2} direction='row' alignItems='start' justifyContent='center' sx={{height:'40%', p:3, pr:5, mb:3}}>
               <Grid item xs={6} sm={4} md={4}>
                 <Typography variant='h6'>Activity</Typography>
                 <Typography variant='body3'>information of your general activity on this site</Typography>
@@ -73,7 +73,7 @@ export default function Stats(){
                 </StatsContainer>
               </Grid>
             </Grid>
-            <Grid container xs={12} sm={12} md={12} spacing={2} direction='row' alignItems='start' justifyContent='center' sx={{height:'40%', p:3,mb:3}}>
+            <Grid container spacing={2} direction='row' alignItems='start' justifyContent='center' sx={{height:'40%', p:3, pr:5, mb:3}}>
               <Grid item xs={6} sm={4} md={4}>
                 <Typography variant='h6'>Contribution</Typography>
                 <Typography variant='body3'>shows how much you contribute to the team</Typography>

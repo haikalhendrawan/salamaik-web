@@ -10,6 +10,7 @@ declare global{
       role: number;
       period: number;
       accessToken: string;
+      status: number;
     },
     setAuth: (auth:AuthType | {[key: string]: any}) => void
   } 

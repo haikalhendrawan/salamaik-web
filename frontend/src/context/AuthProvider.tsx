@@ -1,8 +1,6 @@
 import {createContext, useState} from "react";
 import {AuthProviderType} from "../types/hooks/authTypes";
 
-
-
 const AuthContext = createContext({});
 
 

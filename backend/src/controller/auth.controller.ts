@@ -9,9 +9,10 @@ type JwtPayloadType = {
   name: string;
   email: string;
   picture: string;
-  kppn: number;
+  kppn: string;
   role: number;
   period: number;
+  status: number
 }
 
 // ------------------------------------------------------
@@ -49,6 +50,7 @@ const refresh = async (req: Request, res: Response, next: NextFunction) => {
       kppn: payload.kppn,
       role: payload.role,
       period: payload.period,
+      status: payload.status
     };
     const newAccessToken = jwt.sign(authInfo, process.env.JWT_KEY, {expiresIn:60*60*12});
     const newRefreshToken = jwt.sign(authInfo, process.env.JWT_REFRESH_KEY, {expiresIn:60*60*24});
@@ -77,6 +79,7 @@ const updateToken = async (req: Request, res: Response, next: NextFunction) => {
       kppn: response.kppn,
       role: response.role,
       period: response.period,
+      status: response.status
     };
     const newAccessToken = jwt.sign(authInfo, process.env.JWT_KEY, {expiresIn:60*60*12});
     const newRefreshToken = jwt.sign(authInfo, process.env.JWT_REFRESH_KEY, {expiresIn:60*60*24});

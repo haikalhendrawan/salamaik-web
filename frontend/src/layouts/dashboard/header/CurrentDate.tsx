@@ -21,7 +21,6 @@ export default function CurrentDate() {
   const handleClick = (event: React.MouseEvent<HTMLButtonElement, Event>) => {
       setOpen(prev => !prev);
       setAnchorEl(event.currentTarget);
-      console.log(open, anchorEl)
   };
   const handleClose= () => {
       setOpen(false);

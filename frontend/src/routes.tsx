@@ -28,8 +28,6 @@ import FollowUpDetail from "./sections/followUp/FollowUpDetail";
 import SupervisionHistoryPage from "./pages/SupervisionHistoryPage";
 import StandardizationPage from "./pages/StandardizationPage";
 import NotifInterfacePage from "./pages/admin/NotifInterfacePage";
-
-
 // ----------------------------------------------------
 
 export default function Router() {
@@ -37,7 +35,7 @@ export default function Router() {
    <Routes>
 
     <Route element={<PersistLogin />}> 
-      <Route element={<RequireAuthLayout allowedRoles={[0, 1, 2]}/>}> 
+      <Route element={<RequireAuthLayout allowedRoles={[0, 1, 2, 99]}/>}> 
         <Route path="/" element={<Navigate to ="/home" />} />
       </Route>
     </Route>
@@ -47,7 +45,7 @@ export default function Router() {
     <Route path='/403' element={<Page403/>} />
 
     <Route element={<PersistLogin/>}>
-      <Route path="/" element={<RequireAuthLayout allowedRoles={[0, 1]}/> }>
+      <Route path="/" element={<RequireAuthLayout allowedRoles={[0, 1, 99]}/> }>
         <Route path="home" element={<HomePage />} />
         <Route path='profile' element={<ProfilePage />} />
         <Route path='standard' element={<StandardizationPage />} />
@@ -56,10 +54,10 @@ export default function Router() {
 
     <Route element={<PersistLogin/>}>
       <Route path="/worksheet">
-        <Route element={<RequireAuthLayout allowedRoles={[0, 1, 2]} />}>
+        <Route element={<RequireAuthLayout allowedRoles={[0, 1, 2, 99]} />}>
           <Route index element={<WorksheetLanding />} />
         </Route>
-        <Route path="kppn" element={<RequireAuthLayout allowedRoles={[0, 1, 2]} />}>
+        <Route path="kppn" element={<RequireAuthLayout allowedRoles={[0, 1, 2, 99]} />}>
           <Route index element={<WorksheetKPPN />} />
         </Route>
       </Route>
@@ -67,10 +65,10 @@ export default function Router() {
 
     <Route element={<PersistLogin/>}>
       <Route path="/matrix" >
-        <Route element={<RequireAuthLayout allowedRoles={[0, 1, 2]} />}>
+        <Route element={<RequireAuthLayout allowedRoles={[0, 1, 2, 99]} />}>
           <Route index element={<MatrixPage />} />
         </Route>
-        <Route element={<RequireAuthHorizontalLayout allowedRoles={[0, 1, 2]}/> }>
+        <Route element={<RequireAuthHorizontalLayout allowedRoles={[0, 1, 2, 99]}/> }>
           <Route path="detail" element={<MatrixDetail />} />
         </Route>
       </Route>
@@ -78,17 +76,17 @@ export default function Router() {
 
     <Route element={<PersistLogin/>}>
       <Route path="/followUp" >
-        <Route element={<RequireAuthLayout allowedRoles={[0, 2]} />}>
+        <Route element={<RequireAuthLayout allowedRoles={[0, 2, 99]} />}>
           <Route index element={<FollowUpPage />} />
         </Route>
-        <Route element={<RequireAuthHorizontalLayout allowedRoles={[0, 1, 2]}/>}>
+        <Route element={<RequireAuthHorizontalLayout allowedRoles={[0, 1, 2, 99]}/>}>
           <Route path="detail" element={<FollowUpDetail />} />
         </Route>
       </Route>
     </Route>
 
     <Route element={<PersistLogin/>}>
-      <Route path="/reference" element={<RequireAuthLayout allowedRoles={[0, 1]}/> }>
+      <Route path="/reference" element={<RequireAuthLayout allowedRoles={[0, 1, 99]}/> }>
         <Route index element={<Navigate to="user"/>} />
         <Route path="user" element={<UserRefPage />} />
         <Route path='worksheet' element={<WorksheetRefPage />} />
@@ -96,7 +94,7 @@ export default function Router() {
     </Route>
 
     <Route element={<PersistLogin/>}>
-      <Route path="/interface" element={<RequireAuthLayout allowedRoles={[0, 1]}/> }>
+      <Route path="/interface" element={<RequireAuthLayout allowedRoles={[0, 1, 99]}/> }>
         <Route index element={<Navigate to="notification"/>} />
         <Route path="notification" element={<NotifInterfacePage />} />
       </Route>

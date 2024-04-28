@@ -27,7 +27,7 @@ export default function HomePage() {
     setIsLoading(true);
     const id = setTimeout(() => {
       setIsLoading(false);
-    }, 3000);
+    }, 1000);
 
     return () => {
       clearTimeout(id);

@@ -10,7 +10,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Iconify from '../components/iconify/Iconify';
 // @mui
-import { Container, Stack, Typography, Box, Avatar, Grid, IconButton, Card} from '@mui/material';
+import { Container, Stack, Typography, Grid, IconButton} from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 //sections
 import ProfileTab from '../sections/profile/ProfileTab';
