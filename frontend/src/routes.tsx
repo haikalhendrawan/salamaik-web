@@ -36,67 +36,71 @@ export default function Router() {
   return (
    <Routes>
 
-    {/* <Route element={<PersistLogin />}>  */}
-      <Route element={<RequireAuthLayout allowedRoles={[1,2]}/>}> 
+    <Route element={<PersistLogin />}> 
+      <Route element={<RequireAuthLayout allowedRoles={[0, 1, 2]}/>}> 
         <Route path="/" element={<Navigate to ="/home" />} />
       </Route>
-    {/* </Route> */}
+    </Route>
 
     <Route path="/login" element={<LoginPage/>} />
 
     <Route path='/403' element={<Page403/>} />
 
-    {/* <Route element={<PersistLogin/>}> */}
-      <Route path="/" element={<RequireAuthLayout allowedRoles={[1]}/> }>
+    <Route element={<PersistLogin/>}>
+      <Route path="/" element={<RequireAuthLayout allowedRoles={[0, 1]}/> }>
         <Route path="home" element={<HomePage />} />
         <Route path='profile' element={<ProfilePage />} />
         <Route path='standard' element={<StandardizationPage />} />
       </Route>
-    {/* </Route> */}
-
-    {/* <Route element={<PersistLogin/>}> */}
-    <Route path="/worksheet">
-      <Route element={<RequireAuthLayout allowedRoles={[2]} />}>
-        <Route index element={<WorksheetLanding />} />
-      </Route>
-      <Route path="kppn" element={<RequireAuthLayout allowedRoles={[1, 2]} />}>
-        <Route index element={<WorksheetKPPN />} />
-      </Route>
     </Route>
-    {/* </Route> */}
 
-    <Route path="/matrix" >
-      <Route element={<RequireAuthLayout allowedRoles={[2]} />}>
-        <Route index element={<MatrixPage />} />
-      </Route>
-      <Route element={<RequireAuthHorizontalLayout allowedRoles={[1, 2]}/> }>
-        <Route path="detail" element={<MatrixDetail />} />
+    <Route element={<PersistLogin/>}>
+      <Route path="/worksheet">
+        <Route element={<RequireAuthLayout allowedRoles={[0, 1, 2]} />}>
+          <Route index element={<WorksheetLanding />} />
+        </Route>
+        <Route path="kppn" element={<RequireAuthLayout allowedRoles={[0, 1, 2]} />}>
+          <Route index element={<WorksheetKPPN />} />
+        </Route>
       </Route>
     </Route>
 
-    <Route path="/followUp" >
-      <Route element={<RequireAuthLayout allowedRoles={[2]} />}>
-        <Route index element={<FollowUpPage />} />
-      </Route>
-      <Route element={<RequireAuthHorizontalLayout allowedRoles={[1, 2]}/>}>
-        <Route path="detail" element={<FollowUpDetail />} />
+    <Route element={<PersistLogin/>}>
+      <Route path="/matrix" >
+        <Route element={<RequireAuthLayout allowedRoles={[0, 1, 2]} />}>
+          <Route index element={<MatrixPage />} />
+        </Route>
+        <Route element={<RequireAuthHorizontalLayout allowedRoles={[0, 1, 2]}/> }>
+          <Route path="detail" element={<MatrixDetail />} />
+        </Route>
       </Route>
     </Route>
 
-    {/* <Route element={<PersistLogin/>}> */}
-      <Route path="/reference" element={<RequireAuthLayout allowedRoles={[1]}/> }>
+    <Route element={<PersistLogin/>}>
+      <Route path="/followUp" >
+        <Route element={<RequireAuthLayout allowedRoles={[0, 2]} />}>
+          <Route index element={<FollowUpPage />} />
+        </Route>
+        <Route element={<RequireAuthHorizontalLayout allowedRoles={[0, 1, 2]}/>}>
+          <Route path="detail" element={<FollowUpDetail />} />
+        </Route>
+      </Route>
+    </Route>
+
+    <Route element={<PersistLogin/>}>
+      <Route path="/reference" element={<RequireAuthLayout allowedRoles={[0, 1]}/> }>
         <Route index element={<Navigate to="user"/>} />
         <Route path="user" element={<UserRefPage />} />
         <Route path='worksheet' element={<WorksheetRefPage />} />
       </Route>
-    {/* </Route> */}
+    </Route>
 
-    {/* <Route element={<PersistLogin/>}> */}
-      <Route path="/interface" element={<RequireAuthLayout allowedRoles={[1]}/> }>
+    <Route element={<PersistLogin/>}>
+      <Route path="/interface" element={<RequireAuthLayout allowedRoles={[0, 1]}/> }>
         <Route index element={<Navigate to="notification"/>} />
         <Route path="notification" element={<NotifInterfacePage />} />
       </Route>
-    {/* </Route> */}
+    </Route>
 
    </Routes>
   );

@@ -8,6 +8,7 @@ import { Box, Divider, Typography, Stack, MenuItem, Avatar,
 import Iconify from '../../../components/iconify';
 // hooks and other stuff
 import {useAuth} from "../../../hooks/useAuth";
+import useAxiosJWT from '../../../hooks/useAxiosJWT';
 // ----------------------------------------------------------------------
 interface MenuOptionType{
   label:string,
@@ -39,10 +40,16 @@ const MENU_OPTIONS: Array<MenuOptionType> = [
 
 export default function AccountPopover() {
   const [open, setOpen] = useState<null | EventTarget & HTMLButtonElement>(null);
+
   const {auth, setAuth } = useAuth() as AuthType;
+
   const [anchorEl, setAnchorEl] = useState(null); 
+
   const openPeriod = Boolean(anchorEl); 
+
   const [avatarKey, setAvatarKey] = useState(0);
+
+  const axiosJWT = useAxiosJWT();
 
   const handleOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     setOpen(event.currentTarget);
@@ -60,7 +67,7 @@ export default function AccountPopover() {
   const logout = async () => {
     setAuth({});
     try {
-      const response = await axios.delete("/logout", { withCredentials: true });
+      const response = await axiosJWT.get("/logout");
       console.log(response);
     } catch (err) {
       console.log(err);
@@ -92,7 +99,7 @@ export default function AccountPopover() {
           }),
         }}
       >
-        <Avatar key={avatarKey} src={'/avatar/default-female.png'} alt="photoURL" />
+        <Avatar key={avatarKey} src={auth.picture || '/avatar/default-female.png'} alt="photoURL" />
       </IconButton>
 
       <Popover
@@ -119,10 +126,10 @@ export default function AccountPopover() {
       >
         <Box sx={{ my: 1.5, px: 2.5 }}>
           <Typography variant="subtitle2" noWrap>
-            {auth?.name || 'User'}
+            {auth?.name}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-            {auth?.email || 'user@kemenkeu.go.id'}
+            {auth?.email}
           </Typography>
         </Box>
 

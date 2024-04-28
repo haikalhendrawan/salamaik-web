@@ -1,10 +1,11 @@
 import {useState, useEffect} from'react';
 import {Container, Stack, IconButton, Typography, Button} from '@mui/material';
-import axios from 'axios';
+import axiosJWT from '../../config/axios';
 import { z } from 'zod';
 import Iconify from '../../components/iconify';
 import NotifAddModal from '../../sections/admin/notifInterface/NotifAddModal';
 import NotifTable from '../../sections/admin/notifInterface/NotifTable';
+import useSnackbar from '../../hooks/display/useSnackbar';
 // -----------------------------------------------------------------------
 interface Notif{
   id: number,
@@ -22,35 +23,35 @@ export default function NotifInterfacePage () {
 
   const [notifications, setNotifications] = useState<Notif[] | []>([]);
 
+  const { openSnackbar } = useSnackbar();
+
   const handleClose = () => {
     setModalOpen(false);
   };
 
   const addNotif = async(title: string, message: string, categories: number) => {
     try{
-      const response = await axios.post("http://localhost:8080/addNotif", {title, message, categories});
-      console.log(response.data);
+      const response = await axiosJWT.post(`/addNotif`, {title, message, categories});
       setModalOpen(false);
       getNotif();
-    }catch(err){
-      console.log(err);
+    }catch(err: any){
+      openSnackbar(JSON.stringify(err.response.data.message), "error");
     }
   };
 
   const getNotif= async()=>{
     try{
-      const response = await axios.get("http://localhost:8080/getNotif"); 
+      const response = await axiosJWT.get(`/getNotif`); 
       setNotifications(response.data);
       console.log(response.data);
     }catch(err){
-      console.log(err);
+      openSnackbar("Failed to fetch notifications", "error");
     }
   };
 
   const assignNotif = async(notifID: number) => {
     try{
-      const response = await axios.post("http://localhost:8080/assignNotif", {notifID: notifID});
-      console.log(response.data);
+      const response = await axiosJWT.post("/assignNotif", {notifID: notifID});
       getNotif();
       window.location.reload(); 
     }catch(err){
@@ -60,8 +61,7 @@ export default function NotifInterfacePage () {
 
   const deleteNotif = async(notifID: number) => {
     try{
-      const response = await axios.post("http://localhost:8080/deleteNotif", {notifID: notifID});
-      console.log(response.data);
+      const response = await axiosJWT.post("/deleteNotif", {notifID: notifID});
       getNotif();
     }catch(err){
       console.log(err);

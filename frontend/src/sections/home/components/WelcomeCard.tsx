@@ -23,7 +23,7 @@ export default function WelcomeCard({ title, total, icon, color = 'primary', sx,
   const primaryDark = theme.palette.primary.main;
 
   return (
-      <Grid item spacing={1} sx={{pl:4, pr:4, borderRadius:'16px', background:`rgb(255, 255, 255) linear-gradient(135deg, ${alpha(primaryLight, 0.2)}, ${alpha(primaryDark, 0.2)})`, height:'300px'}}>
+      <Grid item sx={{pl:4, pr:4, borderRadius:'16px', background:`rgb(255, 255, 255) linear-gradient(135deg, ${alpha(primaryLight, 0.2)}, ${alpha(primaryDark, 0.2)})`, height:'300px'}}>
         <Stack direction='row'>
           <Stack direction={'column'} sx={{p:1, pb:5, pt:5, alignItems:'flex-start', textAlign:'left', width:'60%'}} spacing={3}>
             <Stack direction={'column'} spacing={0}>

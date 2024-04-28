@@ -3,6 +3,9 @@ import { Outlet, Navigate, useLocation } from 'react-router-dom';
 // @mui
 import { styled } from '@mui/material/styles';
 import Header from './header';
+import Footer from '../dashboard/footer';
+// hooks
+import { useAuth } from '../../hooks/useAuth';
 
 const APP_BAR_MOBILE = 64;
 const APP_BAR_DESKTOP = 92;
@@ -31,22 +34,23 @@ interface RqAuthHorizontalLayoutProp{
 }; 
 // ----------------------------------------------------------------------
 export default function RequireAuthHorizontalLayout({allowedRoles}: RqAuthHorizontalLayoutProp){
- // const {auth} = useAuth() as AuthType;  //  { username: xxx, role:xxx, accessToken, msg:xxx}
- const [open, setOpen] = useState(false);
+ const {auth} = useAuth() as AuthType;  //  { username: xxx, role:xxx, accessToken, msg:xxx}
  const location = useLocation();
 
- // if (!auth || !auth.accessToken){
- //   return <Navigate to="/login" state={{from:location}} replace />
- // }
+ if (!auth || !auth.accessToken){
+   return <Navigate to="/login" state={{from:location}} replace />
+ }
 
- 
- // return <Navigate to="/403" state={{from:location}} replace /> // if user sudah login, tapi allowed role tidak termasuk
+ if (allowedRoles.includes(auth.role)){
   return (
     <StyledRoot>
       <Header />
       <Main>
         <Outlet />
+        <Footer />
       </Main>
     </StyledRoot>
-  );
+  )}
+
+ return <Navigate to="/403" state={{from:location}} replace /> // if user sudah login, tapi allowed role tidak termasuk
 }

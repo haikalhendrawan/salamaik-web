@@ -42,14 +42,14 @@ const ColorSwitcher = () => {
 							<ClickAwayListener onClickAway={handleClose}>
 								<div>
 										<Stack direction="row" spacing={2}>
-												<IconButton onClick={() => handleColorClick(PRIMARY)}><Iconify icon={"carbon:dot-mark"} sx={{color:'#2065d1', borderRadius:'50%', backgroundColor: bgColor==='primary'?theme.palette.action.selected:null}} /></IconButton>
-												<IconButton onClick={() => handleColorClick(GREEN)}><Iconify icon={"carbon:dot-mark"} sx={{color:'rgb(0, 167, 111)', borderRadius:'50%', backgroundColor: bgColor==='green'?theme.palette.action.selected:null}} /></IconButton>
-												<IconButton onClick={() => handleColorClick(PURPLE)}><Iconify icon={"carbon:dot-mark"} sx={{color:'#9c27b0', borderRadius:'50%', backgroundColor: bgColor==='purple'?theme.palette.action.selected:null}} /></IconButton>
+											<IconButton onClick={() => handleColorClick(PINK)}><Iconify icon={"carbon:dot-mark"} sx={{color:theme.palette.pink.main, borderRadius:'50%', backgroundColor: bgColor==='pink'?theme.palette.action.selected:null}} /></IconButton>
+											<IconButton onClick={() => handleColorClick(GREEN)}><Iconify icon={"carbon:dot-mark"} sx={{color:'rgb(0, 167, 111)', borderRadius:'50%', backgroundColor: bgColor==='green'?theme.palette.action.selected:null}} /></IconButton>
+											<IconButton onClick={() => handleColorClick(PURPLE)}><Iconify icon={"carbon:dot-mark"} sx={{color:'#9c27b0', borderRadius:'50%', backgroundColor: bgColor==='purple'?theme.palette.action.selected:null}} /></IconButton>
 										</Stack>
 										<Stack direction="row" spacing={2}>
-												<IconButton onClick={() => handleColorClick(PINK)}><Iconify icon={"carbon:dot-mark"} sx={{color:theme.palette.pink.main, borderRadius:'50%', backgroundColor: bgColor==='pink'?theme.palette.action.selected:null}} /></IconButton>
-												<IconButton onClick={() => handleColorClick(WARNING)}><Iconify icon={"carbon:dot-mark"} sx={{color:WARNING.main, borderRadius:'50%', backgroundColor: bgColor==='warning'?theme.palette.action.selected:null}} /></IconButton>
-												<IconButton onClick={() => handleColorClick(PRIMARY)}><Iconify icon={"bx:reset"}/></IconButton>
+											<IconButton onClick={() => handleColorClick(PRIMARY)}><Iconify icon={"carbon:dot-mark"} sx={{color:'#2065d1', borderRadius:'50%', backgroundColor: bgColor==='primary'?theme.palette.action.selected:null}} /></IconButton>
+											<IconButton onClick={() => handleColorClick(WARNING)}><Iconify icon={"carbon:dot-mark"} sx={{color:WARNING.main, borderRadius:'50%', backgroundColor: bgColor==='warning'?theme.palette.action.selected:null}} /></IconButton>
+											<IconButton onClick={() => handleColorClick(PINK)}><Iconify icon={"bx:reset"}/></IconButton>
 										</Stack>
 								</div>
 							</ClickAwayListener>

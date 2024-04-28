@@ -1,19 +1,15 @@
 declare global{
   interface AuthType{
     auth:{
-      id: string | number, 
-      username: string, 
-      name: string, 
-      email: string, 
-      image: string, 
-      role: string | number, 
-      kppn: string | number, 
-      accessToken: string, 
-      namaPIC: string, 
-      nipPIC: string, 
-      emailPIC: string, 
-      msg: string,
-      errorMsg?:string
+      id: string;
+      username: string | number | null;
+      name: string | null;
+      email: string | null;
+      picture: string | null;
+      kppn: number;
+      role: number;
+      period: number;
+      accessToken: string;
     },
     setAuth: (auth:AuthType | {[key: string]: any}) => void
   } 

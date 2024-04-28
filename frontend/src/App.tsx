@@ -5,8 +5,9 @@ import { HelmetProvider } from 'react-helmet-async';
 import Router from './routes';
 // provider
 import ThemeProvider from './theme';
-import {AuthProvider} from './context/AuthProvider';
-import { LoadingProvider } from './hooks/useLoading';
+import { AuthProvider } from './context/AuthProvider';
+import { LoadingProvider } from './hooks/display/useLoading';
+import { SnackbarProvider } from './hooks/display/useSnackbar';
 // components
 import { StyledChart } from './components/chart';
 import ScrollToTop from './components/scroll-to-top';
@@ -21,7 +22,9 @@ function App() {
           <StyledChart />
           <AuthProvider>
             <LoadingProvider>
-              <Router />
+              <SnackbarProvider>
+                <Router />
+              </SnackbarProvider>              
             </LoadingProvider>            
           </AuthProvider>
         </ThemeProvider>

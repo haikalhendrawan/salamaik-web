@@ -4,31 +4,35 @@ import { useMemo, useState, createContext, useEffect } from 'react';
 import { CssBaseline} from '@mui/material';
 import { ThemeProvider as MUIThemeProvider, createTheme, StyledEngineProvider, Theme, ThemeOptions} from '@mui/material/styles';
 import { CustomThemeOptions } from '../types/theme';
-import { idID, zhCN } from '@mui/material/locale';
 //
-import palette, {paletteDark, GREY, PRIMARY, SECONDARY, INFO, SUCCESS, WARNING, ERROR} from './palette';
+import palette, {paletteDark, GREY, PRIMARY, SECONDARY, INFO, SUCCESS, WARNING, ERROR, PINK} from './palette';
 import shadows from './shadows';
 import typography from './typography';
 import GlobalStyles from './globalStyles';
 import customShadows from './customShadows';
 import componentsOverride from './overrides';
-import useMode, {ModeContext} from "../hooks/display/useMode";
-// import { CustomShadows, Shadows, Typography, Shape, Palette } from '../types/themeTypes';
+import {ModeContext} from "../hooks/display/useMode";
+import useThemeColor from '../hooks/display/useThemeColor';
+import useThemeMode from '../hooks/display/useThemeMode';
 
 // ----------------------------------------------------------------------
 
 interface ThemeProvider{
   children:JSX.Element | JSX.Element[]
-}
+};
+
 
 export default function ThemeProvider({ children }:ThemeProvider) {
-  const [mode, setMode] = useState('light');
-  const [primaryColor, setPrimaryColor] = useState('primary'); 
-  const currentColor = localStorage.getItem('color') || null;
+  const [mode, setMode] = useThemeMode('light');
+
+  const [primaryColor, setPrimaryColor] = useThemeColor(PINK);
+
   const themeOptions = useMemo(() => ({
+      mode: mode,
+      color: primaryColor,
       palette: {
-        ...localStorage.getItem('mode') === 'light' ? palette : paletteDark,
-        primary: currentColor?JSON.parse(currentColor):PRIMARY,
+        ...mode === 'light' ? palette : paletteDark,
+        primary: primaryColor??PRIMARY,
       },
       shape: { borderRadius: 6 },
       typography,

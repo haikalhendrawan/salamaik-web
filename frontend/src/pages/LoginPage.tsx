@@ -5,9 +5,7 @@ import { styled, Theme } from '@mui/material/styles';
 import { Link, Container, Typography, Divider, Stack, Button, Card, Alert, Box, LinearProgress} from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 // hooks
-import PuffLoader from "react-spinners/PuffLoader";
-import SimpleBackdrop from "../components/loading/simpleBackdrop";
-import useResponsive from '../hooks/useResponsive';
+import useResponsive from '../hooks/display/useResponsive';
 // components
 import Logo from '../components/logo';
 import Iconify from '../components/iconify';
@@ -62,13 +60,20 @@ export default function LoginPage() {
       </Helmet>
 
       <StyledRoot>
+        <Box
+          component="img"
+          src="/logo/salamaik-long.png"
+          sx={{ width: 120, height: 30, cursor: 'pointer', position: 'fixed',
+          top: { xs: 16, md: 24 },
+          left: { xs: 16, md: 24 }, }}
+        />
           <StyledSection>
             <img
-              src={'ws-scenery.png'}
+              src={'/image/Other 10.png'}
               alt="background"
               style={{
-                width: '100%',
-                height: '100%',
+                width: '80%',
+                height: '80%',
                 background:'cover',
                 fill: '#FFFFFF',
               }}
@@ -78,10 +83,10 @@ export default function LoginPage() {
         <Container maxWidth="sm" >
           <StyledContent>
             <Typography variant="h4" gutterBottom>
-              Sign In
+              Sign In to Salamaik
             </Typography>
-            <Typography  gutterBottom sx={{mb:5}}>
-              gunakan username dan password masing2 kppn
+            <Typography sx={{mb:5}}>
+              Belum punya akun? <Link sx={{ml:0.5}} variant="subtitle1" underline="hover" href='#'>Register</Link>
             </Typography>
 
             <LoginForm />   {/* logika dihandle di komponen ini */}

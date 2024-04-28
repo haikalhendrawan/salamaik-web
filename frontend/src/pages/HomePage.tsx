@@ -1,29 +1,37 @@
-import {useEffect, useRef} from "react";
+import {useEffect, useRef, useState} from "react";
 import { Helmet } from 'react-helmet-async';
 // @mui
 import { useTheme, alpha } from '@mui/material/styles';
-import { Grid, Container, Typography, Backdrop } from '@mui/material';
+import { Grid, Container, Snackbar, Alert, Button } from '@mui/material';
 import PuffLoader from 'react-spinners/PuffLoader';
-import useLoading from "../hooks/useLoading";
+import useLoading from "../hooks/display/useLoading";
+import useSnackbar from "../hooks/display/useSnackbar";
+import { useAuth } from "../hooks/useAuth";
 // sections
 import WelcomeCard from "../sections/home/components/WelcomeCard";
 import PhotoGallery from "../sections/home/components/PhotoGallery";
 import KanwilView from "../sections/home/KanwilView";
+import { set } from "lodash";
 // ----------------------------------------------------------------------
 
 export default function HomePage() {
   const theme = useTheme();
 
-  const {isLoading, setIsLoading} = useLoading();
+  const {openSnackbar} = useSnackbar();
+
+  const {setIsLoading} = useLoading();
+
+  const {auth} = useAuth() as AuthType;
 
   useEffect(() => {
     setIsLoading(true);
-
     const id = setTimeout(() => {
       setIsLoading(false);
     }, 3000);
 
-    return () => clearTimeout(id)
+    return () => {
+      clearTimeout(id);
+    };
   }, []);
 
   return (

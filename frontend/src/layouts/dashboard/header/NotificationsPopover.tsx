@@ -47,8 +47,7 @@ export default function NotificationsPopover() {
   const handleMarkAllAsRead = async() => {
     notifications?.map(async(item) => {
       try{
-        const response = await axios.post('http://localhost:8080/updateNotif', {junctionID:item.junction_id});
-        console.log(response.data);
+        const response = await axiosJWT.post('/updateNotif', {junctionID:item.junction_id});
         getNotif();
       }catch(err){
         console.log(err)
@@ -58,9 +57,8 @@ export default function NotificationsPopover() {
 
   const getNotif= async()=>{
     try{
-      const response = await axios.get("http://localhost:8080/getNotifById"); 
+      const response = await axiosJWT.get("/getNotifById"); 
       setNotifications(response.data);
-      console.log(response.data);
     }catch(err){
       console.log(err);
     }
@@ -68,8 +66,7 @@ export default function NotificationsPopover() {
 
   const handleHover = async(notifId: string | number) => {
     try{
-      const response = await axios.post('http://localhost:8080/updateNotif', {junctionID:notifId})
-      console.log(response.data);
+      const response = await axiosJWT.post('/updateNotif', {junctionID:notifId})
       getNotif();
     }catch(err){
       console.log(err)

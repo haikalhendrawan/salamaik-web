@@ -8,7 +8,6 @@ declare global{
     setMode:  (mode: string | ((prev: string) => string)) => void
     primaryColor: Color,
     setPrimaryColor: (primaryColor: Color) => void
-
   }
 }
 

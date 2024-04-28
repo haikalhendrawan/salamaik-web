@@ -68,7 +68,7 @@ export default function NotifTable({notifications, assignNotif, deleteNotif}:Not
           </TableRow>
         </TableHead>
         <TableBody>
-          {notifications.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, index) => 
+          {notifications?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)?.map((row, index) => 
             <TableRow hover key={index} tabIndex={-1}>
               <TableCell align="justify">{index+1}</TableCell>
 

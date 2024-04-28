@@ -89,6 +89,8 @@ mode?: PaletteMode | undefined
 }
 
 export interface CustomThemeOptions extends ThemeOptions{
+  mode: 'light' | 'dark',
+  color: Color | string,
   palette: Palette,
   shape: Shape,
   typography: Typography,
@@ -98,6 +100,8 @@ export interface CustomThemeOptions extends ThemeOptions{
 
 declare module '@mui/material/styles'{
   export interface Theme{
+    mode: 'light' | 'dark',
+    color: Color | string,
     palette: Palette,
     shape: Shape,
     typography: Typography,
@@ -105,6 +109,8 @@ declare module '@mui/material/styles'{
   } 
 
   export interface ThemeOptions{
+    mode: 'light' | 'dark',
+    color: Color | string,
     palette: Palette,
     shape: Shape,
     typography: Typography,

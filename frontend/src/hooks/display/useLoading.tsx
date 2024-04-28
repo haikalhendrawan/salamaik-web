@@ -1,17 +1,24 @@
 import { ReactNode, useState, createContext, useContext } from 'react';
 // @mui
-import { useTheme, alpha } from '@mui/material/styles';
+import { useTheme, alpha, styled } from '@mui/material/styles';
 import { Grid, Container, Typography, Backdrop } from '@mui/material';
 import PuffLoader from 'react-spinners/PuffLoader';
+import useThemeMode from './useThemeMode';
 //------------------------------------------------------------------
+const StyledBackdrop = styled(Backdrop)(({theme}) => ({
+  color: '#F9FAFB', 
+  zIndex:9999, 
+  backgroundColor: theme.mode==='dark'?alpha(theme.palette.grey[700], 0.6):alpha(theme.palette.grey[300], 0.6)
+})); 
+
 type LoadingContextType = {
   isLoading: boolean;
   setIsLoading: (isLoading: boolean) => void;
-}
+};
 
 type LoadingProviderProps = {
   children: ReactNode
-}
+};
 //------------------------------------------------------------------
 const LoadingContext = createContext<LoadingContextType>({isLoading:false, setIsLoading: () => {}});
 
@@ -20,12 +27,10 @@ const LoadingProvider = ({children}: LoadingProviderProps) => {
 
   const [isLoading, setIsLoading] = useState(false);
 
+  
   return(
     <LoadingContext.Provider value={{isLoading, setIsLoading}}>
-      <Backdrop
-        sx={{ color: '#F9FAFB', zIndex:9999, backgroundColor: alpha(theme.palette.grey[700], 0.6)}}
-        open={isLoading}
-      >
+      <StyledBackdrop open={isLoading}>
         <div style ={{position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}>
           <PuffLoader 
             color={theme.palette.primary.main}  
@@ -33,7 +38,7 @@ const LoadingProvider = ({children}: LoadingProviderProps) => {
             speedMultiplier={0.7}
           />
         </div>
-    </Backdrop>
+    </StyledBackdrop>
       {children}
     </LoadingContext.Provider>
   )

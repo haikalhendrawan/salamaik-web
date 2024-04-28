@@ -30,7 +30,7 @@ export default function NavItem({ item }:Item) {
       to={path}
       target={target}
       sx={
-        localStorage.getItem('mode')==='dark'?
+        theme.mode==='dark'?
         {
         '&.active': {
           color: theme.palette.primary.light,

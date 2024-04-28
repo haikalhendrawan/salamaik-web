@@ -6,9 +6,7 @@ import { styled } from '@mui/material/styles';
 import Header from '../dashboard/header';
 import Nav from '../dashboard/nav';
 import Footer from '../dashboard/footer';
-// import {useAuth} from "../../hooks/useAuth"; 
-import Page403 from '../../pages/guard/Page403'; 
-
+import {useAuth} from "../../hooks/useAuth"; 
 // ----------------------------------------------------------------------
 
 const APP_BAR_MOBILE = 64;
@@ -40,28 +38,18 @@ interface RqAuthLayoutProp{
 
 // ----------------------------------------------------------------------
 export default function RequireAuthLayout({allowedRoles}: RqAuthLayoutProp) {
-  // const {auth} = useAuth() as AuthType;  //  { username: xxx, role:xxx, accessToken, msg:xxx}
+  const {auth} = useAuth() as AuthType;  //  { username: xxx, role:xxx, accessToken, msg:xxx}
+  
   const [open, setOpen] = useState(false);
+
   const location = useLocation();
 
-  // if (!auth || !auth.accessToken){
-  //   return <Navigate to="/login" state={{from:location}} replace />
-  // }
+  if (!auth || !auth.accessToken){
+    return <Navigate to="/login" state={{from:location}} replace />
+  }
 
-  // if (allowedRoles.includes(role)){
-  //   return (
-  //   <StyledRoot> 
-  //     <Header onOpenNav={() => setOpen(true)} />
-  //     <Nav openNav={open} onCloseNav={() => setOpen(false)} />
-  //     <Main>
-  //       <Outlet />
-  //       <Footer />
-  //     </Main>
-  //   </StyledRoot>)
-  // }
-  
-  // return <Navigate to="/403" state={{from:location}} replace /> // if user sudah login, tapi allowed role tidak termasuk
-  return (
+  if (allowedRoles.includes(auth.role)){
+    return (
     <StyledRoot> 
       <Header onOpenNav={() => setOpen(true)} />
       <Nav openNav={open} onCloseNav={() => setOpen(false)} />
@@ -70,5 +58,7 @@ export default function RequireAuthLayout({allowedRoles}: RqAuthLayoutProp) {
         <Footer />
       </Main>
     </StyledRoot>)
+  }
   
+  return <Navigate to="/403" state={{from:location}} replace /> // if user sudah login, tapi allowed role tidak termasuk
 }

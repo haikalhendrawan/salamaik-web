@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom';
 import { styled, alpha } from '@mui/material/styles';
 import { Box, Link, Button, Drawer, Typography, Avatar, Stack, LinearProgress } from '@mui/material';
 // hooks
-import useResponsive from '../../../hooks/useResponsive';
+import useResponsive from '../../../hooks/display/useResponsive';
 import {useAuth} from "../../../hooks/useAuth";
 // components
 import Logo from '../../../components/logo';

@@ -1,6 +1,11 @@
-import { useMemo, useState, createContext, useContext } from 'react';
+/**
+ *
+ * utk ngambil campuran state dari useThemeColor dan useThemeMode
+ * value dari useMode hook ada di ../theme/index
+*/
+import { createContext, useContext } from 'react';
 
-// value dari useMode hook ada di ../theme/index
+
 const ModeContext = createContext({});
 
 const useMode = () => {

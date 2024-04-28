@@ -55,7 +55,7 @@ export default function NavItemNested({ item, onClick, open}: NavItemNested) {
           setIsActive(true);
         }}
       sx={
-        localStorage.getItem('mode')==='dark'?
+        theme.mode==='dark'?
         {
         '&.active': {
           color: theme.palette.primary.light,

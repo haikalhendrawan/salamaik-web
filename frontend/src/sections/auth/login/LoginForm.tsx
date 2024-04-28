@@ -2,38 +2,38 @@ import React, { useState, useEffect,} from 'react';
 import { useNavigate,} from 'react-router-dom';
 import axios from "axios";
 // @mui
-import { Link, Stack, IconButton, InputAdornment, TextField, Checkbox, FormControlLabel, Alert, AlertTitle, Snackbar, Button } from '@mui/material';
+import { Link, Stack, IconButton, InputAdornment, TextField, Checkbox, FormControlLabel, Alert, Box, Snackbar, Button } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 // components
 import Iconify from '../../../components/iconify';
 import {useAuth} from "../../../hooks/useAuth";
-
-
+import useSnackbar from '../../../hooks/display/useSnackbar';
 // ----------------------------------------------------------------------
 
 export default function LoginForm() {
   const navigate = useNavigate();
+
   const {auth, setAuth} = useAuth() as AuthType; // { username: xxx, role:xxx, accessToken,msg:xxx}
+
   const [showPassword, setShowPassword] = useState(false); 
-  const [value, setValue] = useState({    // value dari input form
+
+  const { openSnackbar } = useSnackbar();
+
+  const [value, setValue] = useState({    
     username:"",
     password:"",
   }); 
-  const [open, setOpen] = useState(false);  // state snackBar
-  const [loading, setLoading] = useState(false);  // state loading Button
 
-  useEffect(()=>{   // effect setiap awal render
-  setOpen(false);
-  },[])
+  const [loading, setLoading] = useState(false);  // state loading Button
  
   useEffect(()=>{  // effect setiap auth berubah
-  if(auth){
-    if(auth.accessToken){
-      setLoading(true); 
-    }else{
-      setOpen(true)
+    if(auth){
+      if(auth.accessToken){
+        setLoading(true); 
+      }else{
+        setLoading(false);
+      }
     }
-  }
   },[auth])
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,22 +46,22 @@ export default function LoginForm() {
   const handleSubmit = async(event: React.FormEvent<HTMLFormElement>)=>{
     event.preventDefault();
     try{
-      const response = await axios.post("/login", {username:value.username, password:value.password});
-      setAuth(response.data);  // { username: xxx, role:xxx, accessToken,msg:xxx}
-        if(localStorage.getItem('mode')===null){localStorage.setItem('mode', 'dark')};
-      navigate("/app");
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/login`, {username:value.username, password:value.password}, {
+        withCredentials: true
+      });
+      setAuth({
+        ...response.data.authInfo,
+        accessToken: response.data.accessToken
+      }); 
+      console.log({
+        ...response.data.authInfo,
+        accessToken: response.data.accessToken
+      })
+      navigate("/home");
     }catch(err: any){
-      console.log(err);
-      setAuth(err.response.data);
-      setOpen(true);
+      openSnackbar(err.response.data.message, "error");
     }
-  }
-
-  const handleClose = ()=>{
-    setOpen(false);
-  }
-
-  
+  };
 // ----------------------------------------------------------------------
 
   return (
@@ -88,20 +88,8 @@ export default function LoginForm() {
           />
         </Stack>
 
-        <Snackbar open={open} autoHideDuration={6000} onClose={handleClose} anchorOrigin={{vertical:'top', horizontal:'right'}} >
-          <Alert 
-            onClose={handleClose} 
-            variant="filled" 
-            severity={auth&&auth.accessToken?"success":"error"} 
-            sx={{ width: '100%' }}
-          >
-            {auth&&auth.accessToken?"Login Success":
-            auth?.errorMsg?auth.errorMsg:"Server Unavailable"}
-          </Alert>
-        </Snackbar>
-
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ my: 2 }}>
-          <FormControlLabel control={<Checkbox />} label="Remember me" /> 
+        <Stack direction="row" alignItems="center" justifyContent="end" sx={{ my: 3 }}>
+          {/* <FormControlLabel control={<Checkbox />} label="Remember me" />  */}
           <Link variant="subtitle2" underline="hover" href="/resetpassword" sx={{zIndex:1}}>
             Forgot password?
           </Link>

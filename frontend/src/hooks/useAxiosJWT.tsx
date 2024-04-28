@@ -11,7 +11,7 @@ const useAxiosJWT = () => {
     useEffect(() => {
     const requestIntercept = axiosJWT.interceptors.request.use((config) => {
         if(!config.headers.Authorization){
-            config.headers.Authorization = `Bearer ${auth?.accessToken}` // setiap request kita kirim cookies di header yg valuenya mrpk accessToken
+            config.headers.Authorization = `Bearer ${auth?.accessToken}` // setiap request kita auth di header yg valuenya mrpk accessToken
         }
         return config;
     }, (error) => {
@@ -20,14 +20,14 @@ const useAxiosJWT = () => {
 
     const responseIntercept = axiosJWT.interceptors.response.use((resp) => {
         return resp
-    }, (error) => {
+    }, async (error) => {
         const prevRequest = error?.config;
         if(error?.resp?.status ==="403" && !prevRequest?.sent){
-            const newAccessToken = refresh();
+            prevRequest.sent = true;
+            const newAccessToken = await refresh();
             prevRequest.headers.Authorization = `Bearer ${newAccessToken}`;
             return axiosJWT(prevRequest);
         }
-        console.log(error)
         return Promise.reject(error);
     });
 

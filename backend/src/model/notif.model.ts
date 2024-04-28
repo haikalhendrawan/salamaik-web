@@ -1,4 +1,5 @@
 import pool from "../config/db";
+import ErrorDetail from "./error.model";
 
 /**
  *
@@ -19,7 +20,7 @@ class Notif{
       const result = await pool.query(q);
       return result.rows
     }catch(err){
-      return err
+      throw new ErrorDetail(500,'Database query failed', err);
     }
   }
 
@@ -34,7 +35,7 @@ class Notif{
       const result = await pool.query(q, [id]);
       return result.rows
     }catch(err){
-      return err
+      throw new ErrorDetail(500,'Database query failed', err);
     }
   } 
 
@@ -46,7 +47,7 @@ class Notif{
       const result = await pool.query(q, [title, message, categories, creatorID]);
       return result.rows[0]
     }catch(err){
-      return err
+      throw new ErrorDetail(500,'Database query failed', err);
     }
   }
 
@@ -74,7 +75,7 @@ class Notif{
       return response
     }catch(err){
       await client.query('ROLLBACK');
-      return err
+      throw new ErrorDetail(500,'Database query failed', err);
     }finally{
       client.release();
     }
@@ -91,7 +92,7 @@ class Notif{
       return result.rows[0]
     }catch(err){
       console.log(err);
-      return err
+      throw new ErrorDetail(500,'Database query failed', err);
     }
   }
 
@@ -102,7 +103,7 @@ class Notif{
       return result.rows[0]
     }catch(err){
       console.log(err);
-      return err
+      throw new ErrorDetail(500,'Database query failed', err);
     }
   }
 }

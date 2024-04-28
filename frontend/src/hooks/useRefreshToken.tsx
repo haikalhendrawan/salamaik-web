@@ -1,20 +1,23 @@
 import axios from "axios";
+import useAxiosJWT from "./useAxiosJWT";
 import {useAuth} from "./useAuth";
-
+// -----------------------------------------------
 
 const useRefreshToken = () => {
     const {auth, setAuth} = useAuth() as AuthType; // { username: xxx, role:xxx, accessToken, kppn:xx, msg:xxx}
+
     const refresh = async() => {
-        const response = await axios.get("/refresh", {  
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/refresh`, {  
             withCredentials:true
         });
-        console.log(response.data);
-        const {id, username, name, email, image, role, kppn, accessToken, namaPIC, nipPIC, emailPIC, msg} = response.data;
-        setAuth({...auth, id, username, name, email, image, role, kppn, accessToken, namaPIC, nipPIC, emailPIC, msg});
-        return accessToken;
+        const authInfo = response?.data?.authInfo;
+        const accessToken = response.data.accessToken;
+        setAuth({...authInfo, accessToken: accessToken});
+        
+        return accessToken
     }
 
-    return refresh;
+    return refresh
 }
 
 export default useRefreshToken;

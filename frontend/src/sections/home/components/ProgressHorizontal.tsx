@@ -31,8 +31,8 @@ export default function ProgressHorizontal({header, data}:ProgressHorizontalProp
             '& .simplebar-content': { height: 1, display: 'flex', flexDirection: 'column' },
           }}>
             <Stack direction={'column'} spacing={0}>
-              {data?.map((item) => (
-                <LinearProgressWithLabel value={item.value}  text={item.text}></LinearProgressWithLabel>
+              {data?.map((item, index) => (
+                <LinearProgressWithLabel key={index} value={item.value}  text={item.text}></LinearProgressWithLabel>
               ))}
             </Stack>
           </Scrollbar>
