@@ -5,7 +5,8 @@ import ErrorDetail from "./error.model";
  *
  *
  * @class Notif
- * @method getNotif [get seluruh referensi notification] => return notif[]
+ * untuk handle notifications pada app
+ * @method getNotif get seluruh referensi notification => return notif[]
  * @method getNotifById [get seluruh notification per user] => return notif_junction[]
  * @method addNotif [create referensi notification baru] => return void
  * @method assignNotif [assign notification ke user] => return void

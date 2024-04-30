@@ -1,11 +1,14 @@
-import { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState} from 'react';
 import Iconify from '../../components/iconify/Iconify';
 import Label from '../../components/label/Label';
 import StyledTextField from '../../components/styledTextField';
 // @mui
-import { Stack,Box, FormControl,  Grid, IconButton, Card, TextField, InputAdornment, Button, Slide, Grow} from '@mui/material';
+import { Stack,Box, FormControl,  Grid, IconButton, Card, InputAdornment, Button, Slide} from '@mui/material';
 import { useTheme, styled } from '@mui/material/styles';
+import useSnackbar from '../../hooks/display/useSnackbar';
+import useLoading from '../../hooks/display/useLoading';
+import useAxiosJWT from '../../hooks/useAxiosJWT';
+import z from 'zod';
 // ---------------------------------------------------------
 const ResetPassContainer = styled(Box)(({theme}) => ({
   height:'100%',
@@ -17,13 +20,112 @@ const ResetPassContainer = styled(Box)(({theme}) => ({
   gap:theme.spacing(3)
 }));
 
+interface ValueType{
+  oldPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+};
+
+const passwordSchema =  z
+                      .string()
+                      .regex(
+                        /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
+                        'Minimum 8 characters, at least one letter and one number'
+                        );
 
 // ---------------------------------------------------------
 
 export default function Security(){
   const theme = useTheme();
+
+  const { openSnackbar } = useSnackbar();
+
+  const { setIsLoading } = useLoading();
+
+  const axiosJWT = useAxiosJWT();
+
   const [showPassword, setShowPassword] = useState(false); 
 
+  const [value, setValue] = useState<ValueType>({
+    oldPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+
+  const [error, setError] = useState<any>({
+    oldPassword: false,
+    newPassword: false,
+    confirmPassword: false
+  });
+
+  const [errorMessage, setErrorMessage] = useState<ValueType>({
+    oldPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setValue({...value, [event.target.name]: event.target.value});
+    setError(false);
+  };
+
+  const handleReset = () => {
+    setValue({
+      oldPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    })
+  };
+
+  const handleUpdatePassword = async() => {
+    try{
+      const validOldPassword = passwordSchema.safeParse(value.oldPassword);
+      const validNewPassword = passwordSchema.safeParse(value.newPassword);
+      const validConfirmPassword = passwordSchema.safeParse(value.confirmPassword);
+
+      if(value.newPassword !== value.confirmPassword){
+        setError((prev: any) => ({
+          ...prev,
+          newPassword: true,
+          confirmPassword: true
+        })); 
+        setErrorMessage((prev: any) => ({
+          ...prev,
+          newPassword: 'Password does not match',
+          confirmPassword: 'Password does not match'
+        }));
+      }else if(value.newPassword === value.confirmPassword){
+        if(!validOldPassword.success){
+          setError((prev: any) => ({...prev, oldPassword: true}));
+          setErrorMessage((prev) => 
+            ({...prev, oldPassword: 'Minimum 8 characters, at least one letter and one number'}));
+        };
+
+        if(!validNewPassword.success){
+          setError((prev: any) => ({...prev, newPassword: true}));
+          setErrorMessage((prev) => 
+            ({...prev, newPassword: 'Minimum 8 characters, at least one letter and one number'}));
+        };
+
+        if(!validConfirmPassword.success){
+          setError((prev: any) => ({...prev, confirmPassword: true}));
+          setErrorMessage((prev) => 
+            ({...prev, confirmPassword: 'Minimum 8 characters, at least one letter and one number'}));
+        };
+      }
+
+      if(validOldPassword.success && validNewPassword.success && validConfirmPassword.success){
+        const body = { oldPassword: value.oldPassword, newPassword: value.newPassword};
+        const response = await axiosJWT.post("/updatePassword", body);
+        openSnackbar(`${response.data.message}`, "success");
+        handleReset();
+        return
+      };
+
+    }catch(err: any){
+      openSnackbar(`${err.response.data.message}`, "error");
+    }
+  };
 
   return(
     <>
@@ -35,9 +137,13 @@ export default function Security(){
               <Stack direction='column' spacing={2} sx={{width:'100%', px:5}} justifyContent={'center'}>
                 <FormControl>
                   <StyledTextField
-                    name="oldpassword" 
+                    name="oldPassword" 
                     label="Old Password" 
                     type={showPassword ? 'text' : 'password'} 
+                    value={value.oldPassword}
+                    error={error.oldPassword}
+                    helperText={errorMessage.oldPassword}
+                    onChange={handleChange}
                     InputProps={{
                       endAdornment: (
                         <InputAdornment position="end">
@@ -50,9 +156,13 @@ export default function Security(){
                 </FormControl>
                 <FormControl>
                   <StyledTextField
-                    name="newpassword" 
+                    name="newPassword" 
                     label="New Password"
                     type={showPassword ? 'text' : 'password'}
+                    value={value.newPassword}
+                    error={error.newPassword}
+                    helperText={error.newPassword?errorMessage.newPassword:null}
+                    onChange={handleChange}
                     InputProps={{
                       endAdornment: (
                         <InputAdornment position="end">
@@ -65,9 +175,13 @@ export default function Security(){
                 </FormControl>
                 <FormControl>
                   <StyledTextField 
-                    name="confirmpassword" 
+                    name="confirmPassword" 
                     label="Confirm Password"
                     type={showPassword ? 'text' : 'password'}
+                    value={value.confirmPassword}
+                    error={error.confirmPassword}
+                    helperText={error.confirmPassword?errorMessage.confirmPassword:null}
+                    onChange={handleChange}
                     InputProps={{
                       endAdornment: (
                         <InputAdornment position="end">
@@ -81,8 +195,20 @@ export default function Security(){
               </Stack>
 
               <Stack sx={{width:'100%', pr:5, mt:2}} direction='row' spacing={2} flex={'row'} justifyContent={'end'}>
-                <Button variant='contained' sx={{borderRadius:'8px'}}>Save Changes</Button>
-                <Button variant='contained' sx={{borderRadius:'8px', backgroundColor:theme.palette.common.white, color:theme.palette.common.black}}>Reset</Button>
+                <Button 
+                  variant='contained' 
+                  sx={{borderRadius:'8px'}}
+                  onClick={handleUpdatePassword}
+                >
+                  Save Changes
+                </Button>
+                <Button 
+                  variant='contained' 
+                  color='white'
+                  onClick={handleReset}
+                >
+                  Reset
+                </Button>
               </Stack>
             </ResetPassContainer>
           </Card>

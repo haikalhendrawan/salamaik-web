@@ -5,5 +5,6 @@ import authenticate from "../middleware/authenticate";
 const router = express.Router(); 
 
 router.post("/updateCommonProfile", authenticate, profileController.updateCommonProfile);
+router.post("/updatePassword", authenticate, profileController.updatePassword);
 
 export default router

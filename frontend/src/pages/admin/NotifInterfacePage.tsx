@@ -63,7 +63,7 @@ export default function NotifInterfacePage () {
       window.location.reload(); 
       openSnackbar("Notification has been assigned", "success");
     }catch(err: any){
-      openSnackbar(`Fail to assign notification, Err:${err.response.message}`, "success");
+      openSnackbar(`Fail to assign notification, Err:${err.response.message}`, "error");
     }
   };
 
@@ -73,7 +73,7 @@ export default function NotifInterfacePage () {
       getNotif();
       openSnackbar("Notification has been deleted", "success");
     }catch(err: any){
-      openSnackbar(`Fail to assign notification, Err:${err.response.message}`, "success");
+      openSnackbar(`Fail to assign notification, Err:${err.response.message}`, "error");
     }
   };
 
