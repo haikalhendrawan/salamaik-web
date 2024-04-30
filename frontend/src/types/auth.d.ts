@@ -6,11 +6,11 @@ declare global{
       name: string | null;
       email: string | null;
       picture: string | null;
-      kppn: number;
-      role: number;
-      period: number;
-      accessToken: string;
-      status: number;
+      kppn: string;
+      role: number | null;
+      period: number | null;
+      accessToken: string | null;
+      status: number | null;
     },
     setAuth: (auth:AuthType | {[key: string]: any}) => void
   } 

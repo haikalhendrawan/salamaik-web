@@ -3,12 +3,14 @@ import Iconify from '../../components/iconify/Iconify';
 import Label from '../../components/label/Label';
 import ProfilePicUpload from '../../components/profilePicUpload';
 import StyledTextField from '../../components/styledTextField';
+import { StyledSelect, StyledSelectLabel } from '../../components/styledSelect';
 import useLoading from '../../hooks/display/useLoading';
 import useSnackbar from '../../hooks/display/useSnackbar';
 import { useAuth } from '../../hooks/useAuth';
 import useAxiosJWT from '../../hooks/useAxiosJWT';
 // @mui
-import { Stack, Typography, Box, FormControl,  Grid, IconButton, Card, TextField, Button, Slide, Grow} from '@mui/material';
+import { Stack, Typography, Box, FormControl,  Grid, IconButton, Card, 
+        TextField, Button, Slide, Grow, InputLabel, Select, MenuItem} from '@mui/material';
 import { useTheme, styled } from '@mui/material/styles';
 // -----------------------------------------------------------------------
 const UserDataContainer = styled(Box)(({theme}) => ({
@@ -21,6 +23,47 @@ const UserDataContainer = styled(Box)(({theme}) => ({
   gap:theme.spacing(3)
 }));
 
+interface RoleType{
+  id: number;
+  title: string;
+  description: string | null
+};
+
+interface UnitType{
+  id: string;
+  name: string;
+  alias: string | null;
+  kk_name: string | null;
+  kk_nip: string | null;
+  info: string | null
+};
+
+interface PeriodType{
+  id: number;
+  name: string; 
+  start: string;
+  end: string;
+  semester: number;
+  tahun: string
+};
+
+interface ValueType{
+  id: string;
+  username: string | number | null;
+  name: string | null;
+  email: string | null;
+  picture: string | null;
+  kppn: string;
+  role: number | null;
+  period: number | null;
+  status: number | null;
+};
+
+interface refValueType{
+  role: string;
+  unit: string;
+  period: PeriodType[] | [] ; 
+};
 
 //------------------------------------------------------------------------
 export default function General(){
@@ -28,7 +71,7 @@ export default function General(){
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { auth } = useAuth() as AuthType;
+  const {auth, setAuth} = useAuth() as AuthType;
 
   const {setIsLoading} = useLoading();
 
@@ -36,38 +79,91 @@ export default function General(){
 
   const axiosJWT = useAxiosJWT();
 
-  const [refValue, setRefValue] = useState({
+  const [value, setValue] = useState<ValueType>({
+    id: auth?.id || '',
+    username: auth?.username || '',
+    name: auth?.name || '',
+    email: auth?.email || '',
+    picture: auth?.picture || '',
+    kppn: auth?.kppn || '',
+    role: auth?.role || 0,
+    period: auth?.period || 0,
+    status: auth?.status || 0
+  });
+
+  const [refValue, setRefValue] = useState<refValueType>({
     role: '',
     unit: '',
-    period: ''  
+    period: [] 
   });
 
   const handleClick = () => {
     fileInputRef.current?fileInputRef.current.click():null
   };
 
-  useEffect(() => {
-    const getData = async () => {
-      try{
-        setIsLoading(true);
-        const response1 = await axiosJWT.get('/getRoleById');
-        const response2 = await axiosJWT.get('/getUnitById');
-        const response3 = await axiosJWT.get('/getPeriodById');
-        setRefValue({
-          role: response1.data.rows[0].title,
-          unit: response2.data.rows[0].name,
-          period: response3.data.rows[0].name
-        });
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setValue({...value, [event.target.name]: event.target.value });
+  };
 
-        setIsLoading(false);
-      }catch(err){
-        openSnackbar('Failed to fetch user data', 'error');
-        setIsLoading(false);
-      }finally{
-        setIsLoading(false);
-      }
+  const getData = async () => {
+    try{
+      setIsLoading(true);
+      const response1 = await axiosJWT.get('/getRoleById');
+      const response2 = await axiosJWT.get('/getUnitById');
+      const response3 = await axiosJWT.get('/getAllPeriod');
+      setRefValue({
+        role: response1.data.rows[0].title,
+        unit: response2.data.rows[0].alias,
+        period: response3.data.rows
+      });
+      setIsLoading(false);
+    }catch(err){
+      openSnackbar('Failed to fetch user data', 'error');
+      setIsLoading(false);
+    }finally{
+      setIsLoading(false);
     }
+  };
 
+  const handleUpdateProfile = async () => {
+    try{
+      setIsLoading(true);
+      const profileData = {
+        name: value.name,
+        username: value.username,
+        email: value.email,
+        period: value.period
+      };
+      const response = await axiosJWT.post("/updateCommonProfile", profileData);
+      const response2 = await axiosJWT.get("/updateToken");
+      openSnackbar(`${response.data.message}`, "success");
+      setAuth({
+        ...response2.data.authInfo,
+        accessToken: response2.data.accessToken
+      });   
+    }catch(err: any){
+      setIsLoading(false);
+      openSnackbar(`Update profile failed, error: ${err.response.data.message}`, "error");
+    }finally{
+      setIsLoading(false);
+    }
+  };
+
+  const reset = () => {
+    setValue({
+      id: auth?.id || '',
+      username: auth?.username || '',
+      name: auth?.name || '',
+      email: auth?.email || '',
+      picture: auth?.picture || '',
+      kppn: auth?.kppn || '',
+      role: auth?.role || 0,
+      period: auth?.period || 0,
+      status: auth?.status || 0
+    })
+  }
+
+  useEffect(() => {
     getData();
   }, [])
 
@@ -113,37 +209,62 @@ export default function General(){
             <Stack direction='row' spacing={2} sx={{width:'100%'}} justifyContent={'center'}>
               <Stack direction='column' spacing={3} sx={{width:'45%'}}>
                 <FormControl>
-                  <StyledTextField name="name" defaultValue='User' label="Nama Pegawai" />
+                  <StyledTextField name="name" value={value.name} label="Nama Pegawai" onChange={handleChange}/>
                 </FormControl>
                 <FormControl>
-                  <StyledTextField name="email" defaultValue='User@kemenkeu.go.id' label="Email"  />
+                  <StyledTextField name="email" value={value.email} label="Email"  onChange={handleChange}/>
                 </FormControl>
                 <FormControl>
-                  <StyledTextField name="uid" defaultValue='12AB-QWEN-03PE-003M' label="UID" disabled/>
+                  <StyledTextField name="uid" value={value.id} label="UID" disabled/>
                 </FormControl>
                 <FormControl>
-                  <StyledTextField name="role" defaultValue='Admin Kanwil' label="Role"  />
+                  <StyledTextField name="role" disabled value={refValue.role} label="Role" />
                 </FormControl>
               </Stack>
               <Stack direction='column' spacing={3} sx={{width:'45%'}}>
                 <FormControl>
-                  <StyledTextField name="nip" defaultValue='199904082021011001' label="NIP"  />
+                  <StyledTextField name="username" value={value.username} label="NIP"  onChange={handleChange}/>
                 </FormControl>
                 <FormControl>
-                  <StyledTextField name="unit" defaultValue='Kanwil DJPb Sumbar' label="Unit" />
+                  <StyledSelectLabel id="period-select-label">Periode</StyledSelectLabel>
+                  <StyledSelect 
+                    required 
+                    name="period" 
+                    label="period"
+                    labelId="period-select-label"
+                    value={value.period}
+                    onChange={(e: any) => handleChange(e)}
+                  >
+                    {refValue?.period?.map((item, index) => (
+                      <MenuItem key={index} sx={{fontSize:14}} value={item.id}>{item.name}</MenuItem>
+                    ))}
+
+                  </StyledSelect>
                 </FormControl>
                 <FormControl>
-                  <StyledTextField name="name" defaultValue='User' label="Nama Pegawai" />
+                  <StyledTextField name="status" disabled value={value.status===1?'Active User':'Pending User'} label="Status" />
                 </FormControl>
                 <FormControl>
-                  <StyledTextField name="periode" defaultValue='Smt 1 2024' label="Periode" />
+                  <StyledTextField name="unit" disabled value={refValue.unit} label="Unit" />
                 </FormControl>
               </Stack>
             </Stack>
 
             <Stack sx={{width:'100%', pr:3, mt:1}} direction='row' spacing={2} flex={'row'} justifyContent={'end'}>
-              <Button variant='contained' sx={{borderRadius:'8px'}}>Save Changes</Button>
-              <Button variant='contained' sx={{borderRadius:'8px', backgroundColor:theme.palette.common.white, color:theme.palette.common.black}}>Reset</Button>
+              <Button 
+                variant='contained' 
+                sx={{borderRadius:'8px'}} 
+                onClick={handleUpdateProfile}
+              >
+                Save Changes
+              </Button>
+              <Button 
+                variant='contained' 
+                color='white'
+                onClick={reset}
+              >
+                Reset
+              </Button>
             </Stack>
           </UserDataContainer>
         </Card>

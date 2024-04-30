@@ -1,9 +1,15 @@
 import {Request, Response, NextFunction} from 'express';
 import role from '../model/role.model';
-
+// -------------------------------------------------
+interface PeriodType{
+  id: number;
+  title: string;
+  description: string | null
+}
+// ------------------------------------------------------
 const getAllRole = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const roles = await role.getAllRole();
+    const roles: PeriodType[] = await role.getAllRole();
     return res.status(200).json({sucess: true, message: 'Get role success', rows: roles});
   } catch (err) {
     next(err);

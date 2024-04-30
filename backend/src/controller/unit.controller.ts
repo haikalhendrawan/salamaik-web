@@ -1,9 +1,18 @@
 import {Request, Response, NextFunction} from 'express';
 import unit from '../model/unit.model';
-
+// -------------------------------------------------
+interface UnitType{
+  id: string;
+  name: string;
+  alias: string;
+  kk_name: string;
+  kk_nip: string;
+  info: string
+}
+// ------------------------------------------------------
 const getAllUnit = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const units = await unit.getAllUnit();
+    const units: UnitType[] = await unit.getAllUnit();
     return res.status(200).json({sucess: true, message: 'Get unit success', rows: units});
   } catch (err) {
     next(err);

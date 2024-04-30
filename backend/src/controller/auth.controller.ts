@@ -85,7 +85,7 @@ const updateToken = async (req: Request, res: Response, next: NextFunction) => {
     const newRefreshToken = jwt.sign(authInfo, process.env.JWT_REFRESH_KEY, {expiresIn:60*60*24});
 
     res.setHeader('Set-Cookie', `refreshToken=${newRefreshToken}; HttpOnly`);
-    return res.status(200).json({sucess: true, message: 'token payload has been updated', token: newAccessToken})
+    return res.status(200).json({sucess: true, message: 'token payload has been updated', authInfo: authInfo, accessToken: newAccessToken})
   }catch(err){
     next(err)
   }

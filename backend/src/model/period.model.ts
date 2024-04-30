@@ -4,7 +4,14 @@ import jwt, {JwtPayload, VerifyErrors} from "jsonwebtoken";
 import ErrorDetail  from "./error.model";
 import "dotenv/config"; 
 // -------------------------------------------------
-
+interface PeriodType{
+  id: number;
+  name: string; 
+  start: string;
+  end: string;
+  semester: number;
+  tahun: string
+}
 // ------------------------------------------------------
 class Period{
   async getAllPeriod(){

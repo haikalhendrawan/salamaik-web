@@ -4,7 +4,14 @@ import jwt, {JwtPayload, VerifyErrors} from "jsonwebtoken";
 import ErrorDetail  from "./error.model";
 import "dotenv/config"; 
 // -------------------------------------------------
-
+interface UnitType{
+  id: string;
+  name: string;
+  alias: string;
+  kk_name: string;
+  kk_nip: string;
+  info: string
+}
 // ------------------------------------------------------
 class Unit{
   async getAllUnit(){
