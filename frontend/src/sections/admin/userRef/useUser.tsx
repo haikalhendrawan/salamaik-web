@@ -28,20 +28,19 @@ type UserProviderProps = {
 const UserContext = createContext<UserContextType>({user: [], getUser: () => {}});
 
 const UserProvider = ({children}: UserProviderProps) => {
-  const [user, setUser] = useState<UserType[] | []  >([]);
-
   const axiosJWT = useAxiosJWT();
 
   const { setIsLoading } = useLoading();
 
   const { openSnackbar } = useSnackbar();
 
+  const [user, setUser] = useState<UserType[] | []  >([]);
+
   const getUser = async() => {
     try{
       setIsLoading(true);
       const response = await axiosJWT.get("/getUser");
       setUser(response.data.rows);
-      openSnackbar("Get user success", "success");
       setIsLoading(false);
     }catch(err: any){
       setIsLoading(false);

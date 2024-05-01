@@ -16,7 +16,7 @@ interface UnitType{
 class Unit{
   async getAllUnit(){
     try{
-      const q = "SELECT * FROM kppn_ref";
+      const q = "SELECT * FROM kppn_ref ORDER BY col_order ASC";
       const result = await pool.query(q);
       return result.rows;
     }catch(err){
@@ -26,7 +26,7 @@ class Unit{
 
   async getUnitById(id: string){
     try{
-      const q = "SELECT * FROM kppn_ref WHERE id = $1";
+      const q = "SELECT * FROM kppn_ref WHERE id = $1 ORDER BY col_order ASC";
       const result = await pool.query(q, [id]);;
       return result.rows;
     }catch(err){

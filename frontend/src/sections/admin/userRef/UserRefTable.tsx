@@ -6,6 +6,7 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 // hooks
 import useAxiosJWT from "../../../hooks/useAxiosJWT";
 import useUser from './useUser';
+import useDictionary from '../../../hooks/useDictionary';
 // components
 import Label from '../../../components/label';
 import Iconify from '../../../components/iconify';
@@ -41,7 +42,7 @@ const StyledButton = styled(Button)(({ theme }) => ({
 // ----------------------------------------------------------------------
 interface UserRefTableProps{
 users?: any[]
-}
+};
 
 export default function UserRefTable() {
   const [open, setOpen] = useState<HTMLButtonElement | null>(null);
@@ -61,6 +62,8 @@ export default function UserRefTable() {
   const [selectedRowId, setSelectedRowId] = useState<number | null>(null);
 
   const {user, getUser} = useUser();
+
+  const { statusRef, roleRef, kppnRef, periodRef } = useDictionary();
 
   const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
     setOpen(event.currentTarget);
@@ -103,7 +106,6 @@ export default function UserRefTable() {
   
   return (
     <>
-
         <Card>
           <UserRefTableToolbar 
             filterName={filterName} 
@@ -123,12 +125,11 @@ export default function UserRefTable() {
                 />
                 <TableBody>
                   {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, index) => {
-                    const {id, avatarUrl, name, company, isVerified, status, role} = row;
                     return (
                       <TableRow hover key={index} tabIndex={-1}>
                          <TableCell component="th" scope="row" >
                             <Stack direction="row" alignItems="center" spacing={2}>
-                              <Avatar alt={name} src={`${import.meta.env.VITE_API_URL}/avatar/${row.picture}?${new Date().getTime()}`} />
+                              <Avatar alt={row.id} src={`${import.meta.env.VITE_API_URL}/avatar/${row.picture}?${new Date().getTime()}`} />
                               <List disablePadding dense>
                                 <ListItemText>
                                   <Typography variant="body2" noWrap>{row.name}</Typography>
@@ -138,18 +139,18 @@ export default function UserRefTable() {
                             </Stack>
                           </TableCell>
 
-                        <TableCell align="left">{row.kppn}</TableCell>
+                        <TableCell align="left">{kppnRef?kppnRef[row.kppn]:null}</TableCell>
 
                         <TableCell align="left">
                           <Label 
-                            color={status==='active'?'success':'error'} 
+                            color={row.status===1?'success':'error'} 
                             sx={{cursor:'pointer'}}
                           >
-                            {row.status}
+                            {statusRef?statusRef[row.status]:null}
                           </Label>
                         </TableCell>
 
-                        <TableCell align="justify">{ row.role }</TableCell>
+                        <TableCell align="justify">{roleRef?roleRef[row.role]:null}</TableCell>
 
                         <TableCell align="justify">
                           <Stack direction='row' spacing={1}>

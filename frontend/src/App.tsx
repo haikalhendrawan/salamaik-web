@@ -6,6 +6,7 @@ import Router from './routes';
 // provider
 import ThemeProvider from './theme';
 import { AuthProvider } from './context/AuthProvider';
+import { DictionaryProvider } from './hooks/useDictionary';
 import { LoadingProvider } from './hooks/display/useLoading';
 import { SnackbarProvider } from './hooks/display/useSnackbar';
 // components
@@ -21,11 +22,13 @@ function App() {
           <ScrollToTop />
           <StyledChart />
           <AuthProvider>
-            <LoadingProvider>
-              <SnackbarProvider>
-                <Router />
-              </SnackbarProvider>              
-            </LoadingProvider>            
+            <DictionaryProvider>
+              <LoadingProvider>
+                <SnackbarProvider>
+                  <Router />
+                </SnackbarProvider>              
+              </LoadingProvider>     
+            </DictionaryProvider>    
           </AuthProvider>
         </ThemeProvider>
       </BrowserRouter>
