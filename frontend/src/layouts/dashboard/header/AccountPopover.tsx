@@ -47,8 +47,6 @@ export default function AccountPopover() {
 
   const openPeriod = Boolean(anchorEl); 
 
-  const [avatarKey, setAvatarKey] = useState(0);
-
   const axiosJWT = useAxiosJWT();
 
   const handleOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -74,10 +72,6 @@ export default function AccountPopover() {
     }
   };
 
-  useEffect(() => {
-    setAvatarKey(avatarKey+1)
-  },[auth]);
-
 
 // -----------------------------------------------------------------------------------------------
   return (
@@ -99,7 +93,7 @@ export default function AccountPopover() {
           }),
         }}
       >
-        <Avatar key={avatarKey} src={auth.picture || '/avatar/default-female.png'} alt="photoURL" />
+        <Avatar src={`${import.meta.env.VITE_API_URL}/avatar/${auth?.picture}?${new Date().getTime()}` || '/avatar/default-female.png'} alt="photoURL" />
       </IconButton>
 
       <Popover

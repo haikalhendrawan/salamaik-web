@@ -1,10 +1,10 @@
-import {useState} from'react';
+import {useState, useEffect} from'react';
 import {Container, Stack, IconButton, Typography, Button} from '@mui/material';
 import Iconify from '../../components/iconify';
 import UserRefTable from '../../sections/admin/userRef/UserRefTable';
 import UserRefAddModal from '../../sections/admin/userRef/UserRefAddModal';
 import UserRefEditModal from '../../sections/admin/userRef/UserRefEditModal';
-import {users} from '../../mock/user';
+import useUser, { UserProvider } from '../../sections/admin/userRef/useUser';
 // -----------------------------------------------------------------------
 
 export default function UserRefPage () {
@@ -16,27 +16,26 @@ export default function UserRefPage () {
 
   return (
     <>
-      <Container>
-
-        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-          <Stack direction='row' spacing={2}>
-            <Typography variant="h4" gutterBottom>
-              User List
-            </Typography>
+      <UserProvider>
+        <Container>
+          <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+            <Stack direction='row' spacing={2}>
+              <Typography variant="h4" gutterBottom>
+                User List
+              </Typography>
+            </Stack>
+            <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={() => setModalOpen(true)}>
+              Add
+            </Button>
           </Stack>
-          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={() => setModalOpen(true)}>
-            Add
-          </Button>
-        </Stack>
 
-        
-        <UserRefTable users={users} />
+          <UserRefTable />
 
-        <UserRefAddModal modalOpen={modalOpen} modalClose={handleClose} />
-        
-        {/* <UserRefEditModal modalOpen={modalOpen} modalClose={handleClose} /> */}
-      
-      </Container>
+          <UserRefAddModal modalOpen={modalOpen} modalClose={handleClose} />
+          
+          {/* <UserRefEditModal modalOpen={modalOpen} modalClose={handleClose} /> */}
+        </Container>
+      </UserProvider>
     </>
 
   );

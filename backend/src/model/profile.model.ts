@@ -10,6 +10,7 @@ import "dotenv/config";
  * handle perubahan data rinci seperti role, unit,  dll. berada pada user service dan hanya diakses oleh admin
  * @method updateCommonProfile update data basic user => return void
  * @method updatePassword update data password user => return void
+ * @method updateProfilePicture update pp user => return void
  */
 class Profile{
   async updateCommonProfile(id: string, name: string, username: string, email: string, period: number){
@@ -42,6 +43,16 @@ class Profile{
       await client.query("COMMIT");
       
       return result2
+    }catch(err){
+      throw err
+    }
+  }
+
+  async updateProfilePicture(id: string, picture: string){
+    try{
+      const q = "UPDATE user_ref SET picture = $1 WHERE id = $2 RETURNING *";
+      const result = await pool.query(q, [picture, id]);
+      return result
     }catch(err){
       throw err
     }

@@ -31,7 +31,7 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
   }catch(err){
     next(err)
   }
-};
+}
 
 const refresh = async (req: Request, res: Response, next: NextFunction) => {
   try{
@@ -60,7 +60,7 @@ const refresh = async (req: Request, res: Response, next: NextFunction) => {
   }catch(err){
     next(err)
   }
-};
+}
 
 const updateToken = async (req: Request, res: Response, next: NextFunction) => {
   try{
@@ -89,7 +89,7 @@ const updateToken = async (req: Request, res: Response, next: NextFunction) => {
   }catch(err){
     next(err)
   }
-};
+}
 
 const logout = async (req: Request, res: Response, next: NextFunction) => {
   const userID = req.payload.id;
@@ -99,9 +99,9 @@ const logout = async (req: Request, res: Response, next: NextFunction) => {
 
   res.clearCookie('refreshToken', {httpOnly:true });
   return res.status(200).json({success: true, message:`User logged out`})
-};
+}
 
 
 
 
-export {login, refresh, updateToken, logout};
+export {login, refresh, updateToken, logout}

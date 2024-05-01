@@ -5,6 +5,7 @@ import {Card, Table, Stack, Paper, Avatar, Button, ListItemText, TableRow, Toolt
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 // hooks
 import useAxiosJWT from "../../../hooks/useAxiosJWT";
+import useUser from './useUser';
 // components
 import Label from '../../../components/label';
 import Iconify from '../../../components/iconify';
@@ -39,10 +40,10 @@ const StyledButton = styled(Button)(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 interface UserRefTableProps{
-users: any[]
+users?: any[]
 }
 
-export default function UserRefTable({users}: UserRefTableProps) {
+export default function UserRefTable() {
   const [open, setOpen] = useState<HTMLButtonElement | null>(null);
 
   const [page, setPage] = useState<number>(0);
@@ -58,6 +59,8 @@ export default function UserRefTable({users}: UserRefTableProps) {
   const [filterStatus, setFilterStatus] = useState<number | "" | undefined>(0);
 
   const [selectedRowId, setSelectedRowId] = useState<number | null>(null);
+
+  const {user, getUser} = useUser();
 
   const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
     setOpen(event.currentTarget);
@@ -92,9 +95,9 @@ export default function UserRefTable({users}: UserRefTableProps) {
     setFilterName(event.target.value);
   };
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - users.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - user.length) : 0;
 
-  const filteredUsers= applySortFilter(users, getComparator(order, orderBy), filterName);
+  const filteredUsers= applySortFilter(user, getComparator(order, orderBy), filterName);
 
   const isNotFound = !filteredUsers.length && !!filterName;
   
@@ -125,28 +128,28 @@ export default function UserRefTable({users}: UserRefTableProps) {
                       <TableRow hover key={index} tabIndex={-1}>
                          <TableCell component="th" scope="row" >
                             <Stack direction="row" alignItems="center" spacing={2}>
-                              <Avatar alt={name} src={avatarUrl} />
+                              <Avatar alt={name} src={`${import.meta.env.VITE_API_URL}/avatar/${row.picture}?${new Date().getTime()}`} />
                               <List disablePadding dense>
                                 <ListItemText>
-                                  <Typography variant="body2" noWrap>User</Typography>
-                                  <Typography variant="body3" noWrap>user1@kemenkeu.go.id</Typography>
+                                  <Typography variant="body2" noWrap>{row.name}</Typography>
+                                  <Typography variant="body3" noWrap>{row.email}</Typography>
                                 </ListItemText>
                               </List>
                             </Stack>
                           </TableCell>
 
-                        <TableCell align="left">{company}</TableCell>
+                        <TableCell align="left">{row.kppn}</TableCell>
 
                         <TableCell align="left">
                           <Label 
                             color={status==='active'?'success':'error'} 
                             sx={{cursor:'pointer'}}
                           >
-                            {status}
+                            {row.status}
                           </Label>
                         </TableCell>
 
-                        <TableCell align="justify">{ role }</TableCell>
+                        <TableCell align="justify">{ row.role }</TableCell>
 
                         <TableCell align="justify">
                           <Stack direction='row' spacing={1}>
@@ -208,7 +211,7 @@ export default function UserRefTable({users}: UserRefTableProps) {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={users.length}
+            count={user.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}

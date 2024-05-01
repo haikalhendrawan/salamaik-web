@@ -117,8 +117,8 @@ export default function General(){
         period: response3.data.rows
       });
       setIsLoading(false);
-    }catch(err){
-      openSnackbar('Failed to fetch user data', 'error');
+    }catch(err: any){
+      openSnackbar(`Failed to fetch user data ${err.response.status}`, 'error');
       setIsLoading(false);
     }finally{
       setIsLoading(false);
@@ -134,13 +134,14 @@ export default function General(){
         email: value.email,
         period: value.period
       };
-      const response = await axiosJWT.post("/updateCommonProfile", profileData);
+      const response = await axiosJWT.post(`/updateCommonProfile`, profileData);
       const response2 = await axiosJWT.get("/updateToken");
       openSnackbar(`${response.data.message}`, "success");
       setAuth({
         ...response2.data.authInfo,
         accessToken: response2.data.accessToken
-      });   
+      }); 
+      setIsLoading(false);
     }catch(err: any){
       setIsLoading(false);
       openSnackbar(`Update profile failed, error: ${err.response.data.message}`, "error");
@@ -161,7 +162,34 @@ export default function General(){
       period: auth?.period || 0,
       status: auth?.status || 0
     })
-  }
+  };
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    if(!e.target.files){return}
+
+    const selectedFile = e.target.files[0];
+    try{
+      setIsLoading(true);
+      const formData = new FormData();
+      formData.append("picture", selectedFile);
+      const response = await axiosJWT.post(`/updateProfilePicture`, formData, {
+        headers:{"Content-Type": "multipart/form-data"}
+      });
+      const response2 = await axiosJWT.get("/updateToken");
+      openSnackbar(`${response.data.message}`, "success");
+      setAuth({
+        ...response2.data.authInfo,
+        accessToken: response2.data.accessToken
+      });  
+      setIsLoading(false); 
+    }catch(err: any){
+      setIsLoading(false);
+      openSnackbar(`Upload failed, ${err.response.data.message}`, "error");
+    }finally{
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     getData();
@@ -173,10 +201,17 @@ export default function General(){
       <Slide direction="right" in mountOnEnter unmountOnExit>
         <Card sx={{height:500}}>
           <Stack direction="column" justifyContent="center" alignItems="center" spacing={2} sx={{ width: 1, height: "100%" }}>
-            <input accept='image/*' type='file' style={{display:'none'}} ref={fileInputRef} tabIndex={-1} />
-            <ProfilePicUpload 
+            <input 
+              accept='image/*' 
+              type='file' 
+              style={{display:'none'}} 
+              ref={fileInputRef}
+              onChange={handleAvatarChange} 
+              tabIndex={-1} 
+            />
+            <ProfilePicUpload
               onClick={handleClick} 
-              imageUrl={auth?.picture || '/avatar/default-female.png'}
+              imageUrl={`${import.meta.env.VITE_API_URL}/avatar/${auth?.picture}?${new Date().getTime()}` || '/avatar/default-female.png'}
             />
 
             <Stack direction="column"justifyContent="center"alignItems="center">

@@ -8,7 +8,7 @@ const getNotif = async (req: Request, res: Response, next: NextFunction) => {
   }catch(err){
     next(err);  
   }
-};
+}
 
 const getNotifById = async (req: Request, res: Response, next: NextFunction) => {
   try{
@@ -18,7 +18,7 @@ const getNotifById = async (req: Request, res: Response, next: NextFunction) => 
   }catch(err){
     next(err);
   }
-};
+}
 
 const addNotif = async(req: Request, res: Response, next: NextFunction) => {
   try{
@@ -29,7 +29,7 @@ const addNotif = async(req: Request, res: Response, next: NextFunction) => {
   }catch(err){
     next(err);
   }
-};
+}
 
 const assignNotif = async(req: Request, res: Response, next: NextFunction) => { 
   try{
@@ -40,7 +40,7 @@ const assignNotif = async(req: Request, res: Response, next: NextFunction) => {
   }catch(err){
     next(err);
   }
-};
+}
 
 const updateNotif = async(req: Request, res: Response, next: NextFunction) => {
   try{
@@ -51,7 +51,7 @@ const updateNotif = async(req: Request, res: Response, next: NextFunction) => {
   }catch(err){
     next(err);
   }
-};
+}
 
 const deleteNotif = async (req: Request, res: Response, next: NextFunction) => {
   try{
@@ -62,7 +62,7 @@ const deleteNotif = async (req: Request, res: Response, next: NextFunction) => {
   }catch(err){
     next(err);
   }
-};
+}
 
 
 export {getNotif, getNotifById, addNotif, assignNotif, updateNotif, deleteNotif};
