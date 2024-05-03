@@ -88,21 +88,22 @@ class User{
 
   async editUser(body: EditUserBodyType){
     try{
-      const {id, username, name, email, period, role, status, kppn, gender} = body;
+      const {id, username, name, email, kppn, gender} = body;
       const q = ` UPDATE user_ref 
                   SET 
                     username = $1, 
                     name = $2, 
-                    email = $3, 
-                    period = $4, 
-                    role = $5, 
-                    status = $6, 
-                    kppn = $7, 
-                    gender = $8 
-                  WHERE id = $9 
+                    email = $3,
+                    kppn = $4, 
+                    gender = $5 
+                  WHERE id = $6 
                   RETURNING *`;
-      const result = await pool.query(q, [username, name, email, period, role, status, kppn, gender, id]);
-    }catch(err){
+      const result = await pool.query(q, [username, name, email, kppn, gender, id]);
+      return result.rows[0]
+    }catch(err: any){
+      if(err.code === '23505'){
+        throw new ErrorDetail(400, 'NIP has been taken', err.detail)
+      };
       throw err
     }
   }
@@ -129,6 +130,26 @@ class User{
       }
     }catch(err){
       return false
+    }
+  }
+
+  async updateStatus(targetID: string){
+    try{
+      const q = `UPDATE user_ref SET status = 1 WHERE id = $1 RETURNING *`;
+      const result = await pool.query(q, [targetID]);
+      return result.rows[0]
+    }catch(err){
+      throw err
+    }
+  }
+
+  async updateRole(id: string, newRole: number){
+    try{
+      const q = `UPDATE user_ref SET role = $1 WHERE id = $2 RETURNING *`;
+      const result = await pool.query(q, [newRole, id]);
+      return result.rows[0]
+    }catch(err){
+      throw err
     }
   }
 

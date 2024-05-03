@@ -5,12 +5,12 @@ import { styled, Theme } from '@mui/material/styles';
 import { Link, Container, Typography, Divider, Stack, Button, Card, Alert, Box, LinearProgress} from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 // hooks
-import useResponsive from '../hooks/display/useResponsive';
+import useResponsive from '../../hooks/display/useResponsive';
 // components
-import Logo from '../components/logo';
-import Iconify from '../components/iconify';
+import Logo from '../../components/logo';
+import Iconify from '../../components/iconify';
 // sections
-import { LoginForm } from '../sections/auth/login';
+import { LoginForm } from '../../sections/auth/login';
 
 
 // ----------------------------------------------------------------------

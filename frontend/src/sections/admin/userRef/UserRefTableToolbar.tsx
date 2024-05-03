@@ -35,6 +35,20 @@ const StyledSearch = styled(OutlinedInput)(({ theme }) => ({
   }
 }));
 
+const StyledTabs = styled(Tabs)(({ theme }) => ({
+  '& button.Mui-selected': { 
+    color: theme.palette.text.primary 
+  },
+  '& .MuiTabs-flexContainer': {
+    minHeight:'48px',
+    width:'721px'
+  },
+  '& button.MuiTab-root': {
+    minHeight: 30
+  },
+  paddingLeft: 2,
+}));
+
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -93,14 +107,9 @@ export default function UserRefTableToolbar({filterName, onFilterName, onFilterS
 
   return (
     <>
-      <Tabs 
+      <StyledTabs
         value={tabValue} 
         onChange={handleTabChange} 
-        sx={{
-          "& button.Mui-selected": { color: theme.palette.text.primary },
-          "& .MuiTabs-flexContainer": {height:'48px',width:'721px'},
-          "& button.MuiTab-root": {minHeight: 30},
-        }}
         TabIndicatorProps={{ sx: {bgcolor: theme.palette.text.primary}}}
       > 
         <Tab 
@@ -121,7 +130,7 @@ export default function UserRefTableToolbar({filterName, onFilterName, onFilterS
           iconPosition="end"  
           value={2} 
         />
-      </Tabs>
+      </StyledTabs>
 
 
       <StyledRoot

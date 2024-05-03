@@ -7,6 +7,7 @@ import Header from '../dashboard/header';
 import Nav from '../dashboard/nav';
 import Footer from '../dashboard/footer';
 import {useAuth} from "../../hooks/useAuth"; 
+import Page403 from '../../pages/guard/Page403';
 // ----------------------------------------------------------------------
 
 const APP_BAR_MOBILE = 64;
@@ -44,9 +45,11 @@ export default function RequireAuthLayout({allowedRoles}: RqAuthLayoutProp) {
 
   const location = useLocation();
 
+  const pathName = location.pathname;
+
   if (!auth || !auth.accessToken){
     return <Navigate to="/login" state={{from:location}} replace />
-  }
+  };
 
   if (allowedRoles.includes(auth.role)){
     return (
@@ -58,7 +61,17 @@ export default function RequireAuthLayout({allowedRoles}: RqAuthLayoutProp) {
         <Footer />
       </Main>
     </StyledRoot>)
-  }
+  };
   
-  return <Navigate to="/403" state={{from:location}} replace /> // if user sudah login, tapi allowed role tidak termasuk
+  // if user sudah login, tapi allowed role tidak termasuk
+  return (
+    <StyledRoot> 
+      <Header onOpenNav={() => setOpen(true)} />
+      <Nav openNav={open} onCloseNav={() => setOpen(false)} />
+      <Main>
+        <Page403 />
+        <Footer />
+      </Main>
+    </StyledRoot>)
+
 }

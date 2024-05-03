@@ -1,11 +1,33 @@
-import {createContext, useState} from "react";
+import {createContext, useState, ReactNode} from "react";
 import {AuthProviderType} from "../types/hooks/authTypes";
+// --------------------------------------------------------------------
+interface Auth{
+    id: string;
+    username: string | number | null;
+    name: string | null;
+    email: string | null;
+    picture: string | null;
+    kppn: string;
+    role: number | null;
+    period: number | null;
+    accessToken: string | null;
+    status: number | null;
+};
 
-const AuthContext = createContext({});
+type AuthContextType = {
+    auth: Auth | null;
+    setAuth: (auth: Auth | null) => void
+};
+
+type AuthProviderProps = {
+    children: ReactNode
+};
+// --------------------------------------------------------------------
+const AuthContext = createContext<AuthContextType>({auth:null, setAuth: () => {}});
 
 
-const AuthProvider = ({children}:AuthProviderType) => {
-    const[auth, setAuth] = useState<null | AuthType>(null);
+const AuthProvider = ({children}: AuthProviderProps) => {
+    const[auth, setAuth] = useState<Auth | null>(null);
 
     return(
         <AuthContext.Provider value={{auth, setAuth}}>

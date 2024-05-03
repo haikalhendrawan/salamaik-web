@@ -11,7 +11,6 @@ import { useAuth } from "../hooks/useAuth";
 import WelcomeCard from "../sections/home/components/WelcomeCard";
 import PhotoGallery from "../sections/home/components/PhotoGallery";
 import KanwilView from "../sections/home/KanwilView";
-import { set } from "lodash";
 // ----------------------------------------------------------------------
 
 export default function HomePage() {

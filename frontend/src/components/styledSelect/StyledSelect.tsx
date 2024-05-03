@@ -11,7 +11,7 @@ const StyledSelect = styled(Select)(({theme}) => ({
   typography:'body2',
   '& .MuiInputBase-input': {
     fontSize: 14,
-    height:'1.4375em',
+    height:'1.3em',
     borderRadius:'12px',
   },
   "& .MuiInputLabel-root": {

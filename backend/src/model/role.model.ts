@@ -9,7 +9,7 @@ import "dotenv/config";
 class Role{
   async getAllRole(){
     try{
-      const q = "SELECT * FROM role_ref";
+      const q = "SELECT * FROM role_ref ORDER BY id ASC";
       const result = await pool.query(q);
       return result.rows;
     }catch(err){

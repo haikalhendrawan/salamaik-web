@@ -7,6 +7,9 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import useAxiosJWT from "../../../hooks/useAxiosJWT";
 import useUser from './useUser';
 import useDictionary from '../../../hooks/useDictionary';
+import useLoading from '../../../hooks/display/useLoading';
+import useSnackbar from '../../../hooks/display/useSnackbar';
+import useDialog from '../../../hooks/display/useDialog';
 // components
 import Label from '../../../components/label';
 import Iconify from '../../../components/iconify';
@@ -21,12 +24,11 @@ import {descendingComparator, getComparator, applySortFilter} from './utils';
 
 const TABLE_HEAD = [
   { id: 'name', label: 'Nama', alignRight: false },
-  { id: 'company', label: 'Unit', alignRight: false },
+  { id: 'kppn', label: 'Unit', alignRight: false },
   { id: 'status', label: 'Status', alignRight: false },
-  { id: 'isVerified', label: 'Role', alignRight: false },
-  { id: 'role', label: 'Action', alignRight: false },
+  { id: 'role', label: 'Role', alignRight: false },
+  { id: 'action', label: 'Action', alignRight: false },
 ];
-
 
 const StyledButton = styled(Button)(({ theme }) => ({
   display: 'inline-flex',   
@@ -41,12 +43,11 @@ const StyledButton = styled(Button)(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 interface UserRefTableProps{
-users?: any[]
+  users: any[],
+  setEditModalOpen: (id: string) => void,
 };
 
-export default function UserRefTable() {
-  const [open, setOpen] = useState<HTMLButtonElement | null>(null);
-
+export default function UserRefTable({users, setEditModalOpen}: UserRefTableProps) {
   const [page, setPage] = useState<number>(0);
 
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
@@ -59,18 +60,60 @@ export default function UserRefTable() {
 
   const [filterStatus, setFilterStatus] = useState<number | "" | undefined>(0);
 
-  const [selectedRowId, setSelectedRowId] = useState<number | null>(null);
-
-  const {user, getUser} = useUser();
+  const {getUser} = useUser();
 
   const { statusRef, roleRef, kppnRef, periodRef } = useDictionary();
 
-  const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setOpen(event.currentTarget);
+  const {setIsLoading} = useLoading();
+
+  const {openSnackbar} = useSnackbar();
+
+  const {openDialog} = useDialog();
+  
+  const axiosJWT = useAxiosJWT();
+
+  const handleDelete = async(id: number) => {
+    try{
+      setIsLoading(true);
+      const response = await axiosJWT.post("/deleteUser", {id: id});
+      openSnackbar(response.data.message, 'success');
+      getUser();
+      setIsLoading(false);
+    }catch(err: any){
+      openSnackbar(err.response.data.message, 'success');
+      setIsLoading(false);
+    }finally{
+      setIsLoading(false);
+    }
   };
 
-  const handleCloseMenu = () => {
-    setOpen(null);
+  const handleOpenDelete = (id: number) => {
+    openDialog(
+      "Delete",
+      "Are you sure you want to delete this user?",
+      'pink',
+      'Delete',
+      () => handleDelete(id)
+    )
+  };
+
+  const handleApprove = async(id: number) => {
+    try{
+      setIsLoading(true);
+      const response = await axiosJWT.post("/updateStatus", {id: id});
+      openSnackbar(response.data.message, 'success');
+      getUser();
+      setIsLoading(false);
+    }catch(err: any){
+      openSnackbar(err.response.data.message, 'success');
+      setIsLoading(false);
+    }finally{
+      setIsLoading(false);
+    }
+  };
+
+  const handleOpenEdit = (id: string) => {
+    setEditModalOpen(id)
   };
 
   const handleRequestSort = (event: SelectChangeEvent<number>, property: string) => {
@@ -98,9 +141,9 @@ export default function UserRefTable() {
     setFilterName(event.target.value);
   };
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - user.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - users.length) : 0;
 
-  const filteredUsers= applySortFilter(user, getComparator(order, orderBy), filterName);
+  const filteredUsers= applySortFilter(users, getComparator(order, orderBy), filterName);
 
   const isNotFound = !filteredUsers.length && !!filterName;
   
@@ -154,18 +197,39 @@ export default function UserRefTable() {
 
                         <TableCell align="justify">
                           <Stack direction='row' spacing={1}>
-                            <Tooltip title='approve'>
-                              <StyledButton aria-label="approve" variant='contained' size='small' color='success'>
-                                <Iconify icon="solar:check-circle-bold-duotone"/>
-                              </StyledButton>
-                            </Tooltip>
+                            {row.status===0
+                            ? <Tooltip title='approve'>
+                                <StyledButton 
+                                  aria-label="approve" 
+                                  variant='contained' 
+                                  size='small' 
+                                  color='success'
+                                  onClick={() => handleApprove(row.id)}
+                                >
+                                  <Iconify icon="solar:check-circle-bold-duotone"/>
+                                </StyledButton>
+                              </Tooltip>
+                            : null
+                            }
                             <Tooltip title='edit'>
-                              <StyledButton aria-label="edit" variant='contained' size='small' color='warning'>
+                              <StyledButton 
+                                aria-label="edit" 
+                                variant='contained' 
+                                size='small' 
+                                color='warning'
+                                onClick={() => handleOpenEdit(row.id)}
+                                >
                                 <Iconify icon="solar:pen-bold-duotone"/>
                               </StyledButton>
                             </Tooltip>
                             <Tooltip title='delete'>
-                              <StyledButton aria-label="delete" variant='contained' size='small' color='white'>
+                              <StyledButton 
+                                aria-label="delete" 
+                                variant='contained' 
+                                size='small' 
+                                color='white'
+                                onClick={() => handleOpenDelete(row.id)}
+                              >
                                 <Iconify icon="solar:trash-bin-trash-bold"/>
                               </StyledButton>
                             </Tooltip>
@@ -212,7 +276,7 @@ export default function UserRefTable() {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={user.length}
+            count={users.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}

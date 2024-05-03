@@ -25,9 +25,13 @@ export default function SimpleLayout() {
   return (
     <>
       <StyledHeader>
-        <Box sx={{ px: 2.5, py: 3, display: 'inline-flex' }}>
-          <Logo />
-        </Box>
+        <Box
+          component="img"
+          src="/logo/salamaik-long.png"
+          sx={{ width: 120, height: 30, cursor: 'pointer', position: 'fixed',
+          top: { xs: 16, md: 24 },
+          left: { xs: 16, md: 24 }, }}
+        />
       </StyledHeader>
 
       <Outlet />

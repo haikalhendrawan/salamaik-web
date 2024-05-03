@@ -41,7 +41,7 @@ const MENU_OPTIONS: Array<MenuOptionType> = [
 export default function AccountPopover() {
   const [open, setOpen] = useState<null | EventTarget & HTMLButtonElement>(null);
 
-  const {auth, setAuth } = useAuth() as AuthType;
+  const {auth, setAuth} = useAuth() as AuthType;
 
   const [anchorEl, setAnchorEl] = useState(null); 
 
@@ -63,7 +63,7 @@ export default function AccountPopover() {
   // }
 
   const logout = async () => {
-    setAuth({});
+    setAuth(null);
     try {
       const response = await axiosJWT.get("/logout");
       console.log(response);

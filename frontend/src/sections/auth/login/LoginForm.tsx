@@ -90,7 +90,7 @@ export default function LoginForm() {
 
         <Stack direction="row" alignItems="center" justifyContent="end" sx={{ my: 3 }}>
           {/* <FormControlLabel control={<Checkbox />} label="Remember me" />  */}
-          <Link variant="subtitle2" underline="hover" href="/resetpassword" sx={{zIndex:1}}>
+          <Link variant="subtitle2" underline="hover" href="/resetPassword" sx={{zIndex:1}}>
             Forgot password?
           </Link>
         </Stack>

@@ -24,7 +24,7 @@ export default function PersistLogin() {
       }finally {
         setIsLoading(false);
       }
-    }
+    };
     
     verifyRefreshToken();
 

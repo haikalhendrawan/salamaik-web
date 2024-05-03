@@ -11,8 +11,8 @@ declare global{
       period: number | null;
       accessToken: string | null;
       status: number | null;
-    },
-    setAuth: (auth:AuthType | {[key: string]: any}) => void
+    } | null,
+    setAuth: (auth:AuthType | {[key: string]: any} | null) => void
   } 
 }
 

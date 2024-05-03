@@ -4,14 +4,15 @@ import { useAuth } from './useAuth';
 import useLoading from './display/useLoading';
 import useSnackbar from './display/useSnackbar';
 //------------------------------------------------------------------
-interface DictionaryType{
-  [key: string]: string | number
-};
+interface DictionaryType {
+  [key: string | number]: string | number | any[];
+  list: any[];
+}
 
 interface DictionaryContextType{
   statusRef: DictionaryType | null,
   periodRef: DictionaryType | null,
-  kppnRef: DictionaryType[] | null,
+  kppnRef: DictionaryType | null,
   roleRef: DictionaryType | null,
 };
 
@@ -37,6 +38,7 @@ const DictionaryProvider = ({children}: DictionaryProviderProps) => {
   const statusRef = {
     0: "Pending User",
     1: "Active User",
+    list: [{0: "Pending User", 1: "Active User"}]
   };
 
   const [periodRef, setPeriodRef] = useState(null);
@@ -51,18 +53,22 @@ const DictionaryProvider = ({children}: DictionaryProviderProps) => {
         obj[row.id] = row.name;
       });
       setPeriodRef(obj);
-      console.log(obj);
     }catch(err: any){
-      console.log(err)
+      console.log(err);
     }
   };
 
-  const getKPPN= async() => {
+  const getKPPN = async() => {
     try{
       const response = await axiosJWT.get("/getAllUnit");
-      setKPPNRef(response.data.rows);
+      const obj: any = {};
+      await response.data.rows.map((row: any) => {
+        obj[row.id] = row.alias;
+      });
+      obj.list = response.data.rows;
+      setKPPNRef(obj);
     }catch(err: any){
-      console.log(err)
+      console.log(err);
     }
   };
 
@@ -73,10 +79,10 @@ const DictionaryProvider = ({children}: DictionaryProviderProps) => {
       await response.data.rows.map((row: any) => {
         obj[row.id] = row.title;
       });
+      obj.list = response.data.rows;
       setRoleRef(obj);
-      console.log(obj);
     }catch(err: any){
-      console.log(err)
+      console.log(err);
     }
   };
 

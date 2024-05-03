@@ -4,12 +4,34 @@ import Iconify from '../../../components/iconify/Iconify';
 import UserRefTable from './UserRefTable';
 import UserRefAddModal from './UserRefAddModal';
 import UserRefEditModal from './UserRefEditModal';
+import useUser from './useUser';
 // -----------------------------------------------------------------------
 export default function UserRefSection(){
-  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [addModalOpen, setAddModalOpen] = useState<boolean>(false);
 
-  const handleClose = () => {
-    setModalOpen(false);
+  const [editModalOpen, setEditModalOpen] = useState<boolean>(false);
+
+  const [editId, setEditId] = useState<string>('');
+
+  const {user} = useUser();
+
+  const handleOpenAddModal = () => {
+    setAddModalOpen(true);
+    setEditModalOpen(false);
+  };
+
+  const handleOpenEditModal = (id: string) => {
+    setEditModalOpen(true);
+    setEditId(id);
+    setAddModalOpen(false);
+  };
+
+  const handleCloseAddModal = () => {
+    setAddModalOpen(false);
+  };
+
+  const handleCloseEditModal = () =>{
+    setEditModalOpen(false)
   };
 
   return(
@@ -24,17 +46,28 @@ export default function UserRefSection(){
         <Button 
           variant="contained" 
           startIcon={<Iconify icon="eva:plus-fill" />} 
-          onClick={() => setModalOpen(true)}
+          onClick={handleOpenAddModal}
         >
           Add
         </Button>
       </Stack>
 
-      <UserRefTable />
+      <UserRefTable 
+        users={user} 
+        setEditModalOpen={handleOpenEditModal}
+      />
 
-      <UserRefAddModal modalOpen={modalOpen} modalClose={handleClose} />
+      <UserRefAddModal
+        modalOpen={addModalOpen} 
+        modalClose={handleCloseAddModal} 
+      />
       
-      {/* <UserRefEditModal modalOpen={modalOpen} modalClose={handleClose} /> */}
+      <UserRefEditModal 
+        editId={editId}
+        users={user} 
+        modalOpen={editModalOpen}
+        modalClose={handleCloseEditModal} 
+      />
     </Container>
   </>)
 }

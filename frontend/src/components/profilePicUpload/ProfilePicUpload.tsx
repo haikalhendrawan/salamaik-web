@@ -3,7 +3,7 @@
  * bentuk box yang clickable. Utk hidden input perlu dibuat manual diluar komponen
  */
 
-import { Stack, Typography, Box, FormControl,  Grid, IconButton, Card, TextField, Button, Slide, Grow} from '@mui/material';
+import { Stack, Typography, Box, IconButton} from '@mui/material';
 import { useTheme, styled } from '@mui/material/styles';
 import Iconify from '../iconify/Iconify';
 // ----------------------------------------------------------------
@@ -72,18 +72,19 @@ const BackdropIcon = styled(Iconify)(({theme}) => ({
 // ---------------------------------------------------------------------
 interface ProfilePicUploadProps{
   onClick?:() => void,
-  imageUrl?:string
+  imageUrl?:string,
+  disabled?:boolean
 }
 
 // --------------------------------------------------------------------
-export default function ProfilePicUpload({onClick, imageUrl}: ProfilePicUploadProps){
+export default function ProfilePicUpload({onClick, imageUrl, disabled}: ProfilePicUploadProps){
   return(
     <>
       <ImageBox>
         <ImageButton onClick={onClick} sx={{ backgroundImage: `url('${imageUrl}')` }}>
-          <ImageBackdrop className="backdrop" />
-          <BackdropTypography variant="body2">Upload</BackdropTypography>
-          <BackdropIcon icon={"solar:camera-bold"} />
+          <ImageBackdrop className="backdrop" style={{display: disabled?'none':'block'}}/>
+          <BackdropTypography variant="body2" style={{display: disabled?'none':'block'}} >Upload</BackdropTypography>
+          <BackdropIcon icon={"solar:camera-bold"} sx={{display: disabled?'none':'block'}} />
         </ImageButton>
       </ImageBox>
     </>

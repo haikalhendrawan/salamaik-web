@@ -27,7 +27,6 @@ const LoadingProvider = ({children}: LoadingProviderProps) => {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  
   return(
     <LoadingContext.Provider value={{isLoading, setIsLoading}}>
       <StyledBackdrop open={isLoading}>
@@ -38,7 +37,7 @@ const LoadingProvider = ({children}: LoadingProviderProps) => {
             speedMultiplier={0.7}
           />
         </div>
-    </StyledBackdrop>
+      </StyledBackdrop>
       {children}
     </LoadingContext.Provider>
   )

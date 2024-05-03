@@ -8,5 +8,7 @@ router.get("/getUser",  authenticate, userController.getUser);
 router.post("/addUser", userController.addUser);
 router.post("/editUser", userController.editUser);
 router.post("/deleteUser",  userController.deleteUser);
+router.post("/updateStatus",  userController.updateStatus);
+router.post("/updateRole",  userController.updateRole);
 
 export default router
