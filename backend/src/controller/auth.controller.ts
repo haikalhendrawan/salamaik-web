@@ -3,6 +3,7 @@ import auth from "../model/auth.model";
 import jwt, {JwtPayload, VerifyErrors} from "jsonwebtoken";
 import ErrorDetail  from "../model/error.model";
 import otpToken from '../model/token.model';
+import user from 'model/user.model';
 import transporter from '../config/mailer';
 import "dotenv/config";
 import {z} from 'zod';
@@ -114,7 +115,7 @@ const logout = async (req: Request, res: Response, next: NextFunction) => {
 const getForgotPasswordToken = async (req: Request, res: Response, next: NextFunction) => {
   try{
     const {username, email} = req.body;
-    const userEmailIsValid = await auth.checkUserEmail(username, email);
+    const userEmailIsValid = await auth.verifyUserEmail(username, email);
 
     if(!userEmailIsValid){
       throw new ErrorDetail(404,'Invalid username or email')
@@ -146,17 +147,17 @@ const forgotPassword = async (req: Request, res: Response, next: NextFunction) =
   try {
     const { nip, password, confirmPassword, token, otp } = req.body;
     if(password !== confirmPassword){
-      throw new ErrorDetail(400,'Password does not match')
+      return next(new ErrorDetail(400,'Password does not match'))
     };
 
     const validPassword = passwordSchema.safeParse(password);
     if(!validPassword){
-      throw new ErrorDetail(400,'Password criteria is not fulfilled')
+      return next( new ErrorDetail(400,'Password criteria is not fulfilled'))
     };
 
     const tokenIsValid = await otpToken.verifyToken(nip, token, otp);
     if(!tokenIsValid){
-      throw new ErrorDetail(400,'Token is not valid, please generate new OTP')
+      return next( new ErrorDetail(400,'Token is not valid, please generate new OTP'))
     };
 
     const response = await auth.updatePassword(nip, password);
@@ -166,8 +167,55 @@ const forgotPassword = async (req: Request, res: Response, next: NextFunction) =
   }
 }
 
+const getRegisterToken = async (req: Request, res: Response, next: NextFunction) => {
+  try{
+    const {username, email} = req.body;
+    const emailIsValid = await user.checkEmail(email);
+    const nipIsValid = await user.checkUsername(username);
 
-export {login, refresh, updateToken, logout, getForgotPasswordToken, forgotPassword}
+    if(!emailIsValid){
+      return next( new ErrorDetail(400,'Email has been taken'))
+    };
+
+    if(!nipIsValid){
+      return next( new ErrorDetail(400,'NIP has been taken'))
+    };
+
+    if(!emailIsValid && !nipIsValid){
+      return next( new ErrorDetail(400,'Email and NIP has been taken'))
+    };
+
+    const timeDiff =  150000; //2 menit + buffer 30 detik
+    const {tokenId, expireTime, otp} = await otpToken.addToken(username, 0, timeDiff);
+
+    return res.status(200).json({
+      success: true, 
+      message:`Otp has been sent to ${email}`, 
+      otp: otp,
+      token: tokenId, 
+    })
+  }catch(err){
+    next(err)
+  }
+}
+
+const verifyRegister = async (req: Request, res: Response, next: NextFunction) => {
+  try{
+    const { nip, token, otp } = req.body;
+
+    const tokenIsValid = await otpToken.verifyToken(nip, token, otp);
+    if(!tokenIsValid){
+      return next(new ErrorDetail(400,'Token is not valid, please generate new OTP'))
+    };
+
+    return res.status(200).json({sucess: true, message: 'Token verified'});
+  }catch(err){
+    next(err)
+  }
+}
+
+
+export {login, refresh, updateToken, logout, getForgotPasswordToken, forgotPassword, getRegisterToken, verifyRegister}
 
 
 //--------------------------------------------------------------------------------------

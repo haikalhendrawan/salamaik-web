@@ -8,7 +8,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import Iconify from '../../../components/iconify/Iconify';
 import useSnackbar from '../../../hooks/display/useSnackbar';
 import useLoading from '../../../hooks/display/useLoading';
-import axios from "axios";
+import { axiosPublic } from '../../../config/axios';
 //-------------------------------------------------------------------------------------
 const MuiOtpInputStyled = styled(MuiOtpInput)(({ theme }) => ({
   display: 'flex',
@@ -18,11 +18,21 @@ const MuiOtpInputStyled = styled(MuiOtpInput)(({ theme }) => ({
 }));
 
 interface ValueType{
-  username: string;
-  email: string;
+  username: string, 
+  name: string, 
+  email: string, 
+  password: string, 
+  kppn: string, 
+  gender: number
 };
 
 interface RegisterOtpPropsType{
+  otp: string,
+  token: string,
+  value: ValueType,
+  setView: (set: 0 | 1 | 2) => void,
+  setOtp: React.Dispatch<React.SetStateAction<string>>,
+  setToken: React.Dispatch<React.SetStateAction<string>>
 };
 
 const StyledContent = styled('div')(({ theme }) => ({
@@ -37,19 +47,66 @@ const StyledContent = styled('div')(({ theme }) => ({
   marginTop:0
 }));
 //-------------------------------------------------------------------------------------
-export default function RegisterOtp({}: RegisterOtpPropsType) {
+export default function RegisterOtp({otp, token, value, setView ,setOtp, setToken}: RegisterOtpPropsType) {
   const {openSnackbar} = useSnackbar();
+
+  const {isLoading, setIsLoading} = useLoading();
 
   const [countdown, setCountdown] = useState<number>(120);
 
+  const [otpInput, setOtpInput] = useState<string>('');
+
   const [round, setRound] = useState<number>(0);
 
-  const [value, setValue] = useState<string>(''); 
-
   const handleChange = (newValue: string) => {
-    setValue(newValue)
+    setOtpInput(newValue)
   };
 
+  const handleRegister= async() => {
+    try{
+      setIsLoading(true);
+
+      if(otp !== otpInput){
+        return openSnackbar('The OTP you entered is not correct', 'error');
+      };
+
+      const response = await axiosPublic.post("/verifyRegister", {
+        nip: value.username,
+        token: token,
+        otp: otpInput
+      });
+      const response2 = await axiosPublic.post("/addUser", value);
+      openSnackbar(response2.data.message, "success");
+      setIsLoading(false);
+      setView(2);
+    }catch(err: any){
+      if(err.response.data){
+        openSnackbar(err.response.data.message, "error");
+        setIsLoading(false);
+      }else{
+        openSnackbar(err.response2.data.message, "error");
+        setIsLoading(false);
+      }
+    }finally{
+      setIsLoading(false);
+    }
+  };
+
+  const handleResubmit = async() => {
+    try{
+      setCountdown(120);
+      setRound((prev) => prev+1);
+      openSnackbar("Resending OTP...", 'white');
+      const response = await axiosPublic.post('/getRegisterToken', {
+        username: value.username,
+        email: value.email
+      });
+      setOtp(response.data.otp);
+      setToken(response.data.token);
+    }catch(err: any){
+      openSnackbar(err.response.data.message, 'error');
+    }
+  };
 
   return(
     <>
@@ -63,10 +120,9 @@ export default function RegisterOtp({}: RegisterOtpPropsType) {
         <Typography variant="body3" sx={{mb:5}}>
           (It may takes around 20s for email to arrive)
         </Typography>
-        <form >
           <Stack spacing={3}>
             <MuiOtpInputStyled 
-              value={value}
+              value={otpInput}
               onChange={handleChange}
               TextFieldsProps={{
                 sx: {borderRadius:'8px'},
@@ -82,7 +138,8 @@ export default function RegisterOtp({}: RegisterOtpPropsType) {
               variant="contained" 
               sx={{mt: 3}} 
               endIcon={<Iconify icon="solar:plain-bold" />}
-              >
+              onClick={handleResubmit}
+            >
               Resend Otp
             </LoadingButton>
           : <LoadingButton 
@@ -90,7 +147,9 @@ export default function RegisterOtp({}: RegisterOtpPropsType) {
                 size="large" 
                 type="submit" 
                 variant="contained" 
-                sx={{mt: 3}}>
+                sx={{mt: 3}}
+                onClick={handleRegister}
+            >
               Submit
             </LoadingButton>
           }
@@ -106,13 +165,11 @@ export default function RegisterOtp({}: RegisterOtpPropsType) {
               {countdown===0?'expired OTP':'expires in'} {formatTime(countdown)}
             </Typography>
           </Stack>
-
-        </form>
       </StyledContent>
     </>
   )
 }
-
+//-------------------------------------------------------------------------------------
 function formatTime(countdown: number): string {
   const minutes = Math.floor(countdown / 60);
   const seconds = countdown % 60;

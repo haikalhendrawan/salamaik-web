@@ -6,4 +6,11 @@ const axiosJWT = axios.create({
     baseURL: import.meta.env.VITE_API_URL
 });
 
+const axiosPublic= axios.create({
+    headers: {'Content-Type': 'application/json'},
+    baseURL: import.meta.env.VITE_API_URL
+});
+
+
 export default axiosJWT;
+export {axiosPublic}

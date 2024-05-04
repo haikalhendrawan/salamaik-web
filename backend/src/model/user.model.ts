@@ -133,6 +133,21 @@ class User{
     }
   }
 
+  async checkEmail(email: string){
+    try{
+      const q = "SELECT * FROM user_ref WHERE email = $1";
+      const result = await pool.query(q, [email]);
+
+      if(result.rows.length > 0){
+        return false
+      }else{
+        return true
+      }
+    }catch(err){
+      return false
+    }
+  }
+
   async updateStatus(targetID: string){
     try{
       const q = `UPDATE user_ref SET status = 1 WHERE id = $1 RETURNING *`;
@@ -153,13 +168,7 @@ class User{
     }
   }
 
-  // async resetPassword(){
-  //   try{
-     
-  //   }catch(err){
-      
-  //   }
-  // }
+
 
 }
 

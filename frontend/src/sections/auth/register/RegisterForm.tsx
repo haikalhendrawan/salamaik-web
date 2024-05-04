@@ -8,10 +8,7 @@ import { StyledSelect, StyledSelectLabel } from '../../../components/styledSelec
 import Iconify from '../../../components/iconify';
 import useSnackbar from '../../../hooks/display/useSnackbar';
 import useLoading from '../../../hooks/display/useLoading';
-import useAxiosJWT from '../../../hooks/useAxiosJWT';
-import useDictionary from '../../../hooks/useDictionary';
-import useUser from '../../admin/userRef/useUser';
-import axios from "axios";
+import { axiosPublic } from '../../../config/axios';
 import { z } from 'zod';
 //-------------------------------------------------------------------------------------
 const UserDataContainer = styled(Box)(({theme}) => ({
@@ -50,6 +47,19 @@ interface ErrorMessageType{
   gender: string
 };
 
+interface RegisterFormPropTypes{
+  value: ValueType,
+  error: ErrorType,
+  setError: React.Dispatch<React.SetStateAction<ErrorType>>,
+  errorMessage: ErrorMessageType,
+  setErrorMessage: React.Dispatch<React.SetStateAction<ErrorMessageType>>,
+  handleChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement> | SelectChangeEvent<unknown>) => void,
+  handleReset: () => void,
+  setView: (set: 0 | 1 | 2) => void,
+  setOtp: React.Dispatch<React.SetStateAction<string>>,
+  setToken: React.Dispatch<React.SetStateAction<string>>
+};
+
 const AddUserSchema = z.object({
   username: z.string().min(18, 'Must be 18 characters long').max(18, 'Must be 18 characters long'),
   name: z.string().min(1, 'Invalid name'),
@@ -59,64 +69,38 @@ const AddUserSchema = z.object({
   gender: z.number().min(0).max(1, 'Invalid gender specified')
 });
 
-
+const KPPN_REF = [
+  {id:'03010', alias:"Kanwil DJPb Prov. Sumbar"},
+  {id:'010', alias:"KPPN Padang"},
+  {id:'011', alias:"KPPN Bukittinggi"},
+  {id:'090', alias:"KPPN Solok"},
+  {id:'091', alias:"KPPN Lubuk Sikaping"},
+  {id:'077', alias:"KPPN Sijunjung"},
+  {id:'142', alias:"KPPN Painan"},
+];
 //-------------------------------------------------------------------------------------
 
-export default function RegisterForm() {
+export default function RegisterForm({
+  value,
+  error,
+  setError,
+  errorMessage,
+  setErrorMessage,
+  handleChange,
+  handleReset,
+  setView,
+  setOtp, 
+  setToken
+}: RegisterFormPropTypes) {
   const theme = useTheme();
 
-  const { statusRef, roleRef, kppnRef, periodRef } = useDictionary();
-
-  const { getUser } = useUser();
-
   const { openSnackbar } = useSnackbar();
-
-  const axiosJWT = useAxiosJWT();
 
   const { setIsLoading } = useLoading();
 
   const [showPassword, setShowPassword] = useState<boolean>(false); 
 
-  const [value, setValue] = useState<ValueType>({
-    username: "", 
-    name: "", 
-    email: "", 
-    password: "", 
-    kppn: "", 
-    gender: 0
-  });
-
-  const [error, setError] = useState<ErrorType>({
-    username: false, 
-    name: false, 
-    email: false, 
-    password: false, 
-    kppn: false, 
-    gender: false
-  });
-
-  const [errorMessage, setErrorMessage] = useState<ErrorMessageType>({
-    username: '', 
-    name: '', 
-    email: '', 
-    password: '', 
-    kppn: '', 
-    gender: ''
-  });
-
-  const handleReset = () => {
-    setValue({username: "", name: "", email: "", password: "", kppn: "", gender: 0});
-    setError({username: false, name: false, email: false, password: false, kppn: false, gender: false});
-    setErrorMessage({username: '', name: '', email: '', password: '', kppn: '', gender: ''});
-  }
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement> | SelectChangeEvent<unknown>) => {
-    setValue((prev) => ({...prev, [event.target.name]: event.target.value}));
-    setError((prev) => ({...prev, [event.target.name]: false}));
-    setErrorMessage((prev) => ({...prev, [event.target.name]: ''}));
-  };
-
-  const handleAddUser = async() => {
+  const handleSubmit = async() => {
     try{
       setIsLoading(true);
       const result = AddUserSchema.safeParse(value);
@@ -133,11 +117,15 @@ export default function RegisterForm() {
         return
       };
 
-      const response = await axiosJWT.post("/addUser", value);
+      const response = await axiosPublic.post("/getRegisterToken", {
+        username: value.username,
+        email: value.email
+      });
+      setOtp(response.data.otp);
+      setToken(response.data.token);
       openSnackbar(response.data.message, "success");
-      getUser();
       setIsLoading(false);
-      handleReset();
+      setView(1);
     }catch(err: any){
       openSnackbar(err.response.data.message, "error");
       setIsLoading(false);
@@ -161,13 +149,21 @@ export default function RegisterForm() {
             <FormControl>
               <StyledTextField 
                 name="username" 
-                label="NIP"  
+                label="NIP"
+                value={value.username}
+                onChange={handleChange}
+                error={error.username}
+                helperText={errorMessage.username}  
               />
             </FormControl>
             <FormControl>
               <StyledTextField 
                 name="name" 
-                label="Nama Pegawai" 
+                label="Nama Pegawai"
+                value={value.name}
+                onChange={handleChange}
+                error={error.name}
+                helperText={errorMessage.name} 
               />
             </FormControl>
             <FormControl>
@@ -177,6 +173,8 @@ export default function RegisterForm() {
                 name="gender" 
                 label="gender"
                 labelId="gender-select-label"
+                value={value.gender}
+                onChange={handleChange}
               >
                 <MenuItem key={0} sx={{ fontSize: 14 }} value={0}> Pria </MenuItem>
                 <MenuItem key={1} sx={{ fontSize: 14 }} value={1}> Wanita </MenuItem>
@@ -188,6 +186,10 @@ export default function RegisterForm() {
               <StyledTextField 
                 name="email" 
                 label="Email"
+                value={value.email}
+                onChange={handleChange}
+                error={error.email}
+                helperText={errorMessage.email}
               />  
             </FormControl>
             <FormControl error={error.kppn}>
@@ -197,8 +199,10 @@ export default function RegisterForm() {
                 name="kppn" 
                 label="kppn"
                 labelId="kppn-select-label"
+                value={value.kppn}
+                onChange={handleChange}
               >
-                {kppnRef?.list?.map((row: any, index: number) => (
+                {KPPN_REF.map((row: any, index: number) => (
                   <MenuItem 
                     key={index+1} 
                     sx={{ fontSize: 14 }} 
@@ -217,6 +221,10 @@ export default function RegisterForm() {
                 name="password"
                 label="Password"
                 type={showPassword ? 'text' : 'password'}
+                onChange={handleChange}
+                value={value.password}
+                error={error.password}
+                helperText={errorMessage.password}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
@@ -242,9 +250,9 @@ export default function RegisterForm() {
             <Button 
               variant='contained' 
               sx={{borderRadius:'8px'}}
-              onClick={handleAddUser}
+              onClick={handleSubmit}
             >
-              Save Changes
+              Register
             </Button>
             <Button 
               variant='contained' 

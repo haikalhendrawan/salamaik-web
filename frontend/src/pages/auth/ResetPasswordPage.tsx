@@ -94,6 +94,7 @@ export default function ResetPasswordPage() {
       handleChangeView={handleChangeView}
       identityValue={ identityValue} 
       handleChangeOtp={handleChangeOtp}
+      handleChangeToken={handleChangeToken}
     />,
     <ForgotPassSubmit 
       identityValue={identityValue}

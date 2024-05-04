@@ -1,6 +1,6 @@
 import React, { useState, useEffect,} from 'react';
 import { useNavigate,} from 'react-router-dom';
-import axios from "axios";
+import { axiosPublic } from '../../../config/axios';
 // @mui
 import { Link, Stack, IconButton, InputAdornment, TextField, Checkbox, FormControlLabel} from '@mui/material';
 import { LoadingButton } from '@mui/lab';
@@ -8,6 +8,7 @@ import { LoadingButton } from '@mui/lab';
 import Iconify from '../../../components/iconify';
 import {useAuth} from "../../../hooks/useAuth";
 import useSnackbar from '../../../hooks/display/useSnackbar';
+import useLoading from '../../../hooks/display/useLoading';
 // ----------------------------------------------------------------------
 
 export default function LoginForm() {
@@ -24,14 +25,14 @@ export default function LoginForm() {
     password:"",
   }); 
 
-  const [loading, setLoading] = useState(false);  // state loading Button
+  const {isLoading, setIsLoading} = useLoading();
  
   useEffect(()=>{  // effect setiap auth berubah
     if(auth){
       if(auth.accessToken){
-        setLoading(true); 
+        setIsLoading(true); 
       }else{
-        setLoading(false);
+        setIsLoading(false);
       }
     }
   },[auth])
@@ -46,20 +47,19 @@ export default function LoginForm() {
   const handleSubmit = async(event: React.FormEvent<HTMLFormElement>)=>{
     event.preventDefault();
     try{
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/login`, {username:value.username, password:value.password}, {
-        withCredentials: true
-      });
+      setIsLoading(true);
+      const response = await axiosPublic.post(`/login`, {username:value.username, password:value.password});
       setAuth({
         ...response.data.authInfo,
         accessToken: response.data.accessToken
-      }); 
-      console.log({
-        ...response.data.authInfo,
-        accessToken: response.data.accessToken
-      })
+      });
+      setIsLoading(false); 
       navigate("/home");
     }catch(err: any){
       openSnackbar(err.response.data.message, "error");
+      setIsLoading(false); 
+    }finally{
+      setIsLoading(false);
     }
   };
 // ----------------------------------------------------------------------
@@ -95,7 +95,7 @@ export default function LoginForm() {
           </Link>
         </Stack>
 
-        <LoadingButton fullWidth size="large" type="submit" variant="contained" loading={loading} >
+        <LoadingButton fullWidth size="large" type="submit" variant="contained" loading={isLoading} >
           Login
         </LoadingButton>
       </form>

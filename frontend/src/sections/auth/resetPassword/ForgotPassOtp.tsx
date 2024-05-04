@@ -8,7 +8,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import Iconify from '../../../components/iconify/Iconify';
 import useSnackbar from '../../../hooks/display/useSnackbar';
 import useLoading from '../../../hooks/display/useLoading';
-import axios from "axios";
+import axiosPublic from "../../../config/axios";
 //-------------------------------------------------------------------------------------
 const MuiOtpInputStyled = styled(MuiOtpInput)(({ theme }) => ({
   display: 'flex',
@@ -26,10 +26,16 @@ interface ForgotPassOtpPropsType{
   otp: string,
   handleChangeView: (set: 0 | 1 | 2) => void,
   identityValue: ValueType,
-  handleChangeOtp: (otp: string) => void
+  handleChangeOtp: (otp: string) => void,
+  handleChangeToken: (token: string) => void
 };
 //-------------------------------------------------------------------------------------
-export default function ForgotPassOtp({otp, handleChangeView, identityValue, handleChangeOtp}: ForgotPassOtpPropsType) {
+export default function ForgotPassOtp({
+  otp, 
+  handleChangeView, 
+  identityValue,
+   handleChangeOtp,
+   handleChangeToken}: ForgotPassOtpPropsType) {
   const {openSnackbar} = useSnackbar();
 
   const [countdown, setCountdown] = useState<number>(120);
@@ -38,17 +44,17 @@ export default function ForgotPassOtp({otp, handleChangeView, identityValue, han
 
   const handleSubmit = async(event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if(otp !== value){
+    if(otp !== otpInput){
       return openSnackbar('The OTP you entered is not correct', 'error');
     };
 
     return handleChangeView(2);
   };
 
-  const [value, setValue] = useState<string>(''); 
+  const [otpInput, setotpInput] = useState<string>(''); // value dari input otp oleh user
 
-  const handleChange = (newValue: string) => {
-    setValue(newValue)
+  const handleChange = (newotpInput: string) => {
+    setotpInput(newotpInput)
   };
 
   const handleResendOtp = async(event: React.MouseEvent<HTMLButtonElement>) => {
@@ -57,8 +63,9 @@ export default function ForgotPassOtp({otp, handleChangeView, identityValue, han
       setCountdown(120);
       setRound((prev) => prev+1);
       openSnackbar("Resending OTP...", 'white');
-      const response = await axios.post('http://localhost:8080/getForgotPassToken', identityValue);
-      handleChangeOtp(response.data.otp)
+      const response = await axiosPublic.post('/getForgotPassToken', identityValue);
+      handleChangeOtp(response.data.otp);
+      handleChangeToken(response.data.token);
     }catch(err: any){
       console.log(err);
       openSnackbar(err.response.data.message, 'error');
@@ -96,7 +103,7 @@ export default function ForgotPassOtp({otp, handleChangeView, identityValue, han
         <form onSubmit={handleSubmit}>
           <Stack spacing={3}>
             <MuiOtpInputStyled 
-              value={value}
+              value={otpInput}
               onChange={handleChange}
               TextFieldsProps={{
                 sx: {borderRadius:'8px'},

@@ -9,7 +9,7 @@ import Iconify from '../../../components/iconify/Iconify';
 import StyledTextField from '../../../components/styledTextField/StyledTextField';
 import useSnackbar from '../../../hooks/display/useSnackbar';
 import useLoading from '../../../hooks/display/useLoading';
-import axios from "axios";
+import { axiosPublic } from '../../../config/axios';
 import { z } from 'zod';
 //-------------------------------------------------------------------------------------
 interface ValueType{
@@ -72,7 +72,7 @@ export default function ForgotPassSubmit({identityValue, otp, token}: ForgotPass
     };
 
     try{
-      const response = await axios.post('http://localhost:8080/forgotPassword', {
+      const response = await axiosPublic.post('/forgotPassword', {
         nip: identityValue.username,
         password: value.password,
         confirmPassword: value.confirmPassword,

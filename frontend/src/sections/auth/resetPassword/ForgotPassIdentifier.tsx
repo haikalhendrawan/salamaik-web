@@ -8,7 +8,7 @@ import StyledTextField from '../../../components/styledTextField/StyledTextField
 import Iconify from '../../../components/iconify';
 import useSnackbar from '../../../hooks/display/useSnackbar';
 import useLoading from '../../../hooks/display/useLoading';
-import axios from "axios";
+import axiosPublic from "../../../config/axios";
 //-------------------------------------------------------------------------------------
 interface ValueType{
   username: string;
@@ -38,7 +38,7 @@ export default function ForgotPassIdentifier({
   const handleSubmit = async() => {
     try{
       handleChangeView(1);
-      const response = await axios.post('http://localhost:8080/getForgotPassToken', identityValue);
+      const response = await axiosPublic.post('/getForgotPassToken', identityValue);
       handleChangeOtp(response.data.otp);
       handleChangeToken(response.data.token);
     }catch(err: any){

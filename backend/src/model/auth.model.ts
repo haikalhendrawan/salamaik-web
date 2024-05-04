@@ -65,7 +65,7 @@ class Auth{
     }
   }
 
-  async checkUserEmail(username: string, email: string){
+  async verifyUserEmail(username: string, email: string){
     try{
       const q1 = "SELECT * FROM user_ref WHERE username = $1 AND email = $2";
       const result = await pool.query(q1, [username, email]);
