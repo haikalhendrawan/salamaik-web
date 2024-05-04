@@ -7,9 +7,9 @@ import LoadingButton from '@mui/lab/LoadingButton';
 // hooks
 import useResponsive from '../../hooks/display/useResponsive';
 // sections
-import Identifier from '../../sections/auth/resetPassword/Identifier';
-import Otp from '../../sections/auth/resetPassword/Otp';
-import Submit from '../../sections/auth/resetPassword/Submit';
+import ForgotPassIdentifier from '../../sections/auth/resetPassword/ForgotPassIdentifier';
+import ForgotPassOtp from '../../sections/auth/resetPassword/ForgotPassOtp';
+import ForgotPassSubmit from '../../sections/auth/resetPassword/ForgotPassSubmit';
 // ----------------------------------------------------------------------
 const StyledRoot = styled('div')(({ theme }) => ({
   [theme.breakpoints.up('md')]: {
@@ -82,20 +82,20 @@ export default function ResetPasswordPage() {
   };
 
   const SECTION = [
-    <Identifier 
+    <ForgotPassIdentifier 
       handleChange={handleChangeIdentifier} 
       identityValue={ identityValue} 
       handleChangeView={handleChangeView}
       handleChangeOtp={handleChangeOtp}
       handleChangeToken={handleChangeToken}
     />,
-    <Otp 
+    <ForgotPassOtp 
       otp={otp}  
       handleChangeView={handleChangeView}
       identityValue={ identityValue} 
       handleChangeOtp={handleChangeOtp}
     />,
-    <Submit 
+    <ForgotPassSubmit 
       identityValue={identityValue}
       otp={otp}
       token={token} 
@@ -105,7 +105,7 @@ export default function ResetPasswordPage() {
   return (
     <>
       <Helmet>
-        <title> Salamaik | Login</title>
+        <title> Salamaik | Forgot Password</title>
       </Helmet>
 
       <StyledRoot>

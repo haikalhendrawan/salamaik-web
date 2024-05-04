@@ -17,7 +17,7 @@ interface ValueType{
   email: string;
 };
 
-interface SubmitPropsType{
+interface ForgotPassSubmitPropsType{
   identityValue: ValueType;
   otp: string;
   token: string;
@@ -30,7 +30,7 @@ const passwordSchema =  z
                         'Minimum 8 characters, at least one letter and one number'
                       );
 //-------------------------------------------------------------------------------------
-export default function Submit({identityValue, otp, token}: SubmitPropsType) {
+export default function ForgotPassSubmit({identityValue, otp, token}: ForgotPassSubmitPropsType) {
   const navigate = useNavigate();
 
   const {openSnackbar} = useSnackbar();

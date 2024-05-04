@@ -22,28 +22,27 @@ interface ValueType{
   email: string;
 };
 
-interface OtpPropsType{
-  otp: string,
-  handleChangeView: (set: 0 | 1 | 2) => void,
-  identityValue: ValueType,
-  handleChangeOtp: (otp: string) => void
+interface RegisterOtpPropsType{
 };
+
+const StyledContent = styled('div')(({ theme }) => ({
+  maxWidth: 480,
+  margin: 'auto',
+  minHeight: '80vh',
+  display: 'flex',
+  justifyContent: 'center',
+  flexDirection: 'column',
+  padding: theme.spacing(12, 0),
+  paddingTop:0,
+  marginTop:0
+}));
 //-------------------------------------------------------------------------------------
-export default function Otp({otp, handleChangeView, identityValue, handleChangeOtp}: OtpPropsType) {
+export default function RegisterOtp({}: RegisterOtpPropsType) {
   const {openSnackbar} = useSnackbar();
 
   const [countdown, setCountdown] = useState<number>(120);
 
   const [round, setRound] = useState<number>(0);
-
-  const handleSubmit = async(event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if(otp !== value){
-      return openSnackbar('The OTP you entered is not correct', 'error');
-    };
-
-    return handleChangeView(2);
-  };
 
   const [value, setValue] = useState<string>(''); 
 
@@ -51,49 +50,20 @@ export default function Otp({otp, handleChangeView, identityValue, handleChangeO
     setValue(newValue)
   };
 
-  const handleResendOtp = async(event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault(); 
-    try{
-      setCountdown(120);
-      setRound((prev) => prev+1);
-      openSnackbar("Resending OTP...", 'white');
-      const response = await axios.post('http://localhost:8080/getForgotPassToken', identityValue);
-      handleChangeOtp(response.data.otp)
-    }catch(err: any){
-      console.log(err);
-      openSnackbar(err.response.data.message, 'error');
-    }
-  };
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCountdown((prevCountdown) => {
-        if (prevCountdown === 0) {
-          clearInterval(interval);
-          return 0;
-        };
-        return prevCountdown - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [round]);
-
 
   return(
     <>
-      <Typography variant="h4" gutterBottom>
-        OTP
-      </Typography>
-      <Typography gutterBottom>
-        Please input the 4 digit code we've send to your email
-      </Typography>
-      <Typography variant="body3" sx={{mb:5}}>
-        (It may takes around 20s for email to arrive)
-      </Typography>
-
-      <div>
-        <form onSubmit={handleSubmit}>
+      <StyledContent>
+        <Typography variant="h4" gutterBottom>
+          OTP
+        </Typography>
+        <Typography gutterBottom>
+          Please input the 4 digit code we've send to your email
+        </Typography>
+        <Typography variant="body3" sx={{mb:5}}>
+          (It may takes around 20s for email to arrive)
+        </Typography>
+        <form >
           <Stack spacing={3}>
             <MuiOtpInputStyled 
               value={value}
@@ -112,7 +82,6 @@ export default function Otp({otp, handleChangeView, identityValue, handleChangeO
               variant="contained" 
               sx={{mt: 3}} 
               endIcon={<Iconify icon="solar:plain-bold" />}
-              onClick={handleResendOtp}
               >
               Resend Otp
             </LoadingButton>
@@ -139,7 +108,7 @@ export default function Otp({otp, handleChangeView, identityValue, handleChangeO
           </Stack>
 
         </form>
-      </div>
+      </StyledContent>
     </>
   )
 }

@@ -91,7 +91,7 @@ export default function LoginPage() {
               Sign In to Salamaik
             </Typography>
             <Typography sx={{mb:5}}>
-              Belum punya akun? <Link sx={{ml:0.5}} variant="subtitle1" underline="hover" href='#'>Register</Link>
+              Belum punya akun? <Link sx={{ml:0.5}} variant="subtitle1" underline="hover" href='/register'>Register</Link>
             </Typography>
 
             <LoginForm />   {/* logika dihandle di komponen ini */}

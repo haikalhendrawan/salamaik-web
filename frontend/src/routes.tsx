@@ -11,6 +11,7 @@ import PersistLogin from "./layouts/auth/PersistLogin";
 import HomePage from "./pages/HomePage";
 import LoginPage from './pages/auth/LoginPage';
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
+import RegisterPage from "./pages/auth/RegisterPage";
 import WorksheetPage from "./pages/WorksheetPage";
 import ProfilePage from "./pages/ProfilePage";
 import WorksheetLanding from "./sections/worksheet/WorksheetLanding";
@@ -46,6 +47,7 @@ export default function Router() {
       <Route element={<ReverseAuthLayout/>}>
         <Route path="/login" element={<LoginPage/>} />
         <Route path="/resetPassword" element={<ResetPasswordPage/>} />
+        <Route path="/register" element={<RegisterPage/>} />
       </Route>
     </Route>
 

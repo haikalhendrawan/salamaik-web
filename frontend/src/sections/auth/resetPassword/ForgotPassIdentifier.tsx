@@ -15,7 +15,7 @@ interface ValueType{
   email: string;
 };
 
-interface IdentifierPropsType{
+interface ForgotPassIdentifierPropsType{
   handleChange: any;
   identityValue: ValueType;
   handleChangeView: (set: 0 | 1 |2) => void;
@@ -25,12 +25,12 @@ interface IdentifierPropsType{
 
 //-------------------------------------------------------------------------------------
 
-export default function Identifier({
+export default function ForgotPassIdentifier({
   handleChange, 
   identityValue, 
   handleChangeView,
   handleChangeOtp,
-  handleChangeToken}:IdentifierPropsType) {
+  handleChangeToken}:ForgotPassIdentifierPropsType) {
   const {openSnackbar} = useSnackbar();
 
   const { setIsLoading } = useLoading();
