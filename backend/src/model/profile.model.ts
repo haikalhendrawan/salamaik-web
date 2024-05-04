@@ -44,7 +44,10 @@ class Profile{
       
       return result2
     }catch(err){
+      await client.query("ROLLBACK");
       throw err
+    }finally{
+      client.release();
     }
   }
 

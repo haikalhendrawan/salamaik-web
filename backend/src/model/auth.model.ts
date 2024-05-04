@@ -65,6 +65,32 @@ class Auth{
     }
   }
 
+  async checkUserEmail(username: string, email: string){
+    try{
+      const q1 = "SELECT * FROM user_ref WHERE username = $1 AND email = $2";
+      const result = await pool.query(q1, [username, email]);
+
+      if(result.rowCount === 0){
+        return false
+      };
+
+      return true
+    }catch(err){
+      return false
+    }
+  }
+
+  async updatePassword(nip: string, password: string){
+    try{
+      const q2 = "UPDATE user_ref SET password_hash = $1 WHERE username= $2 RETURNING *";
+      const newPasswordHashed = await bcrypt.hash(password, 10);
+      const result2 = await pool.query(q2, [newPasswordHashed, nip]);
+      return result2
+    }catch(err){
+      throw err
+    }
+  }
+
 
 }
 

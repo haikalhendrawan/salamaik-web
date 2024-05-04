@@ -2,6 +2,10 @@ import {Request, Response, NextFunction} from 'express';
 import auth from "../model/auth.model";
 import jwt, {JwtPayload, VerifyErrors} from "jsonwebtoken";
 import ErrorDetail  from "../model/error.model";
+import otpToken from '../model/token.model';
+import transporter from '../config/mailer';
+import "dotenv/config";
+import {z} from 'zod';
 // -------------------------------------------------
 type JwtPayloadType = {
   id: string;
@@ -13,8 +17,14 @@ type JwtPayloadType = {
   role: number;
   period: number;
   status: number
-}
+};
 
+const passwordSchema =  z
+                      .string()
+                      .regex(
+                        /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
+                        'Minimum 8 characters, at least one letter and one number'
+                      );
 // ------------------------------------------------------
 
 const login = async (req: Request, res: Response, next: NextFunction) => {
@@ -101,7 +111,82 @@ const logout = async (req: Request, res: Response, next: NextFunction) => {
   return res.status(200).json({success: true, message:`User logged out`})
 }
 
+const getForgotPasswordToken = async (req: Request, res: Response, next: NextFunction) => {
+  try{
+    const {username, email} = req.body;
+    const userEmailIsValid = await auth.checkUserEmail(username, email);
+
+    if(!userEmailIsValid){
+      throw new ErrorDetail(404,'Invalid username or email')
+    };
+
+    const timeDiff =  150000; //2 menit + buffer 30 detik
+    const {tokenId, expireTime, otp} = await otpToken.addToken(username, 0, timeDiff);
+
+    const info = await transporter.sendMail({
+      from: `"Salamaik" <${process.env.EMAIL_USERNAME}>`, 
+      to: `${email}`, 
+      subject: "Salamaik - Forgot Password", 
+      html:emailHTML(email, otp)
+    });
+
+    return res.status(200).json({
+      success: true, 
+      message:`Otp has been sent to ${email}`, 
+      otp: otp,
+      token: tokenId, 
+      detail: info
+    })
+  }catch(err){
+    next(err)
+  }
+}
+
+const forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { nip, password, confirmPassword, token, otp } = req.body;
+    if(password !== confirmPassword){
+      throw new ErrorDetail(400,'Password does not match')
+    };
+
+    const validPassword = passwordSchema.safeParse(password);
+    if(!validPassword){
+      throw new ErrorDetail(400,'Password criteria is not fulfilled')
+    };
+
+    const tokenIsValid = await otpToken.verifyToken(nip, token, otp);
+    if(!tokenIsValid){
+      throw new ErrorDetail(400,'Token is not valid, please generate new OTP')
+    };
+
+    const response = await auth.updatePassword(nip, password);
+    return res.status(200).json({sucess: true, message: 'Password has been updated', detail: response});
+  } catch (err) {
+    next(err);
+  }
+}
 
 
+export {login, refresh, updateToken, logout, getForgotPasswordToken, forgotPassword}
 
-export {login, refresh, updateToken, logout}
+
+//--------------------------------------------------------------------------------------
+function emailHTML(email: string, otp: string){
+  return (
+    `<div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">
+      <div style="margin:50px auto;width:70%;padding:20px 0">
+        <div style="border-bottom:1px solid #eee">
+        <h1 style="color:#8f0916">Salamaik</h6>
+        </div>
+        <p>Hi ${email},</p>
+        <p>Gunakan kode OTP berikut untuk menyelesaikan pendaftaran. OTP valid untuk 1 menit</p>
+        <h2 style="background: #8f0916;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;">${otp}</h2>
+        <hr style="border:none;border-top:1px solid #eee" />
+        <div style="float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300">
+          <p>Kanwil DJPb Sumbar</p>
+          <p>Jl. Khatib Sulaiman No.3,Kota Padang</p>
+          <p>Sumatera Barat</p>
+        </div>
+      </div>
+    </div>`)
+}

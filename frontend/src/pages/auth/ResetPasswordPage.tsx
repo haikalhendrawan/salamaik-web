@@ -1,20 +1,16 @@
 import { Helmet } from 'react-helmet-async';
 import {useState, useEffect} from 'react';
 // @mui
-import { styled, Theme } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 import { Link, Container, Typography, Divider, Stack, Button, Card, Alert, Box, LinearProgress} from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 // hooks
 import useResponsive from '../../hooks/display/useResponsive';
-// components
-import Logo from '../../components/logo';
-import Iconify from '../../components/iconify';
 // sections
-import { LoginForm } from '../../sections/auth/login';
-
-
+import Identifier from '../../sections/auth/resetPassword/Identifier';
+import Otp from '../../sections/auth/resetPassword/Otp';
+import Submit from '../../sections/auth/resetPassword/Submit';
 // ----------------------------------------------------------------------
-
 const StyledRoot = styled('div')(({ theme }) => ({
   [theme.breakpoints.up('md')]: {
     display: 'flex',
@@ -28,9 +24,8 @@ const StyledSection = styled('div')(({ theme }) => ({
   flexDirection: 'column',
   justifyContent: 'center',
   boxShadow: theme.customShadows.card,
-  // backgroundImage:'url(/assets/bg.png)'
+  backgroundColor: theme.palette.primary.main
 }));
-
 
 const StyledContent = styled('div')(({ theme }) => ({
   maxWidth: 480,
@@ -42,16 +37,70 @@ const StyledContent = styled('div')(({ theme }) => ({
   padding: theme.spacing(12, 0),
 }));
 
+interface ValueType{
+  username: string;
+  email: string;
+};
 
+interface SubmitValueType{
+  password: string;
+  confirmPassword: string;
+};
 // ----------------------------------------------------------------------
 
 export default function ResetPasswordPage() {
-  const mdUp = useResponsive('up', 'md', 'lg');
-  const [showAlert, setShowAlert] = useState(false);
+  const [view, setView] = useState<0 | 1 | 2>(0);
 
-  const handleClick=()=>{
-    setShowAlert((prevState)=>{return !prevState})
-  }
+  const [otp, setOtp] = useState<string>('');
+
+  const [token, setToken] = useState<string>('');
+
+  const [ identityValue, setIdentityValue] = useState<ValueType>({    
+    username:"",
+    email:"",
+  }); 
+
+  const [submitvalue, setSubmitValue] = useState<SubmitValueType>({
+    password: "",
+    confirmPassword:""
+  });
+
+  const handleChangeIdentifier = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setIdentityValue({...identityValue, [event.target.name]: event.target.value});
+  };
+
+  const handleChangeOtp = (newValue: string) => {
+    setOtp(newValue)
+  };
+
+  const handleChangeToken = (newValue: string) => {
+    setToken(newValue)
+  };
+
+  const handleChangeView = (set: 0 | 1 |2 ) => {
+    setView(set);
+  };
+
+  const SECTION = [
+    <Identifier 
+      handleChange={handleChangeIdentifier} 
+      identityValue={ identityValue} 
+      handleChangeView={handleChangeView}
+      handleChangeOtp={handleChangeOtp}
+      handleChangeToken={handleChangeToken}
+    />,
+    <Otp 
+      otp={otp}  
+      handleChangeView={handleChangeView}
+      identityValue={ identityValue} 
+      handleChangeOtp={handleChangeOtp}
+    />,
+    <Submit 
+      identityValue={identityValue}
+      otp={otp}
+      token={token} 
+    />
+  ];
 
   return (
     <>
@@ -63,37 +112,26 @@ export default function ResetPasswordPage() {
         <Box
           component="img"
           src="/logo/salamaik-long.png"
-          sx={{ width: 120, height: 30, cursor: 'pointer', position: 'fixed',
-          top: { xs: 16, md: 24 },
-          left: { xs: 16, md: 24 }, }}
+          sx={{ 
+            width: 120, 
+            height: 30, 
+            cursor: 'pointer', 
+            position: 'fixed', 
+            backgroundColor: 'white',
+            top: { xs: 16, md: 24 },
+            left: { xs: 16, md: 24 }, 
+          }}
         />
-          <StyledSection>
-            <img
-              src={'/image/Other 10.png'}
-              alt="background"
-              style={{
-                width: '80%',
-                height: '80%',
-                background:'cover',
-                fill: '#FFFFFF',
-              }}
-            />
-          </ StyledSection>
+
+        <StyledSection />
           
         <Container maxWidth="sm" >
           <StyledContent>
-            <Typography variant="h4" gutterBottom>
-              Sign In to Salamaik
-            </Typography>
-            <Typography sx={{mb:5}}>
-              Belum punya akun? <Link sx={{ml:0.5}} variant="subtitle1" underline="hover" href='#'>Register</Link>
-            </Typography>
 
-            
-            
+            {SECTION[view]}
+
             <Stack direction="column" justifyContent="center" alignItems="center" spacing={0} sx={{bottom:10, position:'fixed', width:'38%'}}>
-                {/* <Typography variant='body2'>Modul Monev TIK</Typography> */}
-                <Typography variant='body2'>Copyright © 2024 Kanwil DJPb Prov Sumbar</Typography>
+              <Typography variant='body2'>Copyright © 2024 Kanwil DJPb Prov Sumbar</Typography>
             </Stack>
           </StyledContent>
         </Container>

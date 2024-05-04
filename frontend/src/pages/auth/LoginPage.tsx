@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import {useState, useEffect} from 'react';
 // @mui
-import { styled, Theme } from '@mui/material/styles';
+import { styled, useTheme, alpha } from '@mui/material/styles';
 import { Link, Container, Typography, Divider, Stack, Button, Card, Alert, Box, LinearProgress} from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 // hooks
@@ -46,12 +46,17 @@ const StyledContent = styled('div')(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 export default function LoginPage() {
-  const mdUp = useResponsive('up', 'md', 'lg');
+  const theme = useTheme();
+
+  const primaryLight = theme.palette.primary.dark;
+
+  const primaryDark = theme.palette.primary.darker;
+
   const [showAlert, setShowAlert] = useState(false);
 
   const handleClick=()=>{
     setShowAlert((prevState)=>{return !prevState})
-  }
+  };
 
   return (
     <>
@@ -69,7 +74,7 @@ export default function LoginPage() {
         />
           <StyledSection>
             <img
-              src={'/image/Other 10.png'}
+              src={'/image/Other 14.png'}
               alt="background"
               style={{
                 width: '80%',

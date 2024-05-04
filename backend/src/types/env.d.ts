@@ -13,5 +13,10 @@ declare namespace NodeJS {
     
     readonly JWT_KEY: string;
     readonly JWT_REFRESH_KEY: string;
+
+    readonly EMAIL_USERNAME?: string;
+    readonly EMAIL_PASSWORD?: string;
+    readonly EMAIL_SMTP_HOST: string;
+    readonly EMAIL_SMTP_PORT: string;
   }
 }
