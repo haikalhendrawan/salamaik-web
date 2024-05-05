@@ -7,6 +7,7 @@ import Label from '../../../../components/label';
 import Scrollbar from '../../../../components/scrollbar';
 import StyledTextField from '../../../../components/styledTextField/StyledTextField';
 import StyledButton from '../../../../components/styledButton/StyledButton';
+import useDictionary from '../../../../hooks/useDictionary';
 // ---------------------------------------------------
 const TABLE_HEAD = [
   { id: 'id', label: 'Id', alignRight: false },
@@ -18,17 +19,12 @@ const TABLE_HEAD = [
 
 interface KomponenData{
   id: number,
-  komponen: string,
+  title: string,
   bobot: number,
-  numChecklist?: number,
-}
+  detail?: string,
+  alias?: string,
+};
 
-const TABLE_DATA: KomponenData[] = [
-  {id:1, komponen:'Treasurer', bobot:20, numChecklist:10},
-  {id:2, komponen:'Pengelola Fiskal, Representasi Kemenkeu di Daerah, dan Special Mission', bobot:30, numChecklist:34},
-  {id:3, komponen:'Financial Advisor', bobot:20, numChecklist:5},
-  {id:4, komponen:'Tata Kelola Internal', bobot:30, numChecklist:17},
-];
 
 interface KomponenRefProps {
   section: number,
@@ -43,6 +39,8 @@ export default function KomponenRef({section, addState, resetAddState}: Komponen
   const [open, setOpen] = useState<boolean>(false); // for edit modal
 
   const [editID, setEditID] = useState<number | null>(null);
+
+  const { komponenRef } = useDictionary();
 
   const handleOpen = (id: number) => {
     setOpen(true);
@@ -83,11 +81,11 @@ export default function KomponenRef({section, addState, resetAddState}: Komponen
               </TableRow>
             </TableHead>
             <TableBody>
-              {TABLE_DATA.map((row) => 
+              {komponenRef?.map((row) => 
                 <TableRow hover key={row.id} tabIndex={-1}>
                   <TableCell align="justify">{row.id}</TableCell>
 
-                  <TableCell align="left">{row.komponen}</TableCell>
+                  <TableCell align="left">{row.title}</TableCell>
 
                   <TableCell align="left">
                     <Label color={'success'}>
@@ -95,7 +93,7 @@ export default function KomponenRef({section, addState, resetAddState}: Komponen
                     </Label>
                   </TableCell>
 
-                  <TableCell align="center">{row.numChecklist}</TableCell>
+                  <TableCell align="center">{10}</TableCell>
 
                   <TableCell align="justify">
                     <Stack direction='row' spacing={1}>
@@ -106,6 +104,7 @@ export default function KomponenRef({section, addState, resetAddState}: Komponen
                             variant='contained' 
                             size='small' 
                             color='warning'
+                            disabled
                             onClick={() => handleOpen(row.id)}
                           >
                             <Iconify icon="solar:pen-bold-duotone"/>
@@ -133,7 +132,7 @@ export default function KomponenRef({section, addState, resetAddState}: Komponen
         modalClose={handleClose} 
         addState={addState}
         editID={editID}
-        data={TABLE_DATA}
+        data={komponenRef || []}
         /> 
     </>
   )
@@ -177,7 +176,7 @@ interface KomponenRefModalProps {
 function KomponenRefModal({modalOpen, modalClose, addState, editID, data}: KomponenRefModalProps) {
   const [addValue, setAddValue] = useState<KomponenData>({
     id: 0,
-    komponen: '',
+    title: '',
     bobot: 0,
   });
 
@@ -191,14 +190,14 @@ function KomponenRefModal({modalOpen, modalClose, addState, editID, data}: Kompo
   const handleResetAdd = () => {
     setAddValue({
       id: 0,
-      komponen: '',
+      title: '',
       bobot: 0,
     })
   };
 
   const [editValue, setEditValue] = useState<KomponenData>({
     id: 0,
-    komponen: 'null',
+    title: 'null',
     bobot: 0,
   });
 
@@ -212,7 +211,7 @@ function KomponenRefModal({modalOpen, modalClose, addState, editID, data}: Kompo
   const handleResetEdit = () => {
     setEditValue({
       id: data.filter((row) => row.id===editID)[0].id,
-      komponen: data.filter((row) => row.id===editID)[0].komponen,
+      title: data.filter((row) => row.id===editID)[0].title,
       bobot: data.filter((row) => row.id===editID)[0].bobot,
     })
   };
@@ -221,7 +220,7 @@ function KomponenRefModal({modalOpen, modalClose, addState, editID, data}: Kompo
     if(data && editID){
       setEditValue({
         id: data.filter((row) => row.id===editID)[0].id,
-        komponen: data.filter((row) => row.id===editID)[0].komponen,
+        title: data.filter((row) => row.id===editID)[0].title,
         bobot: data.filter((row) => row.id===editID)[0].bobot,
       })
     }
@@ -249,7 +248,7 @@ function KomponenRefModal({modalOpen, modalClose, addState, editID, data}: Kompo
                             label="Nama Komponen"
                             multiline
                             minRows={2}
-                            value={ addState? addValue.komponen : editValue.komponen}
+                            value={ addState? addValue.title : editValue.title}
                             onChange={addState? handleChangeAdd : handleChangeEdit}
                           />
                         </FormControl>

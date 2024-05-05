@@ -11,6 +11,7 @@ import roleRoute from './routes/roleRoute';
 import periodRoute from './routes/periodRoute';
 import profileRoute from './routes/profileRoute';
 import userRoute from './routes/userRoute';
+import komponenRoute from './routes/komponenRoute';
 //middleware
 import errorHandler from './middleware/errorHandler';
 // ------------------------------------------------------------
@@ -30,6 +31,7 @@ app.use(periodRoute);
 app.use(notifRoute);
 app.use(profileRoute);
 app.use(userRoute);
+app.use(komponenRoute);
 app.use(errorHandler);
 
 app.get('/', (req: Request, res: Response) => {

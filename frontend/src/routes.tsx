@@ -93,7 +93,7 @@ export default function Router() {
     </Route>
 
     <Route element={<PersistLogin/>}>
-      <Route path="/reference" element={<RequireAuthLayout allowedRoles={[0, 1, 2, 3, 4, 99]}/> }>
+      <Route path="/reference" element={<RequireAuthLayout allowedRoles={[2, 4, 99]}/> }>
         <Route index element={<Navigate to="user"/>} />
         <Route path="user" element={<UserRefPage />} />
         <Route path='worksheet' element={<WorksheetRefPage />} />
@@ -101,13 +101,13 @@ export default function Router() {
     </Route>
 
     <Route element={<PersistLogin/>}>
-      <Route path="/interface" element={<RequireAuthLayout allowedRoles={[0, 1, 2, 3, 4, 99]}/> }>
+      <Route path="/interface" element={<RequireAuthLayout allowedRoles={[4, 99]}/> }>
         <Route index element={<Navigate to="notification"/>} />
         <Route path="notification" element={<NotifInterfacePage />} />
       </Route>
     </Route>
 
-    <Route element={ <SimpleLayout />}>
+    <Route element={<SimpleLayout />}>
       <Route path="/Page404" element={<Page404 />}/>
       <Route path="/*" element={<Page404 />}/>
     </Route>

@@ -20,7 +20,7 @@ import KomponenRef from '../../sections/admin/worksheetRef/KomponenRef';
 import SubKomponenRef from '../../sections/admin/worksheetRef/SubKomponenRef';
 import SubSubKomponenRef from '../../sections/admin/worksheetRef/SubSubKomponenRef';
 import BatchRef from '../../sections/admin/worksheetRef/BatchRef';
-import PeriodRef from '../../sections/admin/worksheetRef/PeriodRef';
+import PeriodRefSection from '../../sections/admin/worksheetRef/PeriodRef';
 //----------------------------------------------------
 
 export default function WorksheetRefPage() {
@@ -46,7 +46,7 @@ export default function WorksheetRefPage() {
     <SubKomponenRef section={section} addState={addState} resetAddState={resetAddState} />,
     <SubSubKomponenRef section={section} addState={addState} resetAddState={resetAddState} />,
     <BatchRef section={section} addState={addState} resetAddState={resetAddState} />,
-    <PeriodRef section={section} addState={addState} resetAddState={resetAddState} />,
+    <PeriodRefSection section={section} addState={addState} resetAddState={resetAddState} />,
   ];
 
   const SECTION_NAME: string[] = [
@@ -93,7 +93,8 @@ export default function WorksheetRefPage() {
               </Breadcrumbs>
             </Stack>
             <Button 
-              variant="contained" 
+              variant="contained"
+              disabled={section===1?false:true} 
               startIcon={<Iconify icon="eva:plus-fill" />} 
               onClick={() => setAddState(true)}
               >

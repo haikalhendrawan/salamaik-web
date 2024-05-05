@@ -7,6 +7,7 @@ import Label from '../../../../components/label';
 import Scrollbar from '../../../../components/scrollbar';
 import StyledTextField from '../../../../components/styledTextField/StyledTextField';
 import StyledButton from '../../../../components/styledButton/StyledButton';
+import useDictionary from '../../../../hooks/useDictionary';
 //----------------------------------------------------
 const TABLE_HEAD = [
   { id: 'id', label: 'Id', alignRight: false },
@@ -23,7 +24,7 @@ interface SubSubKomponenData{
   subkomponen: number,
   komponen:number,
   numChecklist?: number,
-}
+};
 
 const TABLE_DATA: SubSubKomponenData[] = [
   {id:1, subsubkomponen:'RPD Satuan Kerja', subkomponen:0, komponen:0, numChecklist:10},
@@ -168,6 +169,8 @@ export default function SubSubKomponenRef({section, addState, resetAddState}: Su
 
   const [editID, setEditID] = useState<number | null>(null);
 
+  const { komponenRef, subKomponenRef, subSubKomponenRef } = useDictionary();
+
   const handleOpen = (id: number) => {
     setOpen(true);
     setEditID(id);
@@ -209,30 +212,33 @@ export default function SubSubKomponenRef({section, addState, resetAddState}: Su
               </TableRow>
             </TableHead>
             <TableBody>
-              {TABLE_DATA2.map((row) => 
-                <TableRow hover key={row.subsubcomponent_ID} tabIndex={-1}>
-                  <TableCell align="justify">{row.subsubcomponent_ID}</TableCell>
+              {subSubKomponenRef?.map((row) => 
+                <TableRow hover key={row.id} tabIndex={-1}>
+                  <TableCell align="justify">{row.id}</TableCell>
 
-                  <TableCell align="left">{row.subsubcomponent_title}</TableCell>
-
-                  <TableCell align="left">{row.subcomponent_ID}</TableCell>
+                  <TableCell align="left">{row.title}</TableCell>
 
                   <TableCell align="left">
-                    {row.component_ID}
+                    {subKomponenRef?.filter((item) => item.id === row.subkomponen_id)[0].title}
                   </TableCell>
 
-                  <TableCell align="center">{row.component_ID}</TableCell>
+                  <TableCell align="left">
+                    {komponenRef?.filter((item) => item.id === row.komponen_id)[0].title}
+                  </TableCell>
+
+                  <TableCell align="center">{5}</TableCell>
 
                   <TableCell align="justify">
                     <Stack direction='row' spacing={1}>
                       <Tooltip title='edit'>
                         <span>
                           <StyledButton 
+                            disabled
                             aria-label="edit" 
                             variant='contained' 
                             size='small' 
                             color='warning'
-                            onClick={() => handleOpen(parseInt(row.subsubcomponent_ID))}
+                            onClick={() => handleOpen(row.id)}
                           >
                             <Iconify icon="solar:pen-bold-duotone"/>
                           </StyledButton>

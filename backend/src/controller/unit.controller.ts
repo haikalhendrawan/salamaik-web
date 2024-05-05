@@ -8,7 +8,7 @@ interface UnitType{
   kk_name: string;
   kk_nip: string;
   info: string
-}
+};
 // ------------------------------------------------------
 const getAllUnit = async (req: Request, res: Response, next: NextFunction) => {
   try {

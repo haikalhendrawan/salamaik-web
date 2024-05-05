@@ -123,12 +123,14 @@ export default function RegisterForm({
       });
       setOtp(response.data.otp);
       setToken(response.data.token);
-      openSnackbar(response.data.message, "success");
       setIsLoading(false);
       setView(1);
     }catch(err: any){
-      openSnackbar(err.response.data.message, "error");
-      setIsLoading(false);
+      if(err.response){
+        openSnackbar(err.response.data.message, "error");
+      }else{
+        openSnackbar('Network Error', "error");
+      }
     }finally{
       setIsLoading(false);
     }

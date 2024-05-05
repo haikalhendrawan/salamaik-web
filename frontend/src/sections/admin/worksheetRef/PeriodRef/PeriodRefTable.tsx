@@ -16,15 +16,17 @@ const TABLE_HEAD = [
   { id: 'action', label: 'Action', alignRight: false },
 ];
 
-interface PeriodData{
+interface PeriodType{
   id: number,
-  periodName: string,
-  startDate: string,
-  endDate: string,
-}
+  name: string,
+  start: string,
+  end: string,
+  semester: number,
+  tahun: string,
+};
 
 interface PeriodRefTableProps {
-  tableData: PeriodData[],
+  tableData: PeriodType[] | null,
   handleOpen: (id: number) => void
 };
 
@@ -53,17 +55,17 @@ export default function PeriodRefTable({tableData, handleOpen}: PeriodRefTablePr
               </TableRow>
             </TableHead>
             <TableBody>
-              {tableData.map((row) => 
+              {tableData?.map((row) => 
                 <TableRow hover key={row.id} tabIndex={-1}>
-                  <TableCell align="justify">{row.id}</TableCell>
+                  <TableCell align="justify">{row.id+1}</TableCell>
 
-                  <TableCell align="left">{row.periodName}</TableCell>
+                  <TableCell align="left">{row.name}</TableCell>
 
                   <TableCell align="left">
-                    {row.startDate}
+                    {new Date(row.start).toLocaleDateString("en-GB")}
                   </TableCell>
 
-                  <TableCell align="center">{row.endDate}</TableCell>
+                  <TableCell align="left">{new Date(row.end).toLocaleDateString("en-GB")}</TableCell>
 
                   <TableCell align="justify">
                     <Stack direction='row' spacing={1}>
@@ -74,6 +76,7 @@ export default function PeriodRefTable({tableData, handleOpen}: PeriodRefTablePr
                             variant='contained' 
                             size='small' 
                             color='warning'
+                            disabled
                             onClick={() => handleOpen(row.id)}
                           >
                             <Iconify icon="solar:pen-bold-duotone"/>
@@ -82,7 +85,13 @@ export default function PeriodRefTable({tableData, handleOpen}: PeriodRefTablePr
                       </Tooltip>
                       <Tooltip title='delete'>
                         <span>
-                          <StyledButton aria-label="delete" disabled variant='contained' size='small' color='white'>
+                          <StyledButton 
+                            aria-label="delete" 
+                            disabled 
+                            variant='contained' 
+                            size='small' 
+                            color='white'
+                          >
                             <Iconify icon="solar:trash-bin-trash-bold"/>
                           </StyledButton>
                         </span>

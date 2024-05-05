@@ -1,11 +1,9 @@
 import { MuiOtpInput } from 'mui-one-time-password-input'
 import {useState, useEffect} from 'react';
-import {Link as RouterLink} from 'react-router-dom';
+import {Link as RouterLink, useNavigate} from 'react-router-dom';
 // @mui
 import { styled, useTheme } from '@mui/material/styles';
-import { Typography, Stack, Link, Button} from '@mui/material';
-import StyledButton from '../../../components/styledButton/StyledButton';
-import useSnackbar from '../../../hooks/display/useSnackbar';
+import { Typography, Skeleton, Button} from '@mui/material';
 //-------------------------------------------------------------------------------------
 const MuiOtpInputStyled = styled(MuiOtpInput)(({ theme }) => ({
   display: 'flex',
@@ -35,17 +33,36 @@ const StyledContent = styled('div')(({ theme }) => ({
 }));
 //-------------------------------------------------------------------------------------
 export default function RegisterSuccess({}: RegisterSuccessPropsType) {
-  const {openSnackbar} = useSnackbar();
+  const navigate = useNavigate();
 
-  const [countdown, setCountdown] = useState<number>(120);
-
-  const [round, setRound] = useState<number>(0);
+  const [countdown, setCountdown] = useState<number>(10);
 
   const [value, setValue] = useState<string>(''); 
 
   const handleChange = (newValue: string) => {
     setValue(newValue)
   };
+
+  const [imageLoaded, setImageLoaded] = useState(false);
+
+  const handleImageLoad = () => {
+    setImageLoaded(true);
+  };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCountdown((prevCountdown) => {
+        if (prevCountdown === 0) {
+          clearInterval(interval);
+          navigate('/login');
+          return 0;
+        };
+        return prevCountdown - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
 
   return(
@@ -61,19 +78,23 @@ export default function RegisterSuccess({}: RegisterSuccessPropsType) {
           Please contact admin kppn to activate the account.
         </Typography>
 
+
+        {!imageLoaded && <Skeleton variant="rounded" sx={{ width: '70%',height: '70%',}} />}
         <img
-          src={'/image/Other 06.png'}
-          alt="background"
-          style={{
-            width: '70%',
-            height: '70%',
-            background:'cover',
-            fill: '#FFFFFF',
-          }}
+              src={'/image/Other 06.svg'}
+              alt="background"
+              style={{
+                width: '70%',
+                height: '70%',
+                background:'cover',
+                fill: '#FFFFFF',
+              }}
+              onLoad={handleImageLoad}
         />
+        
 
         <Typography variant="body3" sx={{mb:1}}>
-          (Redirecting in 3s)
+          {countdown===0?'Redirecting':'Redirecting in'} {formatTime(countdown)}
         </Typography>
         <Button 
           variant='contained' 

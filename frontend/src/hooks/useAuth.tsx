@@ -12,7 +12,7 @@ interface Auth{
     period: number | null;
     accessToken: string | null;
     status: number | null;
-}
+};
 
 type AuthContextType = {
     auth: Auth | null;

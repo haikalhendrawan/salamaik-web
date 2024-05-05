@@ -11,6 +11,8 @@ export default function UserRefSection(){
 
   const [editModalOpen, setEditModalOpen] = useState<boolean>(false);
 
+  const [tab, setTab] = useState<0 | 1 | 2>(2);
+
   const [editId, setEditId] = useState<string>('');
 
   const {user} = useUser();
@@ -55,6 +57,8 @@ export default function UserRefSection(){
       <UserRefTable 
         users={user} 
         setEditModalOpen={handleOpenEditModal}
+        tab={tab}
+        setTab={setTab}
       />
 
       <UserRefAddModal

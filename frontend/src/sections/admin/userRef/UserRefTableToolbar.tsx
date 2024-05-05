@@ -63,72 +63,79 @@ const MenuProps = {
 // ----------------------------------------------------------------------
 
 interface UserRefTableToolbarProps {
-  filterName: string;
-  onFilterName: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
-  filterStatus: number | "" | undefined;
-  onFilterStatus: (event: SelectChangeEvent<number>) => void;
+  filterName: string,
+  handleFilterName: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>,
+  filterUnit: string,
+  handleFilterUnit: (e: SelectChangeEvent<unknown>) => void,
+  tab: 0 | 1 | 2,
+  setTab: React.Dispatch<React.SetStateAction<0 | 1 | 2>>,
+  users: any[],
 }
 
 // -------------------------------------------------------------
 interface SelectItemType {
   unit: string;
-  value: number;
-}
+  value: string;
+};
 
 const selectItem: SelectItemType[] = [
-  {unit:'Kanwil DJPb Sumbar', value:7},
-  {unit:'KPPN Padang', value:1},
-  {unit:'KPPN Bukittinggi', value:2},
-  {unit:'KPPN Solok', value:3},
-  {unit:'KPPN Lubuk Sikaping', value:4},
-  {unit:'KPPN Sijunjung', value:5},
-  {unit:'KPPN Painan', value:6},
-]
+  {unit:'Kanwil DJPb Sumbar', value:'03010'},
+  {unit:'KPPN Padang', value: '010'},
+  {unit:'KPPN Bukittinggi', value: '011'},
+  {unit:'KPPN Solok', value: '090'},
+  {unit:'KPPN Lubuk Sikaping', value: '091'},
+  {unit:'KPPN Sijunjung', value: '077'},
+  {unit:'KPPN Painan', value: '142'},
+];
 
 // -------------------------------------------------------------------
 
-export default function UserRefTableToolbar({filterName, onFilterName, onFilterStatus, filterStatus}: UserRefTableToolbarProps) {
+export default function UserRefTableToolbar({
+  filterName, 
+  handleFilterName,
+  filterUnit, 
+  handleFilterUnit, 
+  tab, 
+  setTab,
+  users}: UserRefTableToolbarProps) {
   const [open, setOpen] = useState(false); // open dan close filter icon
 
   const theme = useTheme();
 
-  const filterUnit = useState(null);
-
-  const [tabValue, setTabValue] = useState(0);
-
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    setOpen(prev => !prev);
-  };
-
   const handleTabChange = (event: React.SyntheticEvent, newValue: 0 | 1) => { // setiap tab komponen berubah
-    setTabValue(newValue);
+    setTab(newValue);
   };
+
+  const countAll = users?.length || 0;
+
+  const countActive = users?.filter(row => row.status === 1).length || 0;
+
+  const countInactive = users?.filter(row => row.status === 0).length || 0;
 
   return (
     <>
       <StyledTabs
-        value={tabValue} 
+        value={tab} 
         onChange={handleTabChange} 
         TabIndicatorProps={{ sx: {bgcolor: theme.palette.text.primary}}}
       > 
         <Tab 
-          icon={<Label sx={{color: theme.palette.text.primary, cursor:'pointer'}}>20</Label>} 
+          icon={<Label sx={{color: theme.palette.text.primary, cursor:'pointer'}}>{countAll}</Label>} 
           label="All" 
           iconPosition="end"  
-          value={0} 
+          value={2} 
         />
         <Tab 
-          icon={<Label color={'success'} sx={{cursor:'pointer'}}>10</Label>} 
+          icon={<Label color={'success'} sx={{cursor:'pointer'}}>{countActive}</Label>} 
           label="Active" 
           iconPosition="end"  
           value={1} 
         />
         <Tab 
-          icon={<Label color={'error'} sx={{cursor:'pointer'}}>5</Label>} 
+          icon={<Label color={'error'} sx={{cursor:'pointer'}}>{countInactive}</Label>} 
           label="Inactive" 
           iconPosition="end"  
-          value={2} 
+          value={0} 
         />
       </StyledTabs>
 
@@ -144,19 +151,35 @@ export default function UserRefTableToolbar({filterName, onFilterName, onFilterS
               id="unit-select" 
               sx={{width:'200px', typography:'body2'}} 
               label="status" 
-              onChange={onFilterStatus}
               onClick={(event)=>{event.stopPropagation()}}
+              onChange={handleFilterUnit}
               MenuProps={MenuProps}
               >
-                <MenuItem sx={{typography:'body2', color:theme.palette.primary.main}} onClick={(event)=>{event.stopPropagation()}} value={0}>All Unit</MenuItem>
+                <MenuItem 
+                  sx={{typography:'body2', color:theme.palette.primary.main}} 
+                  onClick={(event)=>{event.stopPropagation()}} 
+                  value={''}
+                >
+                  All Unit
+                </MenuItem>
                 {selectItem.map((item, index) => {
-                  return(<MenuItem key={index} onClick={(event)=>{event.stopPropagation()}} sx={{typography:'body2'}} value={item.value}>{item.unit}</MenuItem>)
+                  return(<MenuItem 
+                            key={index} 
+                            onClick={(event)=>{event.stopPropagation()}} 
+                            sx={{typography:'body2'}} 
+                            value={item.value}
+                          >
+                            {item.unit}
+                          </MenuItem>
+                        )
                 })}
             </Select>
           </FormControl>
 
           <StyledSearch
             placeholder="Search user..."
+            value={filterName}
+            onChange={handleFilterName}
             startAdornment={
               <InputAdornment position="start">
                 <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled', width: 20, height: 20 }} />

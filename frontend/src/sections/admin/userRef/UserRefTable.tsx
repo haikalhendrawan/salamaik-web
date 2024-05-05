@@ -1,7 +1,7 @@
 import { useState } from 'react';
 // @mui
 import {Card, Table, Stack, Paper, Avatar, Button, ListItemText, TableRow, Tooltip, TableBody, TableCell,
-    Container, Typography, IconButton, TableContainer, TablePagination, styled, List} from '@mui/material';
+    Container, Typography, IconButton, TableContainer, TablePagination, styled, List, Grow} from '@mui/material';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 // hooks
 import useAxiosJWT from "../../../hooks/useAxiosJWT";
@@ -45,9 +45,11 @@ const StyledButton = styled(Button)(({ theme }) => ({
 interface UserRefTableProps{
   users: any[],
   setEditModalOpen: (id: string) => void,
+  tab: 0 | 1 | 2,
+  setTab: React.Dispatch<React.SetStateAction<0 | 1 | 2>>
 };
 
-export default function UserRefTable({users, setEditModalOpen}: UserRefTableProps) {
+export default function UserRefTable({users, setEditModalOpen, tab, setTab}: UserRefTableProps) {
   const [page, setPage] = useState<number>(0);
 
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
@@ -56,9 +58,9 @@ export default function UserRefTable({users, setEditModalOpen}: UserRefTableProp
 
   const [filterName, setFilterName] = useState<string>('');
 
-  const [rowsPerPage, setRowsPerPage] = useState<number>(25);
+  const [filterUnit, setFilterUnit]= useState<string>('');
 
-  const [filterStatus, setFilterStatus] = useState<number | "" | undefined>(0);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(25);
 
   const {getUser} = useUser();
 
@@ -122,11 +124,6 @@ export default function UserRefTable({users, setEditModalOpen}: UserRefTableProp
     setOrderBy(property);
   };
 
-  const handleFilterStatus = (event: SelectChangeEvent<number>) => {
-    event.stopPropagation();
-    setFilterStatus(event.target.value as number);
-  }
-
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPage(newPage);
   };
@@ -141,21 +138,31 @@ export default function UserRefTable({users, setEditModalOpen}: UserRefTableProp
     setFilterName(event.target.value);
   };
 
+  const handleFilterUnit = (event: SelectChangeEvent<unknown>) => {
+    setPage(0);
+    setFilterUnit(event.target.value as string);
+    console.log(event.target.value);
+  };
+
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - users.length) : 0;
 
-  const filteredUsers= applySortFilter(users, getComparator(order, orderBy), filterName);
+  const filteredUsers= applySortFilter(users, getComparator(order, orderBy), filterName, tab, filterUnit);
 
   const isNotFound = !filteredUsers.length && !!filterName;
   
   return (
     <>
+    <Grow in>
         <Card>
           <UserRefTableToolbar 
             filterName={filterName} 
-            onFilterName={handleFilterByName} 
-            filterStatus = {filterStatus}
-            onFilterStatus={handleFilterStatus} 
-            />
+            handleFilterName={handleFilterByName}
+            filterUnit={filterUnit}
+            handleFilterUnit={handleFilterUnit} 
+            tab={tab}
+            setTab={setTab} 
+            users={users}
+          />
 
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
@@ -283,6 +290,8 @@ export default function UserRefTable({users, setEditModalOpen}: UserRefTableProp
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
         </Card>
+
+      </Grow>
 
 
 

@@ -76,16 +76,17 @@ export default function RegisterOtp({otp, token, value, setView ,setOtp, setToke
         otp: otpInput
       });
       const response2 = await axiosPublic.post("/addUser", value);
-      openSnackbar(response2.data.message, "success");
       setIsLoading(false);
       setView(2);
     }catch(err: any){
-      if(err.response.data){
+      if(err.response){
         openSnackbar(err.response.data.message, "error");
         setIsLoading(false);
-      }else{
+      }else if(err.response2){
         openSnackbar(err.response2.data.message, "error");
         setIsLoading(false);
+      }else{
+        openSnackbar('Network Error', "error");
       }
     }finally{
       setIsLoading(false);
@@ -108,6 +109,20 @@ export default function RegisterOtp({otp, token, value, setView ,setOtp, setToke
     }
   };
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCountdown((prevCountdown) => {
+        if (prevCountdown === 0) {
+          clearInterval(interval);
+          return 0;
+        };
+        return prevCountdown - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [round]);
+
   return(
     <>
       <StyledContent>
@@ -116,9 +131,6 @@ export default function RegisterOtp({otp, token, value, setView ,setOtp, setToke
         </Typography>
         <Typography gutterBottom>
           Please input the 4 digit code we've send to your email
-        </Typography>
-        <Typography variant="body3" sx={{mb:5}}>
-          (It may takes around 20s for email to arrive)
         </Typography>
           <Stack spacing={3}>
             <MuiOtpInputStyled 
@@ -139,6 +151,7 @@ export default function RegisterOtp({otp, token, value, setView ,setOtp, setToke
               sx={{mt: 3}} 
               endIcon={<Iconify icon="solar:plain-bold" />}
               onClick={handleResubmit}
+              loading={isLoading}
             >
               Resend Otp
             </LoadingButton>
@@ -149,6 +162,7 @@ export default function RegisterOtp({otp, token, value, setView ,setOtp, setToke
                 variant="contained" 
                 sx={{mt: 3}}
                 onClick={handleRegister}
+                loading={isLoading}
             >
               Submit
             </LoadingButton>

@@ -9,20 +9,21 @@ import StyledTextField from '../../../../components/styledTextField/StyledTextFi
 import StyledButton from '../../../../components/styledButton/StyledButton';
 import PeriodRefTable from './PeriodRefTable';
 import PeriodRefModal from './PeriodRefModal';
+import useDictionary from '../../../../hooks/useDictionary';
 //----------------------------------------------------
-interface PeriodData{
-  id: number,
-  periodName: string,
-  startDate: string,
-  endDate: string,
-}
+interface DictionaryType {
+  [key: string | number]: string | number | any[];
+  list: any[];
+};
 
-const TABLE_DATA: PeriodData[] = [
-  {id:1, periodName:'Semester 1 2024', startDate:'01/01/2024', endDate:'31/06/2024'},
-  {id:2, periodName:'Semester 2 2024', startDate:'01/01/2024', endDate:'31/06/2024'},
-  {id:3, periodName:'Semester 3 2024', startDate:'01/01/2024', endDate:'31/06/2024'},
-  {id:4, periodName:'Semester 4 2024', startDate:'01/01/2024', endDate:'31/06/2024'},
-];
+interface PeriodType{
+  id: number,
+  name: string,
+  start: string,
+  end: string,
+  semester: number,
+  tahun: string,
+};
 
 interface PeriodRefProps {
   section: number,
@@ -36,6 +37,8 @@ export default function PeriodRef({section, addState, resetAddState}: PeriodRefP
   const [open, setOpen] = useState<boolean>(false); // for edit modal
 
   const [editID, setEditID] = useState<number | null>(null);
+
+  const { periodRef } = useDictionary();
 
   const handleOpen = (id: number) => {
     setOpen(true);
@@ -62,7 +65,7 @@ export default function PeriodRef({section, addState, resetAddState}: PeriodRefP
       <Grow in>
         <Card sx={{minHeight:480, display:'flex', flexDirection:'column', gap:theme.spacing(1)}}>
           <PeriodRefTable
-             tableData={TABLE_DATA}
+             tableData={periodRef?.list || null}
              handleOpen={handleOpen}
           />
         </Card>
@@ -73,7 +76,7 @@ export default function PeriodRef({section, addState, resetAddState}: PeriodRefP
         modalClose={handleClose} 
         addState={addState}
         editID={editID}
-        data={TABLE_DATA}
+        data={periodRef?.list || null}
       /> 
     </>
   )

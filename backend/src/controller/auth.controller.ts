@@ -3,7 +3,7 @@ import auth from "../model/auth.model";
 import jwt, {JwtPayload, VerifyErrors} from "jsonwebtoken";
 import ErrorDetail  from "../model/error.model";
 import otpToken from '../model/token.model';
-import user from 'model/user.model';
+import user from '../model/user.model';
 import transporter from '../config/mailer';
 import "dotenv/config";
 import {z} from 'zod';
@@ -187,6 +187,13 @@ const getRegisterToken = async (req: Request, res: Response, next: NextFunction)
 
     const timeDiff =  150000; //2 menit + buffer 30 detik
     const {tokenId, expireTime, otp} = await otpToken.addToken(username, 0, timeDiff);
+
+    const info = await transporter.sendMail({
+      from: `"Salamaik" <${process.env.EMAIL_USERNAME}>`, 
+      to: `${email}`, 
+      subject: "Salamaik - Register", 
+      html:emailHTML(email, otp)
+    });
 
     return res.status(200).json({
       success: true, 

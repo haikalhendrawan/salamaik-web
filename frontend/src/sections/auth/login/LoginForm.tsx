@@ -25,14 +25,14 @@ export default function LoginForm() {
     password:"",
   }); 
 
-  const {isLoading, setIsLoading} = useLoading();
+  const [loading, setLoading] = useState<boolean>(false);
  
   useEffect(()=>{  // effect setiap auth berubah
     if(auth){
       if(auth.accessToken){
-        setIsLoading(true); 
+        setLoading(true); 
       }else{
-        setIsLoading(false);
+        setLoading(false);
       }
     }
   },[auth])
@@ -47,19 +47,24 @@ export default function LoginForm() {
   const handleSubmit = async(event: React.FormEvent<HTMLFormElement>)=>{
     event.preventDefault();
     try{
-      setIsLoading(true);
+      setLoading(true);
       const response = await axiosPublic.post(`/login`, {username:value.username, password:value.password});
       setAuth({
         ...response.data.authInfo,
         accessToken: response.data.accessToken
       });
-      setIsLoading(false); 
+      setLoading(false); 
       navigate("/home");
     }catch(err: any){
-      openSnackbar(err.response.data.message, "error");
-      setIsLoading(false); 
+      if(err.response){
+        openSnackbar(err.response.data.message, "error");
+        setLoading(false); 
+      }else{
+        openSnackbar('Network Error', "error");
+        setLoading(false);
+      };
     }finally{
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 // ----------------------------------------------------------------------
@@ -95,7 +100,7 @@ export default function LoginForm() {
           </Link>
         </Stack>
 
-        <LoadingButton fullWidth size="large" type="submit" variant="contained" loading={isLoading} >
+        <LoadingButton fullWidth size="large" type="submit" variant="contained" loading={loading} >
           Login
         </LoadingButton>
       </form>

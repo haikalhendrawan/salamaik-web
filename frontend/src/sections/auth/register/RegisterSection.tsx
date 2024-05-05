@@ -102,7 +102,7 @@ export default function RegisterSection() {
     setValue({username: "", name: "", email: "", password: "", kppn: "", gender: 0});
     setError({username: false, name: false, email: false, password: false, kppn: false, gender: false});
     setErrorMessage({username: '', name: '', email: '', password: '', kppn: '', gender: ''});
-  }
+  };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement> | SelectChangeEvent<unknown>) => {
     setValue((prev) => ({...prev, [event.target.name]: event.target.value}));

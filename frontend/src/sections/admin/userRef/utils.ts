@@ -33,21 +33,19 @@ export function getComparator(order: string, orderBy: string) {
     : (a: any, b: any) => -descendingComparator(a, b, orderBy);
 }
 
-export function applySortFilter(array: any[], comparator: any, query: string) {
+export function applySortFilter(array: any[], comparator: any, query: string, status: number, unit: string) {
+  const filteredData = array.filter((item) => {
+    const statusMatches = item.status===status || status===null || status===2;
+    const unitMatches = item.kppn===unit || unit===null || unit==='';
+    const queryMatches =
+      !query ||
+      Object.values(item).some(
+        (value) => typeof value === 'string' && value.toLowerCase().includes(query.toLowerCase())
+      );
 
-  // const filteredData = array.filter((item) => {
-  //   const date = new Date(Date.parse(item.date));
-  //   const yearMatches = !tahun || date.getFullYear() === tahun;
-  //   const queryMatches =
-  //     !query ||
-  //     Object.values(item).some(
-  //       (value) => typeof value === 'string' && value.toLowerCase().includes(query.toLowerCase())
-  //     );
-  //   const statusMatches = status===null || item.status === status;
-
-  //   return yearMatches && monthMatches && queryMatches && statusMatches;
-  // });
-  const filteredData = array;
+    return queryMatches && statusMatches && unitMatches;
+  });
+  // const filteredData = array;
   const stabilizedThis = array.map((el, index) => [el, index]);
   stabilizedThis.sort((a, b) => comparator(a[0], b[0]));
 

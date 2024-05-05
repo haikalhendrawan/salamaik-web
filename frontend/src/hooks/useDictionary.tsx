@@ -7,13 +7,55 @@ import useSnackbar from './display/useSnackbar';
 interface DictionaryType {
   [key: string | number]: string | number | any[];
   list: any[];
-}
+};
+
+interface PeriodType{
+  id: number,
+  name: string,
+  start: string,
+  end: string,
+  semester: number,
+  tahun: string,
+};
+
+interface PeriodRefType{
+  [key: string | number]: string | number | any[] | null;
+  list: PeriodType[] | null ;
+};
+
+interface KomponenRefType{
+  id: number,
+  title: string,
+  bobot: number,
+  detail?: string,
+  alias?: string,
+};
+
+interface SubKomponenRefType{
+  id: number,
+  komponen_id: number,
+  title: string,
+  detail?: string,
+  alias?: string,
+};
+
+interface SubSubKomponenRefType{
+  id: number,
+  komponen_id: number,
+  subkomponen_id: number,
+  title: string,
+  detail?: string,
+  alias?: string,
+};
 
 interface DictionaryContextType{
   statusRef: DictionaryType | null,
-  periodRef: DictionaryType | null,
+  periodRef: PeriodRefType | null,
   kppnRef: DictionaryType | null,
   roleRef: DictionaryType | null,
+  komponenRef: KomponenRefType[] | null,
+  subKomponenRef: SubKomponenRefType[] | null,
+  subSubKomponenRef: SubSubKomponenRefType[] | null,
 };
 
 type DictionaryProviderProps = {
@@ -25,7 +67,10 @@ const DictionaryContext = createContext<DictionaryContextType>({
   statusRef: null,
   periodRef: null,
   kppnRef: null,
-  roleRef: null
+  roleRef: null,
+  komponenRef: null,
+  subKomponenRef: null,
+  subSubKomponenRef: null
 });
 
 const DictionaryProvider = ({children}: DictionaryProviderProps) => {
@@ -45,6 +90,12 @@ const DictionaryProvider = ({children}: DictionaryProviderProps) => {
 
   const [kppnRef, setKPPNRef] = useState(null);
 
+  const [komponenRef, setKomponenRef] = useState(null);
+
+  const [subKomponenRef, setSubKomponenRef] = useState(null);
+
+  const [subSubKomponenRef, setSubSubKomponenRef] = useState(null);
+
   const getPeriod = async() => {
     try{
       const response = await axiosJWT.get("/getAllPeriod");
@@ -52,6 +103,7 @@ const DictionaryProvider = ({children}: DictionaryProviderProps) => {
       await response.data.rows.map((row: any) => {
         obj[row.id] = row.name;
       });
+      obj.list = response.data.rows;
       setPeriodRef(obj);
     }catch(err: any){
       console.log(err);
@@ -86,18 +138,56 @@ const DictionaryProvider = ({children}: DictionaryProviderProps) => {
     }
   };
 
+  const getKomponen = async() => {
+    try{
+      const response = await axiosJWT.get("/getAllKomponen");
+      setKomponenRef(response.data.rows);
+    }catch(err: any){
+      console.log(err);
+    }
+  };
+
+  const getSubKomponen = async() => {
+    try{
+      const response = await axiosJWT.get("/getAllSubKomponen");
+      setSubKomponenRef(response.data.rows);
+    }catch(err: any){
+      console.log(err);
+    }
+  };
+
+  const getSubSubKomponen = async() => {
+    try{
+      const response = await axiosJWT.get("/getAllSubSubKomponen");
+      setSubSubKomponenRef(response.data.rows);
+    }catch(err: any){
+      console.log(err);
+    }
+  };
+
   useEffect(() => {
     const render = async() => {
       getPeriod();
       getKPPN();
       getRole();
+      getKomponen();
+      getSubKomponen();
+      getSubSubKomponen();
     };
     
     auth?render():null
   }, [auth])
 
   return(
-    <DictionaryContext.Provider value={{statusRef, periodRef, kppnRef, roleRef}}>
+    <DictionaryContext.Provider value={{
+      statusRef, 
+      periodRef, 
+      kppnRef, 
+      roleRef, 
+      komponenRef, 
+      subKomponenRef,
+      subSubKomponenRef
+      }}>
       {children}
     </DictionaryContext.Provider>
   )
