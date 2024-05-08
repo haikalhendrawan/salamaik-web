@@ -12,6 +12,7 @@ import periodRoute from './routes/periodRoute';
 import profileRoute from './routes/profileRoute';
 import userRoute from './routes/userRoute';
 import komponenRoute from './routes/komponenRoute';
+import checklistRoute from './routes/checklistRoute'
 //middleware
 import errorHandler from './middleware/errorHandler';
 // ------------------------------------------------------------
@@ -32,6 +33,7 @@ app.use(notifRoute);
 app.use(profileRoute);
 app.use(userRoute);
 app.use(komponenRoute);
+app.use(checklistRoute);
 app.use(errorHandler);
 
 app.get('/', (req: Request, res: Response) => {
