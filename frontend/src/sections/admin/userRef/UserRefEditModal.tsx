@@ -221,10 +221,10 @@ export default function UserRefEditModal({editId, users, modalOpen, modalClose}:
       };
    
       const response = await axiosJWT.post("/editUser", value);
-      const response2 = await axiosJWT.post("updateRole", {
+      const response2 = await axiosJWT.post("/updateRole", {
         oldRole: users?.find((user) => user.id === editId)?.role,
         newRole: value.role,
-        adminRole: auth.role,
+        adminRole: auth?.role,
         targetId: editId
       });
 
@@ -234,14 +234,11 @@ export default function UserRefEditModal({editId, users, modalOpen, modalClose}:
       handleReset();
       modalClose();
     }catch(err: any){
-      if(err.response2){
-        openSnackbar(err.response2.data.message, "error");
-        setIsLoading(false);
-      }else if(err.response && err.response2){
-        openSnackbar(`${err.response.data.message} and ${err.response2.data.message}`, "error");
+      if(err.response){
+        openSnackbar(err.response.data.message, "error");
         setIsLoading(false);
       }else{
-        openSnackbar(err.response.data.message, "error");
+        openSnackbar("Network Error", "error");
         setIsLoading(false);
       }
     }finally{

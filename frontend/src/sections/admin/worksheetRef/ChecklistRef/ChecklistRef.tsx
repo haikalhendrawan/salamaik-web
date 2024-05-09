@@ -5,7 +5,8 @@ import Label from '../../../../components/label';
 import ChecklistRefTable from './ChecklistRefTable';
 import ChecklistRefModal from './ChecklistRefModal';
 import ChecklistFileModal from './ChecklistFileModal';
-//----------------------------------------------------
+import useChecklist from './useChecklist';
+//---------------------------------------------------------------------------------------------
 interface ChecklistData{
   id: number,
   checklist:string,
@@ -29,7 +30,7 @@ interface ChecklistRefProps {
   addState: boolean,
   resetAddState: () => void,
 }
-
+//--------------------------------------------------------------------------------------------
 export default function ChecklistRef({section, addState, resetAddState}: ChecklistRefProps) {
   const theme = useTheme();
 
@@ -39,7 +40,9 @@ export default function ChecklistRef({section, addState, resetAddState}: Checkli
 
   const [openFile, setOpenFile] = useState<boolean>(false); // for preview file modal
 
-  const [file, setFile] = useState<string | undefined>(''); // for preview file modal
+  const [file, setFile] = useState<string | null>(null); // for preview file modal
+
+  const [fileOption, setFileOption] = useState<1 | 2>(1); // for preview file modal
 
   const [tabValue, setTabValue] = useState(0);
 
@@ -53,12 +56,16 @@ export default function ChecklistRef({section, addState, resetAddState}: Checkli
     resetAddState();
   };
 
-  const handleOpenFile = () => {
+  const handleOpenFile = (id: number, option: 1 | 2) => {
     setOpenFile(true);
+    setEditID(id);
+    setFileOption(option);
   };
 
   const handleCloseFile = () => {
     setOpenFile(false)
+    setEditID(null);
+    setFileOption(1);
   };
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: 0 | 1) => { // setiap tab komponen berubah
@@ -122,9 +129,10 @@ export default function ChecklistRef({section, addState, resetAddState}: Checkli
           </Tabs>
           
           <ChecklistRefTable 
-            tableData={TABLE_DATA}
             handleOpen={handleOpen}
             fileOpen={handleOpenFile}
+            setDeleteFile={() => {}}
+            setFile={setFile}
           />
         </Card>
       </Grow>
@@ -140,7 +148,9 @@ export default function ChecklistRef({section, addState, resetAddState}: Checkli
       <ChecklistFileModal
         open={openFile}
         modalClose={handleCloseFile}
-        file={'https://jdih.kemenkeu.go.id/download/a321969c-4ce0-4073-81ce-df35023750b1/PER_1_PB_2023-Perubahan%20Atas%20PERDIRJEN%20No.PER-24_PB_2019%20tentang%20Pedoman%20Pembinaan%20&%20Supervisi%20Pelaksanaan%20Tugas%20KPPN.pdf'}
+        fileName={file}
+        editID={editID}
+        fileOption={fileOption}
       />
     </>
   )

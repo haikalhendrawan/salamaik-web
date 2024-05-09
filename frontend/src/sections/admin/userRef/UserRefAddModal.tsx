@@ -157,8 +157,13 @@ export default function UserRefAddModal({modalOpen, modalClose}: UserRefAddModal
         handleReset();
         modalClose();
       }catch(err: any){
-        openSnackbar(err.response.data.message, "error");
-        setIsLoading(false);
+        if(err.response){
+          openSnackbar(err.response.data.message, "error");
+          setIsLoading(false);
+        }else{
+          openSnackbar("Network Error", "error");
+        }
+
       }finally{
         setIsLoading(false);
       }

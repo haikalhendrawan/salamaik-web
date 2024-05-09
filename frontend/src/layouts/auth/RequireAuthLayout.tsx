@@ -45,8 +45,6 @@ export default function RequireAuthLayout({allowedRoles}: RqAuthLayoutProp) {
 
   const location = useLocation();
 
-  const pathName = location.pathname;
-
   if (!auth || !auth.accessToken){
     return <Navigate to="/login" state={{from:location}} replace />
   };

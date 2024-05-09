@@ -1,6 +1,6 @@
-import {useState, useEffect, useRef} from'react';
+import {useState, useEffect, useRef, useMemo} from'react';
 import {Stack, Button, Box, Typography, Table, IconButton, TableSortLabel,
-  Tooltip, TableHead, Grow, TableBody, TableRow, TableCell, Select, MenuItem, Tabs, Tab, TableContainer} from '@mui/material';
+  Tooltip, TableHead, Grow, TableBody, TableRow, TableCell, Grid, TableContainer} from '@mui/material';
 import { useTheme, styled } from '@mui/material/styles';
 import Iconify from '../../../../components/iconify';
 import Label from '../../../../components/label';
@@ -8,58 +8,81 @@ import Scrollbar from '../../../../components/scrollbar';
 import StyledTextField from '../../../../components/styledTextField/StyledTextField';
 import StyledButton from '../../../../components/styledButton/StyledButton';
 import ChecklistOpsiModal from './ChecklistOpsiModal';
+import useLoading from '../../../../hooks/display/useLoading';
+import useSnackbar from '../../../../hooks/display/useSnackbar';
+import useAxiosJWT from '../../../../hooks/useAxiosJWT';
+import useChecklist from './useChecklist';
 //----------------------------------------------------
-interface OpsiData{
-  opsiID: number,
-  checklistID: number,
-  opsiTitle: string,
-  opsiValue: number
+const VisuallyHiddenInput = styled('input')({
+  clip: 'rect(0 0 0 0)',
+  clipPath: 'inset(50%)',
+  height: 1,
+  overflow: 'hidden',
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
+  whiteSpace: 'nowrap',
+  width: 1,
+  });
+
+interface ChecklistType{
+  id: number,
+  title: string, 
+  header: string | null,
+  komponen_id: number,
+  subkomponen_id: number | null,
+  subsubkomponen_id: number | number,
+  standardisasi: number | null, 
+  matrix_title: string | null, 
+  file1: string | null,
+  file2: string | null,
+  opsi: OpsiType[] | null
 };
 
-const OPSI_DATA: OpsiData[] = [
-  { opsiID:0, checklistID:0, opsiTitle:'Title 1', opsiValue:10},
-  { opsiID:1, checklistID:1, opsiTitle:'Title 2', opsiValue:5},
-  { opsiID:2, checklistID:2, opsiTitle:'Title 3', opsiValue:3},
-  { opsiID:3, checklistID:3, opsiTitle:'Title 4', opsiValue:1},
-  { opsiID:4, checklistID:4, opsiTitle:'Title 4', opsiValue:1},
-];
+interface OpsiType{
+  id: number,
+  title: string, 
+  value: number,
+  checklist_id: number
+};
 
 const TABLE_HEAD = [
   { id: 'id', label: 'Id', alignRight: false },
   { id: 'checklist', label: 'Judul Checklist', alignRight: false },
-  { id: 'kriteria', label: 'Header Kriteria', alignRight: false },
+  { id: 'kriteria', label: 'Header', alignRight: false },
   { id: 'opsi', label: 'Opsi', alignRight: false },
   { id: 'dokumen', label: 'Contoh Dokumen', alignRight: false },
   { id: 'standardisasiKPPN', label: 'Standardisasi KPPN', alignRight: false },
   { id: 'action', label: 'Action', alignRight: false },
 ];
 
-interface ChecklistData{
-  id: number,
-  checklist:string,
-  kriteria:string,
-  standardisasiKPPN:boolean,
-  subsubkomponen:number,
-  subkomponen: number,
-  komponen:number,
-  numChecklist?: number,
-};
-
 interface ChecklistRefTableProps {
-  tableData: ChecklistData[],
   handleOpen: (id: number)=>void,
-  fileOpen: () => void
+  fileOpen: (id: number, option: 1 | 2) => void,
+  setDeleteFile: React.Dispatch<React.SetStateAction<() => void>>,
+  setFile: React.Dispatch<React.SetStateAction<string | null>>,
 };
 
 // ---------------------------------------------------
-export default function ChecklistRefTable({tableData, handleOpen, fileOpen}: ChecklistRefTableProps) {
+export default function ChecklistRefTable({handleOpen, fileOpen, setDeleteFile, setFile}: ChecklistRefTableProps) {
   const theme = useTheme();
+
+  const {isLoading, setIsLoading} = useLoading();
+
+  const {openSnackbar} = useSnackbar();
+
+  const {checklist, getChecklist} = useChecklist();
+
+  const axiosJWT = useAxiosJWT();
 
   const [open, setOpen] = useState<boolean>(false); // Opsi Modal
 
   const [editID, setEditID] = useState<number>(0); // Opsi Modal
 
+  const [opsiID, setOpsiID] = useState<number>(0); // Opsi Modal
+
   const [addState, setAddState] = useState<boolean>(false); // Opsi Modal
+
 
   const handleClose = () => {  // Opsi Modal
     setOpen(false);
@@ -71,11 +94,46 @@ export default function ChecklistRefTable({tableData, handleOpen, fileOpen}: Che
     setOpen(true); 
   };
 
-  const handleEditOpsi = (id: number) => {
+  const handleEditOpsi = (id: number, opsiID: number) => {
     setEditID(id);
+    setOpsiID(opsiID);
     setAddState(false);
     setOpen(true);
-  }
+  };
+
+  const handleChangeFile = async(e: React.ChangeEvent<HTMLInputElement>, chID: number, option: number) => {
+    console.log(chID)
+    e.preventDefault();
+    if(!e.target.files){return}
+
+    const selectedFile = e.target.files[0];
+    let fileOption;
+
+    if(option === 1){
+      fileOption = 1;
+    }else if(option === 2){
+      fileOption = 2;
+    };
+
+    try{
+      setIsLoading(true);
+      const formData = new FormData();
+      formData.append("id", chID.toString());
+      formData.append("option", fileOption?.toString() || "1");
+      formData.append("file", selectedFile);
+      const response = await axiosJWT.post(`/editChecklistFile`, formData, {
+        headers:{"Content-Type": "multipart/form-data"}
+      });
+      await getChecklist();
+      setIsLoading(false); 
+    }catch(err: any){
+      setIsLoading(false);
+      openSnackbar(`Upload failed, ${err.response.data.message}`, "error");
+    }finally{
+      setIsLoading(false);
+    }
+  };
+
 
   return (
     <>
@@ -84,7 +142,7 @@ export default function ChecklistRefTable({tableData, handleOpen, fileOpen}: Che
           <Table>
             <TableHead>
               <TableRow>
-                {TABLE_HEAD.map((headCell) => (
+                {TABLE_HEAD.map((headCell, index) => (
                   <TableCell
                     key={headCell.id}
                     align={'center'}
@@ -99,84 +157,84 @@ export default function ChecklistRefTable({tableData, handleOpen, fileOpen}: Che
               </TableRow>
             </TableHead>
             <TableBody>
-              {tableData.map((row) => 
+              {useMemo(() => checklist.map((row) => 
                 <TableRow hover key={row.id} tabIndex={-1}>
                   <TableCell align="justify">{row.id}</TableCell>
 
-                  <TableCell align="center" sx={{fontSize:12}}>{row.checklist}</TableCell>
+                  <TableCell align="center" sx={{fontSize:12}}>{row.title}</TableCell>
 
-                  <TableCell align="justify" sx={{fontSize:12}}>{row.kriteria}</TableCell>
+                  <TableCell align="justify" sx={{fontSize:12}}>{row.header}</TableCell>
 
                   <TableCell align="center">
                     <Stack direction='row' spacing={1} alignContent="center" alignItems="center" justifyContent="center">
-                      <Label color={'success'} sx={{cursor: 'pointer'}} onClick={() => handleEditOpsi(row.id)}>
-                        10
-                      </Label>
-                      <Label color={'warning'} sx={{cursor: 'pointer'}} onClick={() => handleEditOpsi(row.id)}>
-                        7
-                      </Label>
-                      <Label color={'warning'} sx={{cursor: 'pointer'}} onClick={() => handleEditOpsi(row.id)}>
-                        5
-                      </Label>
-                      <Label color={'pink'} sx={{cursor: 'pointer'}} onClick={() => handleEditOpsi(row.id)}>
-                        0
-                      </Label>
-                      <IconButton onClick={() => handleEditOpsi(row.id)}>
+                      {row?.opsi?.map((item, index) => 
+                        <Label
+                          key={index} 
+                          color={item.value===10?'success':item.value===0?'pink':'warning'} 
+                          sx={{cursor: 'pointer'}} 
+                          onClick={() => handleEditOpsi(row.id, item.id)}>
+                          {item.value}
+                        </Label>
+                      )}
+
+                      <IconButton>
                         <Iconify sx={{color:theme.palette.grey[500]}} icon="solar:add-circle-bold"/>
                       </IconButton>
-
-                      {/* <StyledButton aria-label="10" variant='contained' size='small' color='success' onClick={() => handleEditOpsi(row.id)}>
-                        10
-                      </StyledButton>
-
-                      <StyledButton aria-label="7" variant='contained' size='small' color='warning' onClick={() => handleEditOpsi(row.id)}>
-                        7
-                      </StyledButton>
-
-                      <StyledButton aria-label="5" variant='contained' size='small' color='warning' onClick={handleAddOpsi}>
-                        5
-                      </StyledButton>
-
-                      <StyledButton aria-label="5" variant='contained' size='small' color='pink' onClick={() => handleEditOpsi(row.id)}>
-                        0
-                      </StyledButton>  */}
-
-                      {/* <StyledButton aria-label="5" variant='contained' size='small' color='white' onClick={() => handleEditOpsi(row.id)}>
-                        <Iconify icon="solar:add-circle-bold-duotone"/>
-                      </StyledButton>  */}
                     </Stack>
                   </TableCell>
 
                   <TableCell align="center" >
                     <Stack direction='row' spacing={0}>
-                      <IconButton color='secondary' onClick={fileOpen}>
-                        <Iconify icon="solar:file-bold-duotone"/>
-                      </IconButton>
-                      <IconButton>
-                        <Iconify sx={{color:theme.palette.grey[500]}} icon="solar:add-circle-bold"/>
-                      </IconButton>
-                      {/* <StyledButton 
-                        aria-label="10" 
-                        variant='contained' 
-                        size='small' 
-                        color='secondary'
-                        onClick={fileOpen}
+                      <IconButton 
+                        color='secondary' 
+                        onClick={() => {fileOpen(row.id, 1); setFile(row.file1)}}  
+                        sx={{display: row.file1?'block':'none'}}
                       >
                         <Iconify icon="solar:file-bold-duotone"/>
-                      </StyledButton>
+                      </IconButton>
 
-                      <StyledButton aria-label="7" variant='contained' size='small' color='secondary'>
+                      <IconButton 
+                        color='secondary' 
+                        onClick={() => {fileOpen(row.id, 2); setFile(row.file2)}} 
+                        sx={{display: row.file2?'block':'none'}}
+                      >
                         <Iconify icon="solar:file-bold-duotone"/>
-                      </StyledButton> 
+                      </IconButton>
+                     
+                      <IconButton 
+                        component="label"
+                        sx={{display: row.file1?'none':'block'}}
+                      >
+                        <Iconify 
+                          sx={{color:theme.palette.grey[500]}} 
+                          icon="solar:add-circle-bold"
+                        />
+                        <VisuallyHiddenInput 
+                        type='file'
+                        accept='image/*,.pdf,.zip' 
+                        onChange={(e) => handleChangeFile(e, row.id, 1)} 
+                      />
+                      </IconButton>
 
-                      <StyledButton aria-label="5" variant='contained' size='small' color='white'>
-                        <Iconify icon="solar:add-circle-bold-duotone"/>
-                      </StyledButton> */}
+                       <IconButton 
+                        component="label"
+                        sx={{display: row.file2?'none':'block'}}
+                      >
+                        <Iconify 
+                          sx={{color:theme.palette.grey[500]}} 
+                          icon="solar:add-circle-bold"
+                        />
+                        <VisuallyHiddenInput 
+                        type='file'
+                        accept='image/*,.pdf,.zip' 
+                        onChange={(e) => handleChangeFile(e, row.id, 2)} 
+                      />
+                      </IconButton>
                     </Stack>
                   </TableCell>
 
                   <TableCell align="center" sx={{fontSize:12}}>
-                    {row.standardisasiKPPN?'Ya':'Tidak'}
+                    {row.standardisasi===1?'Ya':'Tidak'}
                   </TableCell>
 
                   <TableCell align="justify">
@@ -204,7 +262,7 @@ export default function ChecklistRefTable({tableData, handleOpen, fileOpen}: Che
                     </Stack>
                   </TableCell> 
                 </TableRow>
-              )}
+              ), [checklist])}
             </TableBody>
           </Table>
         </TableContainer>
@@ -215,7 +273,9 @@ export default function ChecklistRefTable({tableData, handleOpen, fileOpen}: Che
         modalClose={handleClose}
         addState={addState}
         editID={editID}
-        data={OPSI_DATA}
+        checklist= {checklist?.filter((row) => row.id===editID)?.map((row) => {return {...row}})}
+        opsi={checklist?.filter((row) => row.id===editID)?.flatMap((row) => row.opsi || [])}
+        opsiID={opsiID}
       />
     </>
   )

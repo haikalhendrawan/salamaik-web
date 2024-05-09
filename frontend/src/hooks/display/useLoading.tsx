@@ -1,4 +1,4 @@
-import { ReactNode, useState, createContext, useContext } from 'react';
+import { ReactNode, useState, useEffect, createContext, useContext } from 'react';
 // @mui
 import { useTheme, alpha, styled } from '@mui/material/styles';
 import { Grid, Container, Typography, Backdrop } from '@mui/material';
@@ -20,7 +20,7 @@ type LoadingProviderProps = {
   children: ReactNode
 };
 //------------------------------------------------------------------
-const LoadingContext = createContext<LoadingContextType>({isLoading:false, setIsLoading: () => {}});
+const LoadingContext = createContext<LoadingContextType>({isLoading: false, setIsLoading: () => {}});
 
 const LoadingProvider = ({children}: LoadingProviderProps) => {
   const theme = useTheme();

@@ -31,31 +31,62 @@ const FormDataContainer = styled(Box)(({theme}) => ({
   gap:theme.spacing(3)
 }));
 
+interface ChecklistType{
+  id: number,
+  title: string, 
+  header: string | null,
+  komponen_id: number,
+  subkomponen_id: number | null,
+  subsubkomponen_id: number | number,
+  standardisasi: number | null, 
+  matrix_title: string | null, 
+  file1: string | null,
+  file2: string | null,
+  opsi: OpsiType[] | null
+};
+
+interface OpsiType{
+  id: number,
+  title: string, 
+  value: number,
+  checklist_id: number
+};
+
 interface ChecklistOpsiModalModalProps {
   modalOpen: boolean,
   modalClose: () => void,
   addState: boolean,
-  editID: number | null,
-  data: OpsiData[]
+  editID: number,
+  checklist: ChecklistType[] | [],
+  opsi: OpsiType[] | null,
+  opsiID: number
 };
 
-interface OpsiData{
-  opsiID: number,
-  checklistID: number,
-  opsiTitle: string,
-  opsiValue: number
-};
-
-
+interface TitleType{
+  checklistTitle: string,
+  headerTitle: string
+}
 //----------------------------------------------------------------
-export default function ChecklistOpsiModal({modalOpen, modalClose, addState, editID, data}: ChecklistOpsiModalModalProps) {
+export default function ChecklistOpsiModal({
+  modalOpen, 
+  modalClose, 
+  addState,
+  editID,
+  checklist,
+  opsi, 
+  opsiID}: ChecklistOpsiModalModalProps) {
   const theme = useTheme();
 
-  const [addValue, setAddValue] = useState<OpsiData>({
-    opsiID: 0,
-    checklistID:0,
-    opsiTitle: '',
-    opsiValue: 0,
+  const [title, setTitle] = useState<TitleType>({
+    checklistTitle: '',
+    headerTitle: ''
+  });
+
+  const [addValue, setAddValue] = useState<OpsiType>({
+    id: 0,
+    title: '',
+    value: 0,
+    checklist_id:0,
   });
 
   const handleChangeAdd = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -67,18 +98,18 @@ export default function ChecklistOpsiModal({modalOpen, modalClose, addState, edi
 
   const handleResetAdd = () => {
     setAddValue({
-      opsiID: 0,
-      checklistID:0,
-      opsiTitle: '',
-      opsiValue: 5
+      id: 0,
+      title: '',
+      value: 0,
+      checklist_id:0,
     })
   };
 
-  const [editValue, setEditValue] = useState<OpsiData>({
-    opsiID: 0,
-    checklistID:0,
-    opsiTitle: '',
-    opsiValue: 0,
+  const [editValue, setEditValue] = useState<OpsiType>({
+    id: 0,
+    title: '',
+    value: 0,
+    checklist_id:0,
   });
 
   const handleChangeEdit = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -90,23 +121,28 @@ export default function ChecklistOpsiModal({modalOpen, modalClose, addState, edi
 
   const handleResetEdit = () => {
     setEditValue({
-      opsiID: data.filter((row) => row.opsiID===editID)[0].opsiID,
-      checklistID: data.filter((row) => row.opsiID===editID)[0].checklistID,
-      opsiTitle: data.filter((row) => row.opsiID===editID)[0].opsiTitle,
-      opsiValue: data.filter((row) => row.opsiID===editID)[0].opsiValue,
+      id: opsi?.filter((row) => row.id===opsiID)[0]?.id || 0,
+      title: opsi?.filter((row) => row.id===opsiID)[0]?.title || '',
+      value: opsi?.filter((row) => row.id===opsiID)[0]?.value || 0,
+      checklist_id: opsi?.filter((row) => row.id===opsiID)[0]?.checklist_id || 0,
     })
   };
 
   useEffect(() => {
-    if(data && editID){
+    if(opsi && editID && checklist){
       setEditValue({
-        opsiID: data.filter((row) => row.opsiID===editID)[0].opsiID,
-        checklistID: data.filter((row) => row.opsiID===editID)[0].checklistID,
-        opsiTitle: data.filter((row) => row.opsiID===editID)[0].opsiTitle,
-        opsiValue: data.filter((row) => row.opsiID===editID)[0].opsiValue,
+        id: opsi?.filter((row) => row.id===opsiID)[0]?.id || 0,
+        title: opsi?.filter((row) => row.id===opsiID)[0]?.title || '',
+        value: opsi?.filter((row) => row.id===opsiID)[0]?.value || 0,
+        checklist_id: opsi?.filter((row) => row.id===opsiID)[0]?.checklist_id || 0,
+      })
+
+      setTitle({
+        checklistTitle: checklist[0]?.title || '',
+        headerTitle: checklist[0]?.header || ''
       })
     }
-  }, [data, editID])
+  }, [opsi, editID])
 
 
   // ----------------------------------------------------------------------------------------
@@ -135,7 +171,7 @@ export default function ChecklistOpsiModal({modalOpen, modalClose, addState, edi
                   </Grid>
                   <Grid item xs={5} sx={{textAlign:'justify'}}>
                     <Typography variant="body3">
-                      Akurasi RPD Harian Satker secara semesteran (deviasi : (30%*deviasi unit) + (70%*deviasi nilai))
+                     {title.checklistTitle}
                     </Typography>
                   </Grid>
                 </Grid>
@@ -143,7 +179,7 @@ export default function ChecklistOpsiModal({modalOpen, modalClose, addState, edi
                 <Grid container sx={{ mb: 2, ml: 4}}>
                   <Grid item xs={2}>
                     <Typography variant="body1" fontWeight={'bold'} >
-                      Header Kriteria
+                      Header
                     </Typography>
                   </Grid>
                   <Grid item xs={1}>
@@ -153,7 +189,7 @@ export default function ChecklistOpsiModal({modalOpen, modalClose, addState, edi
                   </Grid>
                   <Grid item xs={5} sx={{textAlign:'justify'}}>
                     <Typography variant="body3">
-                      Berdasarkan tingkat deviasi RPD dari aplikasi MonSAKTI/OMSPAN pada modul renkas 
+                      {title.headerTitle} 
                     </Typography>
                   </Grid>
                 </Grid>
@@ -166,13 +202,13 @@ export default function ChecklistOpsiModal({modalOpen, modalClose, addState, edi
                         name="opsiValue" 
                         label='Nilai'
                         labelId="opsiValue-select-label"
-                        value={addState? addValue.opsiValue : editValue.opsiValue}
+                        value={addState? addValue.value : editValue.value}
                         sx={{typography:'body2', fontSize:14, height:'100%'}}
                       >
-                        <MenuItem key={0} sx={{fontSize:14}} value={0}>10</MenuItem>
-                        <MenuItem key={1} sx={{fontSize:14}} value={1}>7</MenuItem>
-                        <MenuItem key={2} sx={{fontSize:14}} value={2}>5</MenuItem>
-                        <MenuItem key={3} sx={{fontSize:14}} value={3}>0</MenuItem>
+                        <MenuItem key={0} sx={{fontSize:14}} value={0}>0</MenuItem>
+                        <MenuItem key={1} sx={{fontSize:14}} value={5}>5</MenuItem>
+                        <MenuItem key={2} sx={{fontSize:14}} value={7}>7</MenuItem>
+                        <MenuItem key={3} sx={{fontSize:14}} value={10}>10</MenuItem>
                       </Select>
                     </FormControl>
 
@@ -182,7 +218,7 @@ export default function ChecklistOpsiModal({modalOpen, modalClose, addState, edi
                         label="Kriteria"
                         multiline
                         minRows={2}
-                        value={ addState? addValue.opsiTitle : editValue.opsiTitle}
+                        value={ addState? addValue.title : editValue.title}
                         onChange={addState? handleChangeAdd : handleChangeEdit}
                       />
                     </FormControl>
@@ -208,49 +244,43 @@ export default function ChecklistOpsiModal({modalOpen, modalClose, addState, edi
                   </Button>
                 </Stack>
 
-                <Stack sx={{width: '100%', mt: 4}}>
+                {/* <Stack sx={{width: '100%', mt: 4}}>
                   <Divider />
-                </Stack>
+                </Stack> */}
 
                 <Typography variant="h6" sx={{ mb: 2 }}>
                   Opsi Eksisting
                 </Typography>
 
-                <Grid container sx={{ml: 4}}>
-                  <Grid item xs={2}>
-                    <Typography variant="body1" fontWeight={'bold'} color='success.main'>
-                      10
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={1}>
-                    <Typography variant="body1" fontWeight={'bold'}>
-                      : 
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={5} sx={{textAlign:'justify'}}>
-                    <Typography variant="body3">
-                      Nilai Deviasi antara 0 s.d. 1,99%
-                    </Typography>
-                  </Grid>
+                {opsi?.map((row) => (
+                  <Grid 
+                    container 
+                    sx={{ ml: 4, 
+                          backgroundColor: opsi?.filter((row) => row.id===opsiID)[0]?.value === row.value
+                                ?theme.palette.grey[300]
+                                : null,
+                        }}
+                  >
+                    <Grid item xs={2}>
+                      <Typography 
+                        variant="body1" 
+                        fontWeight={'bold'} 
+                        color={row.value===10?'success.main':row.value===0?'error.main':'warning.main'}>
+                        {row.value}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={1}>
+                      <Typography variant="body1" fontWeight={'bold'}>
+                        : 
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={5} sx={{textAlign:'justify'}}>
+                      <Typography variant="body3">
+                        {row.title}
+                      </Typography>
+                    </Grid>
                 </Grid>
-
-                <Grid container sx={{ml: 4}}>
-                  <Grid item xs={2}>
-                    <Typography variant="body1" fontWeight={'bold'} color='warning.main'>
-                      5
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={1}>
-                    <Typography variant="body1" fontWeight={'bold'}>
-                      : 
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={5} sx={{textAlign:'justify'}}>
-                    <Typography variant="body3">
-                      Nilai Deviasi antara 2 s.d. 5%
-                    </Typography>
-                  </Grid>
-                </Grid>
+                ))}
 
               </FormDataContainer>
 

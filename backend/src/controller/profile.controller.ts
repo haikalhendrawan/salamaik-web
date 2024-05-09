@@ -1,7 +1,7 @@
 import {Request, Response, NextFunction} from 'express';
 import profile from '../model/profile.model';
 import multer from 'multer';
-import uploadPP from '../config/multer';
+import {uploadPP} from '../config/multer';
 import ErrorDetail from '../model/error.model';
 // -------------------------------------------------
 

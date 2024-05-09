@@ -164,7 +164,7 @@ export default function General(){
     })
   };
 
-  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarChange = async(e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     if(!e.target.files){return}
 
@@ -172,7 +172,7 @@ export default function General(){
     try{
       setIsLoading(true);
       const formData = new FormData();
-      formData.append("picture", selectedFile);
+      formData.append("file", selectedFile);
       const response = await axiosJWT.post(`/updateProfilePicture`, formData, {
         headers:{"Content-Type": "multipart/form-data"}
       });

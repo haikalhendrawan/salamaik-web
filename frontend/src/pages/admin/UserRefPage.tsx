@@ -6,14 +6,12 @@ import { DialogProvider } from '../../hooks/display/useDialog';
 // -----------------------------------------------------------------------
 
 export default function UserRefPage () {
-  
+
   return (
     <>
       <UserProvider>
         <DialogProvider>
-          <DictionaryProvider>
-            <UserRefSection />
-          </DictionaryProvider>
+          <UserRefSection />
         </DialogProvider>
       </UserProvider>
     </>

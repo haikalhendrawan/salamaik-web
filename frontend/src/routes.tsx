@@ -21,6 +21,7 @@ import Page404 from "./pages/guard/Page404";
 import MatrixPage from "./pages/MatrixPage";
 import MatrixKPPN from "./sections/matrix/MatrixKPPN";
 import FollowUpPage from "./pages/FollowUpPage";
+import { LoadingProvider } from "./hooks/display/useLoading";
 
 // admin
 import UserRefPage from "./pages/admin/UserRefPage";
@@ -69,6 +70,7 @@ export default function Router() {
         </Route>
       </Route>
     </Route>
+    
 
     <Route element={<PersistLogin/>}>
       <Route path="/matrix" >

@@ -1,5 +1,5 @@
 import { Helmet } from 'react-helmet-async';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Iconify from '../../components/iconify';
 import PreviewFileModal from '../../components/previewFileModal/PreviewFileModal';
@@ -7,9 +7,10 @@ import PreviewFileModal from '../../components/previewFileModal/PreviewFileModal
 import WorksheetCard from './component/WorksheetCard';
 import InstructionPopover from './component/InstructionPopover';
 import NavigationDrawer from "./component/NavigationDrawer";
+import PageLoading from '../../components/pageLoading/PageLoading';
 // @mui
 import { Container, Stack, Typography, Tabs, Tab, Grid, Paper, 
-        IconButton, Breadcrumbs, Link} from '@mui/material';
+        IconButton, Box, LinearProgress} from '@mui/material';
 import {useTheme, styled} from '@mui/material/styles';
 // -----------------------------------------------------------------------
 const SubkomponenDivider = styled(Paper)(({theme}) => ({
@@ -74,9 +75,25 @@ export default function WorksheetKPPN() {
     setOpenInstruction(false)
   };
 
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const timeout= setTimeout(() => {
+      setIsLoading(false)
+    }, 2000)
+
+    return () => {
+      clearTimeout(timeout);
+    }
+  }, []);
 
   return (
     <>
+    {isLoading 
+      ?
+        <PageLoading loadingDurationInSeconds={2}/>
+      : 
+        <>
       <Helmet>
         <title> Salamaik | Worksheet</title>
       </Helmet>
@@ -235,8 +252,9 @@ export default function WorksheetKPPN() {
 
       <InstructionPopover open={openInstruction} anchorEl={anchorEl} handleClose={handleCloseInstruction} />
 
-      <NavigationDrawer />
+      <NavigationDrawer /> </>}
     </>
   );
+  
 };
 

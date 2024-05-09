@@ -21,6 +21,7 @@ import SubKomponenRef from '../../sections/admin/worksheetRef/SubKomponenRef';
 import SubSubKomponenRef from '../../sections/admin/worksheetRef/SubSubKomponenRef';
 import BatchRef from '../../sections/admin/worksheetRef/BatchRef';
 import PeriodRefSection from '../../sections/admin/worksheetRef/PeriodRef';
+import { ChecklistProvider } from '../../sections/admin/worksheetRef/ChecklistRef/useChecklist';
 //----------------------------------------------------
 
 export default function WorksheetRefPage() {
@@ -41,7 +42,9 @@ export default function WorksheetRefPage() {
 
   const SELECT_SECTION: JSX.Element[] = [
     <WorksheetRefLanding changeSection={handleChangeSection} />,
-    <ChecklistRef section={section} addState={addState} resetAddState={resetAddState} />,
+    <ChecklistProvider>
+      <ChecklistRef section={section} addState={addState} resetAddState={resetAddState} />
+    </ChecklistProvider>,
     <KomponenRef section={section} addState={addState} resetAddState={resetAddState} />,
     <SubKomponenRef section={section} addState={addState} resetAddState={resetAddState} />,
     <SubSubKomponenRef section={section} addState={addState} resetAddState={resetAddState} />,
