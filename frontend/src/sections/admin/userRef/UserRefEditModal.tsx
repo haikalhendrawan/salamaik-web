@@ -268,7 +268,7 @@ export default function UserRefEditModal({editId, users, modalOpen, modalClose}:
   // ----------------------------------------------------------------------------------------
   return(
     <>
-      <Modal open={modalOpen} onClose={modalClose}>
+      <Modal keepMounted open={modalOpen} onClose={modalClose}>
         <Box sx={style}>
           <Scrollbar>
             <Paper sx={{height:'70vh', width:'auto', p:2}}>

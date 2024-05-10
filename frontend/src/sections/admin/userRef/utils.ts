@@ -1,3 +1,6 @@
+import { styled } from '@mui/material/styles';
+import { Button } from '@mui/material';
+
 export const visuallyHidden = {
   border: 0,
   margin: -1,
@@ -9,6 +12,18 @@ export const visuallyHidden = {
   whiteSpace: 'nowrap',
   clip: 'rect(0 0 0 0)',
 };
+
+
+export const StyledButton = styled(Button)(({ theme }) => ({
+  display: 'inline-flex',   
+  alignItems: 'center', 
+  justifyContent: 'center', 
+  paddingRight: 0,
+  paddingLeft: 0,
+  minHeight: '30px',
+  minWidth: '30px',
+  borderRadius: '12px',
+}));  
 
 
 export function descendingComparator(a: any, b: any, orderBy: string) {
@@ -45,7 +60,7 @@ export function applySortFilter(array: any[], comparator: any, query: string, st
 
     return queryMatches && statusMatches && unitMatches;
   });
-  // const filteredData = array;
+
   const stabilizedThis = array.map((el, index) => [el, index]);
   stabilizedThis.sort((a, b) => comparator(a[0], b[0]));
 

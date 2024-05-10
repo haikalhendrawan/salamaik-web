@@ -1,19 +1,23 @@
-import {useState, useEffect, useRef} from'react';
-import {Stack, Button, Box, Typography, Table, Card, Modal, FormControl, Paper, InputLabel, TableSortLabel,
-  Tooltip, TableHead, Grow, TableBody, TableRow, TableCell, Select, MenuItem, Tabs, Tab, TableContainer} from '@mui/material';
+import {useState, useEffect, useRef, useMemo} from'react';
+import {Stack, Button, Box, Typography, Modal, FormControl, Paper, InputLabel, 
+        Select, MenuItem, SelectChangeEvent} from '@mui/material';
 import { useTheme, styled } from '@mui/material/styles';
-import Iconify from '../../../../components/iconify';
-import Label from '../../../../components/label';
 import Scrollbar from '../../../../components/scrollbar';
 import StyledTextField from '../../../../components/styledTextField/StyledTextField';
 import StyledButton from '../../../../components/styledButton/StyledButton';
+import useChecklist from './useChecklist';
+import useDictionary from '../../../../hooks/useDictionary';
+import useAxiosJWT from '../../../../hooks/useAxiosJWT';
+import useSnackbar from '../../../../hooks/display/useSnackbar';
+import useLoading from '../../../../hooks/display/useLoading';
+import PageLoading from '../../../../components/pageLoading';
 // -------------------------------------------------------------------------------------------
 const style = {
   position: 'absolute',
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  height:'80vh',
+  height:'90vh',
   width: '65vw',
   bgcolor: 'background.paper',
   boxShadow: 24,
@@ -31,39 +35,66 @@ const FormDataContainer = styled(Box)(({theme}) => ({
   gap:theme.spacing(3)
 }));
 
+interface ChecklistType{
+  id: number,
+  title: string, 
+  header: string | null,
+  komponen_id: number,
+  subkomponen_id: number,
+  subsubkomponen_id: number | null,
+  standardisasi: number | null, 
+  matrix_title: string | null, 
+  file1: string | null,
+  file2: string | null,
+  opsi: OpsiType[] | null,
+  instruksi?: string | null,
+  contoh_file?: string | null
+};
+
+interface OpsiType{
+  id: number,
+  title: string, 
+  value: number,
+  checklist_id: number
+};
+
 interface ChecklistRefModalProps {
   modalOpen: boolean,
   modalClose: () => void,
   addState: boolean,
   editID: number | null,
-  data: ChecklistData[]
-};
-
-interface ChecklistData{
-  id: number,
-  checklist:string,
-  kriteria:string,
-  standardisasiKPPN:boolean,
-  subsubkomponen:number,
-  subkomponen: number,
-  komponen:number,
-  numChecklist?: number,
 };
 
 
 //----------------------------------------------------------------
-export default function ChecklistRefModal({modalOpen, modalClose, addState, editID, data}: ChecklistRefModalProps) {
-  const [addValue, setAddValue] = useState<ChecklistData>({
+export default function ChecklistRefModal({modalOpen, modalClose, addState, editID}: ChecklistRefModalProps) {
+  const {checklist, getChecklist} = useChecklist();
+
+  const axiosJWT = useAxiosJWT();
+
+  const {setIsLoading} = useLoading();
+
+  const {openSnackbar} = useSnackbar();
+
+  const {komponenRef, subKomponenRef, subSubKomponenRef} = useDictionary();
+
+  const [addValue, setAddValue] = useState<ChecklistType>({
     id: 0,
-    checklist:'',
-    standardisasiKPPN:false,
-    kriteria:'',
-    subsubkomponen:0,
-    subkomponen:0,
-    komponen: 0,
+    title: '', 
+    header: '',
+    komponen_id: 1,
+    subkomponen_id: 1,
+    subsubkomponen_id: 0,
+    standardisasi: 0, 
+    matrix_title: '', 
+    file1: null,
+    file2: null,
+    opsi: null,
+    instruksi: '',
+    contoh_file: ''
   });
 
-  const handleChangeAdd = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChangeAdd = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>) => {
     setAddValue({
       ...addValue,
       [e.target.name]:e.target.value
@@ -73,26 +104,38 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
   const handleResetAdd = () => {
     setAddValue({
       id: 0,
-      checklist:'',
-      standardisasiKPPN:false,
-      kriteria:'',
-      subsubkomponen:0,
-      subkomponen:0,
-      komponen: 0,
+      title: '', 
+      header: '',
+      komponen_id: 1,
+      subkomponen_id: 1,
+      subsubkomponen_id: 0,
+      standardisasi: 0, 
+      matrix_title: '', 
+      file1: null,
+      file2: null,
+      opsi: null,
+      instruksi: '',
+      contoh_file: ''
     })
   };
 
-  const [editValue, setEditValue] = useState<ChecklistData>({
+  const [editValue, setEditValue] = useState<ChecklistType>({
     id: 0,
-    checklist:'',
-    standardisasiKPPN:false,
-    kriteria:'',
-    subsubkomponen:0,
-    subkomponen:0,
-    komponen: 0,
+    title: '', 
+    header: '',
+    komponen_id: 1,
+    subkomponen_id: 1,
+    subsubkomponen_id: 0,
+    standardisasi: 0, 
+    matrix_title: '', 
+    file1: null,
+    file2: null,
+    opsi: null,
+    instruksi: '',
+    contoh_file: ''
   });
 
-  const handleChangeEdit = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChangeEdit = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>) => {
     setEditValue({
       ...editValue,
       [e.target.name]:e.target.value
@@ -101,35 +144,91 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
 
   const handleResetEdit = () => {
     setEditValue({
-      id: data.filter((row) => row.id===editID)[0].id,
-      checklist: data.filter((row) => row.id===editID)[0].checklist,
-      standardisasiKPPN: data.filter((row) => row.id===editID)[0].standardisasiKPPN,
-      kriteria: data.filter((row) => row.id===editID)[0]. kriteria,
-      subsubkomponen: data.filter((row) => row.id===editID)[0].subsubkomponen,
-      subkomponen: data.filter((row) => row.id===editID)[0].subkomponen,
-      komponen: data.filter((row) => row.id===editID)[0].komponen,
+      id: checklist?.filter((row) => row.id===editID)[0]?.id || 0,
+      title: checklist?.filter((row) => row.id===editID)[0]?.title || '',
+      header: checklist?.filter((row) => row.id===editID)[0]?.header || null,
+      komponen_id: checklist?.filter((row) => row.id===editID)[0]?.komponen_id || 1,
+      subkomponen_id: checklist?.filter((row) => row.id===editID)[0]?.subkomponen_id || 1,
+      subsubkomponen_id: checklist?.filter((row) => row.id===editID)[0]?.subsubkomponen_id || 0,
+      standardisasi: checklist?.filter((row) => row.id===editID)[0]?.standardisasi || 0,
+      matrix_title: checklist?.filter((row) => row.id===editID)[0]?.matrix_title || '',
+      file1: checklist?.filter((row) => row.id===editID)[0]?.file1 || null,
+      file2: checklist?.filter((row) => row.id===editID)[0]?.file2 || null,
+      opsi: checklist?.filter((row) => row.id===editID)[0]?.opsi || null,
+      instruksi: checklist?.filter((row) => row.id===editID)[0]?.instruksi || '',
+      contoh_file: checklist?.filter((row) => row.id===editID)[0]?.contoh_file || ''
     })
   };
 
+  const handleSubmitEdit = async() => {
+    const body = {
+      id: editValue.id, //if this invalid will be checked on server
+      title: editValue.title, //if this invalid will be checked on server
+      header: editValue.header===''?null:editValue.header,
+      komponen_id: editValue.komponen_id, //if this invalid will be checked on server
+      subkomponen_id: editValue.subkomponen_id, //if this invalid will be checked on server
+      subsubkomponen_id: editValue.subsubkomponen_id===0?null:editValue.subsubkomponen_id,
+      standardisasi: editValue.standardisasi===null?0:editValue.standardisasi, 
+      matrix_title: editValue.matrix_title===null?editValue.title:editValue.matrix_title, 
+      file1: editValue.file1===''?null:editValue.file1,
+      file2: editValue.file2===''?null:editValue.file2,
+      instruksi: editValue.instruksi===''?null:editValue.instruksi,
+      contoh_file: editValue.contoh_file===''?null:editValue.contoh_file
+    }
+    try{
+      setIsLoading(true);
+      const response = await axiosJWT.post("/editChecklist", body);
+      openSnackbar(response.data.message, "success");
+      setIsLoading(false);
+      modalClose();
+      getChecklist();
+    }catch(err: any){
+      if(err.response){
+        setIsLoading(false);
+        openSnackbar(err.response.data.message, "error");
+      }else{
+        setIsLoading(false);
+        openSnackbar(err.response.data.message, "error");
+      }
+    }finally{
+      setIsLoading(false);
+    }
+  }
+
   useEffect(() => {
-    if(data && editID){
+    if(checklist && editID){
       setEditValue({
-        id: data.filter((row) => row.id===editID)[0].id,
-        checklist: data.filter((row) => row.id===editID)[0].checklist,
-        standardisasiKPPN: data.filter((row) => row.id===editID)[0].standardisasiKPPN,
-        kriteria: data.filter((row) => row.id===editID)[0]. kriteria,
-        subsubkomponen: data.filter((row) => row.id===editID)[0].subsubkomponen,
-        subkomponen: data.filter((row) => row.id===editID)[0].subkomponen,
-        komponen: data.filter((row) => row.id===editID)[0].komponen,
+        id: checklist?.filter((row) => row.id===editID)[0]?.id || 0,
+        title: checklist?.filter((row) => row.id===editID)[0]?.title || '',
+        header: checklist?.filter((row) => row.id===editID)[0]?.header || null,
+        komponen_id: checklist?.filter((row) => row.id===editID)[0]?.komponen_id || 1,
+        subkomponen_id: checklist?.filter((row) => row.id===editID)[0]?.subkomponen_id || 1,
+        subsubkomponen_id: checklist?.filter((row) => row.id===editID)[0]?.subsubkomponen_id || 0,
+        standardisasi: checklist?.filter((row) => row.id===editID)[0]?.standardisasi || 0,
+        matrix_title: checklist?.filter((row) => row.id===editID)[0]?.matrix_title || '',
+        file1: checklist?.filter((row) => row.id===editID)[0]?.file1 || null,
+        file2: checklist?.filter((row) => row.id===editID)[0]?.file2 || null,
+        opsi: checklist?.filter((row) => row.id===editID)[0]?.opsi || null,
+        instruksi: checklist?.filter((row) => row.id===editID)[0]?.instruksi || '',
+        contoh_file: checklist?.filter((row) => row.id===editID)[0]?.contoh_file || ''
       })
     }
-  }, [data, editID])
+
+  }, [checklist, editID])
+
+  useEffect(() => {
+    if(addState){
+      setAddValue((prev) => ({...prev, subsubkomponen_id: 0}))
+    }else{
+      setEditValue((prev) => ({...prev, subsubkomponen_id: 0}))
+    }
+  }, [addValue.komponen_id, editValue.komponen_id])
 
 
   // ----------------------------------------------------------------------------------------
   return(
-      <>
-      <Modal open={modalOpen} onClose={modalClose}>
+    <>
+      <Modal keepMounted open={modalOpen} onClose={modalClose}>
         <Box sx={style}>
           <Scrollbar>
             <Paper sx={{height:'80vh', width:'auto', p:2}}>
@@ -138,120 +237,148 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
                 Checklist
               </Typography>
 
-                  <FormDataContainer>
-                    <Stack direction='row' spacing={2} sx={{width:'100%'}} justifyContent={'center'}>
-                      <Stack direction='column' spacing={3} sx={{width:'45%'}}>
-                        <FormControl>
-                          <StyledTextField 
-                            name="checklist" 
-                            label="Judul Checklist"
-                            multiline
-                            minRows={2}
-                            value={ addState? addValue.checklist : editValue.checklist}
-                            onChange={addState? handleChangeAdd : handleChangeEdit}
-                          />
-                        </FormControl>
+              <FormDataContainer>
+                <Stack direction='row' spacing={2} sx={{width:'100%'}} justifyContent={'center'}>
+                  <Stack direction='column' spacing={3} sx={{width:'45%'}}>
+                    <FormControl>
+                      <StyledTextField 
+                        name="title" 
+                        label="Judul Checklist"
+                        multiline
+                        minRows={2}
+                        value={ addState? addValue.title : editValue.title}
+                        onChange={addState? handleChangeAdd : handleChangeEdit}
+                      />
+                    </FormControl>
 
-                        <FormControl>
-                          <InputLabel id="komponen-select-label" sx={{typography:'body2'}}>Komponen</InputLabel>
-                          <Select 
-                            name="komponen" 
-                            label='Komponen'
-                            labelId="komponen-select-label"
-                            value={addState? addValue.komponen : editValue.komponen}
-                            sx={{typography:'body2', fontSize:14, height:'100%'}}
-                          >
-                            <MenuItem key={0} sx={{fontSize:14}} value={0}>Treasurer</MenuItem>
-                            <MenuItem key={1} sx={{fontSize:14}} value={1}>Pengelola Fiskal Representasi Kemenkeu di Daerah</MenuItem>
-                            <MenuItem key={2} sx={{fontSize:14}} value={2}>Financial Advisor</MenuItem>
-                            <MenuItem key={3} sx={{fontSize:14}} value={3}>Tata Kelola Internal</MenuItem>
-                          </Select>
-                        </FormControl>
-
-                        <FormControl>
-                          <InputLabel id="subkomponen-select-label" sx={{typography:'body2'}}>Sub Sub Komponen</InputLabel>
-                          <Select 
-                            name="subSubKomponen" 
-                            label='Sub Sub Komponen'
-                            labelId="subsubkomponen-select-label"
-                            value={addState? addValue.subsubkomponen : editValue.subsubkomponen}
-                            sx={{typography:'body2', fontSize:14, height:'100%'}}
-                          >
-                            <MenuItem key={0} sx={{fontSize:14}} value={0}>Sub Sub Komponen A</MenuItem>
-                            <MenuItem key={1} sx={{fontSize:14}} value={1}>Sub Sub Komponen B</MenuItem>
-                            <MenuItem key={2} sx={{fontSize:14}} value={2}>Sub Sub Komponen C</MenuItem>
-                            <MenuItem key={3} sx={{fontSize:14}} value={3}>Sub Sub Komponen D</MenuItem>
-                          </Select>
-                        </FormControl>
-
-                      </Stack>
-                      <Stack direction='column' spacing={3} sx={{width:'45%'}}>
-                        <FormControl>
-                          <StyledTextField 
-                            name="kriteria" 
-                            label="Header Kriteria"
-                            multiline
-                            minRows={2}
-                            value={ addState? addValue.kriteria : editValue.kriteria}
-                            onChange={addState? handleChangeAdd : handleChangeEdit}
-                          />
-                        </FormControl>
-                       
-                        <FormControl>
-                          <InputLabel id="subkomponen-select-label" sx={{typography:'body2'}}>Sub Komponen</InputLabel>
-                          <Select 
-                            name="subkomponen" 
-                            label='Sub Komponen'
-                            labelId="subkomponen-select-label"
-                            value={addState? addValue.subkomponen : editValue.subkomponen}
-                            sx={{typography:'body2', fontSize:14, height:'100%'}}
-                          >
-                            <MenuItem key={0} sx={{fontSize:14}} value={0}>Sub Komponen A</MenuItem>
-                            <MenuItem key={1} sx={{fontSize:14}} value={1}>Sub Komponen B</MenuItem>
-                            <MenuItem key={2} sx={{fontSize:14}} value={2}>Sub Komponen C</MenuItem>
-                            <MenuItem key={3} sx={{fontSize:14}} value={3}>Sub Komponen D</MenuItem>
-                          </Select>
-                        </FormControl>
-
-                        <FormControl>
-                          <InputLabel id="standardisasi-kppn-label" sx={{typography:'body2'}}>Standardisasi KPPN</InputLabel>
-                          <Select 
-                            name="standardisasiKPPN" 
-                            label='Standardisasi KPPN'
-                            labelId="standardisasi-kppn-label"
-                            value={addState? addValue.standardisasiKPPN : editValue.standardisasiKPPN}
-                            sx={{typography:'body2', fontSize:14, height:'100%'}}
-                          >
-                            <MenuItem key={0} sx={{fontSize:14}} value={0}>Ya</MenuItem>
-                            <MenuItem key={1} sx={{fontSize:14}} value={1}>Tidak</MenuItem>
-                          </Select>
-                        </FormControl>
-                      </Stack>
-                    </Stack>
-
-                    <Stack sx={{width:'100%', pr:3, mt:1}} direction='row' spacing={2} flex={'row'} justifyContent={'end'}>
-                      <Button 
-                        variant='contained'
-                        color={addState? 'primary' : 'warning'} 
-                        sx={{borderRadius:'8px'}}
+                    <FormControl>
+                      <InputLabel id="komponen-select-label" sx={{typography:'body2'}}>Komponen</InputLabel>
+                      <Select 
+                        name="komponen_id" 
+                        label='Komponen'
+                        labelId="komponen-select-label"
+                        value={addState? addValue?.komponen_id?.toString() : editValue?.komponen_id?.toString()}
+                        onChange={addState? handleChangeAdd : handleChangeEdit}
+                        sx={{typography:'body2', fontSize:14, height:'100%'}}
                       >
-                        {addState? 'Add' : 'Edit'} 
-                      </Button>
-                      <Button 
-                        variant='contained' 
-                        color="white"
-                        onClick={addState? handleResetAdd : handleResetEdit}
+                        {komponenRef?.map((row) => (
+                          <MenuItem key={row.id} sx={{fontSize:14}} value={row.id}>{row.title}</MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+
+                    <FormControl>
+                      <InputLabel id="subsubkomponen-select-label" sx={{typography:'body2'}}>Sub Sub Komponen</InputLabel>
+                      <Select 
+                        name="subsubkomponen_id" 
+                        label='Sub Sub Komponen'
+                        labelId="subsubkomponen-select-label"
+                        value={addState? addValue?.subsubkomponen_id?.toString() : editValue?.subsubkomponen_id?.toString()}
+                        onChange={addState? handleChangeAdd : handleChangeEdit}
+                        sx={{typography:'body2', fontSize:14, height:'100%'}}
                       >
-                        Reset
-                      </Button>
-                    </Stack>
-                  </FormDataContainer>
+                        <MenuItem key={'0'} sx={{fontSize:14}} value={'0'}>Default</MenuItem>
+                        {subSubKomponenRef
+                        ?.filter((row) => row.komponen_id===(addState? addValue.komponen_id : editValue.komponen_id))
+                        .map((row) => (
+                          <MenuItem key={row.id} sx={{fontSize:14}} value={row?.id?.toString()}>{row.title}</MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+
+                    <FormControl>
+                      <StyledTextField 
+                        name="instruksi" 
+                        label="Instruksi"
+                        multiline
+                        minRows={2}
+                        value={ addState? addValue.instruksi : editValue.instruksi}
+                        onChange={addState? handleChangeAdd : handleChangeEdit}
+                      />
+                    </FormControl>
+
+                  </Stack>
+                  <Stack direction='column' spacing={3} sx={{width:'45%'}}>
+                    <FormControl>
+                      <StyledTextField 
+                        name="header" 
+                        label="Header"
+                        multiline
+                        minRows={2}
+                        value={ addState? addValue.header : editValue.header}
+                        onChange={addState? handleChangeAdd : handleChangeEdit}
+                      />
+                    </FormControl>
+                  
+                    <FormControl>
+                      <InputLabel id="subkomponen-select-label" sx={{typography:'body2'}}>Sub Komponen</InputLabel>
+                      <Select 
+                        name="subkomponen_id" 
+                        label='Sub Komponen'
+                        labelId="subkomponen-select-label"
+                        value={addState? addValue?.subkomponen_id?.toString() : editValue?.subkomponen_id?.toString()}
+                        onChange={addState? handleChangeAdd : handleChangeEdit}
+                        sx={{typography:'body2', fontSize:14, height:'100%'}}
+                      >
+                        {subKomponenRef
+                          ?.filter((row) => row.komponen_id===(addState? addValue.komponen_id : editValue.komponen_id))
+                          .map((row) => (
+                            <MenuItem key={row.id} sx={{fontSize:14}} value={row?.id?.toString()}>{row.title}</MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+
+                    <FormControl>
+                      <InputLabel id="standardisasi-kppn-label" sx={{typography:'body2'}}>Standardisasi KPPN</InputLabel>
+                      <Select 
+                        name="standardisasi" 
+                        label='Standardisasi KPPN'
+                        labelId="standardisasi-kppn-label"
+                        value={addState? addValue?.standardisasi?.toString() : editValue?.standardisasi?.toString()}
+                        onChange={addState? handleChangeAdd : handleChangeEdit}
+                        sx={{typography:'body2', fontSize:14, height:'100%'}}
+                      >
+                        <MenuItem key={0} sx={{fontSize:14}} value={0}>Tidak</MenuItem>
+                        <MenuItem key={1} sx={{fontSize:14}} value={1}>Ya</MenuItem>
+                      </Select>
+                    </FormControl>
+
+                    <FormControl>
+                      <StyledTextField 
+                        name="contoh_file" 
+                        label="Contoh file"
+                        multiline
+                        minRows={2}
+                        value={addState? (addValue.contoh_file ?? '') : (editValue.contoh_file ?? '')}
+                        onChange={addState? handleChangeAdd : handleChangeEdit}
+                      />
+                    </FormControl>
+                  </Stack>
+                </Stack>
+
+                <Stack sx={{width:'100%', pr:3, mt:1}} direction='row' spacing={2} flex={'row'} justifyContent={'end'}>
+                  <Button 
+                    variant='contained'
+                    color={addState? 'primary' : 'warning'} 
+                    sx={{borderRadius:'8px'}}
+                    onClick={addState? () => {} : handleSubmitEdit}
+                  >
+                    {addState? 'Add' : 'Edit'} 
+                  </Button>
+                  <Button 
+                    variant='contained' 
+                    color="white"
+                    onClick={addState? handleResetAdd : handleResetEdit}
+                  >
+                    Reset
+                  </Button>
+                </Stack>
+              </FormDataContainer>
 
             </Paper>
           </Scrollbar>
         </Box>
       </Modal>
-      
-      </>
+    </>
   )
 }

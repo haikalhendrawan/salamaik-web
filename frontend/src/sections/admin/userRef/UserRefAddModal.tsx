@@ -172,7 +172,7 @@ export default function UserRefAddModal({modalOpen, modalClose}: UserRefAddModal
     // ----------------------------------------------------------------------------------------
     return(
         <>
-        <Modal open={modalOpen} onClose={modalClose}>
+        <Modal keepMounted open={modalOpen} onClose={modalClose}>
           <Box sx={style}>
             <Scrollbar>
               <Paper sx={{height:'70vh', width:'auto', p:2}}>

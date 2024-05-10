@@ -29,7 +29,10 @@ export default function WorksheetRefPage() {
 
   const [section, setSection] = useState<number>(0);
 
-  const [addState, setAddState] = useState<boolean>(false); // utk add modal
+  const [addState, setAddState] = useState<boolean>(false); 
+  // seluruh child komponen cuma menampilkan bagian bawah, 
+  // utk tombol add dihandle dari komponen ini sehingga perlu track dari statenya
+  //secondly, kita cuma pakai 1 modal utk add dan edit, sehingga contentnya berubah setiap state ini berubah
 
   const resetAddState = () => {
     setAddState(false);
@@ -100,7 +103,7 @@ export default function WorksheetRefPage() {
               disabled={section===1?false:true} 
               startIcon={<Iconify icon="eva:plus-fill" />} 
               onClick={() => setAddState(true)}
-              >
+            >
               Add
             </Button>
           </Stack>

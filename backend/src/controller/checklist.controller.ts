@@ -16,22 +16,15 @@ interface ChecklistType{
   standardisasi: number, 
   matrix_title: string, 
   file1: string,
-  file2: string
+  file2: string,
+  instruksi: string | null,
+  contoh_file: string | null
 };
 
 const getAllChecklist = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await checklist.getAllChecklist();
     return res.status(200).json({sucess: true, message: 'Get checklist success', rows: result});
-  } catch (err) {
-    next(err);
-  }
-}
-
-const getAllOpsi = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const result = await checklist.getAllOpsi();
-    return res.status(200).json({sucess: true, message: 'Get opsi success', rows: result});
   } catch (err) {
     next(err);
   }
@@ -54,6 +47,21 @@ const getChecklistWithOpsi = async (req: Request, res: Response, next: NextFunct
 
     });
     return res.status(200).json({sucess: true, message: 'Get checklist with opsi success', rows: combined});
+  } catch (err) {
+    next(err);
+  }
+}
+
+const editChecklist = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const{ komponen_id, subkomponen_id } = req.body;
+    const isValidSubKomponen = await sanitizeSubKomponen(komponen_id, subkomponen_id);
+    if(!isValidSubKomponen){
+      return next(new ErrorDetail(400, 'Invalid subkomponen'));
+    };
+
+    const result = await checklist.editChecklist(req.body);
+    return res.status(200).json({sucess: true, message: 'Checklist has been updated', rows: result});
   } catch (err) {
     next(err);
   }
@@ -108,5 +116,72 @@ const deleteChecklistFile = async (req: Request, res: Response, next: NextFuncti
   }
 }
 
+const editOpsiById = async (req: Request, res: Response, next: NextFunction) => {
+  try{
+    const {id, title, value, checklistId} = req.body;
+    const validValue = [0, 5, 7, 10];
+    if(validValue.includes(value) === false){
+      return next(new ErrorDetail(400, 'Nilai dari opsi harus 0, 5, 7, atau 10'));
+    };
+    const result = await checklist.editOpsiById(id, title, value, checklistId);
+    return res.status(200).json({sucess: true, message: 'Opsi updated successfully', rows: result});
+  }catch(err){
+    next(err);
+  }
+}
 
-export {getAllChecklist, getAllOpsi, getChecklistWithOpsi, editChecklistFile, deleteChecklistFile}
+const getAllOpsi = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const result = await checklist.getAllOpsi();
+    return res.status(200).json({sucess: true, message: 'Get opsi success', rows: result});
+  } catch (err) {
+    next(err);
+  }
+}
+
+export {
+  getAllChecklist, 
+  getChecklistWithOpsi, 
+  editChecklist,
+  editChecklistFile, 
+  deleteChecklistFile, 
+  getAllOpsi, 
+  editOpsiById,
+}
+//------------------------------------------------------------------------------------------------------------
+async function sanitizeSubKomponen(komponenId: number, subKomponenId: number) {
+  if(komponenId===0 || !komponenId || komponenId>4){
+    return false
+  };
+  if(subKomponenId===0 || !subKomponenId){
+    return false
+  };
+  switch(komponenId){
+    case 1:
+      const validSubkomponen = [1, 2, 3, 4, 5, 6];
+      if(validSubkomponen.includes(subKomponenId) === false){
+        return false
+      };
+      break;
+    case 2:
+      const validSubkomponen2 = [7, 8, 9, 10, 11];
+      if(validSubkomponen2.includes(subKomponenId) === false){
+        return false
+      };
+      break;
+    case 3:
+      const validSubkomponen3 = [12, 13, 14];
+      if(validSubkomponen3.includes(subKomponenId) === false){
+        return false
+      };
+    case 4:
+      const validSubkomponen4 = [15, 16, 17, 18, 19, 20, 21, 22, 23, 24];
+      if(validSubkomponen4.includes(subKomponenId) === false){
+        return false
+      };
+      break;
+    default:
+      return true
+  }
+  return true
+}

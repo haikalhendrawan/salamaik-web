@@ -1,12 +1,12 @@
 import {useState, useEffect, useRef} from'react';
-import {Stack, Button, Box, Typography, Modal, FormControl, 
+import {Stack, Button, Box, Typography, Modal, FormControl, SelectChangeEvent, 
           Paper, Grid, Select, MenuItem, InputLabel, Divider} from '@mui/material';
 import { useTheme, styled } from '@mui/material/styles';
-import Iconify from '../../../../components/iconify';
-import Label from '../../../../components/label';
 import Scrollbar from '../../../../components/scrollbar';
 import StyledTextField from '../../../../components/styledTextField/StyledTextField';
-import StyledButton from '../../../../components/styledButton/StyledButton';
+import useAxiosJWT from '../../../../hooks/useAxiosJWT';
+import useSnackbar from '../../../../hooks/display/useSnackbar';
+import useChecklist from './useChecklist';
 // -------------------------------------------------------------------------------------------
 const style = {
   position: 'absolute',
@@ -37,12 +37,14 @@ interface ChecklistType{
   header: string | null,
   komponen_id: number,
   subkomponen_id: number | null,
-  subsubkomponen_id: number | number,
+  subsubkomponen_id: number | null,
   standardisasi: number | null, 
   matrix_title: string | null, 
   file1: string | null,
   file2: string | null,
-  opsi: OpsiType[] | null
+  opsi: OpsiType[] | null,
+  instruksi?: string | null,
+  contoh_file?: string | null
 };
 
 interface OpsiType{
@@ -55,7 +57,6 @@ interface OpsiType{
 interface ChecklistOpsiModalModalProps {
   modalOpen: boolean,
   modalClose: () => void,
-  addState: boolean,
   editID: number,
   checklist: ChecklistType[] | [],
   opsi: OpsiType[] | null,
@@ -70,40 +71,47 @@ interface TitleType{
 export default function ChecklistOpsiModal({
   modalOpen, 
   modalClose, 
-  addState,
   editID,
   checklist,
   opsi, 
   opsiID}: ChecklistOpsiModalModalProps) {
   const theme = useTheme();
 
+  const addState = false; // TODO utk period berikutnya
+
+  const axiosJWT = useAxiosJWT();
+
+  const {openSnackbar} = useSnackbar();
+
+  const {getChecklist} = useChecklist();
+
   const [title, setTitle] = useState<TitleType>({
     checklistTitle: '',
     headerTitle: ''
   });
 
-  const [addValue, setAddValue] = useState<OpsiType>({
-    id: 0,
-    title: '',
-    value: 0,
-    checklist_id:0,
-  });
+  // const [addValue, setAddValue] = useState<OpsiType>({
+  //   id: 0,
+  //   title: '',
+  //   value: 0,
+  //   checklist_id:0,
+  // });
 
-  const handleChangeAdd = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setAddValue({
-      ...addValue,
-      [e.target.name]:e.target.value
-    })
-  };
+  // const handleChangeAdd = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  //   setAddValue({
+  //     ...addValue,
+  //     [e.target.name]:e.target.value
+  //   })
+  // };
 
-  const handleResetAdd = () => {
-    setAddValue({
-      id: 0,
-      title: '',
-      value: 0,
-      checklist_id:0,
-    })
-  };
+  // const handleResetAdd = () => {
+  //   setAddValue({
+  //     id: 0,
+  //     title: '',
+  //     value: 0,
+  //     checklist_id:0,
+  //   })
+  // };
 
   const [editValue, setEditValue] = useState<OpsiType>({
     id: 0,
@@ -112,7 +120,7 @@ export default function ChecklistOpsiModal({
     checklist_id:0,
   });
 
-  const handleChangeEdit = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChangeEdit = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> |  SelectChangeEvent) => {
     setEditValue({
       ...editValue,
       [e.target.name]:e.target.value
@@ -126,6 +134,25 @@ export default function ChecklistOpsiModal({
       value: opsi?.filter((row) => row.id===opsiID)[0]?.value || 0,
       checklist_id: opsi?.filter((row) => row.id===opsiID)[0]?.checklist_id || 0,
     })
+  };
+
+  const handleSubmitEdit = async() => {
+    try{
+      const response = await axiosJWT.post("/editOpsi", {
+        id: editValue.id,
+        title: editValue.title,
+        value: editValue.value,
+        checklistId: editValue.checklist_id
+      });
+      getChecklist();
+      modalClose();
+    }catch(err: any){
+      if(err.response){
+        openSnackbar(err.response.data.message, "error");
+      }else{
+        openSnackbar("Network Error", "error");
+      }
+    }
   };
 
   useEffect(() => {
@@ -148,7 +175,7 @@ export default function ChecklistOpsiModal({
   // ----------------------------------------------------------------------------------------
   return(
       <>
-      <Modal open={modalOpen} onClose={modalClose}>
+      <Modal keepMounted open={modalOpen} onClose={modalClose}>
         <Box sx={style}>
           <Scrollbar>
             <Paper sx={{height:'80vh', width:'auto', p:2}}>
@@ -197,13 +224,14 @@ export default function ChecklistOpsiModal({
                 <Stack direction='row' spacing={2} sx={{width:'100%', ml:4}} justifyContent={'center'}>
                   <Stack direction='row' spacing={3} sx={{width:'100%'}} alignItems={'start'}>
                     <FormControl sx={{width:'20%'}}>
-                      <InputLabel id="opsiValue-select-label" sx={{typography:'body2'}}>Nilai</InputLabel>
+                      <InputLabel id="value-select-label" sx={{typography:'body2'}}>Nilai</InputLabel>
                       <Select 
-                        name="opsiValue" 
+                        name="value" 
                         label='Nilai'
                         labelId="opsiValue-select-label"
-                        value={addState? addValue.value : editValue.value}
+                        value={editValue.value.toString()}
                         sx={{typography:'body2', fontSize:14, height:'100%'}}
+                        onChange={handleChangeEdit}
                       >
                         <MenuItem key={0} sx={{fontSize:14}} value={0}>0</MenuItem>
                         <MenuItem key={1} sx={{fontSize:14}} value={5}>5</MenuItem>
@@ -214,12 +242,12 @@ export default function ChecklistOpsiModal({
 
                     <FormControl sx={{width:'70%'}}>
                       <StyledTextField 
-                        name="opsiTitle" 
+                        name="title" 
                         label="Kriteria"
                         multiline
                         minRows={2}
-                        value={ addState? addValue.title : editValue.title}
-                        onChange={addState? handleChangeAdd : handleChangeEdit}
+                        value={editValue.title}
+                        onChange={handleChangeEdit}
                       />
                     </FormControl>
 
@@ -232,13 +260,14 @@ export default function ChecklistOpsiModal({
                     variant='contained'
                     color={addState? 'primary' : 'warning'} 
                     sx={{borderRadius:'8px'}}
+                    onClick={handleSubmitEdit}
                   >
                     {addState? 'Add' : 'Edit'} 
                   </Button>
                   <Button 
                     variant='contained' 
                     color="white"
-                    onClick={addState? handleResetAdd : handleResetEdit}
+                    onClick={handleResetEdit}
                   >
                     Reset
                   </Button>
@@ -252,9 +281,10 @@ export default function ChecklistOpsiModal({
                   Opsi Eksisting
                 </Typography>
 
-                {opsi?.map((row) => (
+                {opsi?.map((row, index) => (
                   <Grid 
-                    container 
+                    container
+                    key={index} 
                     sx={{ ml: 4, 
                           backgroundColor: opsi?.filter((row) => row.id===opsiID)[0]?.value === row.value
                                 ?theme.palette.grey[300]

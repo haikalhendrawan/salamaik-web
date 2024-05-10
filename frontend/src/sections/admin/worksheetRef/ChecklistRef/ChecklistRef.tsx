@@ -1,4 +1,4 @@
-import {useState, useEffect, useRef} from'react';
+import {useState, useEffect, useRef, useCallback} from'react';
 import { Card,  Grow, Tabs, Tab} from '@mui/material';
 import { useTheme, styled } from '@mui/material/styles';
 import Label from '../../../../components/label';
@@ -7,24 +7,6 @@ import ChecklistRefModal from './ChecklistRefModal';
 import ChecklistFileModal from './ChecklistFileModal';
 import useChecklist from './useChecklist';
 //---------------------------------------------------------------------------------------------
-interface ChecklistData{
-  id: number,
-  checklist:string,
-  kriteria:string,
-  standardisasiKPPN:boolean,
-  subsubkomponen:number,
-  subkomponen: number,
-  komponen:number,
-  numChecklist?: number,
-};
-
-const TABLE_DATA: ChecklistData[] = [
-  {id:1, checklist:'Pendaftaran/Perubahan User Pengguna SAKTI',  standardisasiKPPN:true, kriteria:'Berdasarkan uji sampling 10 Satker yang didaftarkan sebagai pengguna SAKTI, Satker wajib mendaftarkan user dengan role administrator, KPA, PPK, dan PPSPM, dan melakukan perubahan apabila terdapat permintaan perubahan', subsubkomponen:0, subkomponen:0, komponen:0, numChecklist:10},
-  {id:2, checklist:'Checklist 2', kriteria:'kriteria 2', standardisasiKPPN:true, subsubkomponen:1, subkomponen:1, komponen:1, numChecklist:34},
-  {id:3, checklist:'Checklist 3', kriteria:'kriteria 3', standardisasiKPPN:false, subsubkomponen:2, subkomponen:2, komponen:2, numChecklist:5,},
-  {id:4, checklist:'Checklist 4', kriteria:'kriteria 4', standardisasiKPPN:true, subsubkomponen:3, subkomponen:3, komponen:3, numChecklist:17},
-];
-
 interface ChecklistRefProps {
   section: number,
   addState: boolean,
@@ -44,7 +26,7 @@ export default function ChecklistRef({section, addState, resetAddState}: Checkli
 
   const [fileOption, setFileOption] = useState<1 | 2>(1); // for preview file modal
 
-  const [tabValue, setTabValue] = useState(0);
+  const [tabValue, setTabValue] = useState<0 | 1 | 2 | 3 | 4>(0);
 
   const handleOpen = (id: number) => { // for edit modal
     setOpen(true);
@@ -68,9 +50,9 @@ export default function ChecklistRef({section, addState, resetAddState}: Checkli
     setFileOption(1);
   };
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: 0 | 1) => { // setiap tab komponen berubah
+  const handleTabChange = useCallback((event: React.SyntheticEvent, newValue: 0 | 1 | 2 | 3 | 4) => {
     setTabValue(newValue);
-  };
+  }, []);
 
   //set modal state utk add Data dan hide modal state buat nge edit
   useEffect(() => {
@@ -128,7 +110,8 @@ export default function ChecklistRef({section, addState, resetAddState}: Checkli
             />
           </Tabs>
           
-          <ChecklistRefTable 
+          <ChecklistRefTable
+            tab={tabValue} 
             handleOpen={handleOpen}
             fileOpen={handleOpenFile}
             setDeleteFile={() => {}}
@@ -142,7 +125,6 @@ export default function ChecklistRef({section, addState, resetAddState}: Checkli
         modalClose={handleClose} 
         addState={addState}
         editID={editID}
-        data={TABLE_DATA}
       /> 
 
       <ChecklistFileModal

@@ -18,7 +18,7 @@ import Scrollbar from '../../../components/scrollbar';
 import UserRefTableHead from './UserRefTableHead';
 import UserRefTableToolbar from './UserRefTableToolbar';
 //utils
-import {descendingComparator, getComparator, applySortFilter} from './utils';
+import {descendingComparator, getComparator, applySortFilter, StyledButton} from './utils';
 
 // ----------------------------------------------------------------------
 
@@ -29,18 +29,6 @@ const TABLE_HEAD = [
   { id: 'role', label: 'Role', alignRight: false },
   { id: 'action', label: 'Action', alignRight: false },
 ];
-
-const StyledButton = styled(Button)(({ theme }) => ({
-  display: 'inline-flex',   
-  alignItems: 'center', 
-  justifyContent: 'center', 
-  paddingRight: 0,
-  paddingLeft: 0,
-  minHeight: '30px',
-  minWidth: '30px',
-  borderRadius: '12px',
-}));  
-
 // ----------------------------------------------------------------------
 interface UserRefTableProps{
   users: any[],

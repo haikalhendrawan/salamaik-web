@@ -9,12 +9,14 @@ interface ChecklistType{
   header: string | null,
   komponen_id: number,
   subkomponen_id: number | null,
-  subsubkomponen_id: number | number,
+  subsubkomponen_id: number | null,
   standardisasi: number | null, 
   matrix_title: string | null, 
   file1: string | null,
   file2: string | null,
-  opsi: OpsiType[] | null
+  opsi: OpsiType[] | null,
+  instruksi?: string | null,
+  contoh_file?: string | null
 };
 
 interface OpsiType{

@@ -11,10 +11,10 @@ const ProgressContainer = styled(Box)(({ theme }) => ({
 }));
 
 type PageLoadingProps = {
-  loadingDurationInSeconds: number
+  duration: number
 };
 
-export default function PageLoading({ loadingDurationInSeconds}:PageLoadingProps){
+export default function PageLoading({ duration}:PageLoadingProps){
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
@@ -25,17 +25,17 @@ export default function PageLoading({ loadingDurationInSeconds}:PageLoadingProps
       timer = setTimeout(() => {
         clearInterval(progressTimer);
         setProgress(100);
-      }, loadingDurationInSeconds * 1000);
+      }, duration * 1000);
 
       progressTimer = setInterval(() => {
         setProgress((oldProgress) => {
           if (oldProgress === 100) {
             return 100;
           }
-          const diff = 100 / (loadingDurationInSeconds * 10);
+          const diff = 100 / (duration * 10);
           return Math.min(oldProgress + diff, 100);
         });
-      }, loadingDurationInSeconds * 100);
+      }, duration * 100);
     };
 
     startLoading();
@@ -44,7 +44,7 @@ export default function PageLoading({ loadingDurationInSeconds}:PageLoadingProps
       clearTimeout(timer);
       clearInterval(progressTimer);
     };
-  }, [loadingDurationInSeconds]);
+  }, [duration]);
   return(
     <>
       <Container>

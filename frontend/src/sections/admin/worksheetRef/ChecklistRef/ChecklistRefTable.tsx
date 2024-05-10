@@ -5,7 +5,7 @@ import { useTheme, styled } from '@mui/material/styles';
 import Iconify from '../../../../components/iconify';
 import Label from '../../../../components/label';
 import Scrollbar from '../../../../components/scrollbar';
-import StyledTextField from '../../../../components/styledTextField/StyledTextField';
+import { VisuallyHiddenInput, descendingComparator, getComparator, applySortFilter } from './utils';
 import StyledButton from '../../../../components/styledButton/StyledButton';
 import ChecklistOpsiModal from './ChecklistOpsiModal';
 import useLoading from '../../../../hooks/display/useLoading';
@@ -13,18 +13,6 @@ import useSnackbar from '../../../../hooks/display/useSnackbar';
 import useAxiosJWT from '../../../../hooks/useAxiosJWT';
 import useChecklist from './useChecklist';
 //----------------------------------------------------
-const VisuallyHiddenInput = styled('input')({
-  clip: 'rect(0 0 0 0)',
-  clipPath: 'inset(50%)',
-  height: 1,
-  overflow: 'hidden',
-  position: 'absolute',
-  bottom: 0,
-  left: 0,
-  whiteSpace: 'nowrap',
-  width: 1,
-  });
-
 interface ChecklistType{
   id: number,
   title: string, 
@@ -57,6 +45,7 @@ const TABLE_HEAD = [
 ];
 
 interface ChecklistRefTableProps {
+  tab: 0 | 1 | 2 | 3 | 4, 
   handleOpen: (id: number)=>void,
   fileOpen: (id: number, option: 1 | 2) => void,
   setDeleteFile: React.Dispatch<React.SetStateAction<() => void>>,
@@ -64,7 +53,7 @@ interface ChecklistRefTableProps {
 };
 
 // ---------------------------------------------------
-export default function ChecklistRefTable({handleOpen, fileOpen, setDeleteFile, setFile}: ChecklistRefTableProps) {
+export default function ChecklistRefTable({tab, handleOpen, fileOpen, setDeleteFile, setFile}: ChecklistRefTableProps) {
   const theme = useTheme();
 
   const {isLoading, setIsLoading} = useLoading();
@@ -75,6 +64,12 @@ export default function ChecklistRefTable({handleOpen, fileOpen, setDeleteFile, 
 
   const axiosJWT = useAxiosJWT();
 
+  const [order, setOrder] = useState<'asc' | 'desc'>('asc');
+
+  const [orderBy, setOrderBy] = useState<string>('id');
+
+  const filteredChecklist= applySortFilter(checklist, getComparator(order, orderBy), tab);
+
   const [open, setOpen] = useState<boolean>(false); // Opsi Modal
 
   const [editID, setEditID] = useState<number>(0); // Opsi Modal
@@ -82,7 +77,6 @@ export default function ChecklistRefTable({handleOpen, fileOpen, setDeleteFile, 
   const [opsiID, setOpsiID] = useState<number>(0); // Opsi Modal
 
   const [addState, setAddState] = useState<boolean>(false); // Opsi Modal
-
 
   const handleClose = () => {  // Opsi Modal
     setOpen(false);
@@ -157,9 +151,9 @@ export default function ChecklistRefTable({handleOpen, fileOpen, setDeleteFile, 
               </TableRow>
             </TableHead>
             <TableBody>
-              {useMemo(() => checklist.map((row) => 
+              {useMemo(() => filteredChecklist?.map((row, index) => 
                 <TableRow hover key={row.id} tabIndex={-1}>
-                  <TableCell align="justify">{row.id}</TableCell>
+                  <TableCell align="justify">{index+1}</TableCell>
 
                   <TableCell align="center" sx={{fontSize:12}}>{row.title}</TableCell>
 
@@ -177,9 +171,9 @@ export default function ChecklistRefTable({handleOpen, fileOpen, setDeleteFile, 
                         </Label>
                       )}
 
-                      <IconButton>
+                      {/* <IconButton>
                         <Iconify sx={{color:theme.palette.grey[500]}} icon="solar:add-circle-bold"/>
-                      </IconButton>
+                      </IconButton> */}
                     </Stack>
                   </TableCell>
 
@@ -262,7 +256,7 @@ export default function ChecklistRefTable({handleOpen, fileOpen, setDeleteFile, 
                     </Stack>
                   </TableCell> 
                 </TableRow>
-              ), [checklist])}
+              ), [checklist, tab])}
             </TableBody>
           </Table>
         </TableContainer>
@@ -271,7 +265,6 @@ export default function ChecklistRefTable({handleOpen, fileOpen, setDeleteFile, 
       <ChecklistOpsiModal
         modalOpen={open}
         modalClose={handleClose}
-        addState={addState}
         editID={editID}
         checklist= {checklist?.filter((row) => row.id===editID)?.map((row) => {return {...row}})}
         opsi={checklist?.filter((row) => row.id===editID)?.flatMap((row) => row.opsi || [])}
