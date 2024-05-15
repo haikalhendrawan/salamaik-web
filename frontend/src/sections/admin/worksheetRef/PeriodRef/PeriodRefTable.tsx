@@ -3,9 +3,6 @@ import {Stack, Button, Box, Typography, Table, Card, Modal, FormControl, Paper, 
   Tooltip, TableHead, Grow, TableBody, TableRow, TableCell, Select, MenuItem} from '@mui/material';
 import { useTheme, styled } from '@mui/material/styles';
 import Iconify from '../../../../components/iconify';
-import Label from '../../../../components/label';
-import Scrollbar from '../../../../components/scrollbar';
-import StyledTextField from '../../../../components/styledTextField/StyledTextField';
 import StyledButton from '../../../../components/styledButton/StyledButton';
 //----------------------------------------------------
 const TABLE_HEAD = [
@@ -17,12 +14,11 @@ const TABLE_HEAD = [
 ];
 
 interface PeriodType{
-  id: number,
-  name: string,
-  start: string,
-  end: string,
-  semester: number,
-  tahun: string,
+  id: number;
+  name: string; 
+  evenPeriod: 0;
+  semester: number;
+  tahun: string
 };
 
 interface PeriodRefTableProps {
@@ -62,10 +58,10 @@ export default function PeriodRefTable({tableData, handleOpen}: PeriodRefTablePr
                   <TableCell align="left">{row.name}</TableCell>
 
                   <TableCell align="left">
-                    {new Date(row.start).toLocaleDateString("en-GB")}
+                    {row.evenPeriod===0?`01 Jan ${row.tahun}`:`01 Jul ${row.tahun}`}
                   </TableCell>
 
-                  <TableCell align="left">{new Date(row.end).toLocaleDateString("en-GB")}</TableCell>
+                  <TableCell align="left">{row.evenPeriod===0?`30 Jun ${row.tahun}`: `31 Dec ${row.tahun}`}</TableCell>
 
                   <TableCell align="justify">
                     <Stack direction='row' spacing={1}>

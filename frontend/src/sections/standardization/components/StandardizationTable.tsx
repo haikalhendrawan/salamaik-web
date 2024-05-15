@@ -7,13 +7,6 @@ import Label from '../../../components/label';
 import Iconify from '../../../components/iconify/Iconify';
 
 // ---------------------------------------------------
-const StyledRoot = styled(Toolbar)(({ theme }) => ({
-  height: 72,
-  display: 'flex',
-  justifyContent: 'space-between',
-  padding: theme.spacing(0, 1, 0, 3),
-}));
-
 const ActionButton = styled(Button)(({ theme }) => ({
   height: '30px', 
   width: '70px', 

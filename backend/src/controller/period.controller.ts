@@ -4,10 +4,9 @@ import period from '../model/period.model';
 interface PeriodType{
   id: number;
   name: string; 
-  start: string | null;
-  end: string | null;
-  semester: number | null;
-  tahun: string | null
+  isEven: 0;
+  semester: number;
+  tahun: string
 }
 // ------------------------------------------------------
 const getAllPeriod = async (req: Request, res: Response, next: NextFunction) => {

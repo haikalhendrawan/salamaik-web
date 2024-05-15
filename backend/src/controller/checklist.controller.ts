@@ -174,6 +174,7 @@ async function sanitizeSubKomponen(komponenId: number, subKomponenId: number) {
       if(validSubkomponen3.includes(subKomponenId) === false){
         return false
       };
+      break;
     case 4:
       const validSubkomponen4 = [15, 16, 17, 18, 19, 20, 21, 22, 23, 24];
       if(validSubkomponen4.includes(subKomponenId) === false){

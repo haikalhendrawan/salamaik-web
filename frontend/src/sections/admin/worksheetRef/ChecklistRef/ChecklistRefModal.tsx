@@ -176,6 +176,7 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
       contoh_file: editValue.contoh_file===''?null:editValue.contoh_file
     }
     try{
+      console.log(body)
       setIsLoading(true);
       const response = await axiosJWT.post("/editChecklist", body);
       openSnackbar(response.data.message, "success");

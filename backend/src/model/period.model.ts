@@ -7,11 +7,10 @@ import "dotenv/config";
 interface PeriodType{
   id: number;
   name: string; 
-  start: string;
-  end: string;
+  evenPeriod: 0;
   semester: number;
   tahun: string
-}
+};
 // ------------------------------------------------------
 class Period{
   async getAllPeriod(){

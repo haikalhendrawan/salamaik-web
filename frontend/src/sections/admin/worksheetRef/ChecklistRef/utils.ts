@@ -65,8 +65,6 @@ export function applySortFilter(array: any[], comparator: any, tab: number): Che
   const stabilizedThis = array.map((el, index) => [el, index]);
   stabilizedThis.sort((a, b) => comparator(a[0], b[0]));
 
-  console.log(stabilizedThis.sort((a, b) => comparator(a[0], b[0])).filter((el) => filteredData.includes(el[0])))
-
   return stabilizedThis
     .filter((el) => filteredData.includes(el[0]))
     .map((el) => el[0]);

@@ -10,12 +10,11 @@ interface DictionaryType {
 };
 
 interface PeriodType{
-  id: number,
-  name: string,
-  start: string,
-  end: string,
-  semester: number,
-  tahun: string,
+  id: number;
+  name: string; 
+  evenPeriod: 0;
+  semester: number;
+  tahun: string
 };
 
 interface PeriodRefType{
