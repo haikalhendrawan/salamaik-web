@@ -12,7 +12,8 @@ import periodRoute from './routes/periodRoute';
 import profileRoute from './routes/profileRoute';
 import userRoute from './routes/userRoute';
 import komponenRoute from './routes/komponenRoute';
-import checklistRoute from './routes/checklistRoute'
+import checklistRoute from './routes/checklistRoute';
+import standardizationRoute from './routes/standardizationRoute';
 //middleware
 import errorHandler from './middleware/errorHandler';
 // ------------------------------------------------------------
@@ -34,6 +35,7 @@ app.use(profileRoute);
 app.use(userRoute);
 app.use(komponenRoute);
 app.use(checklistRoute);
+app.use(standardizationRoute);
 app.use(errorHandler);
 
 app.get('/', (req: Request, res: Response) => {

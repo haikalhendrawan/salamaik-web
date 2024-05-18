@@ -1,7 +1,8 @@
 import multer from "multer";
 import ErrorDetail from "../model/error.model";
+import { sanitizeMimeType } from "../utils/mimeTypeSanitizer";
 
-
+// ----------------------------------------------------------------------------------------------------------
 const storage= multer.diskStorage(
   { 
     destination:(req, file, callback) => {
@@ -23,7 +24,7 @@ const fileFilter = (req: any, file: any, callback: any) => {
 }; 
 
 const limit = {
-  fileSize: 12582912
+  fileSize: 12582912 //12 mb
 };
 
 const uploadPP = multer({storage:storage, limits:limit, fileFilter:fileFilter}).single('picture');
@@ -37,7 +38,7 @@ const checklistFileStorage= multer.diskStorage(
       callback(null, `${__dirname}/../uploads/checklist`)
     },
     filename:(req, file, callback) => {
-      const fileExt = file.mimetype.split("/")[1];
+      const fileExt = sanitizeMimeType(file.mimetype);
       callback(null, `checklist_${req?.body?.id}_${req?.body?.option}.${fileExt}`)
     }
   }
@@ -48,7 +49,9 @@ const checklistFileFilter = (req: any, file: any, callback: any) => {
     file.mimetype === 'image/jpeg' ||
     file.mimetype === 'image/png' ||
     file.mimetype === 'application/pdf' ||
-    file.mimetype === 'application/zip'
+    file.mimetype === 'application/x-zip-compressed' ||
+    file.mimetype === 'application/zip' ||
+    file.mimetype === 'application/vnd.rar'
   ) {
     callback(null, true);
   } else {
@@ -57,7 +60,7 @@ const checklistFileFilter = (req: any, file: any, callback: any) => {
 };
 
 const checklistFileLimit = {
-  fileSize: 12582912
+  fileSize: 12582912 //12 mb
 };
 
 const uploadChecklistFile = multer({
@@ -67,3 +70,44 @@ const uploadChecklistFile = multer({
 }).single('file');
 
 export {uploadChecklistFile}
+
+// ----------------------------------------------------------------------------------------------------------
+const stdFileStorage= multer.diskStorage(
+  { 
+    destination:(req, file, callback) => {
+      callback(null, `${__dirname}/../uploads/standardization`)
+    },
+    filename:(req, file, callback) => {
+      const fileExt = sanitizeMimeType(file.mimetype);
+      const {kppnId, periodId, standardizationId, month, timeStamp} = req.body;
+      callback(null, `std_${kppnId}_${periodId}${month}${standardizationId}_${timeStamp}.${fileExt}`)
+    }
+  }
+);
+
+const stdFileFilter = (req: any, file: any, callback: any) => {
+  if (
+    file.mimetype === 'image/jpeg' ||
+    file.mimetype === 'image/png' ||
+    file.mimetype === 'application/pdf' ||
+    file.mimetype === 'application/x-zip-compressed' ||
+    file.mimetype === 'application/zip' ||
+    file.mimetype === 'application/vnd.rar'
+  ) {
+    callback(null, true);
+  } else {
+    callback(null, false);
+  }
+};
+
+const stdFileLimit = {
+  fileSize: 12582912
+};
+
+const uploadStdFile = multer({
+  storage: stdFileStorage, 
+  limits: stdFileLimit, 
+  fileFilter: stdFileFilter
+}).single('stdFile');
+
+export {uploadStdFile}

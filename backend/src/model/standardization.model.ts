@@ -16,15 +16,15 @@ interface StandardizationJunctionType{
   kppn_id: number;
   period_id: number;
   standardization_id: number
-  date: string;
+  month: number;
   file: string;
   uploaded_at: string
 };
 // ------------------------------------------------------
 class Standardization{
-  async getStandardization(): Promise<StandardizationType[]> {
+  async getStandardization() {
     try{
-      const q = "SELECT * FROM standardization ORDER BY id ASC";
+      const q = "SELECT * FROM standardization_ref ORDER BY id ASC";
       const result = await pool.query(q);
       return result.rows
     }catch(err){
@@ -32,7 +32,7 @@ class Standardization{
     }
   }
 
-  async getStandardizationJunction(kppnId: number, periodId: number): Promise<StandardizationJunctionType[]> {
+  async getStandardizationJunction(kppnId: number, periodId: number) {
     try{
       const q = "SELECT * FROM standardization_junction WHERE kppn_id = $1 AND period_id = $2";
       const result = await pool.query(q, [kppnId, periodId]);
@@ -42,10 +42,10 @@ class Standardization{
     }
   }
 
-  async addStandardizationJunction(kppnId: number, periodId: number, standardizationId: number, date: string, file: string){
+  async addStandardizationJunction(kppnId: number, periodId: number, standardizationId: number, month: string, fileName: string){
     try{
       const q = "INSERT INTO standardization_junction (kppn_id, period_id, standardization_id, date, file) VALUES ($1, $2, $3, $4, $5) RETURNING *";
-      const result = await pool.query(q, [kppnId, periodId, standardizationId, date, file]);
+      const result = await pool.query(q, [kppnId, periodId, standardizationId, month, fileName]);
       return result.rows[0]
     }catch(err){
       throw err
@@ -64,6 +64,5 @@ class Standardization{
 }
 
 const standardization = new Standardization();
-
 
 export default standardization;

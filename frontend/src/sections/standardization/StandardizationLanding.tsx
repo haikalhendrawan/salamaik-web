@@ -1,5 +1,5 @@
 import { Helmet } from 'react-helmet-async';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 // @mui
 import { Container, Stack, Typography, Grid, IconButton, Breadcrumbs, Link} from '@mui/material';
@@ -10,6 +10,7 @@ import SelectionTab from './components/SelectionTab';
 import StandardizationTable from './components/StandardizationTable';
 import DocumentShort from './components/DocumentShort';
 import AmountShort from './components/AmountShort';
+import useStandardization from './useStandardization';
 // --------------------------------------------------------------
 const SELECT_KPPN: {[key: string]: string} = {
   '010': 'Padang',
@@ -35,6 +36,7 @@ export default function StandardizationLanding() {
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => { // setiap tab komponen berubah
     setTabValue(newValue);
   };
+
 
   return (
     <>

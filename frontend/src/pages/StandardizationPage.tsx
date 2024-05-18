@@ -6,6 +6,7 @@ import { Container, Stack, Typography, Tabs, Tab, Grid, Paper, IconButton, Box, 
 import {useTheme, styled} from '@mui/material/styles';
 //sections
 import StandardizationLanding from '../sections/standardization/StandardizationLanding';
+import { StandardizationProvider } from '../sections/standardization/useStandardization';
 
 // -----------------------------------------------------------------------
 
@@ -17,7 +18,9 @@ export default function StandardizationPage() {
 
   return (
     <>
-      <StandardizationLanding/>
+      <StandardizationProvider>
+        <StandardizationLanding/>
+      </StandardizationProvider>
     </>
   );
 };

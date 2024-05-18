@@ -49,9 +49,13 @@ export default function ChecklistFileModal({
 
   const [render, setRender] = useState<string | JSX.Element>('No files');
 
-  const currentFileURL = `http://localhost:8080/checklist`;
+  const currentFileURL = `${import.meta.env.VITE_API_URL}/checklist`;
 
   const fileExt = fileName?fileName.split('.').pop()?.toLowerCase() : '' ;
+
+  const handleDownload = () => {
+    window.location.href=`${currentFileURL}/${fileName}`;
+  };
 
   const handleDelete = async() => {
     try{
@@ -91,13 +95,14 @@ export default function ChecklistFileModal({
         />
       )
       console.log('pdf')
-    }else if(fileExt==='zip' || fileExt==='rar' ){
+    }else if(fileExt==='zip' || fileExt==='rar' || fileExt==='x-zip-compressed'){
       setRender(
         <Button 
           variant="contained" 
-          sx={{position:'absolute', left:'45%', top:'50%'}}
+          sx={{position:'absolute', left:'45%', top:'50%'}} 
+          onClick={handleDownload}
         >
-          Download File
+          Download Zip File
         </Button>
       )
     }else{

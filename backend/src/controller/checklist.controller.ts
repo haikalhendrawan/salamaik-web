@@ -5,6 +5,8 @@ import multer from 'multer';
 import ErrorDetail from '../model/error.model';
 import fs from 'fs';
 import path from 'path';
+import { sanitizeMimeType } from '../utils/mimeTypeSanitizer';
+import { sanitizeSubKomponen } from '../utils/subKomponenSanitizer';
 
 interface ChecklistType{
   id: number,
@@ -89,25 +91,24 @@ const editChecklistFile = async (req: Request, res: Response, next: NextFunction
       if(option!==1 && option!==2){
         return next(new ErrorDetail(400, 'Incorrect option'));
       };
-      const fileExt = req.file.mimetype.split("/")[1];
+      const fileExt = sanitizeMimeType(req.file.mimetype);
       const filename = `checklist_${req.body.id}_${req.body.option}.${fileExt}`;
       const result = await checklist.editChecklistFile(id, filename, option);
       return res.status(200).json({sucess: true, message: 'file inserted successfully', rows: result});
     } catch (err) {
       next(err);
     }
-   
+
   });
 
 }
 
 const deleteChecklistFile = async (req: Request, res: Response, next: NextFunction) => {
   try{
-    console.log(req.body);
-    const {id, filename, option} = req.body;
+    const {id, fileName, option} = req.body;
     const result = await checklist.deleteChecklistFile(id, option);
 
-    const filePath = path.join(__dirname,`../uploads/checklist/`, filename);
+    const filePath = path.join(__dirname,`../uploads/checklist/`, fileName);
     fs.unlinkSync(filePath);
 
     return res.status(200).json({sucess: true, message: 'file deleted successfully', rows: result});
@@ -149,40 +150,3 @@ export {
   editOpsiById,
 }
 //------------------------------------------------------------------------------------------------------------
-async function sanitizeSubKomponen(komponenId: number, subKomponenId: number) {
-  if(komponenId===0 || !komponenId || komponenId>4){
-    return false
-  };
-  if(subKomponenId===0 || !subKomponenId){
-    return false
-  };
-  switch(komponenId){
-    case 1:
-      const validSubkomponen = [1, 2, 3, 4, 5, 6];
-      if(validSubkomponen.includes(subKomponenId) === false){
-        return false
-      };
-      break;
-    case 2:
-      const validSubkomponen2 = [7, 8, 9, 10, 11];
-      if(validSubkomponen2.includes(subKomponenId) === false){
-        return false
-      };
-      break;
-    case 3:
-      const validSubkomponen3 = [12, 13, 14];
-      if(validSubkomponen3.includes(subKomponenId) === false){
-        return false
-      };
-      break;
-    case 4:
-      const validSubkomponen4 = [15, 16, 17, 18, 19, 20, 21, 22, 23, 24];
-      if(validSubkomponen4.includes(subKomponenId) === false){
-        return false
-      };
-      break;
-    default:
-      return true
-  }
-  return true
-}
