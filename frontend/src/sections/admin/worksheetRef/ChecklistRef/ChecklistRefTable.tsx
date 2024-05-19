@@ -96,7 +96,6 @@ export default function ChecklistRefTable({tab, handleOpen, fileOpen, setDeleteF
   };
 
   const handleChangeFile = async(e: React.ChangeEvent<HTMLInputElement>, chID: number, option: number) => {
-    console.log(chID)
     e.preventDefault();
     if(!e.target.files){return}
 

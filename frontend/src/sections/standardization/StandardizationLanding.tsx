@@ -4,13 +4,14 @@ import { useNavigate, useLocation } from 'react-router-dom';
 // @mui
 import { Container, Stack, Typography, Grid, IconButton, Breadcrumbs, Link} from '@mui/material';
 import {useTheme, styled} from '@mui/material/styles';
-import Iconify from '../../components/iconify/Iconify';
 // sections
 import SelectionTab from './components/SelectionTab';
 import StandardizationTable from './components/StandardizationTable';
 import DocumentShort from './components/DocumentShort';
 import AmountShort from './components/AmountShort';
+import PreviewFileModal from './components/PreviewFileModal';
 import useStandardization from './useStandardization';
+import usePreviewFileModal from './usePreviewFileModal';
 // --------------------------------------------------------------
 const SELECT_KPPN: {[key: string]: string} = {
   '010': 'Padang',
@@ -26,17 +27,18 @@ export default function StandardizationLanding() {
   const theme = useTheme();
 
   const navigate = useNavigate();
-  
+
   const params = new URLSearchParams(useLocation().search);
 
   const id= params.get('id');
 
-  const [tabValue, setTabValue] = useState(0); // ganti menu komponen supervisi
+  const {open, modalOpen, modalClose, changeFile, file} = usePreviewFileModal();
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => { // setiap tab komponen berubah
+  const [tabValue, setTabValue] = useState('010'); // ganti menu komponen supervisi
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: string) => { // setiap tab komponen berubah
     setTabValue(newValue);
   };
-
 
   return (
     <>
@@ -69,15 +71,15 @@ export default function StandardizationLanding() {
         </Grid>
 
         <Stack direction='column' spacing={4}>
-          <StandardizationTable />
+          <StandardizationTable modalOpen={modalOpen} kppnTab={tabValue} />
 
-          <StandardizationTable />
+          <StandardizationTable modalOpen={modalOpen} kppnTab={tabValue} />
 
-          <StandardizationTable />
+          <StandardizationTable modalOpen={modalOpen} kppnTab={tabValue} />
         </Stack>
-
-        
       </Container>
+
+      <PreviewFileModal open={open} modalClose={modalClose} file={file} />
     </>
   )
 

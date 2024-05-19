@@ -7,6 +7,7 @@ import {useTheme, styled} from '@mui/material/styles';
 //sections
 import StandardizationLanding from '../sections/standardization/StandardizationLanding';
 import { StandardizationProvider } from '../sections/standardization/useStandardization';
+import { PreviewFileModalProvider } from '../sections/standardization/usePreviewFileModal';
 
 // -----------------------------------------------------------------------
 
@@ -19,7 +20,9 @@ export default function StandardizationPage() {
   return (
     <>
       <StandardizationProvider>
-        <StandardizationLanding/>
+        <PreviewFileModalProvider>
+          <StandardizationLanding/>
+        </PreviewFileModalProvider>
       </StandardizationProvider>
     </>
   );

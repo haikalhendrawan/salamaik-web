@@ -20,8 +20,8 @@ const StyledLabel = styled(Typography)(({theme}) => ({
 }));
 
 interface SelectionTabProps{
-  tab: number;
-  changeTab: (event: React.SyntheticEvent, newValue: number) => void;
+  tab: string;
+  changeTab: (event: React.SyntheticEvent, newValue: string) => void;
 }
 // --------------------------------------------------------------
 
@@ -37,7 +37,7 @@ export default function SelectionTab({tab, changeTab}: SelectionTabProps){
                   KPPN Padang
                 </StyledLabel>
                 } 
-          value={0} 
+          value={'010'} 
         />
         <Tab 
           icon={<Iconify icon="icon-park-twotone:clock-tower" />} 
@@ -46,7 +46,7 @@ export default function SelectionTab({tab, changeTab}: SelectionTabProps){
                   KPPN Bukittinggi
                 </StyledLabel>
                 } 
-          value={1} 
+          value={'011'} 
         />
         <Tab 
           icon={<Iconify icon="ph:plant-duotone" />} 
@@ -55,7 +55,7 @@ export default function SelectionTab({tab, changeTab}: SelectionTabProps){
                   KPPN Solok
                 </StyledLabel>
                 } 
-          value={2} 
+          value={'090'} 
         />
         <Tab 
           icon={<Iconify icon="material-symbols:landscape-2" />} 
@@ -64,7 +64,7 @@ export default function SelectionTab({tab, changeTab}: SelectionTabProps){
                   KPPN Lubuk Sikaping
                 </StyledLabel>
                 } 
-          value={3} 
+          value={'091'} 
         />
         <Tab 
           icon={<Iconify icon="mdi:gold" />} 
@@ -73,7 +73,7 @@ export default function SelectionTab({tab, changeTab}: SelectionTabProps){
                   KPPN Sijunjung
                 </StyledLabel>
                 } 
-          value={4} 
+          value={'077'} 
         />
         <Tab 
           icon={<Iconify icon="streamline:beach-solid" />} 
@@ -82,7 +82,7 @@ export default function SelectionTab({tab, changeTab}: SelectionTabProps){
                   KPPN Painan
                 </StyledLabel>
                 } 
-          value={5} 
+          value={'142'} 
         />
         
       </Tabs>

@@ -1,24 +1,33 @@
 import {IconButton} from '@mui/material';
 import { useTheme, styled } from '@mui/material/styles';
 import Iconify from '../../../components/iconify/Iconify';
+import usePreviewFileModal from '../usePreviewFileModal';
 
+interface CheckButtonProps{
+  file: string,
+  id: number
+}
 
-const Checklist = (props: any) => (<Iconify icon={props.icon} sx={{cursor: 'pointer', color: props.color}} />);
-
-export default function CheckButton(){
+export default function CheckButton({file, id}: CheckButtonProps) {
   const theme = useTheme();
+
+  const {modalOpen, changeFile, selectId} = usePreviewFileModal();
 
   return(
     <>
       <IconButton 
         component="label"
+        onClick={() => {
+          modalOpen(); 
+          changeFile(file);
+          selectId(id);
+        }}
       >
         <Iconify 
           sx={{color:theme.palette.success.dark}} 
           icon='solar:check-circle-bold'
         />
       </IconButton>
-      {/* <Checklist color={theme.palette.success.dark} icon='solar:check-circle-bold'/> */}
     </>
   )
 }

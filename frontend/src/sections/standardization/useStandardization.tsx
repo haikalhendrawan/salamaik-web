@@ -2,6 +2,7 @@ import { ReactNode, useState, createContext, useContext, useEffect } from 'react
 import useAxiosJWT from '../../hooks/useAxiosJWT';
 import useLoading from '../../hooks/display/useLoading';
 import useSnackbar from '../../hooks/display/useSnackbar';
+import {useAuth}  from '../../hooks/useAuth';
 //------------------------------------------------------------------
 interface StandardizationType{
   id: number;
@@ -30,7 +31,7 @@ interface StandardizationJunctionType{
 
 interface StandardizationContextType{
   standardization: StandardizationType[] | [],
-  getStandardization: () => void,
+  getStandardization: () => Promise<void>,
 };
 
 type StandardizationProviderProps = {
@@ -40,7 +41,7 @@ type StandardizationProviderProps = {
 //------------------------------------------------------------------
 const StandardizationContext = createContext<StandardizationContextType>({
   standardization: [], 
-  getStandardization: () => {},
+  getStandardization: async() => {},
 });
 
 const StandardizationProvider = ({children}: StandardizationProviderProps) => {
@@ -50,12 +51,15 @@ const StandardizationProvider = ({children}: StandardizationProviderProps) => {
 
   const { openSnackbar } = useSnackbar();
 
+  const {auth} = useAuth();
+
   const [standardization, setStandardization] = useState<StandardizationType[] | []  >([]);
 
   const getStandardization = async() => {
     try{
       setIsLoading(true);
-      const response = await axiosJWT.get("/getStdWorksheet");
+      const time = new Date().getTime();
+      const response = await axiosJWT.get(`/getStdWorksheet/${'010'}?time=${time}`);
       setStandardization(response.data.rows);
       setIsLoading(false);
     }catch(err: any){

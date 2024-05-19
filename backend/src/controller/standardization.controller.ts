@@ -5,7 +5,7 @@ import period from '../model/period.model';
 import ErrorDetail from '../model/error.model';
 import multer from 'multer';
 import logger from '../config/logger';
-import { sanitizeMimeType } from 'utils/mimeTypeSanitizer';
+import { sanitizeMimeType } from '../utils/mimeTypeSanitizer';
 import fs from 'fs';
 import path from 'path';
 // -------------------------------------------------
@@ -46,7 +46,8 @@ const getStandardizationJunction = async (req: Request, res: Response, next: Nex
 
 const getStdWorksheet = async (req: Request, res: Response, next: NextFunction) => {
   try{
-    const {kppn, period: periodID} = req.payload;
+    const {period: periodID} = req.payload;
+    const {kppn} = req.params
     const periodRef = await period.getAllPeriod();
     const isEvenPeriod = periodRef?.filter((item: PeriodType) => item.id === periodID)?.[0]?.evenPeriod || 0;
 
@@ -93,7 +94,7 @@ const addStandardizationJunction = async (req: Request, res: Response, next: Nex
       const fileExt = sanitizeMimeType(req.file.mimetype);
       const fileName = `std_${kppnId}_${periodId}${month}${standardizationId}_${timeStamp}.${fileExt}`;
       const result = await standardization.addStandardizationJunction(kppnId, periodId, standardizationId, month, fileName);
-      return res.status(200).json({sucess: true, message: 'Add standardization success', rows: result})
+      return res.status(200).json({sucess: true, message: 'Add File success', rows: result})
     }catch(err){
       logger.error('Error adding std junction', err)
       next(err)
@@ -107,10 +108,10 @@ const deleteStandardizationJunction = async (req: Request, res: Response, next: 
     const {id, fileName} = req.body;
     const result = await standardization.deleteStandardizationJunction(id);
 
-    const filePath = path.join(__dirname,`../uploads/checklist/`, fileName);
+    const filePath = path.join(__dirname,`../uploads/standardization/`, fileName);
     fs.unlinkSync(filePath);
 
-    return res.status(200).json({sucess: true, message: 'Delete standardization success', rows: result})
+    return res.status(200).json({sucess: true, message: 'Delete file success', rows: result})
   }catch(err){
     next(err)
   }
