@@ -91,7 +91,7 @@ export default function WorksheetKPPN() {
     <>
     {isLoading 
       ?
-        <PageLoading loadingDurationInSeconds={2}/>
+        <PageLoading duration={2}/>
       : 
       <>
         <Helmet>

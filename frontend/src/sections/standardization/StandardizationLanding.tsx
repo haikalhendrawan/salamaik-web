@@ -6,6 +6,7 @@ import { Container, Stack, Typography, Grid, IconButton, Breadcrumbs, Link} from
 import {useTheme, styled} from '@mui/material/styles';
 // sections
 import SelectionTab from './components/SelectionTab';
+import PageLoading from '../../components/pageLoading/PageLoading';
 import StandardizationTable from './components/StandardizationTable';
 import DocumentShort from './components/DocumentShort';
 import AmountShort from './components/AmountShort';
@@ -28,7 +29,11 @@ export default function StandardizationLanding() {
 
   const navigate = useNavigate();
 
+  const [loading, setLoading] = useState(true);
+
   const params = new URLSearchParams(useLocation().search);
+
+  const {getStandardization} = useStandardization();
 
   const id= params.get('id');
 
@@ -39,6 +44,20 @@ export default function StandardizationLanding() {
   const handleTabChange = (event: React.SyntheticEvent, newValue: string) => { // setiap tab komponen berubah
     setTabValue(newValue);
   };
+
+  useEffect(() => {
+    async function getData(){
+      try{
+        await getStandardization(tabValue);
+        setLoading(false);
+      }catch(err){
+        setLoading(false);
+      }
+    }
+    setLoading(true);
+    getData();
+
+  }, [tabValue]);
 
   return (
     <>
@@ -71,15 +90,34 @@ export default function StandardizationLanding() {
         </Grid>
 
         <Stack direction='column' spacing={4}>
-          <StandardizationTable modalOpen={modalOpen} kppnTab={tabValue} />
-
-          <StandardizationTable modalOpen={modalOpen} kppnTab={tabValue} />
-
-          <StandardizationTable modalOpen={modalOpen} kppnTab={tabValue} />
+          {loading
+            ?<PageLoading duration={2}/>
+            : <>
+                <StandardizationTable 
+                  header={'Manajemen Eksternal'} 
+                  modalOpen={modalOpen} 
+                  kppnTab={tabValue}
+                  cluster={1} 
+                />
+                <StandardizationTable 
+                  header={'Penguatan Kapasitas Perbendaharaan'} 
+                  modalOpen={modalOpen} 
+                  kppnTab={tabValue} 
+                  cluster={2} 
+                />
+                <StandardizationTable 
+                  header={'Penguatan Manajemen Internal'} 
+                  modalOpen={modalOpen} 
+                  kppnTab={tabValue}
+                  cluster={3}  
+                />
+              </>
+          }
+          
         </Stack>
       </Container>
 
-      <PreviewFileModal open={open} modalClose={modalClose} file={file} />
+      <PreviewFileModal open={open} modalClose={modalClose} file={file} kppnId={tabValue} />
     </>
   )
 

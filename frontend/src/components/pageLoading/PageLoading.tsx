@@ -14,7 +14,7 @@ type PageLoadingProps = {
   duration: number
 };
 
-export default function PageLoading({ duration}:PageLoadingProps){
+export default function PageLoading({ duration }:PageLoadingProps){
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {

@@ -10,6 +10,7 @@ import useStandardization from '../useStandardization';
 import usePreviewFileModal from '../usePreviewFileModal';
 import AddButton from './AddButton';
 import CheckButton from './CheckButton';
+import { renderConditionalRow } from '../utils';
 
 
 // ---------------------------------------------------
@@ -35,7 +36,7 @@ const TABLE_HEAD = {
     { id: 'apr', label: 'Apr', alignRight: false },
     { id: 'mei', label: 'Mei', alignRight: false },
     { id: 'jun', label: 'Jun', alignRight: false },
-    { id: 'action', label: 'Action', alignRight: false },
+    // { id: 'action', label: 'Action', alignRight: false },
   ],
   even: [
     { id: 'no', label: 'No', alignRight: false },
@@ -46,7 +47,7 @@ const TABLE_HEAD = {
     { id: 'oct', label: 'Oct', alignRight: false },
     { id: 'nov', label: 'Nov', alignRight: false },
     { id: 'dec', label: 'Dec', alignRight: false },
-    { id: 'action', label: 'Action', alignRight: false },
+    // { id: 'action', label: 'Action', alignRight: false },
   ],
 };
 
@@ -61,11 +62,13 @@ const INTERVAL_DESC = [
 
 interface StandardizationTableProps{
   modalOpen: () => void,
-  kppnTab: string
+  kppnTab: string,
+  header: string,
+  cluster: number
 }
 
 // ----------------------------------------------------------------------------------
-export default function StandardizationTable({modalOpen, kppnTab}: StandardizationTableProps) {
+export default function StandardizationTable({header, modalOpen, kppnTab, cluster}: StandardizationTableProps) {
   const theme = useTheme();
 
   const {periodRef} = useDictionary();
@@ -78,10 +81,18 @@ export default function StandardizationTable({modalOpen, kppnTab}: Standardizati
 
   const tableHeaders = isEvenPeriod === 0 ? TABLE_HEAD.odd : TABLE_HEAD.even;
 
+  const tableHead = useMemo(() => tableHeaders.map((headCell) => (
+    <TableCell key={headCell.id} align={'center'}>
+      <TableSortLabel hideSortIcon>{headCell.label}</TableSortLabel>
+    </TableCell>
+  )),[isEvenPeriod]);
+
   const tableRows = useMemo(() => (
-    standardization?.map((row) => (
+    standardization
+    ?.filter((item) => item.cluster === cluster)
+    ?.map((row, index) => (
       <TableRow hover key={row.id} tabIndex={-1}>
-        <TableCell align="justify" sx={{ fontSize: '13px' }}>{row.id}</TableCell>
+        <TableCell align="justify" sx={{ fontSize: '13px' }}>{index+1}</TableCell>
         <TableCell align="left" sx={{ fontSize: '13px' }}>
           <Typography variant="body2">{row.title}</Typography>
           <Typography variant="body3">{INTERVAL_DESC[row.interval - 1]}</Typography>
@@ -110,25 +121,23 @@ export default function StandardizationTable({modalOpen, kppnTab}: Standardizati
     ))
   ), [standardization]);
 
+  const clusteredStandardization = useMemo(() => standardization?.filter((item) => item.cluster === cluster), [standardization]);
+
 
   return (
     <>
       <Grow in>
         <Card sx={{height:'auto', display:'flex', flexDirection:'column', gap:theme.spacing(1), mb: 1}}>
-          <CardHeader title={<Typography variant='h6'>Tata Kelola Internal</Typography>} sx={{mb:2}}/>
+          <CardHeader title={<Typography variant='h6'>{header}</Typography>} sx={{mb:2}}/>
 
           <Table>
             <TableHead>
               <TableRow>
-              {tableHeaders.map((headCell) => (
-                <TableCell key={headCell.id} align={'center'}>
-                  <TableSortLabel hideSortIcon>{headCell.label}</TableSortLabel>
-                </TableCell>
-              ))}
+              {tableHead}
               </TableRow>
             </TableHead>
             <TableBody>
-              {tableRows}
+              {renderConditionalRow(clusteredStandardization, modalOpen, kppnTab)}
             </TableBody>
           </Table>
         </Card>

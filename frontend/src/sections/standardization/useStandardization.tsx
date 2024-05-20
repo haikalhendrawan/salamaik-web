@@ -31,7 +31,7 @@ interface StandardizationJunctionType{
 
 interface StandardizationContextType{
   standardization: StandardizationType[] | [],
-  getStandardization: () => Promise<void>,
+  getStandardization: (kppnId: string) => Promise<void>,
 };
 
 type StandardizationProviderProps = {
@@ -55,11 +55,11 @@ const StandardizationProvider = ({children}: StandardizationProviderProps) => {
 
   const [standardization, setStandardization] = useState<StandardizationType[] | []  >([]);
 
-  const getStandardization = async() => {
+  const getStandardization = async(kppnId: string) => {
     try{
       setIsLoading(true);
       const time = new Date().getTime();
-      const response = await axiosJWT.get(`/getStdWorksheet/${'010'}?time=${time}`);
+      const response = await axiosJWT.get(`/getStdWorksheet/${kppnId}?time=${time}`);
       setStandardization(response.data.rows);
       setIsLoading(false);
     }catch(err: any){
@@ -70,10 +70,6 @@ const StandardizationProvider = ({children}: StandardizationProviderProps) => {
     }
   };
 
-
-  useEffect(() => {
-    getStandardization();
-  }, [])
 
   return(
     <StandardizationContext.Provider value={{standardization, getStandardization}}>

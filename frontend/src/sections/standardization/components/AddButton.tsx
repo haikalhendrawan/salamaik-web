@@ -55,7 +55,7 @@ export default function AddButton({kppn, standardizationId, month}: AddButtonPro
       const response = await axiosJWT.post("/addStandardizationJunction", formData, {
         headers:{"Content-Type": "multipart/form-data"}
       });
-      await getStandardization();
+      await getStandardization(kppn);
       setIsLoading(false);
       openSnackbar(response.data.message, 'success');
     }catch(err: any){
