@@ -1,27 +1,13 @@
-import {useState, useEffect, useMemo} from'react';
-import { Link } from 'react-router-dom';
-import {Stack, Toolbar, Typography, Table, Card, CardHeader, TableSortLabel, Tooltip,
-        TableHead, Grow, TableBody, TableRow, TableCell, Button} from '@mui/material';
-import { useTheme, styled } from '@mui/material/styles';
-import useDictionary from '../../hooks/useDictionary';
-import { useAuth } from '../../hooks/useAuth';
-import Iconify from '../../components/iconify/Iconify';
-import useStandardization from './useStandardization';
-import usePreviewFileModal from './usePreviewFileModal';
+/**
+ * Need To Refactor this code
+ * maybe someday :))
+ */
+import { useMemo } from 'react';
+import { TableRow, TableCell, Typography, Stack, Grid } from '@mui/material';
 import AddButton from './components/AddButton';
 import CheckButton from './components/CheckButton';
-
-const ActionButton = styled(Button)(({ theme }) => ({
-  height: '30px', 
-  width: '70px', 
-  fontSize:'12px', 
-  display: 'inline-flex',   
-  alignItems: 'center', 
-  justifyContent: 'center', 
-  paddingRight: 0,
-  paddingLeft: 0,
-  borderRadius: '8px',
-})) as typeof Button;  
+import { useAuth } from '../../hooks/useAuth';
+import useDictionary from '../../hooks/useDictionary';
 
 
 const INTERVAL_DESC = [
@@ -33,104 +19,260 @@ const INTERVAL_DESC = [
   "Minimal 2x tiap Triwulan"
 ];
 
-interface StandardizationType{
+interface StandardizationType {
   id: number;
   title: string;
   cluster: number;
   interval: number;
-  list:[
+  list: [
     StandardizationJunctionType[],
     StandardizationJunctionType[],
     StandardizationJunctionType[],
     StandardizationJunctionType[],
     StandardizationJunctionType[],
     StandardizationJunctionType[]
-  ]
-};
+  ];
+}
 
-interface StandardizationJunctionType{
+interface StandardizationJunctionType {
   id: number;
   kppn_id: number;
   period_id: number;
-  standardization_id: number
+  standardization_id: number;
   month: number;
   file: string;
-  uploaded_at: string
-};
-
+  uploaded_at: string;
+}
 
 export function renderConditionalRow(
-  standardization: StandardizationType[], 
+  standardization: StandardizationType[],
   modalOpen: () => void,
   kppnTab: string
-){
-  const tableRows = useMemo(() => (
-    standardization?.map((row, index) => (
-      row.interval===1
-      ? <TableRow hover key={row.id} tabIndex={-1}>
-            <TableCell align="justify" sx={{ fontSize: '13px' }}>{index+1}</TableCell>
-            <TableCell align="left" sx={{ fontSize: '13px' }}>
-              <Typography variant="body2">{row.title}</Typography>
-              <Typography variant="body3">{INTERVAL_DESC[row.interval - 1]}</Typography>
-            </TableCell>
-            {row.list.map((item, index) => (
-              <TableCell key={index} align="center" sx={{ fontSize: '13px' }}>
-                <Stack direction="row" spacing={0} alignContent="center" textAlign={'center'} justifyContent={'center'}>
-                  {item.length === 0 
-                    ? <AddButton kppn={kppnTab} standardizationId={row.id} month={index+1} /> 
-                    : <CheckButton file={item[0].file} id={item[0].id}/>
+) {
+
+  const {auth} = useAuth();
+
+  const {periodRef} = useDictionary();
+
+  const isEvenPeriod = periodRef?.list?.filter((item) => item.id === auth?.period)?.[0]?.evenPeriod || 0;
+
+  const tableRows = useMemo(() =>
+      standardization?.map((row, index) => {
+        let content;
+        switch (row.interval) {
+          case 1:
+            content = (
+              <TableRow hover key={row.id} tabIndex={-1}>
+                <TableCell align="justify" sx={{ fontSize: '13px' }}>
+                  {index + 1}
+                </TableCell>
+                <TableCell align="left" sx={{ fontSize: '13px' }}>
+                  <Typography variant="body2">{row.title}</Typography>
+                  <Typography variant="body3">{INTERVAL_DESC[row.interval - 1]}</Typography>
+                </TableCell>
+                {row.list.map((item, id) => (
+                  <TableCell key={id} align="center" sx={{ fontSize: '13px' }}>
+                    <Stack direction="row" spacing={0} alignContent="center" textAlign={'center'} justifyContent={'center'}>
+                      {item.length === 0 ? (
+                        <AddButton kppn={kppnTab} standardizationId={row.id} month={id + 1} />
+                      ) : (
+                        <CheckButton file={item[0].file} id={item[0].id} />
+                      )}
+                    </Stack>
+                  </TableCell>
+                ))}
+              </TableRow>
+            );
+            break;
+
+          case 2:
+            content = (
+              <TableRow hover key={row.id} tabIndex={-1}>
+                <TableCell align="justify" sx={{ fontSize: '13px' }}>
+                  {index + 1}
+                </TableCell>
+                <TableCell align="left" sx={{ fontSize: '13px' }}>
+                  <Typography variant="body2">{row.title}</Typography>
+                  <Typography variant="body3">{INTERVAL_DESC[row.interval - 1]}</Typography>
+                </TableCell>
+                {row.list.map((item, id) => (
+                  <TableCell key={id} align="center" sx={{ fontSize: '13px' }}>
+                    <Stack direction="row" spacing={0} alignContent="center">
+                      {item.length === 0 
+                        ? (
+                            <>
+                              <AddButton kppn={kppnTab} standardizationId={row.id} month={id + 1} />
+                              <AddButton kppn={kppnTab} standardizationId={row.id} month={id + 1} />
+                            </>
+                          )
+                        : item.length===1 
+                          ? (
+                            <>
+                              <CheckButton file={item[0].file} id={item[0].id} />
+                              <AddButton kppn={kppnTab} standardizationId={row.id} month={id + 1} />
+                            </>
+                            )
+                          :(
+                            <>
+                              <CheckButton file={item[0].file} id={item[0].id} />
+                              <CheckButton file={item[1].file} id={item[1].id} />
+                            </>
+                            )}
+                    </Stack>
+                  </TableCell>
+                ))}
+              </TableRow>
+            );
+            break;
+
+          case 3:
+            content = (
+              <TableRow hover key={row.id} tabIndex={-1}>
+                <TableCell align="justify" sx={{ fontSize: '13px' }}>
+                  {index + 1}
+                </TableCell>
+                <TableCell align="left" sx={{ fontSize: '13px' }}>
+                  <Typography variant="body2">{row.title}</Typography>
+                  <Typography variant="body3">{INTERVAL_DESC[row.interval - 1]}</Typography>
+                </TableCell>
+                {row.list.map((item, id) => {
+                    const expectedLength = 4;
+                    const short = expectedLength - item.length;
+                    return (
+                      <TableCell key={id} align="center" sx={{ fontSize: '13px' }}>
+                        <Stack direction="row" spacing={0} alignContent="center">
+                          <Grid container>
+                            {item.map((std, index) => (
+                              <Grid item xs={6}>
+                                <CheckButton file={item[index].file} id={item[index].id} />
+                              </Grid>
+                            ))}
+                            {Array.from({ length: short }).map((_, index) => (
+                              <Grid item xs={6}>
+                                <AddButton key={index} kppn={kppnTab} standardizationId={row.id} month={id + 1} />
+                              </Grid>
+                            ))}
+                          </Grid>
+                        </Stack>
+                      </TableCell>
+                    )
                   }
-                </Stack>
-              </TableCell>
-            ))}
-            {/* <TableCell align="left" sx={{ fontSize: '13px' }}>
-              <ActionButton
-                endIcon={<Iconify icon="eva:arrow-ios-forward-outline" />}
-                variant="contained"
-                color="white"
-                onClick={modalOpen}
-              >
-                Upload
-              </ActionButton>
-            </TableCell> */}
-        </TableRow>
-      : <TableRow hover key={row.id} tabIndex={-1}>
-            <TableCell align="justify" sx={{ fontSize: '13px' }}>{index+1}</TableCell>
-            <TableCell align="left" sx={{ fontSize: '13px' }}>
-              <Typography variant="body2">{row.title}</Typography>
-              <Typography variant="body3">{INTERVAL_DESC[row.interval - 1]}</Typography>
-            </TableCell>
-            {row.list.map((item, index) => (
-              <TableCell key={index} align="center" sx={{ fontSize: '13px' }}>
-                <Stack direction="row" spacing={0} alignContent="center">
-                  {item.length === 0 
-                    ? <>
-                        <AddButton kppn={kppnTab} standardizationId={row.id} month={index+1} /> 
-                        <AddButton kppn={kppnTab} standardizationId={row.id} month={index+1} />
-                      </>
-                    : <>
-                        <CheckButton file={item[0].file} id={item[0].id}/>
-                        <CheckButton file={item[0].file} id={item[0].id}/>
-                      </>
-                  }
-                </Stack>
-              </TableCell>
-            ))}
-            {/* <TableCell align="left" sx={{ fontSize: '13px' }}>
-              <ActionButton
-                endIcon={<Iconify icon="eva:arrow-ios-forward-outline" />}
-                variant="contained"
-                color="white"
-                onClick={modalOpen}
-              >
-                Upload
-              </ActionButton>
-            </TableCell> */}
-        </TableRow>
+                )}
+              </TableRow>
+            );
+            break;
 
-  ))
-  ),[standardization]);
+          case 4:
+            content = (
+              <TableRow hover key={row.id} tabIndex={-1}>
+                <TableCell align="justify" sx={{ fontSize: '13px' }}>
+                  {index + 1}
+                </TableCell>
+                <TableCell align="left" sx={{ fontSize: '13px' }}>
+                  <Typography variant="body2">{row.title}</Typography>
+                  <Typography variant="body3">{INTERVAL_DESC[row.interval - 1]}</Typography>
+                </TableCell>
+                {row.list.map((item, id) => (
+                  <TableCell key={id} align="center" sx={{ fontSize: '13px' }}>
+                    <Stack direction="row" spacing={0} alignContent="center" textAlign={'center'} justifyContent={'center'}>
+                      {item.length === 0 ? (
+                        <AddButton kppn={kppnTab} standardizationId={row.id} month={id + 1} />
+                      ) : (
+                        <CheckButton file={item[0].file} id={item[0].id} />
+                      )}
+                    </Stack>
+                  </TableCell>
+                ))}
+              </TableRow>
+            );
+          break;
 
+          case 5:
+            content = (
+              <TableRow hover key={row.id} tabIndex={-1}>
+                <TableCell align="justify" sx={{ fontSize: '13px' }}>
+                  {index + 1}
+                </TableCell>
+                <TableCell align="left" sx={{ fontSize: '13px' }}>
+                  <Typography variant="body2">{row.title}</Typography>
+                  <Typography variant="body3">{INTERVAL_DESC[row.interval - 1]}</Typography>
+                </TableCell>
+                <TableCell align="center" sx={{ fontSize: '13px' }} colSpan={3}>
+                  <Stack direction="row" spacing={0} alignContent="center" textAlign={'center'} justifyContent={'center'}>
+                    {row?.list[2]?.length === 0 ? (
+                      <AddButton kppn={kppnTab} standardizationId={row.id} month={isEvenPeriod===0? 3 : 9} />
+                    ) : (
+                      <CheckButton file={row?.list[2][0]?.file} id={row?.list[2][0]?.id} />
+                    )}
+                  </Stack>
+                </TableCell>
+                <TableCell align="center" sx={{ fontSize: '13px' }} colSpan={3}>
+                  <Stack direction="row" spacing={0} alignContent="center" textAlign={'center'} justifyContent={'center'}>
+                    {row?.list[5]?.length === 0 ? (
+                      <AddButton kppn={kppnTab} standardizationId={row.id} month={isEvenPeriod===0? 6 : 12} />
+                    ) : (
+                      <CheckButton file={row?.list[5][0]?.file} id={row?.list[5][0]?.id} />
+                    )}
+                  </Stack>
+                </TableCell>
+              </TableRow>
+            );
+          break;
 
-  return tableRows
+          case 6:
+            const expectedLength = 2;
+            const q1Length = row.list[2].length;
+            const q2Length = row.list[5].length;
+            const q1Short = expectedLength - q1Length;
+            const q2Short = expectedLength - q2Length;
+            content = (
+              <TableRow hover key={row.id} tabIndex={-1}>
+                <TableCell align="justify" sx={{ fontSize: '13px' }}>
+                  {index + 1}
+                </TableCell>
+                <TableCell align="left" sx={{ fontSize: '13px' }}>
+                  <Typography variant="body2">{row.title}</Typography>
+                  <Typography variant="body3">{INTERVAL_DESC[row.interval - 1]}</Typography>
+                </TableCell>
+                <TableCell align="center" sx={{ fontSize: '13px' }} colSpan={3}>
+                  <Stack direction="row" spacing={0} alignContent="center" textAlign={'center'} justifyContent={'center'}>
+                    {
+                      Array.from({ length: q1Length }).map((_, index) =>  (
+                        <CheckButton file={row.list[2][index].file} id={row.list[2][index].id} />
+                      ))
+                    }
+                    {
+                      Array.from({ length: q1Short }).map((_, index) =>  (
+                        <AddButton kppn={kppnTab} standardizationId={row.id} month={isEvenPeriod===0? 3 : 9} />
+                      ))
+                    }
+                  </Stack>
+                </TableCell>
+                <TableCell align="center" sx={{ fontSize: '13px' }} colSpan={3}>
+                  <Stack direction="row" spacing={0} alignContent="center" textAlign={'center'} justifyContent={'center'}>
+                    {
+                      Array.from({ length: q2Length }).map((_, index) =>  (
+                        <CheckButton file={row.list[5][index].file} id={row.list[5][index].id} />
+                      ))
+                    }
+                    {
+                      Array.from({ length: q2Short }).map((_, index) =>  (
+                        <AddButton kppn={kppnTab} standardizationId={row.id} month={isEvenPeriod===0? 6 : 12} />
+                      ))
+                    }
+                  </Stack>
+                </TableCell>
+              </TableRow>
+            );
+          break;
+
+          default:
+            content = null;
+        }
+        return content;
+      }),
+    [standardization]
+  );
+
+  return tableRows;
 }
