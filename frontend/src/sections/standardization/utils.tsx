@@ -31,7 +31,8 @@ interface StandardizationType {
     StandardizationJunctionType[],
     StandardizationJunctionType[],
     StandardizationJunctionType[]
-  ];
+  ],
+  score: number
 }
 
 interface StandardizationJunctionType {
@@ -60,7 +61,7 @@ export function renderConditionalRow(
       standardization?.map((row, index) => {
         let content;
         switch (row.interval) {
-          case 1:
+          case 1: // bulanan (1x tiap bulan)
             content = (
               <TableRow hover key={row.id} tabIndex={-1}>
                 <TableCell align="justify" sx={{ fontSize: '13px' }}>
@@ -69,6 +70,7 @@ export function renderConditionalRow(
                 <TableCell align="left" sx={{ fontSize: '13px' }}>
                   <Typography variant="body2">{row.title}</Typography>
                   <Typography variant="body3">{INTERVAL_DESC[row.interval - 1]}</Typography>
+                  <Typography variant="body3" color="error">{`Nilai: ${row.score}`}</Typography>
                 </TableCell>
                 {row.list.map((item, id) => (
                   <TableCell key={id} align="center" sx={{ fontSize: '13px' }}>
@@ -85,7 +87,7 @@ export function renderConditionalRow(
             );
             break;
 
-          case 2:
+          case 2: // 2 mingguan (2x tiap bulan)
             content = (
               <TableRow hover key={row.id} tabIndex={-1}>
                 <TableCell align="justify" sx={{ fontSize: '13px' }}>
@@ -94,6 +96,7 @@ export function renderConditionalRow(
                 <TableCell align="left" sx={{ fontSize: '13px' }}>
                   <Typography variant="body2">{row.title}</Typography>
                   <Typography variant="body3">{INTERVAL_DESC[row.interval - 1]}</Typography>
+                  <Typography variant="body3" color="error">{`Nilai: ${row.score}`}</Typography>
                 </TableCell>
                 {row.list.map((item, id) => (
                   <TableCell key={id} align="center" sx={{ fontSize: '13px' }}>
@@ -125,7 +128,7 @@ export function renderConditionalRow(
             );
             break;
 
-          case 3:
+          case 3: // 1 mingguan (4x tiap bulan)
             content = (
               <TableRow hover key={row.id} tabIndex={-1}>
                 <TableCell align="justify" sx={{ fontSize: '13px' }}>
@@ -134,6 +137,7 @@ export function renderConditionalRow(
                 <TableCell align="left" sx={{ fontSize: '13px' }}>
                   <Typography variant="body2">{row.title}</Typography>
                   <Typography variant="body3">{INTERVAL_DESC[row.interval - 1]}</Typography>
+                  <Typography variant="body3" color="error">{`Nilai: ${row.score}`}</Typography>
                 </TableCell>
                 {row.list.map((item, id) => {
                     const expectedLength = 4;
@@ -162,7 +166,7 @@ export function renderConditionalRow(
             );
             break;
 
-          case 4:
+          case 4: // harian (20 hari tiap bulan)
             content = (
               <TableRow hover key={row.id} tabIndex={-1}>
                 <TableCell align="justify" sx={{ fontSize: '13px' }}>
@@ -171,6 +175,7 @@ export function renderConditionalRow(
                 <TableCell align="left" sx={{ fontSize: '13px' }}>
                   <Typography variant="body2">{row.title}</Typography>
                   <Typography variant="body3">{INTERVAL_DESC[row.interval - 1]}</Typography>
+                  <Typography variant="body3" color="error">{`Nilai: ${row.score}`}</Typography>
                 </TableCell>
                 {row.list.map((item, id) => (
                   <TableCell key={id} align="center" sx={{ fontSize: '13px' }}>
@@ -187,7 +192,7 @@ export function renderConditionalRow(
             );
           break;
 
-          case 5:
+          case 5: // Triwulanan
             content = (
               <TableRow hover key={row.id} tabIndex={-1}>
                 <TableCell align="justify" sx={{ fontSize: '13px' }}>
@@ -196,6 +201,7 @@ export function renderConditionalRow(
                 <TableCell align="left" sx={{ fontSize: '13px' }}>
                   <Typography variant="body2">{row.title}</Typography>
                   <Typography variant="body3">{INTERVAL_DESC[row.interval - 1]}</Typography>
+                  <Typography variant="body3" color="error">{`Nilai: ${row.score}`}</Typography>
                 </TableCell>
                 <TableCell align="center" sx={{ fontSize: '13px' }} colSpan={3}>
                   <Stack direction="row" spacing={0} alignContent="center" textAlign={'center'} justifyContent={'center'}>
@@ -219,7 +225,7 @@ export function renderConditionalRow(
             );
           break;
 
-          case 6:
+          case 6: // 2 x Tiap Triwulan
             const expectedLength = 2;
             const q1Length = row.list[2].length;
             const q2Length = row.list[5].length;
@@ -233,6 +239,7 @@ export function renderConditionalRow(
                 <TableCell align="left" sx={{ fontSize: '13px' }}>
                   <Typography variant="body2">{row.title}</Typography>
                   <Typography variant="body3">{INTERVAL_DESC[row.interval - 1]}</Typography>
+                  <Typography variant="body3" color="error">{`Nilai: ${row.score}`}</Typography>
                 </TableCell>
                 <TableCell align="center" sx={{ fontSize: '13px' }} colSpan={3}>
                   <Stack direction="row" spacing={0} alignContent="center" textAlign={'center'} justifyContent={'center'}>
@@ -269,6 +276,7 @@ export function renderConditionalRow(
           default:
             content = null;
         }
+        
         return content;
       }),
     [standardization]
@@ -276,3 +284,4 @@ export function renderConditionalRow(
 
   return tableRows;
 }
+

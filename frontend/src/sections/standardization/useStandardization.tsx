@@ -16,7 +16,8 @@ interface StandardizationType{
     StandardizationJunctionType[],
     StandardizationJunctionType[],
     StandardizationJunctionType[]
-  ]
+  ],
+  score: number
 };
 
 interface StandardizationJunctionType{

@@ -87,40 +87,6 @@ export default function StandardizationTable({header, modalOpen, kppnTab, cluste
     </TableCell>
   )),[isEvenPeriod]);
 
-  const tableRows = useMemo(() => (
-    standardization
-    ?.filter((item) => item.cluster === cluster)
-    ?.map((row, index) => (
-      <TableRow hover key={row.id} tabIndex={-1}>
-        <TableCell align="justify" sx={{ fontSize: '13px' }}>{index+1}</TableCell>
-        <TableCell align="left" sx={{ fontSize: '13px' }}>
-          <Typography variant="body2">{row.title}</Typography>
-          <Typography variant="body3">{INTERVAL_DESC[row.interval - 1]}</Typography>
-        </TableCell>
-        {row.list.map((item, index) => (
-          <TableCell key={index} align="left" sx={{ fontSize: '13px' }}>
-            <Stack direction="row" spacing={1} alignContent="center">
-              {item.length === 0 
-                ? <AddButton kppn={kppnTab} standardizationId={row.id} month={index+1} /> 
-                : <CheckButton file={item[0].file} id={item[0].id}/>
-              }
-            </Stack>
-          </TableCell>
-        ))}
-        <TableCell align="left" sx={{ fontSize: '13px' }}>
-          <ActionButton
-            endIcon={<Iconify icon="eva:arrow-ios-forward-outline" />}
-            variant="contained"
-            color="white"
-            onClick={modalOpen}
-          >
-            Upload
-          </ActionButton>
-        </TableCell>
-      </TableRow>
-    ))
-  ), [standardization]);
-
   const clusteredStandardization = useMemo(() => standardization?.filter((item) => item.cluster === cluster), [standardization]);
 
 

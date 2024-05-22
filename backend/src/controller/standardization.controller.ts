@@ -6,6 +6,7 @@ import ErrorDetail from '../model/error.model';
 import multer from 'multer';
 import logger from '../config/logger';
 import { sanitizeMimeType } from '../utils/mimeTypeSanitizer';
+import { stdScoreGenerator } from '../utils/standardizationCounter';
 import fs from 'fs';
 import path from 'path';
 // -------------------------------------------------
@@ -65,7 +66,8 @@ const getStdWorksheet = async (req: Request, res: Response, next: NextFunction) 
         [...stdJunction?.filter((row) => (row.standardization_id === item.id) && row.month === (isEvenPeriod===0?4:10))],
         [...stdJunction?.filter((row) => (row.standardization_id === item.id) && row.month === (isEvenPeriod===0?5:11))],
         [...stdJunction?.filter((row) => (row.standardization_id === item.id) && row.month === (isEvenPeriod===0?6:12))]
-      ]
+      ],
+      score: stdScoreGenerator(item.interval, stdJunction, item, isEvenPeriod)
     }))
     return res.status(200).json({sucess: true, message: 'Get standardization worksheet success', rows: stdWorksheet})
   }catch(err){

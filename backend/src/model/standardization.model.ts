@@ -22,7 +22,7 @@ interface StandardizationJunctionType{
 };
 // ------------------------------------------------------
 class Standardization{
-  async getStandardization() {
+  async getStandardization(): Promise<StandardizationType[]> {
     try{
       const q = "SELECT * FROM standardization_ref ORDER BY id ASC";
       const result = await pool.query(q);
@@ -32,7 +32,7 @@ class Standardization{
     }
   }
 
-  async getStandardizationJunction(kppnId: string, periodId: number) {
+  async getStandardizationJunction(kppnId: string, periodId: number): Promise<StandardizationJunctionType[]> {
     try{
       const q = "SELECT * FROM standardization_junction WHERE kppn_id = $1 AND period_id = $2";
       const result = await pool.query(q, [kppnId, periodId]);
