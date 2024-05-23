@@ -54,6 +54,7 @@ const getStdWorksheet = async (req: Request, res: Response, next: NextFunction) 
 
     const stdRef = await standardization.getStandardization();
     const stdJunction = await standardization.getStandardizationJunction(kppn, periodID);
+    
     const stdWorksheet = stdRef.map((item) => ({
       id: item.id,
       title: item.title,
@@ -67,7 +68,8 @@ const getStdWorksheet = async (req: Request, res: Response, next: NextFunction) 
         [...stdJunction?.filter((row) => (row.standardization_id === item.id) && row.month === (isEvenPeriod===0?5:11))],
         [...stdJunction?.filter((row) => (row.standardization_id === item.id) && row.month === (isEvenPeriod===0?6:12))]
       ],
-      score: stdScoreGenerator(item.interval, stdJunction, item, isEvenPeriod)
+      score:  stdScoreGenerator(item.interval, stdJunction, item, isEvenPeriod).score,
+      short:  stdScoreGenerator(item.interval, stdJunction, item, isEvenPeriod).short
     }))
     return res.status(200).json({sucess: true, message: 'Get standardization worksheet success', rows: stdWorksheet})
   }catch(err){

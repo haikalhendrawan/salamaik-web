@@ -1,11 +1,8 @@
 import { Helmet } from 'react-helmet-async';
-import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-// @mui
-import { Container, Stack, Typography, Grid, IconButton, Breadcrumbs, Link} from '@mui/material';
-import {useTheme, styled} from '@mui/material/styles';
+import { useState, useEffect, useMemo } from 'react';
+import { Container, Stack, Typography, Grid} from '@mui/material';
+import useDictionary from '../../hooks/useDictionary';
 // sections
-import SelectionTab from './components/SelectionTab';
 import PageLoading from '../../components/pageLoading/PageLoading';
 import StandardizationTable from './components/StandardizationTable';
 import DocumentShort from './components/DocumentShort';
@@ -13,37 +10,33 @@ import AmountShort from './components/AmountShort';
 import PreviewFileModal from './components/PreviewFileModal';
 import useStandardization from './useStandardization';
 import usePreviewFileModal from './usePreviewFileModal';
+import { useAuth } from '../../hooks/useAuth';
+import { getAmountShort, getReportingMonth } from './utils';
 // --------------------------------------------------------------
-const SELECT_KPPN: {[key: string]: string} = {
-  '010': 'Padang',
-  '011': 'Bukittinggi',
-  '090': 'Solok',
-  '091': 'Lubuk Sikaping',
-  '077': 'Sijunjung',
-  '142': 'Painan',
-};
 
 // --------------------------------------------------------------
-export default function StandardizationLanding() {
-  const theme = useTheme();
-
-  const navigate = useNavigate();
-
+export default function StandardizationKPPN() {
   const [loading, setLoading] = useState(true);
 
-  const params = new URLSearchParams(useLocation().search);
+  const {kppnRef, periodRef} = useDictionary();
 
-  const {getStandardization} = useStandardization();
+  const {getStandardization, standardization} = useStandardization();
 
-  const id= params.get('id');
+  const {auth} = useAuth();
 
-  const {open, modalOpen, modalClose, changeFile, file} = usePreviewFileModal();
+  const tabValue = auth?.kppn || '';
 
-  const [tabValue, setTabValue] = useState('010'); // ganti menu komponen supervisi
+  const {open, modalOpen, modalClose, file} = usePreviewFileModal();
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: string) => { // setiap tab komponen berubah
-    setTabValue(newValue);
-  };
+  const isEvenPeriod = periodRef?.list?.filter((item) => item.id === auth?.period)?.[0]?.evenPeriod || 0;
+
+  const reportingDate = 15;
+
+  const amountShort = getAmountShort(standardization, isEvenPeriod, reportingDate);
+  
+  const unitName = useMemo(() => (
+    kppnRef?.list?.filter((item) => item.id === tabValue)[0]?.alias || ''
+  ),[kppnRef, tabValue]);
 
   useEffect(() => {
     async function getData(){
@@ -72,21 +65,27 @@ export default function StandardizationLanding() {
           </Typography>
         </Stack>
 
-        <SelectionTab tab={tabValue} changeTab={handleTabChange} />
-
         <Grid container spacing={4} sx={{mb: 4}}>
           <Grid item xs={4}>
-            <AmountShort header='Jumlah Kekurangan Dokumen' subheader='Per 20 Mei 2024' short={4} />
+            <AmountShort 
+              header='Jumlah Kekurangan Dokumen' 
+              subheader={`Periode Pelaporan ${getReportingMonth(reportingDate)}`}
+              short={amountShort*-1} 
+            />
           </Grid>
 
           <Grid item xs={4}>
-            <DocumentShort header='Monitoring Kekurangan Per KPPN' subheader='KPPN Padang' image='/image/Other 12.png'/>
+            <DocumentShort 
+              header='Monitoring Kekurangan Per KPPN' 
+              subheader={`${unitName}`} 
+              image='/image/Other 12.png'
+              tabValue={tabValue}
+            />
           </Grid>
 
-          <Grid item xs={4}>
+          {/* <Grid item xs={4}>
             <DocumentShort header='Monitoring Kekurangan' subheader='Seluruh KPPN' image='/image/Other 09.png'/>
-          </Grid>
-
+          </Grid> */}
         </Grid>
 
         <Stack direction='column' spacing={4}>

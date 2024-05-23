@@ -1,11 +1,8 @@
-import { Helmet } from 'react-helmet-async';
-import { useState } from 'react';
-import { Outlet } from 'react-router-dom';
-// @mui
-import { Container, Stack, Typography, Tabs, Tab, Grid, Paper, IconButton, Box, LinearProgress} from '@mui/material';
 import {useTheme, styled} from '@mui/material/styles';
+import { useAuth } from '../hooks/useAuth';
 //sections
-import StandardizationLanding from '../sections/standardization/StandardizationLanding';
+import StandardizationKanwil from '../sections/standardization/StandardizationKanwil';
+import StandardizationKPPN from '../sections/standardization/StandardizationKPPN';
 import { StandardizationProvider } from '../sections/standardization/useStandardization';
 import { PreviewFileModalProvider } from '../sections/standardization/usePreviewFileModal';
 
@@ -15,13 +12,13 @@ import { PreviewFileModalProvider } from '../sections/standardization/usePreview
 // ----------------------------------------------------------------------
 
 export default function StandardizationPage() {
-  const theme = useTheme();
+  const {auth} = useAuth();
 
   return (
     <>
       <StandardizationProvider>
         <PreviewFileModalProvider>
-          <StandardizationLanding/>
+          {auth?.kppn==='03010'?<StandardizationKanwil/>:<StandardizationKPPN/>}
         </PreviewFileModalProvider>
       </StandardizationProvider>
     </>

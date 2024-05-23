@@ -1,31 +1,14 @@
-import {useState, useEffect, useMemo} from'react';
-import { Link } from 'react-router-dom';
-import {Stack, Toolbar, Typography, Table, Card, CardHeader, TableSortLabel, Tooltip,
-        TableHead, Grow, TableBody, TableRow, TableCell, Button} from '@mui/material';
-import { useTheme, styled } from '@mui/material/styles';
+import {useMemo} from'react';
+import {Typography, Table, Card, CardHeader, TableSortLabel, 
+        TableHead, Grow, TableBody, TableRow, TableCell, } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import useDictionary from '../../../hooks/useDictionary';
 import { useAuth } from '../../../hooks/useAuth';
-import Iconify from '../../../components/iconify/Iconify';
 import useStandardization from '../useStandardization';
-import usePreviewFileModal from '../usePreviewFileModal';
-import AddButton from './AddButton';
-import CheckButton from './CheckButton';
 import { renderConditionalRow } from '../utils';
 
 
 // ---------------------------------------------------
-const ActionButton = styled(Button)(({ theme }) => ({
-  height: '30px', 
-  width: '70px', 
-  fontSize:'12px', 
-  display: 'inline-flex',   
-  alignItems: 'center', 
-  justifyContent: 'center', 
-  paddingRight: 0,
-  paddingLeft: 0,
-  borderRadius: '8px',
-})) as typeof Button;  
-
 const TABLE_HEAD = {
   odd: [
     { id: 'no', label: 'No', alignRight: false },
@@ -50,15 +33,6 @@ const TABLE_HEAD = {
     // { id: 'action', label: 'Action', alignRight: false },
   ],
 };
-
-const INTERVAL_DESC = [
-  "Minimal 1x tiap Bulan",
-  "Minimal 2x tiap Bulan",
-  "Minimal 4x tiap Bulan",
-  "Minimal 20x tiap Bulan",
-  "Minimal 1x tiap Triwulan",
-  "Minimal 2x tiap Triwulan"
-];
 
 interface StandardizationTableProps{
   modalOpen: () => void,
@@ -103,7 +77,7 @@ export default function StandardizationTable({header, modalOpen, kppnTab, cluste
               </TableRow>
             </TableHead>
             <TableBody>
-              {renderConditionalRow(clusteredStandardization, modalOpen, kppnTab)}
+              {renderConditionalRow(clusteredStandardization, kppnTab)}
             </TableBody>
           </Table>
         </Card>

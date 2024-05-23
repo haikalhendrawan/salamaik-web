@@ -8,8 +8,8 @@ import AddButton from './components/AddButton';
 import CheckButton from './components/CheckButton';
 import { useAuth } from '../../hooks/useAuth';
 import useDictionary from '../../hooks/useDictionary';
-
-
+import { StandardizationJunctionType, StandardizationType } from './types';
+// --------------------------------------------------------------
 const INTERVAL_DESC = [
   "Minimal 1x tiap Bulan",
   "Minimal 2x tiap Bulan",
@@ -19,35 +19,23 @@ const INTERVAL_DESC = [
   "Minimal 2x tiap Triwulan"
 ];
 
-interface StandardizationType {
-  id: number;
-  title: string;
-  cluster: number;
-  interval: number;
-  list: [
-    StandardizationJunctionType[],
-    StandardizationJunctionType[],
-    StandardizationJunctionType[],
-    StandardizationJunctionType[],
-    StandardizationJunctionType[],
-    StandardizationJunctionType[]
-  ],
-  score: number
-}
-
-interface StandardizationJunctionType {
-  id: number;
-  kppn_id: number;
-  period_id: number;
-  standardization_id: number;
-  month: number;
-  file: string;
-  uploaded_at: string;
-}
-
+const MONTH_NAME = [
+  'Januari',
+  'Februari',
+  'Maret',
+  'April',
+  'Mei',
+  'Juni',
+  'Juli',
+  'Agustus',
+  'September',
+  'Oktober',
+  'November',
+  'Desember'
+]
+// --------------------------------------------------------------
 export function renderConditionalRow(
   standardization: StandardizationType[],
-  modalOpen: () => void,
   kppnTab: string
 ) {
 
@@ -70,7 +58,7 @@ export function renderConditionalRow(
                 <TableCell align="left" sx={{ fontSize: '13px' }}>
                   <Typography variant="body2">{row.title}</Typography>
                   <Typography variant="body3">{INTERVAL_DESC[row.interval - 1]}</Typography>
-                  <Typography variant="body3" color="error">{`Nilai: ${row.score}`}</Typography>
+                  <Typography variant="body3" color="primary">{`, Nilai: ${row.score}`}</Typography>
                 </TableCell>
                 {row.list.map((item, id) => (
                   <TableCell key={id} align="center" sx={{ fontSize: '13px' }}>
@@ -96,7 +84,7 @@ export function renderConditionalRow(
                 <TableCell align="left" sx={{ fontSize: '13px' }}>
                   <Typography variant="body2">{row.title}</Typography>
                   <Typography variant="body3">{INTERVAL_DESC[row.interval - 1]}</Typography>
-                  <Typography variant="body3" color="error">{`Nilai: ${row.score}`}</Typography>
+                  <Typography variant="body3" color="primary">{`, Nilai: ${row.score}`}</Typography>
                 </TableCell>
                 {row.list.map((item, id) => (
                   <TableCell key={id} align="center" sx={{ fontSize: '13px' }}>
@@ -137,7 +125,7 @@ export function renderConditionalRow(
                 <TableCell align="left" sx={{ fontSize: '13px' }}>
                   <Typography variant="body2">{row.title}</Typography>
                   <Typography variant="body3">{INTERVAL_DESC[row.interval - 1]}</Typography>
-                  <Typography variant="body3" color="error">{`Nilai: ${row.score}`}</Typography>
+                  <Typography variant="body3" color="primary">{`, Nilai: ${row.score}`}</Typography>
                 </TableCell>
                 {row.list.map((item, id) => {
                     const expectedLength = 4;
@@ -175,7 +163,7 @@ export function renderConditionalRow(
                 <TableCell align="left" sx={{ fontSize: '13px' }}>
                   <Typography variant="body2">{row.title}</Typography>
                   <Typography variant="body3">{INTERVAL_DESC[row.interval - 1]}</Typography>
-                  <Typography variant="body3" color="error">{`Nilai: ${row.score}`}</Typography>
+                  <Typography variant="body3" color="primary">{`, Nilai: ${row.score}`}</Typography>
                 </TableCell>
                 {row.list.map((item, id) => (
                   <TableCell key={id} align="center" sx={{ fontSize: '13px' }}>
@@ -201,7 +189,7 @@ export function renderConditionalRow(
                 <TableCell align="left" sx={{ fontSize: '13px' }}>
                   <Typography variant="body2">{row.title}</Typography>
                   <Typography variant="body3">{INTERVAL_DESC[row.interval - 1]}</Typography>
-                  <Typography variant="body3" color="error">{`Nilai: ${row.score}`}</Typography>
+                  <Typography variant="body3" color="primary">{`, Nilai: ${row.score}`}</Typography>
                 </TableCell>
                 <TableCell align="center" sx={{ fontSize: '13px' }} colSpan={3}>
                   <Stack direction="row" spacing={0} alignContent="center" textAlign={'center'} justifyContent={'center'}>
@@ -239,7 +227,7 @@ export function renderConditionalRow(
                 <TableCell align="left" sx={{ fontSize: '13px' }}>
                   <Typography variant="body2">{row.title}</Typography>
                   <Typography variant="body3">{INTERVAL_DESC[row.interval - 1]}</Typography>
-                  <Typography variant="body3" color="error">{`Nilai: ${row.score}`}</Typography>
+                  <Typography variant="body3" color="primary">{`, Nilai: ${row.score}`}</Typography>
                 </TableCell>
                 <TableCell align="center" sx={{ fontSize: '13px' }} colSpan={3}>
                   <Stack direction="row" spacing={0} alignContent="center" textAlign={'center'} justifyContent={'center'}>
@@ -283,5 +271,37 @@ export function renderConditionalRow(
   );
 
   return tableRows;
-}
+};
 
+
+export function getAmountShort(standardization: StandardizationType[] | [], isEvenPeriod: number, reportingDate: number) {
+  const currentMonth = new Date().getMonth();
+
+  const currMonthSmt = isEvenPeriod===0?currentMonth:(currentMonth-6);
+
+  const currentDate = new Date().getDate();
+
+  const amountShort = standardization && standardization.length>0
+    ?standardization.map((item)=> {
+          let shortPerItem = 0;
+          const start = currentDate<reportingDate ?currMonthSmt-1 : currMonthSmt;
+          const end = currentDate<reportingDate ? currMonthSmt : currMonthSmt+1;
+
+          item.short.slice(start, end).map((list) =>
+            shortPerItem += list
+          );
+
+          return shortPerItem
+      })?.reduce((a, c) => a + c)
+    :0
+
+  return amountShort
+};
+
+export function getReportingMonth(reportingDate: number) {
+  const currentDate = new Date().getDate();
+
+  const currentMonth = new Date().getMonth();
+
+  return currentDate<reportingDate?MONTH_NAME[currentMonth-1]:MONTH_NAME[currentMonth]
+};

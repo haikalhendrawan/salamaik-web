@@ -1,14 +1,11 @@
-import {useState, useEffect, useRef} from'react';
-import {Stack, Button, Box, Tooltip, Modal, Typography} from '@mui/material';
-import { useTheme, styled } from '@mui/material/styles';
+import {useState, useEffect} from'react';
+import {Button, Box, Tooltip, Modal, Typography} from '@mui/material';
 import Iconify from '../../../components/iconify';
 import useAxiosJWT from '../../../hooks/useAxiosJWT';
 import useLoading from '../../../hooks/display/useLoading';
 import useSnackbar from '../../../hooks/display/useSnackbar';
 import usePreviewFileModal from '../usePreviewFileModal';
 import useStandardization from '../useStandardization';
-import Label from '../../../components/label';
-import Scrollbar from '../../../components/scrollbar';
 // -------------------------------------------------------------------------------------------
 const style = {
   position: 'absolute',
@@ -29,8 +26,6 @@ interface PreviewFileModalProps {
 
 // -------------------------------------------------------------------------------------------
 export default function PreviewFileModal({open, modalClose, file, kppnId}: PreviewFileModalProps){
-  const theme = useTheme();
-
   const [render, setRender] = useState<string | JSX.Element>('No files');
 
   const axiosJWT = useAxiosJWT();
@@ -54,7 +49,7 @@ export default function PreviewFileModal({open, modalClose, file, kppnId}: Previ
   const deleteFile = async() => {
     try{
       setIsLoading(true);
-      const response = await axiosJWT.post('/deleteStandardizationJunction', {
+      await axiosJWT.post('/deleteStandardizationJunction', {
         id: selectedId,
         fileName: file
       });

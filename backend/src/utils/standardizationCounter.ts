@@ -30,53 +30,55 @@ export function stdScoreGenerator(
     [...stdJunction?.filter((row) => (row.standardization_id === stdRef.id) && row.month === (isEvenPeriod===0?6:12))]
   ];
 
+  const short: number[] = [];
+
   let score: number = 0;
 
   switch(interval){
     case 1: // bulanan (1x tiap bulan)
       list.map((item) => {
-        if(item.length === 1){
-          score +=2
-        }
+        score += (item.length*2);
+        short.push(item.length-1);
       })
       break;
 
     case 2: // 2 mingguan (2x tiap bulan)
       list.map((item) => {
-        score += item.length
+        score += item.length;
+        short.push(item.length-2);
       })
       break;
 
     case 3: // 1 mingguan (4x tiap bulan)
       list.map((item) => {
-        if(item.length>0){
-          score += (item.length/2)
-        }
+        score += (item.length/2);
+        short.push(item.length-4);
       })
       break;
 
     case 4: // harian (20 hari tiap bulan)
       list.map((item) => {
-        if(item.length === 1){
-          score +=2
-        }
+        score += (item.length*2);
+        short.push(item.length-1);
       })
       break;
 
     case 5: // Triwulanan
       const q1Triwulanan = (list[2].length)*6;
       const q2Triwulanan = (list[5].length)*6;
-      score += q1Triwulanan + q2Triwulanan
+      score += q1Triwulanan + q2Triwulanan;
+      short.push(0, 0, (list[2].length-1), 0, 0, (list[5].length-1));
       break;
 
     case 6: // 2 x Tiap Triwulan
       const q1Triwulanan2 = (list[2].length)*3;
       const q2Triwulanan2 = (list[5].length)*3;
-      score += q1Triwulanan2 + q2Triwulanan2
+      score += q1Triwulanan2 + q2Triwulanan2;
+      short.push(0, 0, (list[2].length-2), 0, 0, (list[5].length-2));
       break;
 
     default : score+=0
   }
 
-  return score
+  return {score, short}
 }

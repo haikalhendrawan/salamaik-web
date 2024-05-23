@@ -3,33 +3,8 @@ import useAxiosJWT from '../../hooks/useAxiosJWT';
 import useLoading from '../../hooks/display/useLoading';
 import useSnackbar from '../../hooks/display/useSnackbar';
 import {useAuth}  from '../../hooks/useAuth';
+import { StandardizationType } from './types';
 //------------------------------------------------------------------
-interface StandardizationType{
-  id: number;
-  title: string;
-  cluster: number;
-  interval: number;
-  list:[
-    StandardizationJunctionType[],
-    StandardizationJunctionType[],
-    StandardizationJunctionType[],
-    StandardizationJunctionType[],
-    StandardizationJunctionType[],
-    StandardizationJunctionType[]
-  ],
-  score: number
-};
-
-interface StandardizationJunctionType{
-  id: number;
-  kppn_id: number;
-  period_id: number;
-  standardization_id: number
-  month: number;
-  file: string;
-  uploaded_at: string
-};
-
 interface StandardizationContextType{
   standardization: StandardizationType[] | [],
   getStandardization: (kppnId: string) => Promise<void>,
