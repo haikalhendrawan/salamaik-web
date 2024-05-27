@@ -47,10 +47,26 @@ interface SubSubKomponenRefType{
   alias?: string,
 };
 
+interface UnitType{
+  id: string;
+  name: string;
+  alias: string;
+  kk_name: string;
+  kk_nip: string;
+  info: string;
+  col_order: number;
+  level: number;
+};
+
+interface UnitRefType{
+  [key: string | number]: string | number | any[];
+  list: UnitType[];
+}
+
 interface DictionaryContextType{
   statusRef: DictionaryType | null,
   periodRef: PeriodRefType | null,
-  kppnRef: DictionaryType | null,
+  kppnRef: UnitRefType | null,
   roleRef: DictionaryType | null,
   komponenRef: KomponenRefType[] | null,
   subKomponenRef: SubKomponenRefType[] | null,

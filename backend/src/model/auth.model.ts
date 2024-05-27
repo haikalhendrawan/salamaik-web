@@ -50,7 +50,7 @@ class Auth{
     }
   }
 
-  async updateToken(userID: string){
+  async getUserById(userID: string){
     try{
       const q1 = "SELECT * FROM user_ref WHERE id = $1";
       const result = await pool.query(q1, [userID]);

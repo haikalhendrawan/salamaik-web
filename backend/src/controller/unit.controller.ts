@@ -7,7 +7,9 @@ interface UnitType{
   alias: string;
   kk_name: string;
   kk_nip: string;
-  info: string
+  info: string;
+  col_order: number;
+  level: number;
 };
 // ------------------------------------------------------
 const getAllUnit = async (req: Request, res: Response, next: NextFunction) => {

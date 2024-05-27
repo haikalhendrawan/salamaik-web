@@ -7,6 +7,7 @@ import user from '../model/user.model';
 import transporter from '../config/mailer';
 import "dotenv/config";
 import {z} from 'zod';
+import logger from 'config/logger';
 // -------------------------------------------------
 type JwtPayloadType = {
   id: string;
@@ -80,7 +81,7 @@ const updateToken = async (req: Request, res: Response, next: NextFunction) => {
       throw new ErrorDetail(401,'Invalid jwt payload')
     };
 
-    const response = await auth.updateToken(userID);
+    const response = await auth.getUserById(userID);
     const authInfo: JwtPayloadType = {
       id: response.id,
       username: response.username,

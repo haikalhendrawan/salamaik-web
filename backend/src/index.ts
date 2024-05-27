@@ -3,6 +3,7 @@ import path from "path";
 import "dotenv/config"; 
 import cors from "cors";
 import cookieParser from 'cookie-parser';
+import logger from './config/logger';
 //routes
 import notifRoute from './routes/notifRoute';
 import authRoute from './routes/authRoute';
@@ -16,16 +17,20 @@ import checklistRoute from './routes/checklistRoute';
 import standardizationRoute from './routes/standardizationRoute';
 //middleware
 import errorHandler from './middleware/errorHandler';
+import notFoundHandler from './middleware/notFoundHandler';
+import rateLimiter from './middleware/rateLimiter';
 // ------------------------------------------------------------
 
 const app = express();
+
+app.use(express.json());
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'uploads')));
 app.use(cors({
   origin: process.env.CLIENT_URL,
   credentials: true
 }));
-app.use(express.json());
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'uploads')));
+app.use(rateLimiter);
 app.use(authRoute);
 app.use(unitRoute);
 app.use(roleRoute);
@@ -36,12 +41,9 @@ app.use(userRoute);
 app.use(komponenRoute);
 app.use(checklistRoute);
 app.use(standardizationRoute);
+app.use(notFoundHandler);
 app.use(errorHandler);
 
-app.get('/', (req: Request, res: Response) => {
-  res.json({msg:"Hello World"});
-});
-
 app.listen(process.env.DEV_PORT, () => {
-  console.log(`Server is running on port ${process.env.DEV_PORT}`);
+  logger.info(`Server is running on port ${process.env.DEV_PORT}`);
 });

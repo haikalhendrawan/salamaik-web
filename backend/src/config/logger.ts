@@ -3,6 +3,13 @@ import path from 'path';
 
 const loggerTransports = [];
 
+const levelIdentifier = {
+  info: '📘',
+  debug: '📗',
+  error: '📕',
+  warn: '📒'
+};
+
 if (process.env.NODE_ENV === 'production') {
   loggerTransports.push(
     new transports.File({
@@ -19,6 +26,7 @@ if (process.env.NODE_ENV === 'production') {
   );
 }
 
+
 const logger = createLogger({
   level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
   format: format.combine(
@@ -29,7 +37,7 @@ const logger = createLogger({
     format.splat(),
     format.json(),
     format.printf(({ timestamp, level, message, stack }) => {
-      return `${timestamp} [${level.toUpperCase()}] ${message} ${
+      return `${timestamp} [${levelIdentifier[level as keyof typeof levelIdentifier]} ${level.toUpperCase()}] ${message} ${
         stack ? `\n${stack}` : ''
       }`;
     })
