@@ -26,6 +26,16 @@ class Unit{
     }
   }
 
+  async getAllKPPN(){
+    try{
+      const q = "SELECT * FROM kppn_ref WHERE level = $1 ORDER BY col_order ASC";
+      const result = await pool.query(q, [0]);
+      return result.rows;
+    }catch(err){
+      throw err;
+    }
+  }
+
   async getUnitById(id: string){
     try{
       const q = "SELECT * FROM kppn_ref WHERE id = $1 ORDER BY col_order ASC";

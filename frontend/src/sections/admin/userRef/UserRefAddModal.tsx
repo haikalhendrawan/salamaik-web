@@ -82,7 +82,7 @@ const AddUserSchema = z.object({
 export default function UserRefAddModal({modalOpen, modalClose}: UserRefAddModalProps) {
     const theme = useTheme();
 
-    const { statusRef, roleRef, kppnRef, periodRef } = useDictionary();
+    const { kppnRef } = useDictionary();
 
     const { getUser } = useUser();
 
@@ -162,8 +162,8 @@ export default function UserRefAddModal({modalOpen, modalClose}: UserRefAddModal
           setIsLoading(false);
         }else{
           openSnackbar("Network Error", "error");
+          setIsLoading(false);
         }
-
       }finally{
         setIsLoading(false);
       }

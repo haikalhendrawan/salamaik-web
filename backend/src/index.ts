@@ -15,6 +15,7 @@ import userRoute from './routes/userRoute';
 import komponenRoute from './routes/komponenRoute';
 import checklistRoute from './routes/checklistRoute';
 import standardizationRoute from './routes/standardizationRoute';
+import WorksheetRoute from './routes/worksheetRoute';
 //middleware
 import errorHandler from './middleware/errorHandler';
 import notFoundHandler from './middleware/notFoundHandler';
@@ -41,6 +42,7 @@ app.use(userRoute);
 app.use(komponenRoute);
 app.use(checklistRoute);
 app.use(standardizationRoute);
+app.use(WorksheetRoute);
 app.use(notFoundHandler);
 app.use(errorHandler);
 

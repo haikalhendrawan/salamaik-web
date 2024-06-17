@@ -4,6 +4,14 @@ import { useTheme, alpha, styled } from '@mui/material/styles';
 import { Typography, Dialog, DialogTitle, DialogContent, DialogActions} from '@mui/material';
 import StyledButton from '../../components/styledButton/StyledButton';
 //------------------------------------------------------------------
+/** 
+ * 
+ * 
+ * component untuk confirm action tertentu
+ * cth: delete data utama -> perlu confirm "apakah anda yakin hapus?"
+ * 
+ * 
+ * */
 const StyledDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialog-paper": {
     borderRadius: '16px',
@@ -67,7 +75,7 @@ const DialogProvider = ({children}: DialogProviderProps) => {
     setHandleClick(() => {});
   };
 
-  const handleDeleteAction = () => {
+  const handleAction = () => {
     handleClick(); 
     closeDialog();
   };
@@ -90,7 +98,7 @@ const DialogProvider = ({children}: DialogProviderProps) => {
         </DialogContent>
         <DialogActions sx={{p:3}}>
             <StyledButton 
-              onClick={handleDeleteAction} 
+              onClick={handleAction} 
               color={color} 
               variant='contained'
               sx={{width: '20%', borderRadius: '12px'}}

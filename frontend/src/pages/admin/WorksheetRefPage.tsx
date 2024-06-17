@@ -22,6 +22,8 @@ import SubSubKomponenRef from '../../sections/admin/worksheetRef/SubSubKomponenR
 import BatchRef from '../../sections/admin/worksheetRef/BatchRef';
 import PeriodRefSection from '../../sections/admin/worksheetRef/PeriodRef';
 import { ChecklistProvider } from '../../sections/admin/worksheetRef/ChecklistRef/useChecklist';
+import { BatchProvider } from '../../sections/admin/worksheetRef/BatchRef/useBatch';
+import { DialogProvider } from '../../hooks/display/useDialog';
 //----------------------------------------------------
 
 export default function WorksheetRefPage() {
@@ -40,7 +42,7 @@ export default function WorksheetRefPage() {
 
   const handleChangeSection = (section: number) => {
     setSection(section);
-    window.scrollTo(0, 0); // agar scroll ke atas setiap change section
+    window.scrollTo(0, 0); // scroll ke atas setiap change section
   };
 
   const SELECT_SECTION: JSX.Element[] = [
@@ -51,7 +53,9 @@ export default function WorksheetRefPage() {
     <KomponenRef section={section} addState={addState} resetAddState={resetAddState} />,
     <SubKomponenRef section={section} addState={addState} resetAddState={resetAddState} />,
     <SubSubKomponenRef section={section} addState={addState} resetAddState={resetAddState} />,
-    <BatchRef section={section} addState={addState} resetAddState={resetAddState} />,
+    <BatchProvider>
+      <BatchRef section={section} addState={addState} resetAddState={resetAddState} />
+    </BatchProvider>,
     <PeriodRefSection section={section} addState={addState} resetAddState={resetAddState} />,
   ];
 
@@ -100,7 +104,7 @@ export default function WorksheetRefPage() {
             </Stack>
             <Button 
               variant="contained"
-              disabled={section===1?false:true} 
+              disabled={section===1 || section ===5 ? false : true} 
               startIcon={<Iconify icon="eva:plus-fill" />} 
               onClick={() => setAddState(true)}
             >
@@ -111,7 +115,9 @@ export default function WorksheetRefPage() {
         
 
         <Grid item xs={12} sm={12} md={12}>
-          {SELECT_SECTION[section]}
+          <DialogProvider>
+            {SELECT_SECTION[section]}
+          </DialogProvider>
         </Grid>
 
       </Container>

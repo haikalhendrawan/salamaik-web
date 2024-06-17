@@ -5,7 +5,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 const StyledDate = styled(DatePicker)(({theme}) => ({
   "& .MuiOutlinedInput-input": {
-    fontSize: 13,
+    fontSize: 14,
     height:'100%'
   },
   "& .MuiInputLabel-root": {
@@ -15,7 +15,6 @@ const StyledDate = styled(DatePicker)(({theme}) => ({
     fontSize: '1rem',
     fontWeight: 600,
   },
-
 }));
 
 

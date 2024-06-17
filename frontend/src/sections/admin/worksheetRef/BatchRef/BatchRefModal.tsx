@@ -1,12 +1,16 @@
-import {useState, useEffect, useRef} from'react';
-import {Stack, Button, Box, Typography, Table, Card, Modal, FormControl, Paper, InputLabel, TableSortLabel,
-  Tooltip, TableHead, Grow, TableBody, TableRow, TableCell, Select, MenuItem} from '@mui/material';
-import { useTheme, styled } from '@mui/material/styles';
-import Iconify from '../../../../components/iconify';
-import Label from '../../../../components/label';
-import Scrollbar from '../../../../components/scrollbar';
-import StyledTextField from '../../../../components/styledTextField/StyledTextField';
-import StyledButton from '../../../../components/styledButton/StyledButton';
+import {useState, useEffect} from'react';
+import dayjs, { Dayjs } from 'dayjs';
+import {Stack, Button, Box, Typography, SelectChangeEvent, Modal, 
+  FormControl, Paper,MenuItem} from '@mui/material';
+import { StyledSelect, StyledSelectLabel } from '../../../../components/styledSelect';
+import { styled } from '@mui/material/styles';
+import StyledDatePicker from '../../../../components/styledDatePicker';
+import Scrollbar from '../../../../components/scrollbar/Scrollbar';
+import useDictionary from '../../../../hooks/useDictionary';
+import useSnackbar from '../../../../hooks/display/useSnackbar';
+import useLoading from '../../../../hooks/display/useLoading';
+import useAxiosJWT from '../../../../hooks/useAxiosJWT';
+import useBatch from './useBatch';
 // -------------------------------------------------------------------------------------------
 const style = {
   position: 'absolute',
@@ -22,47 +26,62 @@ const style = {
 };
 
 const FormDataContainer = styled(Box)(({theme}) => ({
-height:'100%',
-display: 'flex', 
-flexDirection:'column', 
-alignItems:'start', 
-justifyContent:'start', 
-marginTop:theme.spacing(5),
-gap:theme.spacing(3)
+  height:'100%',
+  display: 'flex', 
+  flexDirection:'column', 
+  alignItems:'start', 
+  justifyContent:'start', 
+  marginTop:theme.spacing(5),
+  gap:theme.spacing(3)
 }));
 
-interface BatchData{
-  id: number,
-  periodID: number,
-  kppnID: number,
-  kppnName: string,
-  batchStatus: number,
-  openPeriod: string,
-  closePeriod: string
+interface BatchType{
+  id: string, 
+  kppn_id: string,
+  name: string, 
+  alias: string,
+  period: number,
+  status: number,
+  open_period: string,
+  close_period: string,
+  created_at: string,
+  updated_at: string
 };
+
+interface BatchFormType{
+  id: string, 
+  kppnId: string,
+  openPeriod: Dayjs | null,
+  closePeriod: Dayjs | null,
+}
 
 interface BatchRefModalProps {
   modalOpen: boolean,
   modalClose: () => void,
   addState: boolean,
-  editID: number | null,
-  data: BatchData[]
-}
-
-
+  editID: string | null,
+  data: BatchType[]
+};
 //----------------------------------------------------------------
 export default function BatchRefModal({modalOpen, modalClose, addState, editID, data}: BatchRefModalProps) {
-  const [addValue, setAddValue] = useState<BatchData>({
-    id: 0,
-    periodID: 0,
-    kppnID: 0,
-    kppnName: '',
-    batchStatus: 0,
-    openPeriod:'',
-    closePeriod:''
+  const { kppnRef } = useDictionary();
+
+  const {openSnackbar} = useSnackbar();
+
+  const {setIsLoading} = useLoading();
+
+  const axiosJWT = useAxiosJWT();
+
+  const {getBatch} = useBatch();
+  
+  const [addValue, setAddValue] = useState<BatchFormType>({
+    id: '',
+    kppnId: '',
+    openPeriod: null,
+    closePeriod: null,
   });
 
-  const handleChangeAdd = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChangeAdd = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement> | SelectChangeEvent<unknown>) => {
     setAddValue({
       ...addValue,
       [e.target.name]:e.target.value
@@ -71,27 +90,21 @@ export default function BatchRefModal({modalOpen, modalClose, addState, editID, 
 
   const handleResetAdd = () => {
     setAddValue({
-      id: 0,
-      periodID: 0,
-      kppnID: 0,
-      kppnName: '',
-      batchStatus: 0,
-      openPeriod:'',
-      closePeriod:''
+      id: '',
+      kppnId: '',
+      openPeriod: null,
+      closePeriod: null,
     })
   };
 
-  const [editValue, setEditValue] = useState<BatchData>({
-    id: 0,
-    periodID: 0,
-    kppnID: 0,
-    kppnName: '',
-    batchStatus: 0,
-    openPeriod:'',
-    closePeriod:''
+  const [editValue, setEditValue] = useState<BatchFormType>({
+    id: '',
+    kppnId: '',
+    openPeriod: null,
+    closePeriod: null,
   });
 
-  const handleChangeEdit = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChangeEdit = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement> | SelectChangeEvent<unknown>) => {
     setEditValue({
       ...editValue,
       [e.target.name]:e.target.value
@@ -101,25 +114,67 @@ export default function BatchRefModal({modalOpen, modalClose, addState, editID, 
   const handleResetEdit = () => {
     setEditValue({
       id: data.filter((row) => row.id===editID)[0].id,
-      periodID: data.filter((row) => row.id===editID)[0]. periodID,
-      kppnID: data.filter((row) => row.id===editID)[0].kppnID,
-      kppnName: data.filter((row) => row.id===editID)[0].kppnName,
-      batchStatus: data.filter((row) => row.id===editID)[0].batchStatus,
-      openPeriod: data.filter((row) => row.id===editID)[0].openPeriod,
-      closePeriod: data.filter((row) => row.id===editID)[0].closePeriod
+      kppnId: data.filter((row) => row.id===editID)[0].kppn_id,
+      openPeriod: dayjs(data.filter((row) => row.id===editID)[0].open_period),
+      closePeriod: dayjs(data.filter((row) => row.id===editID)[0].close_period)
     })
+  };
+
+  const handleSubmitAdd = async() => {
+    try{
+      setIsLoading(true);
+      const data = {
+        kppnId: addValue.kppnId, 
+        startDate: dayjs(addValue.openPeriod).format('YYYY-MM-DD'), 
+        closeDate: dayjs(addValue.closePeriod).format('YYYY-MM-DD')
+      };
+      const response = await axiosJWT.post('/addWorksheet', data);
+      openSnackbar(response.data.message, "success");
+      getBatch();
+      setIsLoading(false);
+      modalClose();
+    }catch(err: any){
+      if(err.response){
+        openSnackbar(err.response.data.message, "error");
+        setIsLoading(false);
+      }else{
+        openSnackbar("Network Error", "error");
+        setIsLoading(false);
+      }
+    }
+  };
+
+  const handleSubmitEdit= async() => {
+    try{
+      setIsLoading(true);
+      const data = {
+        worksheetId: editValue.id, 
+        startDate: dayjs(editValue.openPeriod).format('YYYY-MM-DD'), 
+        closeDate: dayjs(editValue.closePeriod).format('YYYY-MM-DD')
+      };
+      const response = await axiosJWT.post('/editWorksheetPeriod', data);
+      openSnackbar(response.data.message, "success");
+      getBatch();
+      setIsLoading(false);
+      modalClose();
+    }catch(err: any){
+      if(err.response){
+        openSnackbar(err.response.data.message, "error");
+        setIsLoading(false);
+      }else{
+        openSnackbar("Network Error", "error");
+        setIsLoading(false);
+      }
+    }
   };
 
   useEffect(() => {
     if(data && editID){
       setEditValue({
         id: data.filter((row) => row.id===editID)[0].id,
-        periodID: data.filter((row) => row.id===editID)[0]. periodID,
-        kppnID: data.filter((row) => row.id===editID)[0].kppnID,
-        kppnName: data.filter((row) => row.id===editID)[0].kppnName,
-        batchStatus: data.filter((row) => row.id===editID)[0].batchStatus,
-        openPeriod: data.filter((row) => row.id===editID)[0].openPeriod,
-        closePeriod: data.filter((row) => row.id===editID)[0].closePeriod
+        kppnId: data.filter((row) => row.id===editID)[0].kppn_id,
+        openPeriod: dayjs(data.filter((row) => row.id===editID)[0].open_period),
+        closePeriod: dayjs(data.filter((row) => row.id===editID)[0].close_period)
       })
     }
   }, [data, editID])
@@ -128,7 +183,7 @@ export default function BatchRefModal({modalOpen, modalClose, addState, editID, 
   // ----------------------------------------------------------------------------------------
   return(
       <>
-      <Modal open={modalOpen} onClose={modalClose}>
+      <Modal open={modalOpen} onClose={modalClose} keepMounted>
         <Box sx={style}>
           <Scrollbar>
             <Paper sx={{height:'50vh', width:'auto', p:2}}>
@@ -141,50 +196,49 @@ export default function BatchRefModal({modalOpen, modalClose, addState, editID, 
                     <Stack direction='row' spacing={2} sx={{width:'100%'}} justifyContent={'start'}>
                       <Stack direction='column' spacing={3} sx={{width:'45%'}}>
                         <FormControl>
-                          <StyledTextField 
-                            name="periodName" 
-                            label="Nama Periode"
-                            multiline
-                            minRows={2}
-                            value={ addState? addValue.batchStatus : editValue.batchStatus}
+                          <StyledSelectLabel id="kppn-select-label">Unit</StyledSelectLabel>
+                          <StyledSelect 
+                            required 
+                            name="kppnId" 
+                            label="kppn"
+                            labelId="kppn-select-label"
+                            value={addState ? addValue.kppnId : editValue.kppnId}
                             onChange={addState? handleChangeAdd : handleChangeEdit}
-                          />
+                            disabled={!addState}
+                          >
+                            {kppnRef?.list?.filter((item) => item.level===0).map((row: any, index: number) => (
+                              <MenuItem 
+                                key={index+1} 
+                                sx={{ fontSize: 14 }} 
+                                value={row.id}
+                              >
+                                {row.alias}
+                              </MenuItem>
+                            ))}
+                          </StyledSelect>
                         </FormControl>
-
                       </Stack>
                       <Stack direction='column' spacing={3} sx={{width:'45%'}}>
                         <FormControl>
-                          <InputLabel id="openPeriod-select-label" sx={{typography:'body2'}}>Open Period</InputLabel>
-                          <Select 
-                            required 
-                            name="openPeriod" 
-                            label='Open Period'
-                            labelId="openPeriod-select-label"
-                            value={addState? addValue.openPeriod : editValue.openPeriod}
-                            sx={{typography:'body2', fontSize:14, height:'100%'}}
-                          >
-                            <MenuItem key={0} sx={{fontSize:14}} value={0}>Treasurer</MenuItem>
-                            <MenuItem key={1} sx={{fontSize:14}} value={1}>Pengelola Fiskal Representasi Kemenkeu di Daerah</MenuItem>
-                            <MenuItem key={2} sx={{fontSize:14}} value={2}>Financial Advisor</MenuItem>
-                            <MenuItem key={3} sx={{fontSize:14}} value={3}>Tata Kelola Internal</MenuItem>
-                          </Select>
+                          <StyledDatePicker 
+                            label="Open Period"
+                            name= "openPeriod"
+                            value={addState ? addValue.openPeriod : editValue.openPeriod}
+                            onChange={addState
+                                      ? (newValue: Dayjs) => setAddValue({...addValue, openPeriod: newValue}) 
+                                      : (newValue: Dayjs) => setEditValue({...editValue, openPeriod: newValue})}
+                          />
                         </FormControl>
 
                         <FormControl>
-                          <InputLabel id="closePeriod-select-label" sx={{typography:'body2'}}>Close Period</InputLabel>
-                          <Select 
-                            required 
-                            name="closePeriod" 
-                            label='Close Period'
-                            labelId="closePeriod-select-label"
-                            value={addState? addValue.closePeriod : editValue.closePeriod}
-                            sx={{typography:'body2', fontSize:14, height:'100%'}}
-                          >
-                            <MenuItem key={0} sx={{fontSize:14}} value={0}>Treasurer</MenuItem>
-                            <MenuItem key={1} sx={{fontSize:14}} value={1}>Pengelola Fiskal Representasi Kemenkeu di Daerah</MenuItem>
-                            <MenuItem key={2} sx={{fontSize:14}} value={2}>Financial Advisor</MenuItem>
-                            <MenuItem key={3} sx={{fontSize:14}} value={3}>Tata Kelola Internal</MenuItem>
-                          </Select>
+                          <StyledDatePicker 
+                            label="Close Period"
+                            name= "closePeriod"
+                            value={addState ? addValue.closePeriod : editValue.closePeriod}
+                            onChange={addState
+                                      ? (newValue: Dayjs) => setAddValue({...addValue, closePeriod: newValue}) 
+                                      : (newValue: Dayjs) => setEditValue({...editValue, closePeriod: newValue})}
+                          />
                         </FormControl>
                       </Stack>
                     </Stack>
@@ -194,6 +248,7 @@ export default function BatchRefModal({modalOpen, modalClose, addState, editID, 
                         variant='contained'
                         color={addState? 'primary' : 'warning'} 
                         sx={{borderRadius:'8px'}}
+                        onClick={addState? handleSubmitAdd : handleSubmitEdit}
                       >
                         {addState? 'Add' : 'Edit'} 
                       </Button>

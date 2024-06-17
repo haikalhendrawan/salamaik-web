@@ -140,7 +140,7 @@ export default function UserRefTable({users, setEditModalOpen, tab, setTab}: Use
   
   return (
     <>
-    <Grow in>
+      <Grow in>
         <Card>
           <UserRefTableToolbar 
             filterName={filterName} 
@@ -165,7 +165,7 @@ export default function UserRefTable({users, setEditModalOpen, tab, setTab}: Use
                   {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, index) => {
                     return (
                       <TableRow hover key={index} tabIndex={-1}>
-                         <TableCell component="th" scope="row" >
+                          <TableCell component="th" scope="row" >
                             <Stack direction="row" alignItems="center" spacing={2}>
                               <Avatar alt={row.id} src={`${import.meta.env.VITE_API_URL}/avatar/${row.picture}?${new Date().getTime()}`} />
                               <List disablePadding dense>
@@ -278,11 +278,7 @@ export default function UserRefTable({users, setEditModalOpen, tab, setTab}: Use
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
         </Card>
-
       </Grow>
-
-
-
     </>
   );
 }

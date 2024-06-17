@@ -9,26 +9,15 @@ import StyledTextField from '../../../../components/styledTextField/StyledTextFi
 import StyledButton from '../../../../components/styledButton/StyledButton';
 import BatchRefTable from './BatchRefTable';
 import BatchRefModal from './BatchRefModal';
+import useBatch from './useBatch';
+/**
+ *
+ *
+ * BatchRef
+ * di Backend modul ini sebutannya WorksheetRef
+ * fungsinya untuk membuat kertas kerja baru dan assign KK setiap ada penambahan periode pembinaan
+ */
 //----------------------------------------------------
-interface BatchData{
-  id: number,
-  periodID: number,
-  kppnID: number,
-  kppnName: string,
-  batchStatus: number,
-  openPeriod: string,
-  closePeriod: string
-};
-
-const TABLE_DATA: BatchData[] = [
-  {id:1,periodID:0, kppnID:0, kppnName:'KPPN Padang', batchStatus:1, openPeriod: '01/05/2024', closePeriod: '31/05/2024'},
-  {id:2,periodID:0, kppnID:1, kppnName:'KPPN Bukittinggi', batchStatus:1, openPeriod: '01/05/2024', closePeriod: '31/05/2024'},
-  {id:3,periodID:0, kppnID:2, kppnName:'KPPN Solok', batchStatus:0 , openPeriod: '01/05/2024', closePeriod: '31/05/2024'},
-  {id:4,periodID:0, kppnID:3, kppnName:'KPPN Lubuk Sikaping', batchStatus:1 , openPeriod: '01/05/2024', closePeriod: '31/05/2024'},
-  {id:5,periodID:0, kppnID:4, kppnName:'KPPN Sijunjung', batchStatus:0 , openPeriod: '01/05/2024', closePeriod: '31/05/2024'},
-  {id:6,periodID:0, kppnID:5, kppnName:'KPPN Painan', batchStatus:0 , openPeriod: '01/05/2024', closePeriod: '31/05/2024'},
-];
-
 interface BatchRefProps {
   section: number,
   addState: boolean,
@@ -38,11 +27,13 @@ interface BatchRefProps {
 export default function BatchRef({section, addState, resetAddState}: BatchRefProps) {
   const theme = useTheme();
 
+  const { batch } = useBatch();
+
   const [open, setOpen] = useState<boolean>(false); // for edit modal
 
-  const [editID, setEditID] = useState<number | null>(null);
+  const [editID, setEditID] = useState<string | null>(null);
 
-  const handleOpen = (id: number) => {
+  const handleOpen = (id: string) => {
     setOpen(true);
     setEditID(id);
   };
@@ -61,13 +52,12 @@ export default function BatchRef({section, addState, resetAddState}: BatchRefPro
 
   }, [addState, section]);
 
-
   return (
     <>
       <Grow in>
         <Card sx={{minHeight:480, display:'flex', flexDirection:'column', gap:theme.spacing(1)}}>
           <BatchRefTable
-             tableData={TABLE_DATA}
+             tableData={batch}
              handleOpen={handleOpen}
           />
         </Card>
@@ -78,7 +68,7 @@ export default function BatchRef({section, addState, resetAddState}: BatchRefPro
         modalClose={handleClose} 
         addState={addState}
         editID={editID}
-        data={TABLE_DATA}
+        data={batch}
       /> 
     </>
   )

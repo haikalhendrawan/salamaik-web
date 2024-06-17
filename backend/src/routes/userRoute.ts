@@ -5,10 +5,10 @@ import authenticate from "../middleware/authenticate";
 const router = express.Router(); 
 
 router.get("/getUser",  authenticate, userController.getUser);
-router.post("/addUser", userController.addUser);
-router.post("/editUser", userController.editUser);
-router.post("/deleteUser",  userController.deleteUser);
-router.post("/updateStatus",  userController.updateStatus);
-router.post("/updateRole",  userController.updateRole);
+router.post("/addUser", authenticate, userController.addUser);
+router.post("/editUser", authenticate, userController.editUser);
+router.post("/deleteUser",  authenticate, userController.deleteUser);
+router.post("/updateStatus",  authenticate, userController.updateStatus);
+router.post("/updateRole",  authenticate, userController.updateRole);
 
 export default router
