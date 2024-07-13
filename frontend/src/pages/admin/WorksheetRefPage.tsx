@@ -72,7 +72,7 @@ export default function WorksheetRefPage() {
 
   return (
     <>
-      <Container>
+      <Container maxWidth='xl'>
         <Stack direction="column" justifyContent="space-between" sx={{mb: 5}}>
           <Stack direction='row' spacing={1} alignItems="center">
             <IconButton 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 // @mui
 import {Card, Table, Stack, Paper, Avatar, ListItemText, TableRow, Tooltip, TableBody, TableCell,
     Typography, TableContainer, TablePagination, Grow, List} from '@mui/material';
@@ -132,11 +132,12 @@ export default function UserRefTable({users, setEditModalOpen, tab, setTab}: Use
     console.log(event.target.value);
   };
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - users.length) : 0;
+  const emptyRows = useMemo(() => page > 0 ? Math.max(0, (1 + page) * rowsPerPage - users.length) : 0, [page, rowsPerPage, users.length]);
 
-  const filteredUsers= applySortFilter(users, getComparator(order, orderBy), filterName, tab, filterUnit);
+  const filteredUsers = useMemo(() => applySortFilter(users, getComparator(order, orderBy), filterName, tab, filterUnit), [users, order, orderBy, filterName, tab, filterUnit]);
 
-  const isNotFound = !filteredUsers.length && !!filterName;
+  const isNotFound = useMemo(() => !filteredUsers.length && !!filterName, [filteredUsers, filterName]);
+
   
   return (
     <>

@@ -1,10 +1,11 @@
 import {useState, useEffect} from'react';
-import {Container, Stack, IconButton, Typography, Button} from '@mui/material';
+import {Container, Stack, Typography, Button} from '@mui/material';
 import Iconify from '../../../components/iconify/Iconify';
 import UserRefTable from './UserRefTable';
 import UserRefAddModal from './UserRefAddModal';
 import UserRefEditModal from './UserRefEditModal';
 import useUser from './useUser';
+import PageLoading from '../../../components/pageLoading/PageLoading';
 // -----------------------------------------------------------------------
 export default function UserRefSection(){
   const [addModalOpen, setAddModalOpen] = useState<boolean>(false);
@@ -15,7 +16,9 @@ export default function UserRefSection(){
 
   const [editId, setEditId] = useState<string>('');
 
-  const {user} = useUser();
+  const [pageLoading, setPageLoading] = useState<boolean>(true);
+
+  const {user, getUser} = useUser();
 
   const handleOpenAddModal = () => {
     setAddModalOpen(true);
@@ -36,9 +39,21 @@ export default function UserRefSection(){
     setEditModalOpen(false)
   };
 
+  useEffect(() => {
+    async function getData(){
+      try{
+        await getUser();
+        setPageLoading(false);
+      }catch(err){
+        setPageLoading(false);
+      }
+    }
+    getData();
+  }, [])
+
   return(
   <>
-    <Container>
+    <Container maxWidth='xl'>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
         <Stack direction='row' spacing={2}>
           <Typography variant="h4" gutterBottom>
@@ -54,24 +69,33 @@ export default function UserRefSection(){
         </Button>
       </Stack>
 
-      <UserRefTable 
-        users={user} 
-        setEditModalOpen={handleOpenEditModal}
-        tab={tab}
-        setTab={setTab}
-      />
+      {pageLoading
+        ?
+          null
+        :
+          <>
+            <UserRefTable 
+              users={user} 
+              setEditModalOpen={handleOpenEditModal}
+              tab={tab}
+              setTab={setTab}
+            />
 
-      <UserRefAddModal
-        modalOpen={addModalOpen} 
-        modalClose={handleCloseAddModal} 
-      />
-      
-      <UserRefEditModal 
-        editId={editId}
-        users={user} 
-        modalOpen={editModalOpen}
-        modalClose={handleCloseEditModal} 
-      />
+            <UserRefAddModal
+              modalOpen={addModalOpen} 
+              modalClose={handleCloseAddModal} 
+            />
+          
+            <UserRefEditModal 
+              editId={editId}
+              users={user} 
+              modalOpen={editModalOpen}
+              modalClose={handleCloseEditModal} 
+            />
+          </>   
+      }
+
+
     </Container>
   </>)
 }

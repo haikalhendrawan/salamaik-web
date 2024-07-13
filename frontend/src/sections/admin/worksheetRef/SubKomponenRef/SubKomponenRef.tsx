@@ -153,13 +153,13 @@ const style = {
 };
 
 const FormDataContainer = styled(Box)(({theme}) => ({
-height:'100%',
-display: 'flex', 
-flexDirection:'column', 
-alignItems:'start', 
-justifyContent:'start', 
-marginTop:theme.spacing(5),
-gap:theme.spacing(3)
+  height:'100%',
+  display: 'flex', 
+  flexDirection:'column', 
+  alignItems:'start', 
+  justifyContent:'start', 
+  marginTop:theme.spacing(5),
+  gap:theme.spacing(3)
 }));
 
 interface SubKomponenRefModalProps {

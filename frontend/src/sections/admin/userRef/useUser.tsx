@@ -18,14 +18,14 @@ interface UserType{
 
 interface UserContextType{
   user: UserType[] | [],
-  getUser: () => void
+  getUser: () => Promise<void>
 };
 
 type UserProviderProps = {
   children: ReactNode
 };
 //------------------------------------------------------------------
-const UserContext = createContext<UserContextType>({user: [], getUser: () => {}});
+const UserContext = createContext<UserContextType>({user: [], getUser: async() => {}});
 
 const UserProvider = ({children}: UserProviderProps) => {
   const axiosJWT = useAxiosJWT();
@@ -50,9 +50,9 @@ const UserProvider = ({children}: UserProviderProps) => {
     }
   };
 
-  useEffect(() => {
-    getUser();
-  }, [])
+  // useEffect(() => {
+  //   getUser();
+  // }, [])
 
   return(
     <UserContext.Provider value={{user, getUser}}>

@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {Card, Typography, Grid, CardHeader, CardContent, Button, Box} from '@mui/material';
+import {Card, Typography, Grid, CardHeader, CardContent, Button, Box, Container, Stack} from '@mui/material';
 import Iconify from "../../../components/iconify/Iconify";
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import StdKPPNReportPDF from "../../PDF/StandardizationReport/StdKPPNReportPDF";
@@ -35,43 +35,44 @@ export default function DocumentShort({header, subheader, image, tabValue }:Docu
 
   return(
     <Card sx={{height:'200px', borderRadius:'16px'}}>
-      <CardHeader 
-        title={<Typography variant="subtitle2">{header}</Typography>} 
-        subheader={subheader} 
-      />
-      <CardContent>
-        <Grid container spacing={1} sx={{height: '100%'}}>
-          <Grid item xs={4} key={0} sx={{height: '100%'}}>
-            <PDFDownloadLink 
-              document={<StdKPPNReportPDF
-                          period={auth?.period} 
-                          periodRef={periodRef} 
-                          standardization={standardization}
-                          unitName={subheader}
-                          kppn={auth?.kppn}
-                        />} 
-              fileName={'standardisasi-kppn'}
-            >
-              <Button 
-                variant='contained' 
-                size='small'
-                endIcon={<Iconify icon="solar:printer-2-bold-duotone" />} 
-                sx={{mt: 6}}
-                disabled={loading}
+      <Grid container spacing={0}>
+        
+        <Grid item xs={6}>
+          <CardHeader title={header}  subheader={subheader} titleTypographyProps={{variant:'subtitle2'}} /> 
+          <Box sx={{ p: 3, pb: 2 }} dir="ltr">
+            <Grid container direction="row" sx={{ justifyContent: 'start', alignItems: 'end'}}>
+              <PDFDownloadLink 
+                document={<StdKPPNReportPDF
+                            period={auth?.period} 
+                            periodRef={periodRef} 
+                            standardization={standardization}
+                            unitName={subheader}
+                            kppn={auth?.kppn}
+                          />} 
+                fileName={'standardisasi-kppn'}
               >
-                Print
-              </Button>
-            </ PDFDownloadLink>
-            
-          </Grid>
+                <Button 
+                  variant='contained' 
+                  size='small'
+                  endIcon={<Iconify icon="solar:printer-2-bold-duotone" />} 
+                  disabled={loading}
+                  sx={{mt: 2}}
+                >
+                  Print
+                </Button>
+              </ PDFDownloadLink>
 
-          <Grid item xs={8} key={1} sx={{height: '100%'}}>
-            <Box sx={{justifyContent:'center', maxWidth:'100%'}} dir="ltr" >
-              <img src={image} style={{maxWidth:'100%', margin: 'auto', marginTop: -70, marginLeft: 30}} />
-            </Box>
-          </Grid>
+            </Grid>                      
+          </Box>
         </Grid>
-      </CardContent>
+
+        <Grid item xs={6}>
+          <Box sx={{ overflow:'hidden',  display:'flex', height:'100%', width:'100%', background:'cover', alignContent: 'center', alignItems: 'center'}}>
+            <img src={image}  style={{ maxHeight:'100%', width: '90%', borderRadius:'12px'}}  />
+          </Box>
+        </Grid>
+
+      </Grid>
     </Card>
   )
 }

@@ -114,7 +114,7 @@ export default function ChecklistRefTable({tab, handleOpen, fileOpen, setDeleteF
       formData.append("id", chID.toString());
       formData.append("option", fileOption?.toString() || "1");
       formData.append("file", selectedFile);
-      const response = await axiosJWT.post(`/editChecklistFile`, formData, {
+      await axiosJWT.post(`/editChecklistFile`, formData, {
         headers:{"Content-Type": "multipart/form-data"}
       });
       await getChecklist();

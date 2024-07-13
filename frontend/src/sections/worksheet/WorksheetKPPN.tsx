@@ -91,14 +91,14 @@ export default function WorksheetKPPN() {
     <>
     {isLoading 
       ?
-        <PageLoading duration={2}/>
+        <PageLoading duration={1}/>
       : 
       <>
         <Helmet>
           <title> Salamaik | Worksheet</title>
         </Helmet>
 
-        <Container>
+        <Container maxWidth='xl'>
           <Stack direction="column" justifyContent="space-between" sx={{mb: 5}}>
             <Stack direction='row' spacing={1} alignItems="center">
               <IconButton  
@@ -106,7 +106,7 @@ export default function WorksheetKPPN() {
               >
                 <Iconify icon={"eva:arrow-ios-back-outline"} />
               </IconButton> 
-              <Typography variant="h4" >
+              <Typography variant="h4">
                 {`KPPN ${id!==null ? SELECT_KPPN[id]:null}`}
               </Typography>
             </Stack>

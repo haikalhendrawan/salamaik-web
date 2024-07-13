@@ -2,6 +2,14 @@ import { useState, useEffect } from 'react';
 import { Container,Typography, Box, LinearProgress} from '@mui/material';
 import {styled} from '@mui/material/styles';
 
+/** 
+ * 
+ * Menampilkan loading yg bentuknya linear progress bar
+ * Selain komponen ini, juga ada global loading state di folder hooks
+ * Bedanya komponen ini, digunain untuk local loading di masing2 page
+ * fungsi utamanya utk fix performance issue saat render komponen berat
+ * @param duration pass dalam satuan second, atur lama progress bar
+ * */
 const ProgressContainer = styled(Box)(({ theme }) => ({
   height: '70vh', 
   display:'flex', 
@@ -18,13 +26,13 @@ export default function PageLoading({ duration }:PageLoadingProps){
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    let timer: any;
-    let progressTimer: any;
+    let timer: number;
+    let progressTimer: number;
 
     const startLoading = () => {
       timer = setTimeout(() => {
         clearInterval(progressTimer);
-        setProgress(100);
+        setProgress(95);
       }, duration * 1000);
 
       progressTimer = setInterval(() => {

@@ -83,7 +83,7 @@ export default function NotifInterfacePage () {
 
   return (
     <>
-      <Container>
+      <Container maxWidth="xl">
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Stack direction='row' spacing={2}>
             <Typography variant="h4" gutterBottom>

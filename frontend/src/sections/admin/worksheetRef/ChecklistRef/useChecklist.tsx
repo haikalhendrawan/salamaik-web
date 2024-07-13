@@ -1,4 +1,4 @@
-import { ReactNode, useState, createContext, useContext, useEffect } from 'react';
+import { ReactNode, useState, createContext, useContext} from 'react';
 import useAxiosJWT from '../../../../hooks/useAxiosJWT';
 import useLoading from '../../../../hooks/display/useLoading';
 import useSnackbar from '../../../../hooks/display/useSnackbar';
@@ -36,7 +36,7 @@ type ChecklistProviderProps = {
   children: ReactNode
 };
 //------------------------------------------------------------------
-const ChecklistContext = createContext<ChecklistContextType>({checklist: [], getChecklist: () => new Promise ((res, rej) => null)});
+const ChecklistContext = createContext<ChecklistContextType>({checklist: [], getChecklist: () => new Promise (() => null)});
 
 const ChecklistProvider = ({children}: ChecklistProviderProps) => {
   const axiosJWT = useAxiosJWT();
@@ -47,11 +47,9 @@ const ChecklistProvider = ({children}: ChecklistProviderProps) => {
 
   const [checklist, setChecklist] = useState<ChecklistType[] | []  >([]);
 
-  const [opsi, setOpsi] = useState<OpsiType[] | []  >([]);
-
   const getChecklist = async() => {
+    setIsLoading(true);
     try{
-      setIsLoading(true);
       const response = await axiosJWT.get("/getChecklistWithOpsi");
       setChecklist(response.data.rows);
       setIsLoading(false);
@@ -62,9 +60,6 @@ const ChecklistProvider = ({children}: ChecklistProviderProps) => {
       setIsLoading(false);
     }
   };
-  useEffect(() => {
-    getChecklist();
-  }, [])
 
   return(
     <ChecklistContext.Provider value={{checklist, getChecklist}}>

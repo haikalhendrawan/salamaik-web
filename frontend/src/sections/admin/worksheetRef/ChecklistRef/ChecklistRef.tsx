@@ -28,6 +28,10 @@ export default function ChecklistRef({section, addState, resetAddState}: Checkli
 
   const [tabValue, setTabValue] = useState<0 | 1 | 2 | 3 | 4>(0);
 
+  const [pageLoading, setPageLoading] = useState<boolean>(true);
+
+  const {getChecklist} = useChecklist();
+
   const handleOpen = (id: number) => { // for edit modal
     setOpen(true);
     setEditID(id);
@@ -63,6 +67,17 @@ export default function ChecklistRef({section, addState, resetAddState}: Checkli
 
   }, [addState, section]);
 
+  useEffect(() => {
+    async function getData(){
+      try{
+        await getChecklist();
+        setPageLoading(false);
+      }catch(err){
+        setPageLoading(false);
+      }
+    }
+    getData();
+  }, [])
 
   return(
     <>
@@ -109,31 +124,45 @@ export default function ChecklistRef({section, addState, resetAddState}: Checkli
               value={4} 
             />
           </Tabs>
-          
-          <ChecklistRefTable
-            tab={tabValue} 
-            handleOpen={handleOpen}
-            fileOpen={handleOpenFile}
-            setDeleteFile={() => {}}
-            setFile={setFile}
-          />
+          {pageLoading 
+            ? 
+              null 
+            :  
+              <ChecklistRefTable
+                tab={tabValue} 
+                handleOpen={handleOpen}
+                fileOpen={handleOpenFile}
+                setDeleteFile={() => {}}
+                setFile={setFile}
+              />
+          }
+         
         </Card>
       </Grow>
 
-      <ChecklistRefModal 
-        modalOpen={open} 
-        modalClose={handleClose} 
-        addState={addState}
-        editID={editID}
-      /> 
+      {pageLoading 
+        ? 
+          null 
+        :
+          <>      
+            <ChecklistRefModal 
+              modalOpen={open} 
+              modalClose={handleClose} 
+              addState={addState}
+              editID={editID}
+            /> 
 
-      <ChecklistFileModal
-        open={openFile}
-        modalClose={handleCloseFile}
-        fileName={file}
-        editID={editID}
-        fileOption={fileOption}
-      />
+            <ChecklistFileModal
+              open={openFile}
+              modalClose={handleCloseFile}
+              fileName={file}
+              editID={editID}
+              fileOption={fileOption}
+            />
+          </>
+      }
+
+
     </>
   )
 }
