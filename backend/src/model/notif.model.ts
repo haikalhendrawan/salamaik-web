@@ -61,13 +61,15 @@ class Notif{
       const result1 = await pool.query(q1);
       const allUser = result1.rows;
 
-      const response  = await Promise.all(allUser.map(async (receiverID: {id: string}) => {
-        const q2 = `INSERT INTO notif_junction (notif_id, creator_id, receiver_id) 
-                    VALUES ($1, $2, $3) 
-                    RETURNING *`;
-        const result2 = await client.query(q2, [notifID, userID, receiverID.id]);
-        return result2.rows[0]
-      }));
+      const response  = await Promise.all(
+        allUser.map(async (receiverID: {id: string}) => {
+          const q2 = `INSERT INTO notif_junction (notif_id, creator_id, receiver_id) 
+                      VALUES ($1, $2, $3) 
+                      RETURNING *`;
+          const result2 = await client.query(q2, [notifID, userID, receiverID.id]);
+          return result2.rows[0]
+        }
+      ));
 
       const q3 = `UPDATE notif SET published = $1 WHERE id = $2`;
       await pool.query(q3, [1, notifID]);

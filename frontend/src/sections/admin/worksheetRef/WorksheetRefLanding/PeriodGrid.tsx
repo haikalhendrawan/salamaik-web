@@ -45,7 +45,7 @@ export default function PeriodGrid({changeSection}: PeriodGridProps) {
         <StatsContainer>
           <Grid container>
             <Grid item md={6}>
-              <Typography variant='body2'>Batch</Typography>
+              <Typography variant='body2'>Periode Kertas Kerja</Typography>
             </Grid>
             <Grid item md={6}>
               <Stack direction='column' flex={'column'} alignItems='start'>
@@ -63,7 +63,7 @@ export default function PeriodGrid({changeSection}: PeriodGridProps) {
           </Grid>
           <Grid container>
             <Grid item md={6}>
-              <Typography variant='body2'>Periode</Typography>
+              <Typography variant='body2'>Periode Pembinaan</Typography>
             </Grid>
             <Grid item md={6}>
               <Stack direction='column' flex={'column'} alignItems='start'>

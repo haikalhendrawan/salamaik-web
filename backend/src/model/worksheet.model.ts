@@ -37,6 +37,18 @@ class Worksheet{
     }  
   }
 
+  async getWorksheetByPeriodAndKPPN(period: number, kppnId: string){
+    try{
+      const q = ` SELECT *
+                  FROM worksheet_ref
+                  WHERE period = $1 AND kppn_id = $2`;
+      const result = await pool.query(q, [period, kppnId]);
+      return result.rows;
+    }catch(err){
+      throw err;
+    }
+  }
+
   async addWorksheet(kppnId: string, period: number, startDate: string, closeDate: string){
     try{
       const id = uuidv4();

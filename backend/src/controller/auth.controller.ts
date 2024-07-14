@@ -18,7 +18,7 @@ type JwtPayloadType = {
   kppn: string;
   role: number;
   period: number;
-  status: number
+  status: number;
 };
 
 const passwordSchema =  z
