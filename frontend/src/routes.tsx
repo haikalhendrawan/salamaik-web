@@ -57,10 +57,14 @@ export default function Router() {
         <Route path="home" element={<HomePage />} />
         <Route path='profile' element={<ProfilePage />} />
         <Route path='standard' element={<StandardizationPage />} />
+        <Route path="worksheet" element={<WorksheetPage />}>
+          <Route index element={<WorksheetLanding />} />
+          <Route path="kppn" element={<WorksheetKPPN />} />
+        </Route>
       </Route>
     </Route>
 
-    <Route element={<PersistLogin/>}>
+    {/* <Route element={<PersistLogin/>}>
       <Route path="/worksheet">
         <Route element={<RequireAuthLayout allowedRoles={[0, 1, 2, 3, 4, 99]} />}>
           <Route index element={<WorksheetLanding />} />
@@ -69,7 +73,7 @@ export default function Router() {
           <Route index element={<WorksheetKPPN />} />
         </Route>
       </Route>
-    </Route>
+    </Route> */}
     
 
     <Route element={<PersistLogin/>}>

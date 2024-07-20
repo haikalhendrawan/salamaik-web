@@ -23,7 +23,7 @@ const style = {
     borderRadius:'12px',
 };
 
-const UserDataContainer = styled(Box)(({theme}) => ({
+const NotifDataContainer = styled(Box)(({theme}) => ({
   height:'100%',
   display: 'flex', 
   flexDirection:'column', 
@@ -100,9 +100,9 @@ export default function NotifAddModal({modalOpen, modalClose, addNotif}: NotifAd
             <Grid container sx={{width:'100%', height:'70%'}} spacing={2}>
 
               <Grid item xs={12}>
-                <UserDataContainer>
+                <NotifDataContainer maxWidth={'xl'}>
                   <Stack direction='row' spacing={2} sx={{width:'100%'}} justifyContent={'center'}>
-                    <Stack direction='column' spacing={3} sx={{width:'45%'}}>
+                    <Stack direction='column' spacing={3} sx={{width:'100%'}}>
                       <FormControl>
                         <StyledTextField 
                           name="title" 
@@ -159,7 +159,7 @@ export default function NotifAddModal({modalOpen, modalClose, addNotif}: NotifAd
                       Reset
                     </Button>
                   </Stack>
-                </UserDataContainer>
+                </NotifDataContainer>
               </Grid>
             </Grid>  
             

@@ -1,10 +1,11 @@
 import { Helmet } from 'react-helmet-async';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Iconify from '../../components/iconify';
-import PreviewFileModal from '../../components/previewFileModal/PreviewFileModal';
+import PreviewFileModal from './component/PreviewFileModal';
+import useWsJunction from './useWsJunction';
 //sections
-import WorksheetCard from './component/WorksheetCard';
+import WorksheetCard from './component/WorksheetCard/WorksheetCard';
 import InstructionPopover from './component/InstructionPopover';
 import NavigationDrawer from "./component/NavigationDrawer";
 import PageLoading from '../../components/pageLoading/PageLoading';
@@ -38,13 +39,15 @@ const SELECT_KPPN: {[key: string]: string} = {
 export default function WorksheetKPPN() {
   const theme = useTheme();
 
+  const { wsJunction, getWsJunctionKanwil } = useWsJunction();
+
   const navigate = useNavigate();
 
   const params = new URLSearchParams(useLocation().search);
   
-  const id= params.get('id');
+  const id= params.get('id') || "";
 
-  const [tabValue, setTabValue] = useState(0); // ganti menu komponen supervisi
+  const [tabValue, setTabValue] = useState(1); // ganti menu komponen supervisi
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => { // setiap tab komponen berubah
     setTabValue(newValue);
@@ -78,14 +81,41 @@ export default function WorksheetKPPN() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const timeout= setTimeout(() => {
-      setIsLoading(false)
-    }, 2000)
-
-    return () => {
-      clearTimeout(timeout);
-    }
+    getWsJunctionKanwil(id);
+    console.log(wsJunction)
+    setIsLoading(false);
   }, []);
+
+  const row = useMemo(() => 
+    (wsJunction?.filter((item) => item.komponen_id===tabValue).map((item, index) => {
+      const isStandardisasi = item.standardisasi===1;
+      
+      const opsiText = isStandardisasi
+        ?
+          ""
+          
+        : 
+          item?.opsi?.map((item, index) => (
+            `<b>-Nilai ${item?.value}</b>: ${item?.title} <br><br>`
+          )).join('');
+
+      const header = item.header?`${item.header}<br><br>`: "";
+
+      return(
+        <WorksheetCard 
+          key={index}
+          id={item.junction_id} 
+          title={item.title} 
+          description={`${header} ${opsiText}`}
+          num={index+1}
+          dateUpdated={new Date()}
+          modalOpen={handleOpenFile}
+          modalClose={handleCloseFile}
+          file={file}
+          openInstruction={handleOpenInstruction}
+        />
+    )})
+    ), [wsJunction]);
 
   return (
     <>
@@ -113,13 +143,14 @@ export default function WorksheetKPPN() {
 
           </Stack>
 
-          <Stack direction="row" alignItems="center" justifyContent="center " mb={5} >
-            <Tabs value={tabValue} onChange={handleTabChange}> 
-              <Tab icon={<Iconify icon="solar:safe-2-bold-duotone" />} label="Treasurer" value={0} />
-              <Tab icon={<Iconify icon="solar:buildings-2-bold-duotone" />} label="PF, RKDD, SM" value={1} />
-              <Tab icon={<Iconify icon="solar:wallet-money-bold" />} label="Financial Advisor" value={2} />
-              <Tab icon={<Iconify icon="solar:incognito-bold-duotone" />} label="Tata Kelola Internal" value={3} />
-            </Tabs>
+          <Stack direction="row" alignItems="center" justifyContent="center " mb={5}>
+              <Tabs value={tabValue} onChange={handleTabChange}> 
+                <Tab icon={<Iconify icon="solar:safe-2-bold-duotone" />} label="Treasurer" value={0} />
+                <Tab icon={<Iconify icon="solar:buildings-2-bold-duotone" />} label="Pengelola Fiskal, Representasi Kemenkeu di Daerah, dan Special Mission" value={1} />
+                <Tab icon={<Iconify icon="solar:wallet-money-bold" />} label="Financial Advisor" value={2} />
+                <Tab icon={<Iconify icon="solar:incognito-bold-duotone" />} label="Tata Kelola Internal" value={3} />
+              </Tabs>
+
           </Stack>
 
           <Grid container spacing={2}>
@@ -140,42 +171,8 @@ export default function WorksheetKPPN() {
                     </IconButton> */}
                   </Stack>
                 </Grid>
-                
-                <WorksheetCard 
-                  id={1} 
-                  title={'Akurasi RPD Harian Satker secara semesteran'} 
-                  description={`Berdasarkan tingkat deviasi RPD dari aplikasi MonSAKTI/OMSPAN pada Modul Renkas: <br/><br/>
-                  <b>-Nilai 10</b>:
-                  Nilai Deviasi antara 0 s.d. 1,99%<br/>
-                  <b>-Nilai 7</b>:
-                  Nilai Deviasi antara 2% s.d. 5% <br/>
-                  <b>-Nilai 5</b>:
-                  Nilai Deviasi antara 5% s.d. 10% <br/>
-                  <b>-Nilai 0</b>:
-                  Nilai deviasi lebih dari 10%`}
-                  num={1}
-                  dateUpdated={new Date()}
-                  modalOpen={handleOpenFile}
-                  modalClose={handleCloseFile}
-                  file={file}
-                  openInstruction={handleOpenInstruction}
-                />
-                <WorksheetCard 
-                  id={2} 
-                  title={'Upaya meminimalisir terjadinya deviasi RPD pada Satker'} 
-                  description={`Berdasarkan data Satker yang belum merealisasikan anggarannya mendekati akhir bulan, Melakukan konfirmasi kepada KPPN terkait upaya pencegahan deviasi tersebut
-                  <br/><br/>
-                  <b>-Nilai 10</b>:  apabila ada upaya peminimalisiran atas deviasi (misal surat pemberitahuan ke Satker, rekapitulasi monitoring realisasi anggaran di tiap bulan atau
-                    dilakukannya bimbingan/konsultasi kepada satker, dan ada dokumen pembuktian/pendukung yang jelas) <br/> <br/>
-                    <b>-Nilai 5</b>: apabila ada upaya peminimalisiran deviasi, namun tidak ditemukan dokumen pembuktian/pendukung<br/> <br/>
-                    <b>-Nilai 0</b>: Tidak ada keterangan dari KPPN yang mampu menunjukan upaya peminimalisiran<br/> <br/>`}
-                  num={2}
-                  dateUpdated={new Date()}
-                  modalOpen={handleOpenFile}
-                  modalClose={handleCloseFile}
-                  file={file}
-                  openInstruction={handleOpenInstruction}
-                />
+
+                {row}
 
                 <Grid item xs={12} sm={12} md={12}>
                   <Stack direction='row'>
@@ -193,54 +190,7 @@ export default function WorksheetKPPN() {
                   </Stack>
                 </Grid>
 
-                <WorksheetCard 
-                  id={3} 
-                  title={'Prosedur Penerbitan SP2D'} 
-                  description={`Berdasarkan 10 uji sampling pelaksanaan SOP Penerbitan SP2D
-                    <br/><br/>
-                    <b>-Nilai 10</b>:  tidak ada penyimpangan/ketidaksesuaian dengan prosedur dalam SOP Penerbitan SP2D <br/> <br/>
-                    <b>-Nilai 7</b>: ditemukan penyimpangan prosedur SOP Penerbitan SP2D, maksimal 1 langkah prosedur (ada pertimbangan KPPN kenapa ketidaksesuaian terjadi)<br/> <br/>
-                    <b>-Nilai 5</b>: ditemukan ketidaksesuaian Prosedur SOP Penerbitan SP2D 1 s.d. 5 langkah prosedur<br/> <br/>
-                    <b>-Nilai 0</b>: ditemukan ketidaksesuaian Prosedur SOP Penerbitan SP2D lebih dari 5 langkah prosedur<br/> <br/>`}
-                  num={3}
-                  dateUpdated={new Date()}
-                  modalOpen={handleOpenFile}
-                  modalClose={handleCloseFile}
-                  file={file}
-                  openInstruction={handleOpenInstruction}
-                />
-                <WorksheetCard 
-                  id={4} 
-                  title={'Ketepatan waktu penyelesaian tagihan'} 
-                  description={`Terhadap penyelesaian tagihan yang telah menjadi SP2D, memastikan bahwa KPPN melakukan proses penerbitan SP2D sesuai dengan Tata Cara Pembayaran APBN
-                    <br/><br/>
-                    <b>-Nilai 10</b>:  Penerbitan SP2D (dibawah jam 12 setempat) lebih dari satu jam berjumlah 0,1 s.d. 10% dari total SP2D <br/> <br/>
-                    <b>-Nilai 7</b>:  Penerbitan SP2D (dibawah jam 12 setempat) lebih dari satu jam berjumlah 10% s.d. 25% dari total SP2D <br/> <br/>
-                    <b>-Nilai 5</b>: Penerbitan SP2D (dibawah jam 12 setempat) lebih dari satu jam berjumlah 25% s.d. 50% dari total SP2D <br/> <br/>
-                    <b>-Nilai 0</b>: Penerbitan SP2D (dibawah jam 12 setempat) berjumlah lebih dari  50% dari total SP2D <br/> <br/>`}
-                  num={4}
-                  dateUpdated={new Date()}
-                  modalOpen={handleOpenFile}
-                  modalClose={handleCloseFile}
-                  file={file}
-                  openInstruction={handleOpenInstruction}
-                />
-                <WorksheetCard 
-                  id={5} 
-                  title={'Upaya meminimalisir terjadinya deviasi RPD pada Satker'} 
-                  description={`Berdasarkan data Satker yang belum merealisasikan anggarannya mendekati akhir bulan, Melakukan konfirmasi kepada KPPN terkait upaya pencegahan deviasi tersebut
-                  <br/><br/>
-                  <b>-Nilai 10</b>:  apabila ada upaya peminimalisiran atas deviasi (misal surat pemberitahuan ke Satker, rekapitulasi monitoring realisasi anggaran di tiap bulan atau
-                    dilakukannya bimbingan/konsultasi kepada satker, dan ada dokumen pembuktian/pendukung yang jelas) <br/> <br/>
-                    <b>-Nilai 5</b>: apabila ada upaya peminimalisiran deviasi, namun tidak ditemukan dokumen pembuktian/pendukung<br/> <br/>
-                    <b>-Nilai 0</b>: Tidak ada keterangan dari KPPN yang mampu menunjukan upaya peminimalisiran<br/> <br/>`}
-                  num={5}
-                  dateUpdated={new Date()}
-                  modalOpen={handleOpenFile}
-                  modalClose={handleCloseFile}
-                  file={file}
-                  openInstruction={handleOpenInstruction}
-                />
+
               </Grid>
             </Grid>
 

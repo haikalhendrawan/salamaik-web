@@ -16,9 +16,42 @@ interface WorksheetJunctionType{
   kanwil_note: string,
   kppn_id: string,
   period: string
-}
-// ------------------------------------------------------
+};
 
+interface OpsiType{
+  id: number,
+  title: string, 
+  value: number,
+  checklist_id: number
+};
+
+interface WsJunctionJoinChecklistType{
+  junction_id: number,
+  worksheet_id: string,
+  checklist_id: number,
+  kanwil_score: number,
+  kppn_score: number,
+  file_1: string,
+  file_2: string,
+  file_3: string,
+  kanwil_note: string,
+  kppn_id: string,
+  period: string,
+  id: number,
+  title: string | null, 
+  header: string | null,
+  komponen_id: number,
+  subkomponen_id: number,
+  subsubkomponen_id: number,
+  standardisasi: number, 
+  matrix_title: string | null, 
+  file1: string | null,
+  file2: string | null,
+  instruksi: string | null,
+  contoh_file: string | null,
+  opsi: OpsiType[] | [] | null
+};
+// ------------------------------------------------------
 const getWsJunctionByWorksheetForKPPN = async(req: Request, res: Response, next: NextFunction) => {
   try{
     const {kppn, period} = req.payload;
@@ -29,7 +62,7 @@ const getWsJunctionByWorksheetForKPPN = async(req: Request, res: Response, next:
       throw new ErrorDetail(404, 'Worksheet not found');
     };
 
-    const result: WorksheetJunctionType[] = await wsJunction.getWsJunctionByWorksheetId(worksheetId);
+    const result: WsJunctionJoinChecklistType[] = await wsJunction.getWsJunctionByWorksheetId(worksheetId);
     return res.status(200).json({sucess: true, message: 'Get worksheet junction success', rows: result})
   }catch(err){
     next(err);
@@ -38,8 +71,9 @@ const getWsJunctionByWorksheetForKPPN = async(req: Request, res: Response, next:
 
 const getWsJunctionByWorksheetForKanwil = async(req: Request, res: Response, next: NextFunction) => {
   try{
-    const kppn = req.body;
+    const kppn = req.query?.kppn?.toString() || "";
     const {period} = req.payload;
+
     const worksheetData = await worksheet.getWorksheetByPeriodAndKPPN(period, kppn);
     const worksheetId = worksheetData.length>0? worksheetData[0].id : null;
 
@@ -47,7 +81,7 @@ const getWsJunctionByWorksheetForKanwil = async(req: Request, res: Response, nex
       throw new ErrorDetail(404, 'Worksheet not found');
     };
 
-    const result: WorksheetJunctionType[] = await wsJunction.getWsJunctionByWorksheetId(worksheetId);
+    const result: WsJunctionJoinChecklistType[] = await wsJunction.getWsJunctionByWorksheetId(worksheetId);
     return res.status(200).json({sucess: true, message: 'Get worksheet junction success', rows: result})
   }catch(err){
     next(err);
@@ -84,7 +118,7 @@ const editWsJunctionKPPNScore = async(req: Request, res: Response, next: NextFun
   }
 }
 
-//protect endpoint di middleware
+//protect endpoint di route
 const editWsJunctionKanwilScore = async(req: Request, res: Response, next: NextFunction) => {
   try{
     const {worksheetId, junctionId, kanwilScore} = req.body;
@@ -95,7 +129,7 @@ const editWsJunctionKanwilScore = async(req: Request, res: Response, next: NextF
   }
 }
 
-//protect endpoint di middleware
+//protect endpoint di route
 const editWsJunctionKanwilNote = async(req: Request, res: Response, next: NextFunction) => {
   try{
     const {worksheetId, junctionId, kanwilNote} = req.body; 
@@ -116,7 +150,7 @@ const editWsJunctionFile = async(req: Request, res: Response, next: NextFunction
   }
 }
 
-//protect endpoint di middleware
+//protect endpoint di route
 const deleteWsJunctionByWorksheetId = async(req: Request, res: Response, next: NextFunction) => {
   try{
     const {worksheetId} = req.body; 
@@ -125,4 +159,16 @@ const deleteWsJunctionByWorksheetId = async(req: Request, res: Response, next: N
   }catch(err){
     next(err);
   }
+}
+
+export {
+  getWsJunctionByWorksheetForKPPN, 
+  getWsJunctionByWorksheetForKanwil,
+  getWsJunctionByPeriod,
+  getWsJunctionByKPPN,
+  editWsJunctionKPPNScore,
+  editWsJunctionKanwilScore,
+  editWsJunctionKanwilNote,
+  editWsJunctionFile,
+  deleteWsJunctionByWorksheetId
 }

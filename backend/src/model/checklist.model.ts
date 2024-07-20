@@ -1,16 +1,17 @@
 import pool from "../config/db";
+import { PoolClient } from "pg";
 
-interface ChecklistType{
+export interface ChecklistType{
   id: number,
-  title: string, 
-  header: string,
+  title: string | null, 
+  header: string | null,
   komponen_id: number,
   subkomponen_id: number,
   subsubkomponen_id: number,
   standardisasi: number, 
-  matrix_title: string, 
-  file1: string,
-  file2: string,
+  matrix_title: string | null, 
+  file1: string | null,
+  file2: string | null,
   instruksi: string | null,
   contoh_file: string | null
 };
@@ -24,10 +25,12 @@ interface OpsiType{
 
 //-----------------------------------------------------------------------------
 class Checklist{
-  async getAllChecklist(){
+  async getAllChecklist(poolTrx?: PoolClient){
+    const poolInstance = poolTrx??pool;
+
     try{
       const q = "SELECT * FROM checklist_ref ORDER BY id ASC";
-      const result = await pool.query(q);
+      const result = await poolInstance.query(q);
       return result.rows
     }catch(err){
       throw err

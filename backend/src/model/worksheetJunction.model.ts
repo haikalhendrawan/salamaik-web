@@ -1,8 +1,6 @@
 import pool from "../config/db";
-import ErrorDetail  from "./error.model";
-import { v4 as uuidv4 } from 'uuid';
 import "dotenv/config";
-import logger from "../config/logger"; 
+import { PoolClient } from "pg";
 /**
  *
  *
@@ -20,14 +18,59 @@ interface WorksheetJunctionType{
   file_3: string,
   kanwil_note: string,
   kppn_id: string,
-  period: string
-}
+  period: string,
+};
+
+interface OpsiType{
+  id: number,
+  title: string, 
+  value: number,
+  checklist_id: number
+};
+
+interface WsJunctionJoinChecklistType{
+  junction_id: number,
+  worksheet_id: string,
+  checklist_id: number,
+  kanwil_score: number,
+  kppn_score: number,
+  file_1: string,
+  file_2: string,
+  file_3: string,
+  kanwil_note: string,
+  kppn_id: string,
+  period: string,
+  id: number,
+  title: string | null, 
+  header: string | null,
+  komponen_id: number,
+  subkomponen_id: number,
+  subsubkomponen_id: number,
+  standardisasi: number, 
+  matrix_title: string | null, 
+  file1: string | null,
+  file2: string | null,
+  instruksi: string | null,
+  contoh_file: string | null,
+  opsi: OpsiType[] | [] | null
+};
+
+
 // ------------------------------------------------------
 
 class WorksheetJunction{
-  async getWsJunctionByWorksheetId(worksheetId: number): Promise<WorksheetJunctionType[]>{
+  async getWsJunctionByWorksheetId(worksheetId: number): Promise<WsJunctionJoinChecklistType[]>{
     try{
-      const q = "SELECT * FROM worksheet_junction WHERE worksheet_id = $1";
+      const q = ` SELECT worksheet_junction.*, checklist_ref.*, json_agg(opsi_ref.*) AS opsi
+                  FROM worksheet_junction
+                  LEFT JOIN checklist_ref 
+                  ON worksheet_junction.checklist_id = checklist_ref.id
+                  LEFT JOIN opsi_ref
+                  ON worksheet_junction.checklist_id = opsi_ref.checklist_id
+                  WHERE worksheet_id = $1
+                  GROUP BY worksheet_junction.junction_id, checklist_ref.id
+                  ORDER BY worksheet_junction.checklist_id
+                  `;
       const result = await pool.query(q, [worksheetId]);
       return result.rows
     }catch(err){
@@ -55,10 +98,12 @@ class WorksheetJunction{
     }
   }
 
-  async addWsJunction(worksheetId: string, checklistId: number, kppnId: string, period: number){
+  async addWsJunction(worksheetId: string, checklistId: number, kppnId: string, period: number, poolTrx?: PoolClient){
+    const poolInstance = poolTrx ?? pool;
+
     try{
       const q = "INSERT INTO worksheet_junction (worksheet_id, checklist_id, kppn_id, period) VALUES ($1, $2, $3, $4) RETURNING *";
-      const result = await pool.query(q, [worksheetId, checklistId, kppnId, period]);
+      const result = await poolInstance.query(q, [worksheetId, checklistId, kppnId, period]);
       return result.rows
     }catch(err){
       throw err

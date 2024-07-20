@@ -1,4 +1,4 @@
-import express, {Request, Response} from 'express';
+import express from 'express';
 import path from "path";
 import "dotenv/config"; 
 import cors from "cors";
@@ -16,9 +16,10 @@ import komponenRoute from './routes/komponenRoute';
 import checklistRoute from './routes/checklistRoute';
 import standardizationRoute from './routes/standardizationRoute';
 import WorksheetRoute from './routes/worksheetRoute';
+import WsJunctionRoute from './routes/worksheetJunctionRoute';
+import notFoundRoute from './routes/notFoundRoute';
 //middleware
 import errorHandler from './middleware/errorHandler';
-import notFoundHandler from './middleware/notFoundHandler';
 import rateLimiter from './middleware/rateLimiter';
 // ------------------------------------------------------------
 
@@ -43,7 +44,8 @@ app.use(komponenRoute);
 app.use(checklistRoute);
 app.use(standardizationRoute);
 app.use(WorksheetRoute);
-app.use(notFoundHandler);
+app.use(WsJunctionRoute);
+app.use(notFoundRoute);
 app.use(errorHandler);
 
 app.listen(process.env.DEV_PORT, () => {

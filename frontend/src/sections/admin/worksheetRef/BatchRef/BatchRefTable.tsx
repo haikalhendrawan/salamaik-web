@@ -81,10 +81,10 @@ export default function BatchRefTable({tableData, handleOpen}: BatchRefTableProp
     )
   };
 
-  const handleAssign = async(id: string) => {
+  const handleAssign = async(id: string, kppnId: string, period: number) => {
     try{
       setIsLoading(true);
-      const response = await axiosJWT.post(`/assignWorksheet`, {worksheetId: id});
+      const response = await axiosJWT.post(`/assignWorksheet`, {worksheetId: id, kppnId, period});
       openSnackbar(response.data.message, "success");
       getBatch();
       setIsLoading(false);
@@ -99,13 +99,13 @@ export default function BatchRefTable({tableData, handleOpen}: BatchRefTableProp
     }
   };
 
-  const handleOpenAssign= (id: string) => {
+  const handleOpenAssign= (id: string, kppnId: string, period: number) => {
     openDialog(
       "Assign Kertas Kerja",
       "Yakin assign kertas kerja? pastikan kembali seluruh referensi checklist telah diinput",
       'success',
       'assign',
-      () => handleAssign(id)
+      () => handleAssign(id, kppnId, period)
     )
   };
 
@@ -161,7 +161,7 @@ export default function BatchRefTable({tableData, handleOpen}: BatchRefTableProp
                             variant='contained' 
                             size='small' 
                             color='success'
-                            onClick={() => handleOpenAssign(row.id)}
+                            onClick={() => handleOpenAssign(row.id, row.kppn_id, row.period)}
                           >
                             <Iconify icon="solar:plain-bold"/>
                           </StyledButton>

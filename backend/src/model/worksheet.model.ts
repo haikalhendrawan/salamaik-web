@@ -1,4 +1,5 @@
 import pool from "../config/db";
+import { Pool, PoolClient } from "pg";
 import ErrorDetail  from "./error.model";
 import { v4 as uuidv4 } from 'uuid';
 import "dotenv/config";
@@ -31,7 +32,7 @@ class Worksheet{
                   INNER JOIN kppn_ref ON kppn_ref.id = worksheet_ref.kppn_id 
                   WHERE period = $1 AND kppn_ref.level = $2`;
       const result = await pool.query(q, [period, 0]);
-      return result.rows;
+      return result.rows
     }catch(err){
       throw err;
     }  
@@ -43,9 +44,9 @@ class Worksheet{
                   FROM worksheet_ref
                   WHERE period = $1 AND kppn_id = $2`;
       const result = await pool.query(q, [period, kppnId]);
-      return result.rows;
+      return result.rows
     }catch(err){
-      throw err;
+      throw err
     }
   }
 
@@ -56,9 +57,9 @@ class Worksheet{
                   VALUES ($1, $2, $3, $4, $5, $6) 
                   RETURNING *`;
       const result = await pool.query(q, [id, kppnId, period, 0, startDate, closeDate]);
-      return result.rows[0];
+      return result.rows[0]
     }catch(err){
-      throw err;
+      throw err
     }
   }
 
@@ -66,22 +67,23 @@ class Worksheet{
     try{
       const q = `SELECT * FROM worksheet_ref WHERE kppn_id = $1 AND period = $2`;
       const result = await pool.query(q, [kppnId, period]);
-      return result.rows.length > 0;
+      return result.rows.length > 0
     }catch(err){
-      throw err;
+      throw err
     }
   }
 
-  async editWorksheetStatus(id: string){
+  async editWorksheetStatus(id: string, poolTrx?: PoolClient){
+    const poolInstance = poolTrx??pool;
     try{
       const q = ` UPDATE worksheet_ref
                   SET status = $1
                   WHERE id = $2
                   RETURNING *`;
-      const result = await pool.query(q, [1, id]);
-      return result.rows[0];
+      const result = await poolInstance.query(q, [1, id]);
+      return result.rows[0]
     }catch(err){
-      throw err;
+      throw err
     }
   }
 
@@ -92,9 +94,9 @@ class Worksheet{
                   WHERE id = $3
                   RETURNING *`;
       const result = await pool.query(q, [startDate, closeDate, id]);
-      return result.rows[0];
+      return result.rows[0]
     }catch(err){
-      throw err;
+      throw err
     }
   }
 
@@ -102,9 +104,9 @@ class Worksheet{
     try{
       const q = `DELETE FROM worksheet_ref WHERE id = $1 RETURNING *`;
       const result = await pool.query(q, [id]);
-      return result.rows[0];
+      return result.rows[0]
     }catch(err){
-      throw err;
+      throw err
     }
   }
 }

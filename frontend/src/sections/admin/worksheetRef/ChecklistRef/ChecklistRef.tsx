@@ -1,4 +1,4 @@
-import {useState, useEffect, useRef, useCallback} from'react';
+import {useState, useEffect, useMemo, useCallback} from'react';
 import { Card,  Grow, Tabs, Tab} from '@mui/material';
 import { useTheme, styled } from '@mui/material/styles';
 import Label from '../../../../components/label';
@@ -30,7 +30,17 @@ export default function ChecklistRef({section, addState, resetAddState}: Checkli
 
   const [pageLoading, setPageLoading] = useState<boolean>(true);
 
-  const {getChecklist} = useChecklist();
+  const {checklist, getChecklist} = useChecklist();
+
+  const komponen1Count = useMemo(() => checklist?.filter((item) => item.komponen_id === 1).length, [checklist]);
+  
+  const komponen2Count = useMemo(() => checklist?.filter((item) => item.komponen_id === 2).length, [checklist]);
+  
+  const komponen3Count = useMemo(() => checklist?.filter((item) => item.komponen_id === 3).length, [checklist]);
+  
+  const komponen4Count = useMemo(() => checklist?.filter((item) => item.komponen_id === 4).length, [checklist]);
+  
+  const allKomponenCount = useMemo(() => checklist?.length, [checklist]);
 
   const handleOpen = (id: number) => { // for edit modal
     setOpen(true);
@@ -94,31 +104,31 @@ export default function ChecklistRef({section, addState, resetAddState}: Checkli
             TabIndicatorProps={{ sx: {bgcolor: theme.palette.text.primary}}}
           > 
             <Tab 
-              icon={<Label sx={{color: theme.palette.text.primary, cursor:'pointer'}}>20</Label>} 
+              icon={<Label sx={{color: theme.palette.text.primary, cursor:'pointer'}}>{allKomponenCount}</Label>} 
               label="All" 
               iconPosition="end"  
               value={0} 
             />
             <Tab 
-              icon={<Label color={'primary'} sx={{cursor:'pointer'}}>10</Label>} 
+              icon={<Label color={'primary'} sx={{cursor:'pointer'}}>{komponen1Count}</Label>} 
               label="Treasurer" 
               iconPosition="end"  
               value={1} 
             />
             <Tab 
-              icon={<Label color={'primary'} sx={{cursor:'pointer'}}>5</Label>} 
-              label="PF, RKDD, SM" 
+              icon={<Label color={'primary'} sx={{cursor:'pointer'}}>{komponen2Count}</Label>} 
+              label="Pengelola Fiskal, Representasi Kemenkeu di Daerah, dan Special Mission" 
               iconPosition="end"  
               value={2} 
             />
             <Tab 
-              icon={<Label color={'primary'} sx={{cursor:'pointer'}}>15</Label>} 
+              icon={<Label color={'primary'} sx={{cursor:'pointer'}}>{komponen3Count}</Label>} 
               label="Financial Advisor" 
               iconPosition="end"  
               value={3} 
             />
             <Tab 
-              icon={<Label color={'primary'} sx={{cursor:'pointer'}}>10</Label>} 
+              icon={<Label color={'primary'} sx={{cursor:'pointer'}}>{komponen4Count}</Label>} 
               label="Tata Kel. Internal" 
               iconPosition="end"  
               value={4} 

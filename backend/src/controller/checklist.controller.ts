@@ -10,15 +10,15 @@ import { sanitizeSubKomponen } from '../utils/subKomponenSanitizer';
 
 interface ChecklistType{
   id: number,
-  title: string, 
-  header: string,
+  title: string | null, 
+  header: string | null,
   komponen_id: number,
   subkomponen_id: number,
   subsubkomponen_id: number,
   standardisasi: number, 
-  matrix_title: string, 
-  file1: string,
-  file2: string,
+  matrix_title: string | null, 
+  file1: string | null,
+  file2: string | null,
   instruksi: string | null,
   contoh_file: string | null
 };
