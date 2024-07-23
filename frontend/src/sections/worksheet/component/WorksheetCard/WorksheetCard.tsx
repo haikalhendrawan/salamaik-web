@@ -8,6 +8,7 @@ import Kriteria from "./Kriteria";
 import Dokumen from "./Dokumen";
 import Nilai from "./Nilai";
 import Catatan from "./Catatan";
+import { OpsiType } from "../../types";
 // ------------------------------------------------------------
 const selectKondisi = [
   {jenis:'Sesuai', value:2, color:'success'}, 
@@ -30,7 +31,10 @@ const VisuallyHiddenInput = styled('input')({
 interface WorksheetCardProps{
   id: number,
   title: string | null,
-  description: string | null,
+  description: {
+    kriteria: string,
+    opsi: OpsiType[] | [] | null
+  },
   num: number | string,
   dateUpdated: Date,
   modalOpen: () => void,
@@ -80,7 +84,7 @@ export default function WorksheetCard(props: WorksheetCardProps) {
 
             <Grid container sx={{mt:0, maxHeight:'160px', textAlign:'center',  justifyContent:'center'}} spacing={1}>  {/* Table Body */}
                 <Grid item xs={6} >
-                  <Kriteria description={props.description || ""} />
+                  <Kriteria description={props.description} />
                 </Grid>
 
                 <Grid item xs={1.5}> 

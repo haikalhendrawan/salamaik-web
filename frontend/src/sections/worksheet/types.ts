@@ -1,4 +1,4 @@
-interface OpsiType{
+export interface OpsiType{
     id: number,
     title: string, 
     value: number,

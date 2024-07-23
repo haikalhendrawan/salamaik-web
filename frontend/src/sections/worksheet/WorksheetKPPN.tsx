@@ -96,17 +96,27 @@ export default function WorksheetKPPN() {
           
         : 
           item?.opsi?.map((item, index) => (
-            `<b>-Nilai ${item?.value}</b>: ${item?.title} <br><br>`
-          )).join('');
+            `<div key={index} style="display: flex; flex-direction: row; align-items: center;">
+              <div>
+                <b>-Nilai ${item.value}</b>
+              </div>
+              <div >
+                :
+              </div>
+              <div>
+                ${item.title}
+              </div>
+            </div>`
+        ));
 
-      const header = item.header?`${item.header}<br><br>`: "";
+      const header = item.header?`${item.header}`: "";
 
       return(
         <WorksheetCard 
           key={index}
           id={item.junction_id} 
           title={item.title} 
-          description={`${header} ${opsiText}`}
+          description={{kriteria: header, opsi: item.opsi}}
           num={index+1}
           dateUpdated={new Date()}
           modalOpen={handleOpenFile}

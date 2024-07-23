@@ -61,7 +61,7 @@ interface WsJunctionJoinChecklistType{
 class WorksheetJunction{
   async getWsJunctionByWorksheetId(worksheetId: number): Promise<WsJunctionJoinChecklistType[]>{
     try{
-      const q = ` SELECT worksheet_junction.*, checklist_ref.*, json_agg(opsi_ref.*) AS opsi
+      const q = ` SELECT worksheet_junction.*, checklist_ref.*, json_agg(opsi_ref.* ORDER BY opsi_ref.checklist_id ASC, value DESC) AS opsi
                   FROM worksheet_junction
                   LEFT JOIN checklist_ref 
                   ON worksheet_junction.checklist_id = checklist_ref.id
