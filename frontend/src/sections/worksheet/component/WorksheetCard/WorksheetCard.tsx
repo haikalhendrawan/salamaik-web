@@ -1,46 +1,18 @@
 import {useState, useRef} from "react";
-import axios from "axios";
-import { Stack, Typography, Grid, Card, CardHeader, Select, MenuItem,
-          FormControl, TextField, Grow, Divider} from '@mui/material';
+import { Typography, Grid, Card, CardHeader, Grow, Divider} from '@mui/material';
+import InstructionPopover from "../InstructionPopover";
 import {useTheme, styled} from '@mui/material/styles';
 import Head from "./Head";
 import Kriteria from "./Kriteria";
 import Dokumen from "./Dokumen";
 import Nilai from "./Nilai";
 import Catatan from "./Catatan";
-import { OpsiType } from "../../types";
+import { WsJunctionType } from "../../types";
 // ------------------------------------------------------------
-const selectKondisi = [
-  {jenis:'Sesuai', value:2, color:'success'}, 
-  {jenis:'Belum Sesuai', value:1, color:'error'},
-  {jenis:'Tidak Tahu', value:0, color:'warning'},
-  ];
-
-const VisuallyHiddenInput = styled('input')({
-  clip: 'rect(0 0 0 0)',
-  clipPath: 'inset(50%)',
-  height: 1,
-  overflow: 'hidden',
-  position: 'absolute',
-  bottom: 0,
-  left: 0,
-  whiteSpace: 'nowrap',
-  width: 1,
-});
-
 interface WorksheetCardProps{
-  id: number,
-  title: string | null,
-  description: {
-    kriteria: string,
-    opsi: OpsiType[] | [] | null
-  },
-  num: number | string,
-  dateUpdated: Date,
   modalOpen: () => void,
   modalClose: () => void,
-  file: string | undefined,
-  openInstruction: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
+  wsJunction: WsJunctionType | null,
 };
 
 // ------------------------------------------------------------
@@ -53,30 +25,44 @@ export default function WorksheetCard(props: WorksheetCardProps) {
     addFileRef.current? addFileRef.current.click() : null
   };
 
+  const [openInstruction, setOpenInstruction] = useState<boolean>(false);
+
+  const [anchorEl, setAnchorEl] = useState<EventTarget & HTMLButtonElement | null>(null);
+
+  const handleOpenInstruction = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    setOpenInstruction(true);
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseInstruction = () => {
+    setOpenInstruction(false)
+  };
+
   return(
+    <>
     <Grow in>
       <Grid item xs={12} sm={12} md={12}>
         <Card sx={{minHeight:'300px'}}>
           <CardHeader 
-            title={<Head num={props.num} title={props.title || ""} dateUpdated={props.dateUpdated} />} 
+            title={<Head num={props.wsJunction?.checklist_id} title={props.wsJunction?.title || ""} dateUpdated={new Date()} />} 
             sx={{backgroundColor:theme.palette.background.default, color:theme.palette.text.primary,  height:'67px', pl:1, pt:0}}
           /> 
 
             <Grid container sx={{mt:1, mb:1, textAlign:'center', justifyContent:'center', color:theme.palette.text.secondary}} spacing={0}>  {/* Kepala Table */}
                 <Grid item xs={6}>
-                    <Typography variant="body2" sx={{mr:1}}> Kriteria </Typography>
+                  <Typography variant="body2" sx={{mr:1}}> Kriteria </Typography>
                 </Grid>
 
                 <Grid item xs={1.5}>
-                    <Typography variant="body2"> Dokumen </Typography>
+                  <Typography variant="body2"> Dokumen </Typography>
                 </Grid>
 
                 <Grid item xs={1.5}>
-                    <Typography variant="body2"> Nilai</Typography>
+                  <Typography variant="body2"> Nilai</Typography>
                 </Grid>
 
                 <Grid item xs={3}>
-                    <Typography variant="body2"> Catatan Kanwil </Typography>
+                  <Typography variant="body2"> Catatan Kanwil </Typography>
                 </Grid>
             </Grid>
 
@@ -84,11 +70,11 @@ export default function WorksheetCard(props: WorksheetCardProps) {
 
             <Grid container sx={{mt:0, maxHeight:'160px', textAlign:'center',  justifyContent:'center'}} spacing={1}>  {/* Table Body */}
                 <Grid item xs={6} >
-                  <Kriteria description={props.description} />
+                  <Kriteria kriteria={props.wsJunction?.header || ""} opsi={props?.wsJunction?.opsi || []} />
                 </Grid>
 
                 <Grid item xs={1.5}> 
-                  <Dokumen modalOpen={props.modalOpen} openUploadFile={openUploadFile} openInstruction={props.openInstruction} />
+                  <Dokumen modalOpen={props.modalOpen} openUploadFile={openUploadFile} openInstruction={handleOpenInstruction} />
                 </Grid>
 
                 <Grid item xs={1.5} > 
@@ -105,6 +91,16 @@ export default function WorksheetCard(props: WorksheetCardProps) {
         </Card>
       </Grid> 
     </Grow>
+
+    <InstructionPopover 
+      open={openInstruction} 
+      anchorEl={anchorEl} 
+      handleClose={handleCloseInstruction} 
+      instruction={props.wsJunction?.instruksi || null} 
+      fileExample={props.wsJunction?.contoh_file || null}
+    />
+
+    </>
       
       ) 
 }

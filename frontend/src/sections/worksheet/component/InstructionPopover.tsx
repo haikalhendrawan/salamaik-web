@@ -16,11 +16,13 @@ const style = {
 interface InstructionPopperProps{
   open: boolean,
   anchorEl: EventTarget & HTMLButtonElement | null,
-  handleClose: () => void
+  handleClose: () => void,
+  instruction: string | null,
+  fileExample: string | null
 };
 
 // ---------------------------------------------------------------------------------------------
-export default function InstructionPopover({open, anchorEl, handleClose}: InstructionPopperProps){
+export default function InstructionPopover({open, anchorEl, handleClose, instruction, fileExample}: InstructionPopperProps){
   const theme = useTheme();
 
   return(
@@ -38,9 +40,13 @@ export default function InstructionPopover({open, anchorEl, handleClose}: Instru
 							<ClickAwayListener onClickAway={handleClose}>
                 <Box>
                   <Stack direction='column' spacing={1}>
-                    <Typography variant='body2' sx={{fontSize: 14}}  fontWeight={'bold'}>Instruksi</Typography>
-                    <Typography variant='body2' sx={{fontSize: 12}}>Pada aplikasi OMSPAN, navigasi pada menu Pembayaran kemudian sesuaikan data dengan file yang tertera</Typography>
-                    <Typography variant='body2' sx={{fontSize: 12}}>Buka menu yang tertulis pada petunjuk kemudian update sesuai ketentuan</Typography>
+                    <Typography variant='body2' sx={{fontSize: 14}} fontWeight={'bold'}>Instruksi</Typography>
+                    <Typography variant='body2' sx={{fontSize: 12}}>{instruction}</Typography>
+                  </Stack>
+                  <br />
+                  <Stack direction='column' spacing={1}>
+                    <Typography variant='body2' sx={{fontSize: 14}} fontWeight={'bold'}>Contoh file</Typography>
+                    <Typography variant='body2' sx={{fontSize: 12}}>{fileExample}</Typography>
                   </Stack>
                 </Box>
 							</ClickAwayListener>

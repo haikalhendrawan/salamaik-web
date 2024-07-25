@@ -80,7 +80,7 @@ const getStdWorksheet = async (req: Request, res: Response, next: NextFunction) 
 const addStandardizationJunction = async (req: Request, res: Response, next: NextFunction) => {
   uploadStdFile(req, res, async (err) => {
     if(!req.file){
-      return next(new ErrorDetail(400, 'Incorrect file type', err));
+      return next(new ErrorDetail(400,  'Incorrect file type or Directory doesn\'t exist', err.message));
     };
 
     if(err instanceof multer.MulterError) {

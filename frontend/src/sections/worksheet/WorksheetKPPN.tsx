@@ -1,6 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { FixedSizeList as List } from 'react-window';
 import Iconify from '../../components/iconify';
 import PreviewFileModal from './component/PreviewFileModal';
 import useWsJunction from './useWsJunction';
@@ -13,6 +14,8 @@ import PageLoading from '../../components/pageLoading/PageLoading';
 import { Container, Stack, Typography, Tabs, Tab, Grid, Paper, 
         IconButton, Box, LinearProgress} from '@mui/material';
 import {useTheme, styled} from '@mui/material/styles';
+import useDictionary from '../../hooks/useDictionary';
+import { filterKomponen, filterSubkomponen } from './utils';
 // -----------------------------------------------------------------------
 const SubkomponenDivider = styled(Paper)(({theme}) => ({
   padding: theme.spacing(1),
@@ -41,6 +44,8 @@ export default function WorksheetKPPN() {
 
   const { wsJunction, getWsJunctionKanwil } = useWsJunction();
 
+  const { komponenRef, subKomponenRef } = useDictionary();
+
   const navigate = useNavigate();
 
   const params = new URLSearchParams(useLocation().search);
@@ -65,67 +70,50 @@ export default function WorksheetKPPN() {
     setOpen(false)
   };
 
-  const [openInstruction, setOpenInstruction] = useState<boolean>(false);
-
-  const [anchorEl, setAnchorEl] = useState<EventTarget & HTMLButtonElement | null>(null);
-
-  const handleOpenInstruction = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    setOpenInstruction(true);
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleCloseInstruction = () => {
-    setOpenInstruction(false)
-  };
-
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     getWsJunctionKanwil(id);
-    console.log(wsJunction)
     setIsLoading(false);
   }, []);
 
-  const row = useMemo(() => 
-    (wsJunction?.filter((item) => item.komponen_id===tabValue).map((item, index) => {
-      const isStandardisasi = item.standardisasi===1;
-      
-      const opsiText = isStandardisasi
-        ?
-          ""
-          
-        : 
-          item?.opsi?.map((item, index) => (
-            `<div key={index} style="display: flex; flex-direction: row; align-items: center;">
-              <div>
-                <b>-Nilai ${item.value}</b>
-              </div>
-              <div >
-                :
-              </div>
-              <div>
-                ${item.title}
-              </div>
-            </div>`
-        ));
-
-      const header = item.header?`${item.header}`: "";
-
-      return(
-        <WorksheetCard 
-          key={index}
-          id={item.junction_id} 
-          title={item.title} 
-          description={{kriteria: header, opsi: item.opsi}}
-          num={index+1}
-          dateUpdated={new Date()}
-          modalOpen={handleOpenFile}
-          modalClose={handleCloseFile}
-          file={file}
-          openInstruction={handleOpenInstruction}
-        />
-    )})
-    ), [wsJunction]);
+  const content = useMemo(() =>
+    subKomponenRef?.filter(item => item?.komponen_id === tabValue)?.map((i) => (
+      <>
+        <Grid item xs={12} sm={12} md={12} key={i.id}>
+          <Stack direction='row'>
+            <SubkomponenDivider>
+              Subkomponen : {i.title}
+            </SubkomponenDivider>
+  
+            <IconButton aria-label="edit" size='small' color='primary'>
+              <Iconify icon="solar:round-arrow-up-bold"/>
+            </IconButton>
+  
+            <IconButton aria-label="edit" size='small' color='primary'>
+              <Iconify icon="solar:round-arrow-down-bold"/>
+            </IconButton>
+          </Stack>
+        </Grid>
+  
+        {wsJunction
+          ?.filter(item => item?.komponen_id === tabValue && item?.subkomponen_id === i?.id)
+          .map((item, index) => {
+            const isStandardisasi = item.standardisasi === 1;
+            const header = item.header ? `${item.header}` : "";
+  
+            return (
+              <WorksheetCard 
+                key={index}
+                wsJunction={item}
+                modalOpen={handleOpenFile}
+                modalClose={handleCloseFile}
+              />
+            );
+          })}
+      </>
+    ))
+  , [wsJunction, tabValue]);
 
   return (
     <>
@@ -153,53 +141,20 @@ export default function WorksheetKPPN() {
 
           </Stack>
 
-          <Stack direction="row" alignItems="center" justifyContent="center " mb={5}>
+          <Stack direction="row" alignItems="center" justifyContent="center" mb={5}>
               <Tabs value={tabValue} onChange={handleTabChange}> 
-                <Tab icon={<Iconify icon="solar:safe-2-bold-duotone" />} label="Treasurer" value={0} />
-                <Tab icon={<Iconify icon="solar:buildings-2-bold-duotone" />} label="Pengelola Fiskal, Representasi Kemenkeu di Daerah, dan Special Mission" value={1} />
-                <Tab icon={<Iconify icon="solar:wallet-money-bold" />} label="Financial Advisor" value={2} />
-                <Tab icon={<Iconify icon="solar:incognito-bold-duotone" />} label="Tata Kelola Internal" value={3} />
+                <Tab icon={<Iconify icon="solar:safe-2-bold-duotone" />} label="Treasurer" value={1} />
+                <Tab icon={<Iconify icon="solar:buildings-2-bold-duotone" />} label="Pengelola Fiskal, Representasi Kemenkeu di Daerah, dan Special Mission" value={2} />
+                <Tab icon={<Iconify icon="solar:wallet-money-bold" />} label="Financial Advisor" value={3} />
+                <Tab icon={<Iconify icon="solar:incognito-bold-duotone" />} label="Tata Kelola Internal" value={4} />
               </Tabs>
-
           </Stack>
 
           <Grid container spacing={2}>
             <Grid item xs={12} md={12}>
               <Grid container spacing={2}>
-                <Grid item xs={12} sm={12} md={12}>
-                  <Stack direction='row'>
-                    <SubkomponenDivider>
-                      Subkomponen : Pemantauan dan Evaluasi Kinerja Anggaran Satker dan Reviu Pelaksanaan Anggaran Satker K/L dan BLU
-                    </SubkomponenDivider>
-
-                    {/* <IconButton aria-label="edit" size='small' color='primary'>
-                      <Iconify icon="solar:round-arrow-up-bold"/>
-                    </IconButton>
-
-                    <IconButton aria-label="edit" size='small' color='primary'>
-                      <Iconify icon="solar:round-arrow-down-bold"/>
-                    </IconButton> */}
-                  </Stack>
-                </Grid>
-
-                {row}
-
-                <Grid item xs={12} sm={12} md={12}>
-                  <Stack direction='row'>
-                    <SubkomponenDivider>
-                      Subkomponen : Penyaluran Belanja atas Beban APBN
-                    </SubkomponenDivider>
-
-                    {/* <IconButton aria-label="edit" size='small' color='primary'>
-                      <Iconify icon="solar:round-arrow-up-bold"/>
-                    </IconButton>
-
-                    <IconButton aria-label="edit" size='small' color='primary'>
-                      <Iconify icon="solar:round-arrow-down-bold"/>
-                    </IconButton> */}
-                  </Stack>
-                </Grid>
-
+              
+                {content}
 
               </Grid>
             </Grid>
@@ -210,7 +165,7 @@ export default function WorksheetKPPN() {
 
         <PreviewFileModal open={open} modalClose={handleCloseFile} file={file} />
 
-        <InstructionPopover open={openInstruction} anchorEl={anchorEl} handleClose={handleCloseInstruction} />
+        {/* <InstructionPopover open={openInstruction} anchorEl={anchorEl} handleClose={handleCloseInstruction} /> */}
 
         <NavigationDrawer /> </>}
       </>

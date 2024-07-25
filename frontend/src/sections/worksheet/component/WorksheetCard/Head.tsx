@@ -3,7 +3,7 @@ import { Stack, Typography, Grid, Card, CardHeader, IconButton, Tooltip, Select,
 import Iconify from "../../../../components/iconify";
   // ------------------------------------------------------------
 interface HeadPropInterface{
-  num: number | string,
+  num: number | undefined,
   title:string,
   dateUpdated: Date
 };

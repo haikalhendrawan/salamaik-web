@@ -34,12 +34,13 @@ const WsJunctionProvider = ({children}: WsJunctionProviderProps) => {
   async function getWsJunctionKanwil(kppnId: string) {
     try{
       setIsLoading(true);
-      const response = await axiosJWT.get(`/getWsJunctionByWorksheetForKanwil?kppn=${kppnId}`);
+      const response = await axiosJWT.get(`/getWsJunctionByWorksheetForKanwil?kppn=${kppnId}&time=${new Date().getTime()}`);
       setWsJunction(response.data.rows);
       console.log(response.data.rows)
       setIsLoading(false);
     }catch(err: any){
       openSnackbar(err.response.data.message, "error");
+      setWsJunction([]);
       setIsLoading(false);
     }finally{
       setIsLoading(false);
