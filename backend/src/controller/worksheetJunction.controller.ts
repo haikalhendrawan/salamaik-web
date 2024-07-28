@@ -82,6 +82,11 @@ const getWsJunctionByWorksheetForKanwil = async(req: Request, res: Response, nex
     };
 
     const result: WsJunctionJoinChecklistType[] = await wsJunction.getWsJunctionByWorksheetId(worksheetId);
+
+    if(!result || result.length===0) {
+      throw new ErrorDetail(404, 'Worksheet not assigned');
+    };
+    
     return res.status(200).json({sucess: true, message: 'Get worksheet junction success', rows: result})
   }catch(err){
     next(err);

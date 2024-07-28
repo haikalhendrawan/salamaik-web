@@ -1,5 +1,5 @@
-import {useState, useRef} from "react";
-import { Typography, Grid, Card, CardHeader, Grow, Divider} from '@mui/material';
+import {useState, useRef, useEffect} from "react";
+import { Typography, Grid, Card, CardHeader, Grow, Divider, Skeleton, Box} from '@mui/material';
 import InstructionPopover from "../InstructionPopover";
 import {useTheme, styled} from '@mui/material/styles';
 import Head from "./Head";
@@ -21,6 +21,8 @@ export default function WorksheetCard(props: WorksheetCardProps) {
 
   const addFileRef = useRef<HTMLInputElement>(null);
 
+  const [mounted, setIsMounted] = useState(false)
+
   const openUploadFile = () => {
     addFileRef.current? addFileRef.current.click() : null
   };
@@ -38,74 +40,129 @@ export default function WorksheetCard(props: WorksheetCardProps) {
     setOpenInstruction(false)
   };
 
-  return(
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if(!mounted) {
+    return <WorksheetCardSkeleton />
+  };
+
+  return (
     <>
-    <Grow in>
-      <Grid item xs={12} sm={12} md={12}>
-        <Card sx={{minHeight:'300px'}}>
-          <CardHeader 
-            title={<Head num={props.wsJunction?.checklist_id} title={props.wsJunction?.title || ""} dateUpdated={new Date()} />} 
-            sx={{backgroundColor:theme.palette.background.default, color:theme.palette.text.primary,  height:'67px', pl:1, pt:0}}
-          /> 
+      <Grow in>
+        <Grid item xs={12} sm={12} md={12}>
+          <Card sx={{ minHeight: '300px' }}>
+            <CardHeader
+              title={
+                <Head
+                  num={props.wsJunction?.checklist_id}
+                  title={props.wsJunction?.title || ""}
+                  dateUpdated={new Date()}
+                />
+              }
+              sx={{
+                backgroundColor: theme.palette.background.default,
+                color: theme.palette.text.primary,
+                height: '67px',
+                pl: 1,
+                pt: 0,
+              }}
+            />
 
-            <Grid container sx={{mt:1, mb:1, textAlign:'center', justifyContent:'center', color:theme.palette.text.secondary}} spacing={0}>  {/* Kepala Table */}
-                <Grid item xs={6}>
-                  <Typography variant="body2" sx={{mr:1}}> Kriteria </Typography>
-                </Grid>
+            <Grid
+              container
+              sx={{
+                mt: 1,
+                mb: 1,
+                textAlign: 'center',
+                justifyContent: 'center',
+                color: theme.palette.text.secondary,
+              }}
+              spacing={0}
+            >
+              {/* Table Header */}
+              <Grid item xs={6}>
+                <Typography variant="body2" sx={{ mr: 1 }}>
+                  Kriteria
+                </Typography>
+              </Grid>
 
-                <Grid item xs={1.5}>
-                  <Typography variant="body2"> Dokumen </Typography>
-                </Grid>
+              <Grid item xs={1.5}>
+                <Typography variant="body2">Dokumen</Typography>
+              </Grid>
 
-                <Grid item xs={1.5}>
-                  <Typography variant="body2"> Nilai</Typography>
-                </Grid>
+              <Grid item xs={1.5}>
+                <Typography variant="body2">Nilai</Typography>
+              </Grid>
 
-                <Grid item xs={3}>
-                  <Typography variant="body2"> Catatan Kanwil </Typography>
-                </Grid>
+              <Grid item xs={3}>
+                <Typography variant="body2">Catatan Kanwil</Typography>
+              </Grid>
             </Grid>
 
-            <Divider  flexItem/>  
+            <Divider flexItem />
 
-            <Grid container sx={{mt:0, maxHeight:'160px', textAlign:'center',  justifyContent:'center'}} spacing={1}>  {/* Table Body */}
-                <Grid item xs={6} >
-                  <Kriteria kriteria={props.wsJunction?.header || ""} opsi={props?.wsJunction?.opsi || []} />
-                </Grid>
+            <Grid
+              container
+              sx={{
+                mt: 0,
+                maxHeight: '160px',
+                textAlign: 'center',
+                justifyContent: 'center',
+              }}
+              spacing={1}
+            >
+              {/* Table Body */}
+              <Grid item xs={6}>
+                <Kriteria
+                  kriteria={props.wsJunction?.header || ""}
+                  opsi={props?.wsJunction?.opsi || []}
+                />
+              </Grid>
 
-                <Grid item xs={1.5}> 
-                  <Dokumen modalOpen={props.modalOpen} openUploadFile={openUploadFile} openInstruction={handleOpenInstruction} />
-                </Grid>
+              <Grid item xs={1.5}>
+                <Dokumen
+                  modalOpen={props.modalOpen}
+                  openUploadFile={openUploadFile}
+                  openInstruction={handleOpenInstruction}
+                />
+              </Grid>
 
-                <Grid item xs={1.5} > 
-                  <Nilai />
-                </Grid>
+              <Grid item xs={1.5}>
+                <Nilai />
+              </Grid>
 
-                <Grid item xs={3}>  
-                  <Catatan />
-                </Grid>
+              <Grid item xs={3}>
+                <Catatan />
+              </Grid>
             </Grid>
 
-            <Divider sx={{ borderStyle: 'dashed', mt: 3 }}/>
+            <Divider sx={{ borderStyle: 'dashed', mt: 3 }} />
+          </Card>
+        </Grid>
+      </Grow>
 
-        </Card>
-      </Grid> 
-    </Grow>
-
-    <InstructionPopover 
-      open={openInstruction} 
-      anchorEl={anchorEl} 
-      handleClose={handleCloseInstruction} 
-      instruction={props.wsJunction?.instruksi || null} 
-      fileExample={props.wsJunction?.contoh_file || null}
-    />
-
+      <InstructionPopover
+        open={openInstruction}
+        anchorEl={anchorEl}
+        handleClose={handleCloseInstruction}
+        instruction={props.wsJunction?.instruksi || null}
+        fileExample={props.wsJunction?.contoh_file || null}
+      />
     </>
-      
-      ) 
+  );
 }
 
 
 // ------------------------------------------------------------------------------------------------------
+
+function WorksheetCardSkeleton(){
+  return(
+    <Grid item xs={12} sm={12} md={12}>
+      <Skeleton variant="rounded" style={{width:'100%', height:'300px'}} />
+    </Grid>
+  )
+}
 
 

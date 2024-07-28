@@ -7,6 +7,7 @@ import { WsJunctionType } from './types';
 //------------------------------------------------------------------
 interface WsJunctionContextType{
   wsJunction: WsJunctionType[] | [],
+  setWsJunction: React.Dispatch<React.SetStateAction<[] | WsJunctionType[]>>, 
   getWsJunctionKanwil: (kppnId: string) => Promise<void>,
 };
 
@@ -16,7 +17,8 @@ type WsJunctionProviderProps = {
 
 //------------------------------------------------------------------
 const WsJunctionContext = createContext<WsJunctionContextType>({
-  wsJunction: [], 
+  wsJunction: [],
+  setWsJunction: () => {}, 
   getWsJunctionKanwil: async() => {},
 });
 
@@ -36,7 +38,7 @@ const WsJunctionProvider = ({children}: WsJunctionProviderProps) => {
       setIsLoading(true);
       const response = await axiosJWT.get(`/getWsJunctionByWorksheetForKanwil?kppn=${kppnId}&time=${new Date().getTime()}`);
       setWsJunction(response.data.rows);
-      console.log(response.data.rows)
+      console.log(response.data.rows);
       setIsLoading(false);
     }catch(err: any){
       openSnackbar(err.response.data.message, "error");
@@ -45,11 +47,11 @@ const WsJunctionProvider = ({children}: WsJunctionProviderProps) => {
     }finally{
       setIsLoading(false);
     }
-  }
+  };
 
 
   return(
-    <WsJunctionContext.Provider value={{wsJunction, getWsJunctionKanwil}}>
+    <WsJunctionContext.Provider value={{wsJunction, setWsJunction, getWsJunctionKanwil}}>
       {children}
     </WsJunctionContext.Provider>
   )

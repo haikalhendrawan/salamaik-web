@@ -1,5 +1,6 @@
 import {useEffect, useRef} from "react";
 import { Helmet } from 'react-helmet-async';
+import useWsJunction from "./useWsJunction";
 // @mui
 import { useTheme } from '@mui/material/styles';
 import { Grid, Container, Typography, LinearProgress, Button, Box } from '@mui/material';
@@ -9,6 +10,12 @@ import KPPNSelectionCard from "./component/KPPNSelectionCard";
 
 export default function WorksheetLanding() {
   const theme = useTheme();
+
+  const { setWsJunction } = useWsJunction();
+
+  useEffect(() => {
+    setWsJunction([]);
+  });
 
   return (
     <>

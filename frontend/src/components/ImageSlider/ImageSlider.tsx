@@ -30,25 +30,21 @@ export default function ImageSlider({images, title, height}: ImageSliderProps) {
   const settings = {
     dots: false,
     infinite: true,
-    arrows:false,
+    arrows: false,
     autoplay: true,
     speed: 500,
     slidesToShow: 1,
     slidesToScroll: 1,
     beforeChange: (prev: number, next: number) => {
       setCurrent(next);
+  
       const diff = next - prev;
-      const absolute = Math.abs(next-prev)===1;
-      if(diff>0 && absolute){
-        setSlideCounter(prev => prev+=1)
-      }else if(diff<0 && absolute){
-        setSlideCounter(prev => prev-=1)
-      }else if(diff>0 && !absolute){
-        setSlideCounter(prev => prev-=1)
-      }else if(diff<0 && !absolute){
-        setSlideCounter(prev => prev+=1)
+  
+      if (Math.abs(diff) === 1) {
+        setSlideCounter((prev) => prev + diff);
+      } else {
+        setSlideCounter((prev) => prev - diff);
       }
-
     },
     afterChange: () => {
       
@@ -64,7 +60,7 @@ export default function ImageSlider({images, title, height}: ImageSliderProps) {
   const toIndex = (slideCounter: number, length: number, currCircle: number, circleIndex: number) => {
     const difference = circleIndex - currCircle;
     return (slideCounter + difference) % length
-  }
+  };
 
 
   return (
