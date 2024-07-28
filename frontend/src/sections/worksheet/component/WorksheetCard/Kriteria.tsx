@@ -1,5 +1,5 @@
 import Scrollbar from "../../../../components/scrollbar/Scrollbar";
-import {Box, Typography, Grid} from "@mui/material";
+import {Box, Typography} from "@mui/material";
 import { OpsiType } from "../../types";
 
 interface KriteriaProps{
@@ -37,7 +37,9 @@ export default function Kriteria({kriteria, opsi}: KriteriaProps) {
         </Typography>
 
         <table style={{tableLayout: 'fixed'}}>
-          {descriptionText}
+          <tbody>
+            {descriptionText}
+          </tbody>
         </table>
       </Box> 
     </Scrollbar>

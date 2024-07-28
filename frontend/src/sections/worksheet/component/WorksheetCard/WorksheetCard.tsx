@@ -1,7 +1,7 @@
 import {useState, useRef, useEffect} from "react";
-import { Typography, Grid, Card, CardHeader, Grow, Divider, Skeleton, Box} from '@mui/material';
+import { Typography, Grid, Card, CardHeader, Grow, Divider, Skeleton} from '@mui/material';
 import InstructionPopover from "../InstructionPopover";
-import {useTheme, styled} from '@mui/material/styles';
+import {useTheme} from '@mui/material/styles';
 import Head from "./Head";
 import Kriteria from "./Kriteria";
 import Dokumen from "./Dokumen";
@@ -13,6 +13,7 @@ interface WorksheetCardProps{
   modalOpen: () => void,
   modalClose: () => void,
   wsJunction: WsJunctionType | null,
+  id?: string
 };
 
 // ------------------------------------------------------------
@@ -52,7 +53,7 @@ export default function WorksheetCard(props: WorksheetCardProps) {
     <>
       <Grow in>
         <Grid item xs={12} sm={12} md={12}>
-          <Card sx={{ minHeight: '300px' }}>
+          <Card sx={{ minHeight: '300px' }} id={props.id}>
             <CardHeader
               title={
                 <Head

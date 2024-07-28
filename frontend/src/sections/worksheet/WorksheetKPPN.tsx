@@ -1,7 +1,6 @@
 import { Helmet } from 'react-helmet-async';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FixedSizeList as List } from 'react-window';
 import Iconify from '../../components/iconify';
 import PreviewFileModal from './component/PreviewFileModal';
 import useWsJunction from './useWsJunction';
@@ -44,7 +43,7 @@ export default function WorksheetKPPN() {
 
   const { wsJunction, getWsJunctionKanwil } = useWsJunction();
 
-  const { komponenRef, subKomponenRef } = useDictionary();
+  const { subKomponenRef } = useDictionary();
 
   const navigate = useNavigate();
 
@@ -70,44 +69,54 @@ export default function WorksheetKPPN() {
     setOpen(false)
   };
 
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     getWsJunctionKanwil(id);
     setIsLoading(false);
   }, []);
 
-  const content = useMemo(() =>
+  function scrollToElement(id: string){
+    const element = document.getElementById(id);
+    if(element) {
+      window.scrollTo({ 
+        top: element.offsetTop - 200,
+        behavior: 'smooth' });
+    }
+  };
+
+  const content = useCallback(() =>
     subKomponenRef?.filter(item => item?.komponen_id === tabValue)?.map((i) => (
       <>
-        <Grid item xs={12} sm={12} md={12} key={i.id}>
-          <Stack direction='row'>
-            <SubkomponenDivider>
-              Subkomponen : {i.title}
-            </SubkomponenDivider>
-  
-            <IconButton aria-label="edit" size='small' color='primary'>
-              <Iconify icon="solar:round-arrow-up-bold"/>
-            </IconButton>
-  
-            <IconButton aria-label="edit" size='small' color='primary'>
-              <Iconify icon="solar:round-arrow-down-bold"/>
-            </IconButton>
-          </Stack>
+        <Grid item xs={12} sm={12} md={12} key={i.id} id={"divider"+i.id.toString()}>
+            <Stack direction='row'>
+              <SubkomponenDivider>
+                Subkomponen : {i.title}
+              </SubkomponenDivider>
+    
+              <IconButton aria-label="edit" size='small' color='primary' onClick={() => scrollToElement("divider"+(i.id-1).toString())}>
+                <Iconify icon="solar:round-arrow-up-bold"/>
+              </IconButton>
+    
+              <IconButton aria-label="edit" size='small' color='primary' onClick={() => scrollToElement("divider"+(i.id+1).toString())}>
+                <Iconify icon="solar:round-arrow-down-bold"/>
+              </IconButton>
+            </Stack>
         </Grid>
+       
   
         {wsJunction
           ?.filter(item => item?.komponen_id === tabValue && item?.subkomponen_id === i?.id)
           .map((item, index) => {
             const isStandardisasi = item.standardisasi === 1;
             const header = item.header ? `${item.header}` : "";
-  
             return (
               <WorksheetCard 
                 key={index}
                 wsJunction={item}
                 modalOpen={handleOpenFile}
                 modalClose={handleCloseFile}
+                id={"card"+ item.checklist_id.toString()}
               />
             );
           })}
@@ -117,58 +126,61 @@ export default function WorksheetKPPN() {
 
   return (
     <>
-    {isLoading 
-      ?
-        <PageLoading duration={1}/>
-      : 
-      <>
-        <Helmet>
-          <title> Salamaik | Worksheet</title>
-        </Helmet>
+      {isLoading 
+        ?
+          <PageLoading duration={1}/>
+        : 
+        <>
+          <Helmet>
+            <title> Salamaik | Worksheet</title>
+          </Helmet>
 
-        <Container maxWidth='xl'>
-          <Stack direction="column" justifyContent="space-between" sx={{mb: 5}}>
-            <Stack direction='row' spacing={1} alignItems="center">
-              <IconButton  
-                onClick={() => navigate(-1)}
-              >
-                <Iconify icon={"eva:arrow-ios-back-outline"} />
-              </IconButton> 
-              <Typography variant="h4">
-                {`KPPN ${id!==null ? SELECT_KPPN[id]:null}`}
-              </Typography>
+          <Container maxWidth='xl'>
+            <Stack direction="column" justifyContent="space-between" sx={{mb: 5}}>
+              <Stack direction='row' spacing={1} alignItems="center">
+                <IconButton  
+                  onClick={() => navigate(-1)}
+                >
+                  <Iconify icon={"eva:arrow-ios-back-outline"} />
+                </IconButton> 
+                <Typography variant="h4">
+                  {`KPPN ${id!==null ? SELECT_KPPN[id]:null}`}
+                </Typography>
+              </Stack>
+
             </Stack>
 
-          </Stack>
+            <Stack direction="row" alignItems="center" justifyContent="center" mb={5}>
+                <Tabs value={tabValue} onChange={handleTabChange}> 
+                  <Tab icon={<Iconify icon="solar:safe-2-bold-duotone" />} label="Treasurer" value={1} />
+                  <Tab icon={<Iconify icon="solar:buildings-2-bold-duotone" />} label="Pengelola Fiskal, Representasi Kemenkeu di Daerah, dan Special Mission" value={2} />
+                  <Tab icon={<Iconify icon="solar:wallet-money-bold" />} label="Financial Advisor" value={3} />
+                  <Tab icon={<Iconify icon="solar:incognito-bold-duotone" />} label="Tata Kelola Internal" value={4} />
+                </Tabs>
+            </Stack>
 
-          <Stack direction="row" alignItems="center" justifyContent="center" mb={5}>
-              <Tabs value={tabValue} onChange={handleTabChange}> 
-                <Tab icon={<Iconify icon="solar:safe-2-bold-duotone" />} label="Treasurer" value={1} />
-                <Tab icon={<Iconify icon="solar:buildings-2-bold-duotone" />} label="Pengelola Fiskal, Representasi Kemenkeu di Daerah, dan Special Mission" value={2} />
-                <Tab icon={<Iconify icon="solar:wallet-money-bold" />} label="Financial Advisor" value={3} />
-                <Tab icon={<Iconify icon="solar:incognito-bold-duotone" />} label="Tata Kelola Internal" value={4} />
-              </Tabs>
-          </Stack>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={12}>
+                <Grid container spacing={2}>
+                
+                  {content()}
 
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={12}>
-              <Grid container spacing={2}>
-              
-                {content}
-
+                </Grid>
               </Grid>
+
             </Grid>
 
-          </Grid>
+          </Container>
 
-        </Container>
+          <PreviewFileModal open={open} modalClose={handleCloseFile} file={file} />
 
-        <PreviewFileModal open={open} modalClose={handleCloseFile} file={file} />
+          {/* <InstructionPopover open={openInstruction} anchorEl={anchorEl} handleClose={handleCloseInstruction} /> */}
 
-        {/* <InstructionPopover open={openInstruction} anchorEl={anchorEl} handleClose={handleCloseInstruction} /> */}
-
-        <NavigationDrawer /> </>}
-      </>
+          <NavigationDrawer tabValue={tabValue} scrollToElement={scrollToElement}/> 
+          
+        </>
+      }
+    </>
   );
   
 };

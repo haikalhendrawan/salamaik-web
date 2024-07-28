@@ -1,7 +1,7 @@
 import {useContext} from "react";
 import AuthContext from "../context/AuthProvider";
 
-interface Auth{
+export interface AuthType{
     id: string;
     username: string | number | null;
     name: string | null;
@@ -15,8 +15,8 @@ interface Auth{
 };
 
 type AuthContextType = {
-    auth: Auth | null;
-    setAuth: (auth: Auth | null) => void
+    auth: AuthType | null;
+    setAuth: (auth: AuthType | null) => void
 };
 
 const useAuth = () :  AuthContextType => {
