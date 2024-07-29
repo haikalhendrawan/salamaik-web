@@ -1,8 +1,6 @@
 import { Stack, Typography, Button, Tooltip, IconButton} from '@mui/material';
 import {useTheme, styled} from '@mui/material/styles';
 import Iconify from "../../../../components/iconify";
-import Label from "../../../../components/label";
-import Scrollbar from "../../../../components/scrollbar/Scrollbar";
 import StyledButton from "../../../../components/styledButton/StyledButton";
 // ----------------------------------------------------------------------------
 const VisuallyHiddenInput = styled('input')({

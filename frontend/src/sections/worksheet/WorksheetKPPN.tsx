@@ -6,7 +6,6 @@ import PreviewFileModal from './component/PreviewFileModal';
 import useWsJunction from './useWsJunction';
 //sections
 import WorksheetCard from './component/WorksheetCard/WorksheetCard';
-import InstructionPopover from './component/InstructionPopover';
 import NavigationDrawer from "./component/NavigationDrawer";
 import PageLoading from '../../components/pageLoading/PageLoading';
 // @mui
@@ -108,8 +107,6 @@ export default function WorksheetKPPN() {
         {wsJunction
           ?.filter(item => item?.komponen_id === tabValue && item?.subkomponen_id === i?.id)
           .map((item, index) => {
-            const isStandardisasi = item.standardisasi === 1;
-            const header = item.header ? `${item.header}` : "";
             return (
               <WorksheetCard 
                 key={index}
@@ -173,8 +170,6 @@ export default function WorksheetKPPN() {
           </Container>
 
           <PreviewFileModal open={open} modalClose={handleCloseFile} file={file} />
-
-          {/* <InstructionPopover open={openInstruction} anchorEl={anchorEl} handleClose={handleCloseInstruction} /> */}
 
           <NavigationDrawer tabValue={tabValue} scrollToElement={scrollToElement}/> 
           

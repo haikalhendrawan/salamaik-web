@@ -1,9 +1,9 @@
 import {useEffect, useRef, useState} from "react";
 import { Helmet } from 'react-helmet-async';
 // @mui
-import { useTheme, alpha } from '@mui/material/styles';
+import { useTheme} from '@mui/material/styles';
 import { Grid, Container, Snackbar, Alert, Button } from '@mui/material';
-import PuffLoader from 'react-spinners/PuffLoader';
+import io from "socket.io-client";
 import useLoading from "../hooks/display/useLoading";
 import useSnackbar from "../hooks/display/useSnackbar";
 import { useAuth } from "../hooks/useAuth";
@@ -12,6 +12,7 @@ import WelcomeCard from "../sections/home/components/WelcomeCard";
 import PhotoGallery from "../sections/home/components/PhotoGallery";
 import KanwilView from "../sections/home/KanwilView";
 // ----------------------------------------------------------------------
+const socket = io("http://localhost:8080");
 
 export default function HomePage() {
   const theme = useTheme();
@@ -21,6 +22,31 @@ export default function HomePage() {
   const {setIsLoading} = useLoading();
 
   const {auth} = useAuth() as AuthType;
+
+  const [isConnected, setIsConnected] = useState(socket.connected);
+  const [lastMessage, setLastMessage] = useState(null);
+
+  useEffect(() => {
+    socket.on('connect', () => {
+      setIsConnected(true);
+      console.log('connected')
+    });
+
+    socket.on('disconnect', () => {
+      setIsConnected(false);
+      console.log('disconnected')
+    });
+
+    socket.on('message', data => {
+      setLastMessage(data);
+    });
+
+    return () => {
+      socket.off('connect');
+      socket.off('disconnect');
+      socket.off('message');
+    };
+  }, []);
 
   useEffect(() => {
     setIsLoading(true);
