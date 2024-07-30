@@ -12,3 +12,11 @@ export default class ErrorDetail extends Error{
     this.stack = stack;
   }
 }
+
+
+export const socketError = (callback: (res: {success: boolean, message: string | object}) => void, message: string) => {
+  return callback({
+    success: false,
+    message: message
+  })
+}

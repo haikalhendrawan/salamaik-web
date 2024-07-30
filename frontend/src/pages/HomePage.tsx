@@ -12,7 +12,6 @@ import WelcomeCard from "../sections/home/components/WelcomeCard";
 import PhotoGallery from "../sections/home/components/PhotoGallery";
 import KanwilView from "../sections/home/KanwilView";
 // ----------------------------------------------------------------------
-const socket = io("http://localhost:8080");
 
 export default function HomePage() {
   const theme = useTheme();
@@ -23,8 +22,26 @@ export default function HomePage() {
 
   const {auth} = useAuth() as AuthType;
 
+
+  const socket = io("http://localhost:8080", {
+    // autoConnect: false,
+    auth: {
+      token: auth?.accessToken
+    }
+  });
+  
   const [isConnected, setIsConnected] = useState(socket.connected);
   const [lastMessage, setLastMessage] = useState(null);
+
+  function submitEvent(){
+    socket.emit("getData", {
+      kppn: "010",
+      period: auth?.period
+    }, (response: any) => {
+      console.log(response)
+      console.log(socket.connected)
+    })
+  };
 
   useEffect(() => {
     socket.on('connect', () => {
@@ -37,12 +54,17 @@ export default function HomePage() {
       console.log('disconnected')
     });
 
+    socket.on("error", (err) => {
+      console.error("Socket error:", err);
+    });
+
     socket.on('message', data => {
       setLastMessage(data);
     });
 
     return () => {
       socket.off('connect');
+      socket.off('error')
       socket.off('disconnect');
       socket.off('message');
     };
@@ -57,6 +79,11 @@ export default function HomePage() {
     return () => {
       clearTimeout(id);
     };
+  }, []);
+
+  useEffect(() => {
+    socket.connect();
+    return () => {socket.disconnect()}
   }, []);
 
   return (
@@ -78,6 +105,8 @@ export default function HomePage() {
               height={'300px'} 
             /> 
           </Grid>
+
+          <Button onClick={submitEvent}>Button</Button>
 
           <KanwilView />
 

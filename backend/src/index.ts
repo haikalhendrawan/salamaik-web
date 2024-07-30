@@ -5,7 +5,7 @@ import cors from "cors";
 import cookieParser from 'cookie-parser';
 import logger from './config/logger';
 import { createServer } from "http";
-import { Server } from "socket.io";
+import { Server, Socket } from "socket.io";
 //routes
 import notifRoute from './routes/notifRoute';
 import authRoute from './routes/authRoute';
@@ -23,23 +23,18 @@ import notFoundRoute from './routes/notFoundRoute';
 //middleware
 import errorHandler from './middleware/errorHandler';
 import rateLimiter from './middleware/rateLimiter';
+//socket events
+import disconnectEvent from './events/disconnect';
+import worksheetEvent from './events/worksheetEvent';
+import socketAuthenticate from './middleware/socketAuthenticate';
 // ------------------------------------------------------------
 
 const app = express();
-
 const httpServer = createServer(app);
 const io = new Server(httpServer, { 
   cors: {
     origin: process.env.CLIENT_URL,
   }
-});
-
-io.on('connection', (socket) => {
-  console.log('a user connected');
-  
-  socket.on('disconnect', () => {
-    console.log('user disconnected');
-  });
 });
 
 app.use(express.json());
@@ -49,8 +44,6 @@ app.use(cors({
   origin: process.env.CLIENT_URL,
   credentials: true
 }));
-
-
 
 app.use(rateLimiter);
 app.use(authRoute);
@@ -67,6 +60,15 @@ app.use(WorksheetRoute);
 app.use(WsJunctionRoute);
 app.use(notFoundRoute);
 app.use(errorHandler);
+
+const onConnection = (socket: Socket) => {
+  console.log("client is connected", socket.id);
+  worksheetEvent.getWorksheetJunction(socket);
+  disconnectEvent(socket);
+};
+
+io.use(socketAuthenticate);
+io.on('connection', onConnection);
 
 httpServer.listen(process.env.DEV_PORT, () => {
   logger.info(`Server is running on port ${process.env.DEV_PORT}`);

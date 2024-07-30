@@ -29,7 +29,7 @@ interface OpsiType{
   checklist_id: number
 };
 
-interface WsJunctionJoinChecklistType{
+export interface WsJunctionJoinChecklistType{
   junction_id: number,
   worksheet_id: string,
   checklist_id: number,
