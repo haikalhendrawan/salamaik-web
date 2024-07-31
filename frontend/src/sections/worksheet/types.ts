@@ -30,5 +30,6 @@ export interface WsJunctionType{
     instruksi: string | null,
     contoh_file: string | null,
     opsi: OpsiType[] | [] | null,
-    last_update: string | null
+    last_update: string | null,
+    updated_by: string | null
 }

@@ -27,7 +27,7 @@ import rateLimiter from './middleware/rateLimiter';
 import connectEvent from './events';
 import socketAuthenticate from './middleware/socketAuthenticate';
 //utils and option
-import { socketOption, corsOption } from './utils/option';
+import { socketOption, corsOption } from './config/option';
 // ------------------------------------------------------------
 
 const app = express();

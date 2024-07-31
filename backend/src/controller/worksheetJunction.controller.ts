@@ -117,8 +117,8 @@ const getWsJunctionByKPPN = async(req: Request, res: Response, next: NextFunctio
 
 const editWsJunctionKPPNScore = async(req: Request, res: Response, next: NextFunction) => {
   try{
-    const {worksheetId, junctionId, kppnScore} = req.body;
-    const result = await wsJunction.editWsJunctionKPPNScore(worksheetId, junctionId, kppnScore);
+    const {worksheetId, junctionId, kppnScore, userName} = req.body;
+    const result = await wsJunction.editWsJunctionKPPNScore(worksheetId, junctionId, kppnScore, userName);
     return res.status(200).json({sucess: true, message: 'Edit worksheet junction success', rows: result})
   }catch(err){
     next(err);
@@ -128,8 +128,8 @@ const editWsJunctionKPPNScore = async(req: Request, res: Response, next: NextFun
 //protect endpoint di route
 const editWsJunctionKanwilScore = async(req: Request, res: Response, next: NextFunction) => {
   try{
-    const {worksheetId, junctionId, kanwilScore} = req.body;
-    const result = await wsJunction.editWsJunctionKanwilScore(worksheetId, junctionId, kanwilScore);
+    const {worksheetId, junctionId, kanwilScore, userName} = req.body;
+    const result = await wsJunction.editWsJunctionKanwilScore(worksheetId, junctionId, kanwilScore, userName);
     return res.status(200).json({sucess: true, message: 'Edit worksheet junction success', rows: result})
   }catch(err){
     next(err);
@@ -139,8 +139,8 @@ const editWsJunctionKanwilScore = async(req: Request, res: Response, next: NextF
 //protect endpoint di route
 const editWsJunctionKanwilNote = async(req: Request, res: Response, next: NextFunction) => {
   try{
-    const {worksheetId, junctionId, kanwilNote} = req.body; 
-    const result = await wsJunction.editWsJunctionKanwilNote(worksheetId, junctionId, kanwilNote);
+    const {worksheetId, junctionId, kanwilNote, userName} = req.body; 
+    const result = await wsJunction.editWsJunctionKanwilNote(worksheetId, junctionId, kanwilNote, userName);
     return res.status(200).json({sucess: true, message: 'Edit worksheet junction success', rows: result})
   }catch(err){
     next(err);
@@ -149,8 +149,8 @@ const editWsJunctionKanwilNote = async(req: Request, res: Response, next: NextFu
 
 const editWsJunctionFile = async(req: Request, res: Response, next: NextFunction) => {
   try{
-    const {worksheetId, junctionId, file1, file2, file3} = req.body; 
-    const result = await wsJunction.editWsJunctionFile(worksheetId, junctionId, file1, file2, file3);
+    const {worksheetId, junctionId, file1, file2, file3, userName} = req.body; 
+    const result = await wsJunction.editWsJunctionFile(worksheetId, junctionId, file1, file2, file3, userName);
     return res.status(200).json({sucess: true, message: 'Edit worksheet junction success', rows: result})
   }catch(err){
     next(err);

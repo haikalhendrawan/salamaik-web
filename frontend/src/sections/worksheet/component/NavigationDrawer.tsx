@@ -43,11 +43,17 @@ const SubkomponenDivider = styled(Paper)(({theme}) => ({
   padding: theme.spacing(1),
   paddingRight: theme.spacing(2),
   backgroundColor: theme.palette.grey[200],
-  maxWidth: 'fit-content',
-  color: theme.palette.primary.dark,
+  width:'100%',
+  color: theme.palette.common.black,
   borderRadius: '16px',
-  fontWeight: '600',
+  fontWeight: '200',
   fontSize: '10px',
+  cursor: 'pointer'
+}));
+
+const StyledLabel = styled(Label)(({theme}) => ({
+  border: `1px solid `, 
+  width: 22, 
   cursor: 'pointer'
 }));
 
@@ -84,7 +90,7 @@ export default function NavigationDrawer({tabValue, scrollToElement}: {tabValue:
   const content = useCallback(() =>
     subKomponenRef?.filter(item => item?.komponen_id === tabValue)?.map((i) => (
       <>
-        <Grid item xs={12} sx={{ml: -1, mb:1}} key={i.id}>
+        <Grid item xs={12} sx={{ml: -1, my: 1}} key={i.id}>
           <SubkomponenDivider onClick={() => handleScrollAndClose(i?.id, "divider")}>
             {i?.title}
           </SubkomponenDivider>
@@ -97,9 +103,9 @@ export default function NavigationDrawer({tabValue, scrollToElement}: {tabValue:
   
             return (
               <Grid item xs={2} onClick={() => handleScrollAndClose(item.checklist_id, "card")} key={index}>
-                <Label color={getLabelColor(item, auth)} sx={{border:1, width: 22, cursor: 'pointer' }}>
+                <StyledLabel color={getLabelColor(item, auth)}>
                   { item?.checklist_id }
-                </Label>
+                </StyledLabel>
               </Grid>
             );
           })}
@@ -170,17 +176,19 @@ export default function NavigationDrawer({tabValue, scrollToElement}: {tabValue:
                         </Grid>
 
                         <Stack direction='column' spacing={1}>
-                          <Stack direction='row' spacing={1}>
-                            <Label color="pink" sx={{border:1, width: 22, cursor: 'pointer' }}>{ }</Label>
-                            <Typography variant='body3'>: Belum diisi</Typography>
+                          <Stack direction="row" spacing={4}>
+                            <Stack direction='row' spacing={1}>
+                              <StyledLabel color="pink" >{ }</StyledLabel>
+                              <Typography variant='body2' sx={{fontSize: 10}}>: Belum diisi</Typography>
+                            </Stack>
+                            <Stack direction='row'  spacing={1}>
+                              <StyledLabel color="warning">{ }</StyledLabel>
+                              <Typography variant='body2' sx={{fontSize: 10}}>: Sudah diisi/nilai belum maksimal</Typography>
+                            </Stack>
                           </Stack>
                           <Stack direction='row'  spacing={1}>
-                            <Label color="warning" sx={{border:1, width: 22, cursor: 'pointer' }}>{ }</Label>
-                            <Typography variant='body3'>: Sudah diisi/nilai belum maks.</Typography>
-                          </Stack>
-                          <Stack direction='row'  spacing={1}>
-                            <Label color="success" sx={{border:1, width: 22, cursor: 'pointer' }}>{ }</Label>
-                            <Typography variant='body3'>: Sudah diisi/nilai maks.</Typography>
+                            <StyledLabel color="success">{ }</StyledLabel>
+                            <Typography variant='body2' sx={{fontSize: 10}}>: Sudah diisi/nilai maksimal</Typography>
                           </Stack>
                         </Stack>
                       </Stack>

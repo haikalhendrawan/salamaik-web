@@ -112,40 +112,44 @@ class WorksheetJunction{
     }
   }
 
-  async editWsJunctionKPPNScore(junctionID: number, worksheetId: string, kppnScore: number){
+  async editWsJunctionKPPNScore(junctionID: number, worksheetId: string, kppnScore: number, userName: string){
     try{
-      const q = "UPDATE worksheet_junction SET kppn_score = $1 WHERE junction_id = $2 AND worksheet_id = $3 RETURNING *";
-      const result = await pool.query(q, [kppnScore, junctionID, worksheetId]);
+      const updateTime = new Date(Date.now()).toISOString();
+      const q = "UPDATE worksheet_junction SET kppn_score = $1, last_update = $2, updated_by = $3 WHERE junction_id = $4 AND worksheet_id = $5 RETURNING *";
+      const result = await pool.query(q, [kppnScore, updateTime, userName, junctionID, worksheetId]);
       return result.rows
     }catch(err){
       throw err
     }
   }
 
-  async editWsJunctionKanwilScore(junctionID: number, worksheetId: string, kanwilScore: number){
+  async editWsJunctionKanwilScore(junctionID: number, worksheetId: string, kanwilScore: number, userName: string){
     try{
-      const q = "UPDATE worksheet_junction SET kanwil_score = $1 WHERE junction_id = $2 AND worksheet_id = $3 RETURNING *";
-      const result = await pool.query(q, [kanwilScore, junctionID, worksheetId]);
+      const updateTime = new Date(Date.now()).toISOString();
+      const q = "UPDATE worksheet_junction SET kanwil_score = $1, last_update = $2, updated_by = $3 WHERE junction_id = $4 AND worksheet_id = $5 RETURNING *";
+      const result = await pool.query(q, [kanwilScore, updateTime, userName, junctionID, worksheetId]);
       return result.rows
     }catch(err){
       throw err
     }
   }
 
-  async editWsJunctionKanwilNote(junctionID: number, worksheetId: string, kanwilNote: string){
+  async editWsJunctionKanwilNote(junctionID: number, worksheetId: string, kanwilNote: string, userName: string){
     try{
-      const q = "UPDATE worksheet_junction SET kanwil_note = $1 WHERE junction_id = $2 AND worksheet_id = $3 RETURNING *";
-      const result = await pool.query(q, [kanwilNote, junctionID, worksheetId]);
+      const updateTime = new Date(Date.now()).toISOString();
+      const q = "UPDATE worksheet_junction SET kanwil_note = $1, last_update = $2, updated_by = $3 WHERE junction_id = $4 AND worksheet_id = $5 RETURNING *";
+      const result = await pool.query(q, [kanwilNote, updateTime, userName, junctionID, worksheetId]);
       return result.rows
     }catch(err){
       throw err
     }
   }
 
-  async editWsJunctionFile(junctionID: number, worksheetId: string, file1: string, file2: string, file3: string){
+  async editWsJunctionFile(junctionID: number, worksheetId: string, file1: string, file2: string, file3: string, userName: string){
     try{
-      const q = "UPDATE worksheet_junction SET file_1 = $1, file_2 = $2, file_3 = $3 WHERE junction_id = $4 AND worksheet_id = $5 RETURNING *";
-      const result = await pool.query(q, [file1, file2, file3, junctionID, worksheetId]);
+      const updateTime = new Date(Date.now()).toISOString();
+      const q = "UPDATE worksheet_junction SET file_1 = $1, file_2 = $2, file_3 = $3, last_update = $4, updated_by = $5 WHERE junction_id = $6 AND worksheet_id = $7 RETURNING *";
+      const result = await pool.query(q, [file1, file2, file3, updateTime, userName, junctionID, worksheetId]);
       return result.rows
     }catch(err){
       throw err

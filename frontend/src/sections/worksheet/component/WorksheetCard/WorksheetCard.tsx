@@ -59,7 +59,8 @@ export default function WorksheetCard(props: WorksheetCardProps) {
                 <Head
                   num={props.wsJunction?.checklist_id}
                   title={props.wsJunction?.title || ""}
-                  dateUpdated={new Date()}
+                  dateUpdated={props.wsJunction?.last_update || null}
+                  updatedBy={props.wsJunction?.updated_by || null}
                 />
               }
               sx={{
@@ -131,7 +132,7 @@ export default function WorksheetCard(props: WorksheetCardProps) {
               </Grid>
 
               <Grid item xs={1.5}>
-                <Nilai wsJunction={props.wsJunction} junctionId={props?.id | ""} />
+                <Nilai wsJunction={props.wsJunction} />
               </Grid>
 
               <Grid item xs={3}>

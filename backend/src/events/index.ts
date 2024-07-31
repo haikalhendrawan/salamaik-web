@@ -5,9 +5,9 @@ import worksheet from "model/worksheet.model";
 
 const connectEvent = (socket: Socket) => {
   console.log("client is connected", socket.id);
-  worksheetEvent.getWorksheetJunction(socket);
-  worksheetEvent.updateKanwilScore(socket);
-  worksheetEvent.updateKPPNScore(socket);
+  socket.on("getWorksheetJunction", worksheetEvent.getWorksheetJunction);
+  socket.on("updateKanwilScore", worksheetEvent.updateKanwilScore);
+  socket.on("updateKPPNScore", worksheetEvent.updateKPPNScore);
   disconnectEvent(socket);
 };
 

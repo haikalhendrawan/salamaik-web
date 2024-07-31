@@ -3,15 +3,16 @@ import { Stack, Typography, Select, MenuItem, FormControl} from '@mui/material';
 import { WsJunctionType } from "../../types";
 import useSocket from "../../../../hooks/useSocket";
 import useWsJunction from "../../useWsJunction";
-import { isNumber } from "lodash";
+import {useAuth} from "../../../../hooks/useAuth";
 // ------------------------------------------------------------
 interface NilaiPropsType{
   wsJunction: WsJunctionType | null,
-  junctionId: string
 }
 // ------------------------------------------------------------
-export default function Nilai({wsJunction, junctionId}: NilaiPropsType) {
+export default function Nilai({wsJunction}: NilaiPropsType) {
   const {socket} = useSocket();
+
+  const { auth } = useAuth();
 
   const {getWsJunctionKanwil} = useWsJunction();
 
@@ -25,11 +26,12 @@ export default function Nilai({wsJunction, junctionId}: NilaiPropsType) {
     socket?.emit("updateKanwilScore", {
       worksheetId: wsJunction?.worksheet_id, 
       junctionId: wsJunction?.junction_id, 
-      kanwilScore: score
+      kanwilScore: score,
+      userName: auth?.name
     },
     (response: any) => {
-      console.log(response);
-      // getWsJunctionKanwil(wsJunction?.kppn_id || '');
+      console.log(response.success);
+      getWsJunctionKanwil(wsJunction?.kppn_id || '');
     });
   };
 
@@ -39,11 +41,12 @@ export default function Nilai({wsJunction, junctionId}: NilaiPropsType) {
     socket?.emit("updateKPPNScore", {
       worksheetId: wsJunction?.worksheet_id, 
       junctionId: wsJunction?.junction_id, 
-      kppnScore: score
+      kppnScore: score,
+      userName: auth?.name
     },
     (response: any) => {
       console.log(response);
-      // getWsJunctionKanwil(wsJunction?.kppn_id || '');
+      getWsJunctionKanwil(wsJunction?.kppn_id || '');
     });
 
   };

@@ -1,4 +1,4 @@
-import { ReactNode, useState, createContext, useContext, useEffect } from 'react';
+import { ReactNode, useState, createContext, useContext } from 'react';
 import useAxiosJWT from '../../hooks/useAxiosJWT';
 import useLoading from '../../hooks/display/useLoading';
 import useSnackbar from '../../hooks/display/useSnackbar';
@@ -35,17 +35,17 @@ const WsJunctionProvider = ({children}: WsJunctionProviderProps) => {
 
   async function getWsJunctionKanwil(kppnId: string) {
     try{
-      setIsLoading(true);
+      // setIsLoading(true);
       const response = await axiosJWT.get(`/getWsJunctionByWorksheetForKanwil?kppn=${kppnId}&time=${new Date().getTime()}`);
       setWsJunction(response.data.rows);
       console.log(response.data.rows);
-      setIsLoading(false);
+      // setIsLoading(false);
     }catch(err: any){
       openSnackbar(err.response.data.message, "error");
       setWsJunction([]);
-      setIsLoading(false);
+      // setIsLoading(false);
     }finally{
-      setIsLoading(false);
+      // setIsLoading(false);
     }
   };
 

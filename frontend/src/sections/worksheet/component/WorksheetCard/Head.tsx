@@ -1,18 +1,18 @@
-import { Stack, Typography, Grid, Card, CardHeader, IconButton, Tooltip, Select, MenuItem,
-  FormControl, TextField, Grow, Divider, Badge, Box} from '@mui/material';
+import { Stack, Typography, IconButton, Tooltip, } from '@mui/material';
 import Iconify from "../../../../components/iconify";
+import { parseISO, format } from 'date-fns';
   // ------------------------------------------------------------
 interface HeadPropInterface{
   num: number | undefined,
   title:string,
-  dateUpdated: Date
+  dateUpdated: string | null,
+  updatedBy: string | null
 };
 // ------------------------------------------------------------
 export default function Head(props: HeadPropInterface) {  // bagian atas dari card
-  const date = new Date(props.dateUpdated).toLocaleDateString('en-GB');
-  const time = new Date(props.dateUpdated).toLocaleTimeString('en-GB');
-  const tooltipText = `Last update: ${date} (${time})`;
-  const isUpdate = props.dateUpdated;
+  const dateUpdated = props?.dateUpdated ? format(parseISO(props.dateUpdated), 'dd/MM/yyyy - HH:mm') : null;
+  const tooltipText = <div>Last update: {dateUpdated} <br/> By: {props.updatedBy}</div>;
+  const isUpdate = props?.dateUpdated;
 
   return(
   <>

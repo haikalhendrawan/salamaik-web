@@ -3,13 +3,12 @@ import wsJunction, {WsJunctionJoinChecklistType} from '../model/worksheetJunctio
 import worksheet from '../model/worksheet.model';
 import { socketError } from '../model/error.model';
 import logger from '../config/logger';
-
+// ---------------------------------------------------------------------------------------------------
 
 class WorksheetEvent{
 
-   getWorksheetJunction(socket : Socket){
-    socket.on("getData", async(data, callback) => {
-      try{
+  async getWorksheetJunction(data: any, callback: any) {
+     try{
         const {kppn, period} = data;
 
         const worksheetData = await worksheet.getWorksheetByPeriodAndKPPN(period, kppn);
@@ -32,36 +31,29 @@ class WorksheetEvent{
       }catch(err: any){
         return socketError(callback, err.message)
       }
- 
-    })
   }
 
-  updateKanwilScore(socket: Socket){
-    socket.on("updateKanwilScore", async(data, callback) => {
-      try{
-        const {worksheetId, junctionId, kanwilScore} = data;
-        const result = await wsJunction.editWsJunctionKanwilScore( junctionId, worksheetId, kanwilScore);
-        return callback({success: true, rows: result});
+  async updateKanwilScore(data: any, callback: any) {
+    try{
+      const {worksheetId, junctionId, kanwilScore, userName} = data;
+      const result = await wsJunction.editWsJunctionKanwilScore( junctionId, worksheetId, kanwilScore, userName);
+      return callback({success: true, rows: result});
 
-      }catch(err: any){
-        return socketError(callback, err.message)
-      }
-    });
+    }catch(err: any){
+      return socketError(callback, err.message)
+    }
   }
 
-  updateKPPNScore(socket: Socket){
-    socket.on("updateKPPNScore", async(data, callback) => {
-      try{
-        const {worksheetId, junctionId, kppnScore} = data;
-        const result = await wsJunction.editWsJunctionKPPNScore( junctionId, worksheetId, kppnScore);
-        return callback({success: true, rows: result});
+  async updateKPPNScore(data: any, callback: any) {
+    try{
+      const {worksheetId, junctionId, kppnScore, userName} = data;
+      const result = await wsJunction.editWsJunctionKPPNScore( junctionId, worksheetId, kppnScore, userName);
+      return callback({success: true, rows: result});
 
-      }catch(err: any){
-        return socketError(callback, err.message)
-      }
-    });
+    }catch(err: any){
+      return socketError(callback, err.message)
+    }
   }
-
 
 }
 
