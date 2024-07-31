@@ -1,13 +1,53 @@
-import {useState, useRef} from "react";
-import { Stack, Typography, Grid, Card, CardHeader, Select, MenuItem,
-  FormControl, TextField, Grow, Divider} from '@mui/material';
+import {useState, useEffect} from "react";
+import { Stack, Typography, Select, MenuItem, FormControl} from '@mui/material';
+import { WsJunctionType } from "../../types";
+import useSocket from "../../../../hooks/useSocket";
+import useWsJunction from "../../useWsJunction";
+import { isNumber } from "lodash";
 // ------------------------------------------------------------
-
+interface NilaiPropsType{
+  wsJunction: WsJunctionType | null,
+  junctionId: string
+}
 // ------------------------------------------------------------
-export default function Nilai() {
-  const [selectValue, setSelectValue] = useState<number>(0);
+export default function Nilai({wsJunction, junctionId}: NilaiPropsType) {
+  const {socket} = useSocket();
 
-  const [selectValue2, setSelectValue2] = useState<number>(1);
+  const {getWsJunctionKanwil} = useWsJunction();
+
+  const opsiSelection = wsJunction?.opsi?.map((item, index) => (
+    <MenuItem key={index} sx={{fontSize:12}} value={item?.value?.toString() || ''}>{item?.value}</MenuItem>
+  ) || null);
+
+  const handleChangeKanwilScore = (newScore: string) => {
+    const score = parseInt(newScore);
+
+    socket?.emit("updateKanwilScore", {
+      worksheetId: wsJunction?.worksheet_id, 
+      junctionId: wsJunction?.junction_id, 
+      kanwilScore: score
+    },
+    (response: any) => {
+      console.log(response);
+      // getWsJunctionKanwil(wsJunction?.kppn_id || '');
+    });
+  };
+
+  const handleChangeKPPNScore = (newScore: string) => {
+    const score = parseInt(newScore);
+
+    socket?.emit("updateKPPNScore", {
+      worksheetId: wsJunction?.worksheet_id, 
+      junctionId: wsJunction?.junction_id, 
+      kppnScore: score
+    },
+    (response: any) => {
+      console.log(response);
+      // getWsJunctionKanwil(wsJunction?.kppn_id || '');
+    });
+
+  };
+
 
   return (
     <Stack direction='column' spacing={2}>
@@ -16,15 +56,13 @@ export default function Nilai() {
         <FormControl sx={{width:'100%', height:'100%'}}>
           <Select 
             required 
-            name="kondisi" 
-            disabled
-            value={selectValue2}  
+            name="kppnScore" 
+            defaultValue={wsJunction?.kppn_score} 
+            onChange = {(e) => handleChangeKPPNScore(e.target.value as string)}
             size='small' 
             sx={{typography:'body2', fontSize:12,}}
           >
-            <MenuItem key={0} sx={{fontSize:12}} value={0}>10</MenuItem>
-            <MenuItem key={1} sx={{fontSize:12}} value={1}>5</MenuItem>
-            <MenuItem key={2} sx={{fontSize:12}} value={2}>0</MenuItem>
+            {opsiSelection}
           </Select>
         </FormControl>
       </Stack>
@@ -34,14 +72,13 @@ export default function Nilai() {
         <FormControl sx={{width:'100%', height:'100%'}}>
           <Select 
             required 
-            name="kondisi" 
-            value={selectValue2}  
+            name="kanwilScore" 
+            defaultValue={wsJunction?.kanwil_score}  
+            onChange={(e) => handleChangeKanwilScore(e.target.value as string)}
             size='small' 
             sx={{typography:'body2', fontSize:12}}
           >
-            <MenuItem key={0} sx={{fontSize:12}} value={0}>10</MenuItem>
-            <MenuItem key={1} sx={{fontSize:12}} value={1}>5</MenuItem>
-            <MenuItem key={2} sx={{fontSize:12}} value={2}>0</MenuItem>
+            {opsiSelection}
           </Select>
         </FormControl>
       </Stack>

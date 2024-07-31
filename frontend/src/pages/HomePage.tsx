@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async';
 // @mui
 import { useTheme} from '@mui/material/styles';
 import { Grid, Container, Snackbar, Alert, Button } from '@mui/material';
-import io from "socket.io-client";
+import useSocket from "../hooks/useSocket";
 import useLoading from "../hooks/display/useLoading";
 import useSnackbar from "../hooks/display/useSnackbar";
 import { useAuth } from "../hooks/useAuth";
@@ -22,55 +22,16 @@ export default function HomePage() {
 
   const {auth} = useAuth() as AuthType;
 
+  const {socket} = useSocket();
 
-  const socket = io("http://localhost:8080", {
-    // autoConnect: false,
-    auth: {
-      token: auth?.accessToken
-    }
-  });
-  
-  const [isConnected, setIsConnected] = useState(socket.connected);
-  const [lastMessage, setLastMessage] = useState(null);
-
-  function submitEvent(){
-    socket.emit("getData", {
+  useEffect(() => {
+    socket?.emit("getData", {
       kppn: "010",
       period: auth?.period
     }, (response: any) => {
-      console.log(response)
-      console.log(socket.connected)
+      console.log(response);
     })
-  };
 
-  useEffect(() => {
-    socket.on('connect', () => {
-      setIsConnected(true);
-      console.log('connected')
-    });
-
-    socket.on('disconnect', () => {
-      setIsConnected(false);
-      console.log('disconnected')
-    });
-
-    socket.on("error", (err) => {
-      console.error("Socket error:", err);
-    });
-
-    socket.on('message', data => {
-      setLastMessage(data);
-    });
-
-    return () => {
-      socket.off('connect');
-      socket.off('error')
-      socket.off('disconnect');
-      socket.off('message');
-    };
-  }, []);
-
-  useEffect(() => {
     setIsLoading(true);
     const id = setTimeout(() => {
       setIsLoading(false);
@@ -81,10 +42,6 @@ export default function HomePage() {
     };
   }, []);
 
-  useEffect(() => {
-    socket.connect();
-    return () => {socket.disconnect()}
-  }, []);
 
   return (
     <>
@@ -106,7 +63,8 @@ export default function HomePage() {
             /> 
           </Grid>
 
-          <Button onClick={submitEvent}>Button</Button>
+          {/* <Button onClick={submitEvent}>Button</Button>
+          <Button onClick={() => socketRef.current.disconnect()}>disconnect</Button> */}
 
           <KanwilView />
 

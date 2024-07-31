@@ -69,7 +69,6 @@ export default function NavigationDrawer({tabValue, scrollToElement}: {tabValue:
   };
 
   const handleScrollAndClose = (id: number, type: string) => {
-    console.log(type + id.toString());
     scrollToElement(type + id.toString());
     setOpen(false);
   };
@@ -85,7 +84,7 @@ export default function NavigationDrawer({tabValue, scrollToElement}: {tabValue:
   const content = useCallback(() =>
     subKomponenRef?.filter(item => item?.komponen_id === tabValue)?.map((i) => (
       <>
-        <Grid item xs={12} sx={{ml: -1, mb:1}}>
+        <Grid item xs={12} sx={{ml: -1, mb:1}} key={i.id}>
           <SubkomponenDivider onClick={() => handleScrollAndClose(i?.id, "divider")}>
             {i?.title}
           </SubkomponenDivider>
@@ -97,7 +96,7 @@ export default function NavigationDrawer({tabValue, scrollToElement}: {tabValue:
           .map((item, index) => {
   
             return (
-              <Grid item xs={2} onClick={() => handleScrollAndClose(item.checklist_id, "card")}>
+              <Grid item xs={2} onClick={() => handleScrollAndClose(item.checklist_id, "card")} key={index}>
                 <Label color={getLabelColor(item, auth)} sx={{border:1, width: 22, cursor: 'pointer' }}>
                   { item?.checklist_id }
                 </Label>

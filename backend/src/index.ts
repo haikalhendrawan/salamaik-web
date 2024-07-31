@@ -24,26 +24,20 @@ import notFoundRoute from './routes/notFoundRoute';
 import errorHandler from './middleware/errorHandler';
 import rateLimiter from './middleware/rateLimiter';
 //socket events
-import disconnectEvent from './events/disconnect';
-import worksheetEvent from './events/worksheetEvent';
+import connectEvent from './events';
 import socketAuthenticate from './middleware/socketAuthenticate';
+//utils and option
+import { socketOption, corsOption } from './utils/option';
 // ------------------------------------------------------------
 
 const app = express();
 const httpServer = createServer(app);
-const io = new Server(httpServer, { 
-  cors: {
-    origin: process.env.CLIENT_URL,
-  }
-});
+const io = new Server(httpServer, socketOption);
 
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'uploads')));
-app.use(cors({
-  origin: process.env.CLIENT_URL,
-  credentials: true
-}));
+app.use(cors(corsOption));
 
 app.use(rateLimiter);
 app.use(authRoute);
@@ -61,14 +55,8 @@ app.use(WsJunctionRoute);
 app.use(notFoundRoute);
 app.use(errorHandler);
 
-const onConnection = (socket: Socket) => {
-  console.log("client is connected", socket.id);
-  worksheetEvent.getWorksheetJunction(socket);
-  disconnectEvent(socket);
-};
-
 io.use(socketAuthenticate);
-io.on('connection', onConnection);
+io.on('connection', connectEvent);
 
 httpServer.listen(process.env.DEV_PORT, () => {
   logger.info(`Server is running on port ${process.env.DEV_PORT}`);

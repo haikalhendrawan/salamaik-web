@@ -6,6 +6,7 @@ import Router from './routes';
 // provider
 import ThemeProvider from './theme';
 import { AuthProvider } from './context/AuthProvider';
+import { SocketProvider } from './hooks/useSocket';
 import { DictionaryProvider } from './hooks/useDictionary';
 import { LoadingProvider } from './hooks/display/useLoading';
 import { SnackbarProvider } from './hooks/display/useSnackbar';
@@ -21,15 +22,17 @@ function App() {
         <ThemeProvider>
           <ScrollToTop />
           <StyledChart />
-          <AuthProvider>
-            <DictionaryProvider>
-              <LoadingProvider>
-                <SnackbarProvider>
-                  <Router />
-                </SnackbarProvider>              
-              </LoadingProvider>     
-            </DictionaryProvider>    
-          </AuthProvider>
+            <AuthProvider>
+            <SocketProvider>
+              <DictionaryProvider>
+                <LoadingProvider>
+                  <SnackbarProvider>
+                    <Router />
+                  </SnackbarProvider>              
+                </LoadingProvider>     
+              </DictionaryProvider>    
+            </SocketProvider>
+            </AuthProvider>
         </ThemeProvider>
       </BrowserRouter>
     </HelmetProvider>

@@ -131,7 +131,7 @@ export default function WorksheetCard(props: WorksheetCardProps) {
               </Grid>
 
               <Grid item xs={1.5}>
-                <Nilai />
+                <Nilai wsJunction={props.wsJunction} junctionId={props?.id | ""} />
               </Grid>
 
               <Grid item xs={3}>
