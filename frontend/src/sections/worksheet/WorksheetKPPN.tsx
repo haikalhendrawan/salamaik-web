@@ -4,16 +4,15 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import Iconify from '../../components/iconify';
 import PreviewFileModal from './component/PreviewFileModal';
 import useWsJunction from './useWsJunction';
+import usePreviewFileModal from './usePreviewFileModal';
 //sections
 import WorksheetCard from './component/WorksheetCard/WorksheetCard';
 import NavigationDrawer from "./component/NavigationDrawer";
 import PageLoading from '../../components/pageLoading/PageLoading';
 // @mui
-import { Container, Stack, Typography, Tabs, Tab, Grid, Paper, 
-        IconButton, Box, LinearProgress} from '@mui/material';
+import { Container, Stack, Typography, Tabs, Tab, Grid, Paper, IconButton} from '@mui/material';
 import {useTheme, styled} from '@mui/material/styles';
 import useDictionary from '../../hooks/useDictionary';
-import { filterKomponen, filterSubkomponen } from './utils';
 // -----------------------------------------------------------------------
 const SubkomponenDivider = styled(Paper)(({theme}) => ({
   padding: theme.spacing(1),
@@ -44,6 +43,8 @@ export default function WorksheetKPPN() {
 
   const { subKomponenRef } = useDictionary();
 
+  const { modalOpen, modalClose } = usePreviewFileModal();
+
   const navigate = useNavigate();
 
   const params = new URLSearchParams(useLocation().search);
@@ -54,18 +55,6 @@ export default function WorksheetKPPN() {
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => { // setiap tab komponen berubah
     setTabValue(newValue);
-  };
-
-  const [open, setOpen] = useState<boolean>(false); // for preview file modal
-
-  const [file, setFile] = useState<string | undefined>('https://jdih.kemenkeu.go.id/download/a321969c-4ce0-4073-81ce-df35023750b1/PER_1_PB_2023-Perubahan%20Atas%20PERDIRJEN%20No.PER-24_PB_2019%20tentang%20Pedoman%20Pembinaan%20&%20Supervisi%20Pelaksanaan%20Tugas%20KPPN.pdf'); // for preview file modal
-
-  const handleOpenFile = () => {
-    setOpen(true);
-  };
-
-  const handleCloseFile = () => {
-    setOpen(false)
   };
 
   const [isLoading, setIsLoading] = useState(true);
@@ -111,8 +100,8 @@ export default function WorksheetKPPN() {
               <WorksheetCard 
                 key={index}
                 wsJunction={item}
-                modalOpen={handleOpenFile}
-                modalClose={handleCloseFile}
+                modalOpen={modalOpen}
+                modalClose={modalClose}
                 id={"card"+ item.checklist_id.toString()}
               />
             );
@@ -169,7 +158,7 @@ export default function WorksheetKPPN() {
 
           </Container>
 
-          <PreviewFileModal open={open} modalClose={handleCloseFile} file={file} />
+          <PreviewFileModal />
 
           <NavigationDrawer tabValue={tabValue} scrollToElement={scrollToElement}/> 
           

@@ -24,7 +24,7 @@ export default function ChecklistRef({section, addState, resetAddState}: Checkli
 
   const [file, setFile] = useState<string | null>(null); // for preview file modal
 
-  const [fileOption, setFileOption] = useState<1 | 2>(1); // for preview file modal
+  const [fileOption, setFileOption] = useState<1 | 2>(1); //  opsi 1 untuk upload file 1 opsi 2 utk upload file 2
 
   const [tabValue, setTabValue] = useState<0 | 1 | 2 | 3 | 4>(0);
 

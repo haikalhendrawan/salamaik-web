@@ -55,6 +55,16 @@ class WorksheetEvent{
     }
   }
 
+  async updateKanwilNote(data: any, callback: any) {
+    try{
+      const {worksheetId, junctionId, kanwilNote, userName} = data; 
+      const result = await wsJunction.editWsJunctionKanwilNote( junctionId, worksheetId, kanwilNote, userName);
+      return callback({success: true, rows: result});
+    }catch(err: any){
+      return socketError(callback, err.message)
+    }
+  }
+
 }
 
 const worksheetEvent = new WorksheetEvent();

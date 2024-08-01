@@ -1,7 +1,10 @@
 import {Request, Response, NextFunction} from 'express';
+import multer from 'multer';
 import wsJunction from '../model/worksheetJunction.model';
 import worksheet from '../model/worksheet.model';
 import ErrorDetail from '../model/error.model';
+import { uploadWsJunctionFile } from '../config/multer';
+
 
 // -------------------------------------------------
 interface WorksheetJunctionType{
@@ -148,13 +151,31 @@ const editWsJunctionKanwilNote = async(req: Request, res: Response, next: NextFu
 }
 
 const editWsJunctionFile = async(req: Request, res: Response, next: NextFunction) => {
-  try{
-    const {worksheetId, junctionId, file1, file2, file3, userName} = req.body; 
-    const result = await wsJunction.editWsJunctionFile(worksheetId, junctionId, file1, file2, file3, userName);
-    return res.status(200).json({sucess: true, message: 'Edit worksheet junction success', rows: result})
-  }catch(err){
-    next(err);
-  }
+  uploadWsJunctionFile(req, res, async (err: any) => {
+    if(!req.file){
+      return next(new ErrorDetail(400, 'Incorrect file type', err));
+    };
+
+    if(err instanceof multer.MulterError) {
+      if(err.message==='LIMIT FILE SIZE'){
+        return next(new ErrorDetail(400, 'File size is too large'));
+      }else{
+        return next(err);
+      }
+    } else if(err) {
+      return next(err);
+    };
+
+    try{
+      const {worksheetId, junctionId, file1, file2, file3, userName} = req.body; 
+      const result = await wsJunction.editWsJunctionFile(junctionId, worksheetId, file1, file2, file3, userName);
+      return res.status(200).json({sucess: true, message: 'Edit worksheet junction success', rows: result})
+    }catch(err){
+      next(err);
+    }
+
+  });
+
 }
 
 //protect endpoint di route

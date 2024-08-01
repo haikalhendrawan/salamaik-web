@@ -139,7 +139,7 @@ class WorksheetJunction{
       const updateTime = new Date(Date.now()).toISOString();
       const q = "UPDATE worksheet_junction SET kanwil_note = $1, last_update = $2, updated_by = $3 WHERE junction_id = $4 AND worksheet_id = $5 RETURNING *";
       const result = await pool.query(q, [kanwilNote, updateTime, userName, junctionID, worksheetId]);
-      return result.rows
+      return result?.rows[0]
     }catch(err){
       throw err
     }

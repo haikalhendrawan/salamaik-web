@@ -111,3 +111,44 @@ const uploadStdFile = multer({
 }).single('stdFile');
 
 export {uploadStdFile}
+
+// ----------------------------------------------------------------------------------------------------------
+const wsJunctionFileStorage= multer.diskStorage(
+  { 
+    destination:(req, file, callback) => {
+      callback(null, `${__dirname}/../uploads/worksheet`)
+    },
+    filename:(req, file, callback) => {
+      const fileExt = sanitizeMimeType(file.mimetype);
+      // const {kppnId, periodId, standardizationId, month, timeStamp} = req.body;
+      callback(null, `worksheet.${fileExt}`)
+    }
+  }
+);
+
+const wsJunctionFileFilter = (req: any, file: any, callback: any) => {
+  if (
+    file.mimetype === 'image/jpeg' ||
+    file.mimetype === 'image/png' ||
+    file.mimetype === 'application/pdf' ||
+    file.mimetype === 'application/x-zip-compressed' ||
+    file.mimetype === 'application/zip' ||
+    file.mimetype === 'application/vnd.rar'
+  ) {
+    callback(null, true);
+  } else {
+    callback(null, false);
+  }
+};
+
+const wsJunctionFileLimit = {
+  fileSize: 12582912
+};
+
+const uploadWsJunctionFile = multer({
+  storage: wsJunctionFileStorage, 
+  limits: wsJunctionFileLimit, 
+  fileFilter: wsJunctionFileFilter
+}).single('wsJunctionFile');
+
+export {uploadWsJunctionFile}

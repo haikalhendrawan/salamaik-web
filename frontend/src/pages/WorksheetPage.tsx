@@ -1,6 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
+import { PreviewFileModalProvider } from '../sections/worksheet/usePreviewFileModal';
 //sections
 import WorksheetKPPN from '../sections/worksheet/WorksheetKPPN';
 import WorksheetLanding from '../sections/worksheet/WorksheetLanding';
@@ -19,7 +20,9 @@ export default function WorksheetPage() {
   return (
     <>
       <WsJunctionProvider>
-        <Outlet />
+        <PreviewFileModalProvider>
+          <Outlet />
+        </PreviewFileModalProvider>
       </WsJunctionProvider>
     </>
   );

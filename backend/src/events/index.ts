@@ -8,6 +8,7 @@ const connectEvent = (socket: Socket) => {
   socket.on("getWorksheetJunction", worksheetEvent.getWorksheetJunction);
   socket.on("updateKanwilScore", worksheetEvent.updateKanwilScore);
   socket.on("updateKPPNScore", worksheetEvent.updateKPPNScore);
+  socket.on("updateKanwilNote", worksheetEvent.updateKanwilNote);
   disconnectEvent(socket);
 };
 

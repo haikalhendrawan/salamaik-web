@@ -1,25 +1,56 @@
 import {useState, useRef} from "react";
 import { FormControl, TextField} from '@mui/material';
+import { WsJunctionType } from "../../types";
+import useSocket from "../../../../hooks/useSocket";
+import useWsJunction from "../../useWsJunction";
+import {useAuth} from "../../../../hooks/useAuth";
+// ------------------------------------------------------------
+interface CatatanPropsType{
+  wsJunction: WsJunctionType | null,
+};
+// ------------------------------------------------------------
+export default function Catatan({wsJunction}: CatatanPropsType) {
+  const initialNoteRef = useRef(wsJunction?.kanwil_note || '');
 
-export default function Catatan() {
+  const lastSavedNoteRef = useRef(wsJunction?.kanwil_note || "");
 
-  const [value, setValue] = useState<string>('');
+  const {auth} = useAuth();
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setValue(event.target.value)
+  const {socket} = useSocket();
+
+  const {getWsJunctionKanwil} = useWsJunction();
+
+  const handleEditKanwilNote = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const currentNote = e.target.value;
+
+    if(currentNote === lastSavedNoteRef.current) {
+      return
+    };
+
+    socket?.emit("updateKanwilNote", {
+      worksheetId: wsJunction?.worksheet_id, 
+      junctionId: wsJunction?.junction_id, 
+      kanwilNote: currentNote,
+      userName: auth?.name
+    },
+    (response: any) => {
+      console.log(response);
+      getWsJunctionKanwil(wsJunction?.kppn_id || '');
+      lastSavedNoteRef.current = currentNote;
+    });
   };
   return (
     <>
-      <FormControl sx={{width:'100%', height:'100%', pr:1, pt:0.5}}>
+      <FormControl sx={{width:'100%', height:'100%', pr:1, pt:0.5}} key={wsJunction?.checklist_id}>
         <TextField 
-          name="catatankppn" 
+          key={wsJunction?.checklist_id} 
           size='small' 
-          value={value} 
-          onChange={handleChange} 
+          defaultValue={initialNoteRef.current}
+          onBlur={(e) => handleEditKanwilNote(e)} 
           multiline 
           minRows={6} 
           maxRows={6}
-          sx={{width:'100%', height:'100%'}}  
+          fullWidth
           inputProps={{sx: {fontSize: 12, width:'100%', height:'100%'}, spellCheck: false,}} 
         />
       </FormControl>

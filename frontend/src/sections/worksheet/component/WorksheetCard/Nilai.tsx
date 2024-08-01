@@ -7,7 +7,7 @@ import {useAuth} from "../../../../hooks/useAuth";
 // ------------------------------------------------------------
 interface NilaiPropsType{
   wsJunction: WsJunctionType | null,
-}
+};
 // ------------------------------------------------------------
 export default function Nilai({wsJunction}: NilaiPropsType) {
   const {socket} = useSocket();
@@ -17,7 +17,7 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
   const {getWsJunctionKanwil} = useWsJunction();
 
   const opsiSelection = wsJunction?.opsi?.map((item, index) => (
-    <MenuItem key={index} sx={{fontSize:12}} value={item?.value?.toString() || ''}>{item?.value}</MenuItem>
+    <MenuItem key={index+1} sx={{fontSize:12}} value={item?.value?.toString() || ''}>{item?.value}</MenuItem>
   ) || null);
 
   const handleChangeKanwilScore = (newScore: string) => {
@@ -60,12 +60,13 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
           <Select 
             required 
             name="kppnScore" 
-            defaultValue={wsJunction?.kppn_score} 
+            value={wsJunction?.kppn_score !== null ? String(wsJunction?.kppn_score) : ''}
             onChange = {(e) => handleChangeKPPNScore(e.target.value as string)}
             size='small' 
             sx={{typography:'body2', fontSize:12,}}
           >
             {opsiSelection}
+            <MenuItem key={null} sx={{fontSize:12}} value={''}>{null}</MenuItem>
           </Select>
         </FormControl>
       </Stack>
@@ -76,12 +77,13 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
           <Select 
             required 
             name="kanwilScore" 
-            defaultValue={wsJunction?.kanwil_score}  
+            value={wsJunction?.kanwil_score !== null ? String(wsJunction?.kanwil_score) : ''} 
             onChange={(e) => handleChangeKanwilScore(e.target.value as string)}
             size='small' 
             sx={{typography:'body2', fontSize:12}}
           >
             {opsiSelection}
+            <MenuItem key={null} sx={{fontSize:12}} value={''}>{null}</MenuItem>
           </Select>
         </FormControl>
       </Stack>

@@ -15,15 +15,29 @@ const style = {
   justifyContent: 'center', alignItems: 'center', height: '100vh'
 };
 
-
 interface PreviewFileModalProps {
   open: boolean,
   modalClose: () => void,
-  file: string | undefined,
+  file: string | null,
+  fileOption: 1 | 2,
+  isExampleFile: boolean,
 };
 
 // -------------------------------------------------------------------------------------------
-export default function PreviewFileModal({open, modalClose, file}: PreviewFileModalProps){
+export default function PreviewFileModal(){
+  const {
+    open, 
+    file, 
+    selectedId, 
+    fileOption,
+    isExampleFile, 
+    handleSetIsExampleFile, 
+    modalOpen, 
+    modalClose, 
+    changeFile, 
+    selectId 
+  } = usePreviewFileModal();
+
   const [render, setRender] = useState<string | JSX.Element>('No files');
 
   const axiosJWT = useAxiosJWT();
@@ -31,8 +45,6 @@ export default function PreviewFileModal({open, modalClose, file}: PreviewFileMo
   const {setIsLoading} = useLoading();
 
   const {openSnackbar} = useSnackbar();
-
-  const {selectedId} = usePreviewFileModal();
 
   const currentFileURL = `${import.meta.env.VITE_API_URL}/standardization`;
 
@@ -63,14 +75,15 @@ export default function PreviewFileModal({open, modalClose, file}: PreviewFileMo
   useEffect(() => {
     if(fileExt==='jpg' || fileExt==='jpeg' || fileExt==='png' || fileExt==='pdf'){
       setRender(
-       <embed src={`${import.meta.env.VITE_API_URL}/standardization/${file}`} style={{borderRadius:'12px', height:'100vh', width:'60vw'}} />
+       <embed src={`${import.meta.env.VITE_API_URL}/${file}`} style={{borderRadius:'12px', height:'100vh', width:'60vw'}} />
       )
     }else if(fileExt==='zip' || fileExt==='rar' ){
       setRender(
          <Button 
             variant="contained" 
-            sx={{position:'absolute', left:'45%', top:'50%'}} 
+            sx={{position:'absolute', left:'40%', top:'50%'}} 
             onClick={handleDownload}
+            endIcon={<Iconify icon="solar:download-bold"/>}
           >
             Download Zip File
           </Button>
@@ -90,10 +103,10 @@ export default function PreviewFileModal({open, modalClose, file}: PreviewFileMo
         </Box>
         <Tooltip title="Delete File">
             <Button 
-              sx={{position: 'absolute', right:160, top:30}} 
+              sx={{position: 'absolute', right:160, top:30, display: isExampleFile ? 'none' : 'block'}} 
               variant='contained'
               color='pink'
-              onClick={deleteFile}
+              // onClick={deleteFile}
             >
               Delete 
               <Iconify icon="solar:trash-bin-trash-bold"/>

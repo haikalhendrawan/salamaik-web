@@ -53,7 +53,7 @@ export default function WorksheetCard(props: WorksheetCardProps) {
     <>
       <Grow in>
         <Grid item xs={12} sm={12} md={12}>
-          <Card sx={{ minHeight: '300px' }} id={props.id}>
+          <Card sx={{ minHeight: '300px' }} id={props.id} key={props.wsJunction?.checklist_id}>
             <CardHeader
               title={
                 <Head
@@ -124,11 +124,7 @@ export default function WorksheetCard(props: WorksheetCardProps) {
               </Grid>
 
               <Grid item xs={1.5}>
-                <Dokumen
-                  modalOpen={props.modalOpen}
-                  openUploadFile={openUploadFile}
-                  openInstruction={handleOpenInstruction}
-                />
+                <Dokumen openInstruction={handleOpenInstruction} wsJunction={props.wsJunction} />
               </Grid>
 
               <Grid item xs={1.5}>
@@ -136,7 +132,7 @@ export default function WorksheetCard(props: WorksheetCardProps) {
               </Grid>
 
               <Grid item xs={3}>
-                <Catatan />
+                <Catatan key={props.wsJunction?.checklist_id} wsJunction={props.wsJunction}/>
               </Grid>
             </Grid>
 

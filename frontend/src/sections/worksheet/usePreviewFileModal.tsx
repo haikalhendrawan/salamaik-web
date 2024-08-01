@@ -1,12 +1,12 @@
-import { ReactNode, useState, createContext, useContext, useEffect } from 'react';
-import useAxiosJWT from '../../hooks/useAxiosJWT';
-import useLoading from '../../hooks/display/useLoading';
-import useSnackbar from '../../hooks/display/useSnackbar';
+import { ReactNode, useState, createContext, useContext } from 'react';
 //------------------------------------------------------------------
 interface PreviewFileModalContextType{
   open: boolean,
   file: string,
   selectedId: number,
+  fileOption: number,
+  isExampleFile: boolean,
+  handleSetIsExampleFile: (isExample: boolean) => void,
   modalOpen: () => void,
   modalClose: () => void,
   changeFile: (file: string) => void,
@@ -22,6 +22,9 @@ const PreviewFileModalContext = createContext<PreviewFileModalContextType>({
   open: false,
   file: '',
   selectedId: 0,
+  fileOption: 1,
+  isExampleFile: false,
+  handleSetIsExampleFile: () => {},
   modalClose: () => {},
   modalOpen: () => {},
   changeFile: () => {},
@@ -35,12 +38,20 @@ const PreviewFileModalProvider = ({children}: PreviewFileModalProviderProps) => 
 
   const [selectedId, setSelectedId] = useState<number>(0);
 
+  const [isExampleFile, setIsExampleFile] = useState<boolean>(false);
+
+  const [fileOption, setFileOption] = useState<number>(1);
+
   const modalOpen = () => {   //modal
     setOpen(true);
   };
 
   const modalClose = () => {  //modal
     setOpen(false);
+    setFile('');
+    setSelectedId(0);
+    setIsExampleFile(false);
+    setFileOption(1);
   };
 
   const changeFile = (file: string) => {
@@ -51,8 +62,24 @@ const PreviewFileModalProvider = ({children}: PreviewFileModalProviderProps) => 
     setSelectedId(id);
   };
 
+  const handleSetIsExampleFile = (isExampleFile: boolean) => {
+    setIsExampleFile(isExampleFile);
+  }
+
   return(
-    <PreviewFileModalContext.Provider value={{open, file, selectedId, modalOpen, modalClose, changeFile, selectId}}>
+    <PreviewFileModalContext.Provider value={{
+      open, 
+      file, 
+      selectedId, 
+      fileOption, 
+      isExampleFile, 
+      handleSetIsExampleFile, 
+      modalOpen, 
+      modalClose, 
+      changeFile, 
+      selectId
+      }}
+    >
       {children}
     </PreviewFileModalContext.Provider>
   )

@@ -1,7 +1,11 @@
-import { Stack, Typography, Button, Tooltip, IconButton} from '@mui/material';
+import { useCallback } from 'react';
+import { Stack, Typography, Tooltip} from '@mui/material';
 import {useTheme, styled} from '@mui/material/styles';
+import usePreviewFileModal from '../../usePreviewFileModal';
 import Iconify from "../../../../components/iconify";
 import StyledButton from "../../../../components/styledButton/StyledButton";
+import { useAuth } from '../../../../hooks/useAuth';
+import { WsJunctionType } from '../../types';
 // ----------------------------------------------------------------------------
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -16,14 +20,34 @@ const VisuallyHiddenInput = styled('input')({
 });
 
 interface DokumenProps{
-  modalOpen: () => void,
-  openUploadFile: () => void,
-  openInstruction: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
+  openInstruction: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
+  wsJunction: WsJunctionType | null
 }
 
 // ----------------------------------------------------------------------------
-export default function Dokumen({modalOpen, openUploadFile, openInstruction}: DokumenProps){
+export default function Dokumen({openInstruction, wsJunction}: DokumenProps){
   const theme = useTheme();
+
+  const {auth} = useAuth();
+
+  const {open, file, selectedId, fileOption, handleSetIsExampleFile, modalOpen, modalClose, changeFile, selectId } = usePreviewFileModal();
+
+  const handleOpenExampleFile = useCallback((option: number) => {
+    const baseDir = "checklist";
+    const fileOption = option===1?wsJunction?.file1:wsJunction?.file2;
+    modalOpen();
+    changeFile(baseDir+ '/' + fileOption || '');
+    handleSetIsExampleFile(true);
+  }, [modalOpen]);
+
+  const handleOpenWsJunctionFile = useCallback((option: number, id: number) => {
+    const baseDir = "worksheet";
+    const fileOption = [wsJunction?.file_1, wsJunction?.file_2, wsJunction?.file_3][option-1];
+    modalOpen();
+    changeFile(baseDir+ '/' + fileOption || '');
+    handleSetIsExampleFile(false);
+    selectId(wsJunction?.junction_id || 0);
+  }, [modalOpen]);
 
   return(
     <>
@@ -44,54 +68,109 @@ export default function Dokumen({modalOpen, openUploadFile, openInstruction}: Do
                 </StyledButton>
               </span>
             </Tooltip>
-            <Tooltip title='Contoh Bukti Dukung'>
-              <span>
-                <StyledButton 
-                  aria-label="edit" 
-                  variant='contained' 
-                  size='small' 
-                  color='warning'
-                >
-                  <Iconify icon="solar:file-bold-duotone"/>
-                </StyledButton>
-              </span>
-            </Tooltip>
+            {
+              wsJunction?.file1
+              ?
+                <Tooltip title='Contoh Bukti Dukung 1'>
+                  <span>
+                    <StyledButton 
+                      aria-label="edit" 
+                      variant='contained' 
+                      size='small' 
+                      color='warning'
+                      onClick={() => handleOpenExampleFile(1)}
+                    >
+                      <Iconify icon="solar:file-bold-duotone"/>
+                    </StyledButton>
+                  </span>
+                </Tooltip>
+              :
+                null
+            }
+            {
+              wsJunction?.file2
+              ?
+                <Tooltip title='Contoh Bukti Dukung 2'>
+                  <span>
+                    <StyledButton 
+                      aria-label="edit" 
+                      variant='contained' 
+                      size='small' 
+                      color='warning'
+                      onClick={() => handleOpenExampleFile(2)}
+                    >
+                      <Iconify icon="solar:file-bold-duotone"/>
+                    </StyledButton>
+                  </span>
+                </Tooltip>
+              :
+                null
+            } 
           </Stack>
         </Stack>
 
         <Stack direction='column' spacing={1}>
           <Typography variant='body3' sx={{fontSize:12}} textAlign={'left'}>Bukti Dukung :</Typography>
           <Stack direction='row' spacing={1}>
-            <Tooltip title='file 1'>
-              <span>
-                <StyledButton 
-                  aria-label="edit" 
-                  variant='contained' 
-                  size='small' 
-                  color='secondary'
-                  onClick={modalOpen}
-                >
-                  <Iconify icon="solar:file-bold-duotone"/>
-                </StyledButton>
-              </span>
-            </Tooltip>
-
-            <Tooltip title='file 2'>
-              <span>
-                <StyledButton 
-                  aria-label="edit" 
-                  variant='contained' 
-                  size='small' 
-                  color='secondary'
-                  onClick={modalOpen}
-                >
-                  <Iconify icon="solar:file-bold-duotone"/>
-                </StyledButton>
-              </span>
-            </Tooltip>
-
+            {
+              wsJunction?.file_1
+              ?
+                <Tooltip title='file 1'>
+                  <span>
+                    <StyledButton 
+                      aria-label="edit" 
+                      variant='contained' 
+                      size='small' 
+                      color='secondary'
+                      onClick={() => handleOpenWsJunctionFile(1, wsJunction?.junction_id || 0)}
+                    >
+                      <Iconify icon="solar:file-bold-duotone"/>
+                    </StyledButton>
+                  </span>
+                </Tooltip>
+              :
+                null
+            }
+            {
+              wsJunction?.file_2
+              ?
+                <Tooltip title='file 2'>
+                  <span>
+                    <StyledButton 
+                      aria-label="edit" 
+                      variant='contained' 
+                      size='small' 
+                      color='secondary'
+                      onClick={() => handleOpenWsJunctionFile(2, wsJunction?.junction_id || 0)}
+                    >
+                      <Iconify icon="solar:file-bold-duotone"/>
+                    </StyledButton>
+                  </span>
+                </Tooltip>
+              :
+                null
+            }
+            {
+              wsJunction?.file_3
+              ?
+                <Tooltip title='file 3'>
+                  <span>
+                    <StyledButton 
+                      aria-label="edit" 
+                      variant='contained' 
+                      size='small' 
+                      color='secondary'
+                      onClick={() => handleOpenWsJunctionFile(3, wsJunction?.junction_id || 0)}
+                    >
+                      <Iconify icon="solar:file-bold-duotone"/>
+                    </StyledButton>
+                  </span>
+                </Tooltip>
+              :
+                null
+            }
             <Tooltip title='Add file'>
-              <StyledButton variant='contained' component='label' aria-label="delete"   size='small' color='white'>
+              <StyledButton variant='contained' component='label' aria-label="delete"   size='small' color='white' sx={{display: wsJunction?.file_3?'none':'flex'}}>
                 <Iconify 
                   sx={{color:theme.palette.grey[500]}} 
                   icon="solar:add-circle-bold"
