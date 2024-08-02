@@ -73,7 +73,7 @@ export default function WorksheetKPPN() {
     }
   };
 
-  const content = useCallback(() =>
+  const content = useMemo(() =>
     subKomponenRef?.filter(item => item?.komponen_id === tabValue)?.map((i) => (
       <>
         <Grid item xs={12} sm={12} md={12} key={i.id} id={"divider"+i.id.toString()}>
@@ -149,7 +149,7 @@ export default function WorksheetKPPN() {
               <Grid item xs={12} md={12}>
                 <Grid container spacing={2}>
                 
-                  {content()}
+                  {content}
 
                 </Grid>
               </Grid>

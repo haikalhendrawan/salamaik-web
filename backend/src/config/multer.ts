@@ -120,8 +120,8 @@ const wsJunctionFileStorage= multer.diskStorage(
     },
     filename:(req, file, callback) => {
       const fileExt = sanitizeMimeType(file.mimetype);
-      // const {kppnId, periodId, standardizationId, month, timeStamp} = req.body;
-      callback(null, `worksheet.${fileExt}`)
+      const {worksheetId, checklistId, kppnId, option} = req.body;
+      callback(null, `ch${checklistId}_file${option}_kppn${kppnId}_${worksheetId}.${fileExt}`)
     }
   }
 );

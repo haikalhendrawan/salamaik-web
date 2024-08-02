@@ -145,11 +145,25 @@ class WorksheetJunction{
     }
   }
 
-  async editWsJunctionFile(junctionID: number, worksheetId: string, file1: string, file2: string, file3: string, userName: string){
+  async editWsJunctionFile(junctionId: number, worksheetId: string, file1: string, file2: string, file3: string, userName: string){
     try{
       const updateTime = new Date(Date.now()).toISOString();
       const q = "UPDATE worksheet_junction SET file_1 = $1, file_2 = $2, file_3 = $3, last_update = $4, updated_by = $5 WHERE junction_id = $6 AND worksheet_id = $7 RETURNING *";
-      const result = await pool.query(q, [file1, file2, file3, updateTime, userName, junctionID, worksheetId]);
+      const result = await pool.query(q, [file1, file2, file3, updateTime, userName, junctionId, worksheetId]);
+      return result.rows
+    }catch(err){
+      throw err
+    }
+  }
+
+  async deleteWsJunctionFile(junctionId: number, option: number){
+    try{
+      const queryOption = ["UPDATE worksheet_junction SET file_1 = null WHERE junction_id = $1 RETURNING *",
+        "UPDATE worksheet_junction SET file_2 = null WHERE junction_id = $1 RETURNING *",
+        "UPDATE worksheet_junction SET file_3 = null WHERE junction_id = $1 RETURNING *"
+      ]
+      const q = queryOption[option-1];
+      const result = await pool.query(q, [junctionId]);
       return result.rows
     }catch(err){
       throw err

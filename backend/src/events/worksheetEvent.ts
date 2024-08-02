@@ -2,6 +2,8 @@ import { Socket } from 'socket.io';
 import wsJunction, {WsJunctionJoinChecklistType} from '../model/worksheetJunction.model';
 import worksheet from '../model/worksheet.model';
 import { socketError } from '../model/error.model';
+import fs from 'fs';
+import path from 'path';
 import logger from '../config/logger';
 // ---------------------------------------------------------------------------------------------------
 
@@ -60,6 +62,20 @@ class WorksheetEvent{
       const {worksheetId, junctionId, kanwilNote, userName} = data; 
       const result = await wsJunction.editWsJunctionKanwilNote( junctionId, worksheetId, kanwilNote, userName);
       return callback({success: true, rows: result});
+    }catch(err: any){
+      return socketError(callback, err.message)
+    }
+  }
+
+  async deleteWsJunctionFile(data: any, callback: any){
+    try{
+      const {id, fileName, option} = data;
+      const result = await wsJunction.deleteWsJunctionFile(id, option);
+  
+      const filePath = path.join(__dirname,`../uploads/`, fileName);
+      fs.unlinkSync(filePath);
+      return callback({success: true, rows: result});
+   
     }catch(err: any){
       return socketError(callback, err.message)
     }

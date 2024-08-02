@@ -27,6 +27,10 @@ export default function Catatan({wsJunction}: CatatanPropsType) {
       return
     };
 
+    console.log('edit');
+    console.log(auth);
+    console.log(socket);
+
     socket?.emit("updateKanwilNote", {
       worksheetId: wsJunction?.worksheet_id, 
       junctionId: wsJunction?.junction_id, 

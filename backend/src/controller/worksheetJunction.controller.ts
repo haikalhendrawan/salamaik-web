@@ -4,6 +4,8 @@ import wsJunction from '../model/worksheetJunction.model';
 import worksheet from '../model/worksheet.model';
 import ErrorDetail from '../model/error.model';
 import { uploadWsJunctionFile } from '../config/multer';
+import fs from 'fs';
+import path from 'path';
 
 
 // -------------------------------------------------
@@ -168,14 +170,32 @@ const editWsJunctionFile = async(req: Request, res: Response, next: NextFunction
 
     try{
       const {worksheetId, junctionId, file1, file2, file3, userName} = req.body; 
-      const result = await wsJunction.editWsJunctionFile(junctionId, worksheetId, file1, file2, file3, userName);
+      const file1Sanitized = file1 === "null" ? null : file1;
+      const file2Sanitized = file2 === "null" ? null : file2;
+      const file3Sanitized = file3 === "null" ? null : file3;
+
+      const result = await wsJunction.editWsJunctionFile(junctionId, worksheetId, file1Sanitized, file2Sanitized, file3Sanitized, userName);
       return res.status(200).json({sucess: true, message: 'Edit worksheet junction success', rows: result})
     }catch(err){
       next(err);
     }
 
   });
+}
 
+const deleteWsJunctionFile = async(req: Request, res: Response, next: NextFunction) => {
+  try{
+    const {id, fileName, option} = req.body;
+    const result = await wsJunction.deleteWsJunctionFile(id, option);
+
+    const filePath = path.join(__dirname,`../uploads/worksheet/`, fileName);
+    fs.unlinkSync(filePath);
+ 
+
+    return res.status(200).json({sucess: true, message: 'file deleted successfully', rows: result});
+  }catch(err){
+    next(err);
+  }
 }
 
 //protect endpoint di route
@@ -198,5 +218,6 @@ export {
   editWsJunctionKanwilScore,
   editWsJunctionKanwilNote,
   editWsJunctionFile,
-  deleteWsJunctionByWorksheetId
+  deleteWsJunctionByWorksheetId,
+  deleteWsJunctionFile
 }

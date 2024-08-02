@@ -1,11 +1,11 @@
-import {useState, useEffect, useRef, useMemo} from'react';
-import {Stack, Button, Box, Typography, Table, IconButton, TableSortLabel,
-  Tooltip, TableHead, Grow, TableBody, TableRow, TableCell, Grid, TableContainer} from '@mui/material';
-import { useTheme, styled } from '@mui/material/styles';
+import {useState,  useMemo} from'react';
+import {Stack, Typography, Table, IconButton, TableSortLabel,
+  Tooltip, TableHead,  TableBody, TableRow, TableCell, TableContainer} from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import Iconify from '../../../../components/iconify';
 import Label from '../../../../components/label';
 import Scrollbar from '../../../../components/scrollbar';
-import { VisuallyHiddenInput, descendingComparator, getComparator, applySortFilter } from './utils';
+import { VisuallyHiddenInput, getComparator, applySortFilter } from './utils';
 import StyledButton from '../../../../components/styledButton/StyledButton';
 import ChecklistOpsiModal from './ChecklistOpsiModal';
 import useLoading from '../../../../hooks/display/useLoading';

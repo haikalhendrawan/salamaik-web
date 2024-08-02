@@ -5,6 +5,8 @@ import useAxiosJWT from '../../../hooks/useAxiosJWT';
 import useLoading from '../../../hooks/display/useLoading';
 import useSnackbar from '../../../hooks/display/useSnackbar';
 import usePreviewFileModal from '../usePreviewFileModal';
+import useSocket from '../../../hooks/useSocket';
+import useWsJunction from '../useWsJunction';
 // -------------------------------------------------------------------------------------------
 const style = {
   position: 'absolute',
@@ -44,7 +46,11 @@ export default function PreviewFileModal(){
 
   const {setIsLoading} = useLoading();
 
+  const {socket} = useSocket();
+
   const {openSnackbar} = useSnackbar();
+
+  const {getWsJunctionKanwil} = useWsJunction();
 
   const currentFileURL = `${import.meta.env.VITE_API_URL}/standardization`;
 
@@ -55,21 +61,27 @@ export default function PreviewFileModal(){
   };
 
   const deleteFile = async() => {
-    try{
+    console.log({
+      id: selectedId,
+      fileName: file,
+      option: fileOption
+    });
+
+    if(isExampleFile){
+      return
+    };
+
+    socket?.emit("deleteWsJunctionFile", {
+      id: selectedId,
+      fileName: file,
+      option: fileOption
+    }, async(response: any) => {
+      console.log(response);
       setIsLoading(true);
-      setIsLoading(false);
+      await getWsJunctionKanwil('010');
       modalClose();
-    }catch(err: any){
-      if(err.response){
-        openSnackbar(err.response.data.message, 'error');
-        setIsLoading(false);
-      }else{
-        openSnackbar('Network Error', 'error');
-        setIsLoading(false);
-      }
-    }finally{
       setIsLoading(false);
-    }
+    });
   };
 
   useEffect(() => {
@@ -106,7 +118,7 @@ export default function PreviewFileModal(){
               sx={{position: 'absolute', right:160, top:30, display: isExampleFile ? 'none' : 'block'}} 
               variant='contained'
               color='pink'
-              // onClick={deleteFile}
+              onClick={deleteFile}
             >
               Delete 
               <Iconify icon="solar:trash-bin-trash-bold"/>
