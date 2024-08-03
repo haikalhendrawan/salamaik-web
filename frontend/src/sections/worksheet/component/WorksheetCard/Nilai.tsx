@@ -1,5 +1,10 @@
 import { useMemo } from 'react';
-import { Stack, Typography, Select, MenuItem, FormControl} from '@mui/material';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import styled  from '@mui/material/styles/styled';
 import { WsJunctionType } from "../../types";
 import useSocket from "../../../../hooks/useSocket";
 import useWsJunction from "../../useWsJunction";
@@ -10,6 +15,20 @@ import useSnackbar from "../../../../hooks/display/useSnackbar";
 interface NilaiPropsType{
   wsJunction: WsJunctionType | null,
 };
+
+const StyledFormControl = styled(FormControl)(({}) => ({
+  width: '100%',
+  height: '100%'
+}));
+
+const StyledSelect = styled(Select)(({}) => ({
+  fontSize: 12,
+  typography:'body2'
+}));
+
+const StyledMenuItem = styled(MenuItem)(({}) => ({
+  fontSize: 12,
+}))
 // ------------------------------------------------------------
 export default function Nilai({wsJunction}: NilaiPropsType) {
   const {socket} = useSocket();
@@ -27,7 +46,7 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
   }, [auth])
 
   const opsiSelection = wsJunction?.opsi?.map((item, index) => (
-    <MenuItem key={index+1} sx={{fontSize:12}} value={item?.value?.toString() || ''}>{item?.value}</MenuItem>
+    <StyledMenuItem key={index+1} value={item?.value?.toString() || ''}>{item?.value}</StyledMenuItem>
   ) || null);
 
   const handleChangeKanwilScore = (newScore: string) => {
@@ -85,39 +104,37 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
   return (
     <Stack direction='column' spacing={2}>
       <Stack direction='column' spacing={1} >
-        <Typography variant='body3' sx={{fontSize:12}} textAlign={'left'}>Nilai KPPN :</Typography>
-        <FormControl sx={{width:'100%', height:'100%'}}>
-          <Select 
+        <Typography variant='body3' fontSize={12} textAlign={'left'}>Nilai KPPN :</Typography>
+        <StyledFormControl>
+          <StyledSelect
             required 
             name="kppnScore" 
             value={wsJunction?.kppn_score !== null ? String(wsJunction?.kppn_score) : ''}
             onChange = {(e) => handleChangeKPPNScore(e.target.value as string)}
             size='small' 
-            sx={{typography:'body2', fontSize:12}}
             disabled ={isKanwil}
           >
             {opsiSelection}
-            <MenuItem key={null} sx={{fontSize:12}} value={''}>{null}</MenuItem>
-          </Select>
-        </FormControl>
+            <StyledMenuItem key={null} value={''}>{null}</StyledMenuItem>
+          </StyledSelect>
+        </StyledFormControl>
       </Stack>
       
       <Stack direction='column' spacing={1}>
-        <Typography variant='body3' sx={{fontSize:12}} textAlign={'left'}>Nilai Kanwil :</Typography>
-        <FormControl sx={{width:'100%', height:'100%'}}>
-          <Select 
+        <Typography variant='body3' fontSize={12} textAlign={'left'}>Nilai Kanwil :</Typography>
+        <StyledFormControl>
+          <StyledSelect 
             required 
             name="kanwilScore" 
             value={wsJunction?.kanwil_score !== null ? String(wsJunction?.kanwil_score) : ''} 
             onChange={(e) => handleChangeKanwilScore(e.target.value as string)}
             size='small' 
-            sx={{typography:'body2', fontSize:12}}
             disabled={!isKanwil}
           >
             {opsiSelection}
-            <MenuItem key={null} sx={{fontSize:12}} value={''}>{null}</MenuItem>
-          </Select>
-        </FormControl>
+            <StyledMenuItem key={null} value={''}>{null}</StyledMenuItem>
+          </StyledSelect>
+        </StyledFormControl>
       </Stack>
       
     </Stack>    

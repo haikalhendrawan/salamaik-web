@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import Iconify from '../../components/iconify/Iconify';
 import Label from '../../components/label/Label';
 import ProfilePicUpload from '../../components/profilePicUpload';
@@ -9,8 +9,7 @@ import useSnackbar from '../../hooks/display/useSnackbar';
 import { useAuth } from '../../hooks/useAuth';
 import useAxiosJWT from '../../hooks/useAxiosJWT';
 // @mui
-import { Stack, Typography, Box, FormControl,  Grid, IconButton, Card, 
-        TextField, Button, Slide, Grow, InputLabel, Select, MenuItem} from '@mui/material';
+import { Stack, Typography, Box, FormControl,  Grid, Card, Button, Slide,  MenuItem} from '@mui/material';
 import { useTheme, styled } from '@mui/material/styles';
 // -----------------------------------------------------------------------
 const UserDataContainer = styled(Box)(({theme}) => ({
@@ -55,7 +54,7 @@ interface ValueType{
   picture: string | null;
   kppn: string;
   role: number | null;
-  period: number | null;
+  period: number | string;
   status: number | null;
 };
 
@@ -73,7 +72,7 @@ export default function General(){
 
   const {auth, setAuth} = useAuth() as AuthType;
 
-  const {setIsLoading} = useLoading();
+  const {isLoading, setIsLoading} = useLoading();
 
   const {openSnackbar} = useSnackbar();
 
@@ -87,7 +86,7 @@ export default function General(){
     picture: auth?.picture || '',
     kppn: auth?.kppn || '',
     role: auth?.role || 0,
-    period: auth?.period || 0,
+    period: auth?.period || '',
     status: auth?.status || 0
   });
 
@@ -96,6 +95,12 @@ export default function General(){
     unit: '',
     period: [] 
   });
+
+  const periodSelection = useMemo(() => {
+    return refValue?.period?.map((item, index) => (
+      <MenuItem key={index} sx={{fontSize:14}} value={item.id.toString()}>{item.name}</MenuItem>
+    ) || <></>);
+  }, [refValue]);
 
   const handleClick = () => {
     fileInputRef.current?fileInputRef.current.click():null
@@ -193,7 +198,11 @@ export default function General(){
 
   useEffect(() => {
     getData();
-  }, [])
+  }, []);
+
+  if(isLoading){
+    return <></>
+  }
 
   return (
   <>
@@ -270,10 +279,7 @@ export default function General(){
                     value={value.period}
                     onChange={(e: any) => handleChange(e)}
                   >
-                    {refValue?.period?.map((item, index) => (
-                      <MenuItem key={index} sx={{fontSize:14}} value={item.id}>{item.name}</MenuItem>
-                    ))}
-
+                    {periodSelection}
                   </StyledSelect>
                 </FormControl>
                 <FormControl>

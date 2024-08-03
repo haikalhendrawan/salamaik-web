@@ -1,6 +1,9 @@
 import { useCallback, useMemo } from 'react';
-import { Stack, Typography, Tooltip} from '@mui/material';
-import {useTheme, styled} from '@mui/material/styles';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
+import Tooltip from '@mui/material/Tooltip';
+import useTheme  from '@mui/material/styles/useTheme';
+import styled  from '@mui/material/styles/styled';
 import usePreviewFileModal from '../../usePreviewFileModal';
 import Iconify from "../../../../components/iconify";
 import StyledButton from "../../../../components/styledButton/StyledButton";
@@ -8,7 +11,6 @@ import useLoading from '../../../../hooks/display/useLoading';
 import useAxiosJWT from '../../../../hooks/useAxiosJWT';
 import useSnackbar from '../../../../hooks/display/useSnackbar';
 import useWsJunction from '../../useWsJunction';
-import { useAuth } from '../../../../hooks/useAuth';
 import { WsJunctionType } from '../../types';
 // ----------------------------------------------------------------------------
 const VisuallyHiddenInput = styled('input')({
@@ -32,9 +34,7 @@ interface DokumenProps{
 export default function Dokumen({openInstruction, wsJunction}: DokumenProps){
   const theme = useTheme();
 
-  const {auth} = useAuth();
-
-  const { handleSetIsExampleFile, modalOpen, modalClose, changeFile, selectId, setFileOption } = usePreviewFileModal();
+  const { handleSetIsExampleFile, modalOpen, changeFile, selectId, setFileOption } = usePreviewFileModal();
 
   const {getWsJunctionKanwil} = useWsJunction();
 
@@ -109,7 +109,7 @@ export default function Dokumen({openInstruction, wsJunction}: DokumenProps){
     <>
       <Stack direction='column' spacing={2}>
         <Stack direction='column' spacing={1}>
-          <Typography variant='body3' sx={{fontSize:12}} textAlign={'left'}>Petunjuk :</Typography>
+          <Typography variant='body3' fontSize={12} textAlign={'left'}>Petunjuk :</Typography>
           <Stack direction='row' spacing={1}>
             <Tooltip title='Instruksi'>
               <span>
@@ -120,7 +120,7 @@ export default function Dokumen({openInstruction, wsJunction}: DokumenProps){
                   color='white' 
                   onClick={(e) => openInstruction(e)}
                 >
-                  <Iconify sx={{color:theme.palette.grey[500]}} icon="solar:info-circle-bold"/>
+                  <Iconify color={theme.palette.grey[500]} icon="solar:info-circle-bold"/>
                 </StyledButton>
               </span>
             </Tooltip>
@@ -166,7 +166,7 @@ export default function Dokumen({openInstruction, wsJunction}: DokumenProps){
         </Stack>
 
         <Stack direction='column' spacing={1}>
-          <Typography variant='body3' sx={{fontSize:12}} textAlign={'left'}>Bukti Dukung :</Typography>
+          <Typography variant='body3' fontSize={12} textAlign={'left'}>Bukti Dukung :</Typography>
           <Stack direction='row' spacing={1}>
             {
               wsJunction?.file_1
@@ -225,19 +225,26 @@ export default function Dokumen({openInstruction, wsJunction}: DokumenProps){
               :
                 null
             }
-            <Tooltip title='Add file'>
-              <StyledButton variant='contained' component='label' aria-label="delete"   size='small' color='white' sx={{display: isMaxFile?'none':'flex'}}>
-                <Iconify 
-                  sx={{color:theme.palette.grey[500]}} 
-                  icon="solar:add-circle-bold"
-                />
-                <VisuallyHiddenInput 
-                  type='file'
-                  accept='image/*,.pdf,.zip' 
-                  onChange={(e) => handleChangeFile(e, wsJunction)} 
-                />
-              </StyledButton>
-            </Tooltip>
+            {
+              !isMaxFile
+              ?
+                <Tooltip title='Add file'>
+                  <StyledButton variant='contained' component='label' aria-label="delete" size='small' color='white'>
+                    <Iconify 
+                      icon="solar:add-circle-bold"
+                      color={theme.palette.grey[500]}
+                    />
+                    <VisuallyHiddenInput 
+                      type='file'
+                      accept='image/*,.pdf,.zip' 
+                      onChange={(e) => handleChangeFile(e, wsJunction)} 
+                    />
+                  </StyledButton>
+                </Tooltip>
+              :
+                null
+            }
+           
           </Stack>
         </Stack>
       </Stack>   

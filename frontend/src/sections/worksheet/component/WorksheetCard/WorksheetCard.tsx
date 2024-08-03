@@ -1,7 +1,13 @@
-import {useState, useRef, useEffect} from "react";
-import { Typography, Grid, Card, CardHeader, Grow, Divider, Skeleton} from '@mui/material';
+import {useState, useEffect, useCallback} from "react";
+import Typography from '@mui/material/Typography';
+import Grid from '@mui/material/Grid';
+import Card from '@mui/material/Card';
+import CardHeader from '@mui/material/CardHeader';
+import Grow from '@mui/material/Grow';
+import Divider from '@mui/material/Divider';
+import Skeleton from '@mui/material/Skeleton';
 import InstructionPopover from "../InstructionPopover";
-import {useTheme} from '@mui/material/styles';
+import styled from '@mui/material/styles/styled';
 import Head from "./Head";
 import Kriteria from "./Kriteria";
 import Dokumen from "./Dokumen";
@@ -16,30 +22,50 @@ interface WorksheetCardProps{
   id?: string
 };
 
+const StyledCardHeader = styled(CardHeader)(({theme}) => ({
+  backgroundColor: theme.palette.background.default,
+  color: theme.palette.text.primary,
+  height: '67px',
+  paddingLeft: theme.spacing(1),
+  paddingTop: theme.spacing(0),
+}));
+
+const HeadGrid = styled(Grid)(({theme}) => ({
+  marginTop: theme.spacing(1),
+  marginBottom: theme.spacing(1),
+  textAlign: 'center',
+  justifyContent: 'center',
+  color: theme.palette.text.secondary,
+}));
+
+const BodyGrid = styled(Grid)(({theme}) => ({
+  marginTop: theme.spacing(0),
+  maxHeight: '160px',
+  textAlign: 'center',
+  justifyContent: 'center',
+}));
+
+const StyledDivider = styled(Divider)(({theme}) => ({
+  borderStyle: 'dashed', 
+  maringTop: theme.spacing(3)
+}));
+
 // ------------------------------------------------------------
 export default function WorksheetCard(props: WorksheetCardProps) {
-  const theme = useTheme();
-
-  const addFileRef = useRef<HTMLInputElement>(null);
-
   const [mounted, setIsMounted] = useState(false)
-
-  const openUploadFile = () => {
-    addFileRef.current? addFileRef.current.click() : null
-  };
 
   const [openInstruction, setOpenInstruction] = useState<boolean>(false);
 
   const [anchorEl, setAnchorEl] = useState<EventTarget & HTMLButtonElement | null>(null);
 
-  const handleOpenInstruction = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const handleOpenInstruction = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     setOpenInstruction(true);
     setAnchorEl(event.currentTarget);
-  };
+  }, []); 
 
-  const handleCloseInstruction = () => {
+  const handleCloseInstruction = useCallback(() => {
     setOpenInstruction(false)
-  };
+  }, []);
 
   useEffect(() => {
     setIsMounted(true);
@@ -54,7 +80,7 @@ export default function WorksheetCard(props: WorksheetCardProps) {
       <Grow in>
         <Grid item xs={12} sm={12} md={12}>
           <Card sx={{ minHeight: '300px' }} id={props.id} key={props.wsJunction?.checklist_id}>
-            <CardHeader
+            <StyledCardHeader
               title={
                 <Head
                   num={props.wsJunction?.checklist_id}
@@ -63,29 +89,12 @@ export default function WorksheetCard(props: WorksheetCardProps) {
                   updatedBy={props.wsJunction?.updated_by || null}
                 />
               }
-              sx={{
-                backgroundColor: theme.palette.background.default,
-                color: theme.palette.text.primary,
-                height: '67px',
-                pl: 1,
-                pt: 0,
-              }}
             />
 
-            <Grid
-              container
-              sx={{
-                mt: 1,
-                mb: 1,
-                textAlign: 'center',
-                justifyContent: 'center',
-                color: theme.palette.text.secondary,
-              }}
-              spacing={0}
-            >
+            <HeadGrid container spacing={0}>
               {/* Table Header */}
               <Grid item xs={6}>
-                <Typography variant="body2" sx={{ mr: 1 }}>
+                <Typography variant="body2">
                   Kriteria
                 </Typography>
               </Grid>
@@ -101,21 +110,14 @@ export default function WorksheetCard(props: WorksheetCardProps) {
               <Grid item xs={3}>
                 <Typography variant="body2">Catatan Kanwil</Typography>
               </Grid>
-            </Grid>
+            </HeadGrid>
 
             <Divider flexItem />
 
-            <Grid
+            <BodyGrid
               container
-              sx={{
-                mt: 0,
-                maxHeight: '160px',
-                textAlign: 'center',
-                justifyContent: 'center',
-              }}
               spacing={1}
             >
-              {/* Table Body */}
               <Grid item xs={6}>
                 <Kriteria
                   kriteria={props.wsJunction?.header || ""}
@@ -134,9 +136,9 @@ export default function WorksheetCard(props: WorksheetCardProps) {
               <Grid item xs={3}>
                 <Catatan key={props.wsJunction?.checklist_id} wsJunction={props.wsJunction}/>
               </Grid>
-            </Grid>
+            </BodyGrid>
 
-            <Divider sx={{ borderStyle: 'dashed', mt: 3 }} />
+            <StyledDivider  />
           </Card>
         </Grid>
       </Grow>
@@ -158,7 +160,7 @@ export default function WorksheetCard(props: WorksheetCardProps) {
 function WorksheetCardSkeleton(){
   return(
     <Grid item xs={12} sm={12} md={12}>
-      <Skeleton variant="rounded" style={{width:'100%', height:'300px'}} />
+      <Skeleton variant="rounded" height={'300px'} width={'100%'} />
     </Grid>
   )
 }

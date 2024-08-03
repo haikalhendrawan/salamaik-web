@@ -1,47 +1,96 @@
+import React from "react";
 import Scrollbar from "../../../../components/scrollbar/Scrollbar";
-import {Box, Typography} from "@mui/material";
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 import { OpsiType } from "../../types";
-
+// ------------------------------------------------------------
 interface KriteriaProps{
     kriteria: string,
     opsi: OpsiType[] | [] | null
-}
+};
 
+const tableStyle: React.CSSProperties = {
+  tableLayout: 'fixed'
+};
+
+const rowStyle: React.CSSProperties = {
+  fontSize: 12, 
+  width: '100%'
+};
+
+const col1Style: React.CSSProperties = {
+  width: '10%', 
+  alignContent: 'start', 
+  justifyContent: 'start', 
+  alignItems: 'start', 
+  verticalAlign: 'top', 
+  textAlign: 'left'
+};
+
+const col2Style: React.CSSProperties = {
+  width:'5%', 
+  verticalAlign: 'top'
+};
+
+const col3Style: React.CSSProperties = {
+  width:'80%', 
+  justifyContent:'start', 
+  textAlign: 'justify'
+  
+}; 
+
+const scrollBarStyle={
+  height: 150,
+  '& .simplebar-content': { height: 1, display: 'flex', flexDirection: 'column' },
+  pl:4,
+  pr:4
+};
+
+const gradientOverlayStyle: React.CSSProperties = {
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
+  width: '100%',
+  height: '20px',
+  background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%)',
+  pointerEvents: 'none' // Ensures it does not interfere with scrolling
+};
+
+// ------------------------------------------------------------
 export default function Kriteria({kriteria, opsi}: KriteriaProps) {
   const descriptionText = opsi?.map((item, index) => (
-    <tr style={{fontSize: 12, width: '100%'}} key={index}>
-      <td style={{width: '10%', alignContent: 'start', justifyContent: 'start', alignItems: 'start', verticalAlign: 'top', textAlign: 'left'}}>
+    <tr style={rowStyle} key={index}>
+      <td style={col1Style}>
         <b>{item?.value !==undefined ? `Nilai ${item?.value}`: null}</b>
       </td>
-      <td style={{width:'5%', verticalAlign: 'top'}}>
+      <td style={col2Style}>
       {item?.value !==undefined ? `:`: null}
       </td>
-      <td style={{width:'80%', justifyContent:'start', textAlign: 'justify'}}>
+      <td style={col3Style}>
         {item?.title}
       </td>
     </tr>
   ));
 
   return(
-    <Scrollbar  
-      sx={{
-        height: 150,
-        '& .simplebar-content': { height: 1, display: 'flex', flexDirection: 'column' },
-        pl:4,
-        pr:4
-      }}
-    >
+    <Box sx={{ position: 'relative' }}>
+    <Scrollbar sx={scrollBarStyle}>
       <Box>
-        <Typography variant="body2" sx={{mr:1, mb:1, fontSize:13}} textAlign={'justify'}>
+        <Typography variant="body2" fontSize={13} marginRight={1} marginBottom={1} textAlign='justify'>
           {kriteria}
         </Typography>
 
-        <table style={{tableLayout: 'fixed'}}>
+        <table style={tableStyle}>
           <tbody>
             {descriptionText}
+            <br></br>
           </tbody>
         </table>
-      </Box> 
+      </Box>
     </Scrollbar>
+
+    {/* Gradient overlay */}
+    <Box sx={gradientOverlayStyle} />
+  </Box>
   )
 }

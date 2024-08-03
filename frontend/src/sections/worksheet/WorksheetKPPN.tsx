@@ -1,5 +1,5 @@
 import { Helmet } from 'react-helmet-async';
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Iconify from '../../components/iconify';
 import PreviewFileModal from './component/PreviewFileModal';
@@ -10,9 +10,17 @@ import WorksheetCard from './component/WorksheetCard/WorksheetCard';
 import NavigationDrawer from "./component/NavigationDrawer";
 import PageLoading from '../../components/pageLoading/PageLoading';
 // @mui
-import { Container, Stack, Typography, Tabs, Tab, Grid, Paper, IconButton} from '@mui/material';
-import {styled} from '@mui/material/styles';
+import Container from '@mui/material/Container';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import Grid from '@mui/material/Grid';
+import Paper from '@mui/material/Paper';
+import IconButton from '@mui/material/IconButton';
+import styled from '@mui/material/styles/styled';
 import useDictionary from '../../hooks/useDictionary';
+// import useLoading from '../../hooks/display/useLoading';
 // -----------------------------------------------------------------------
 const SubkomponenDivider = styled(Paper)(({theme}) => ({
   padding: theme.spacing(1),
@@ -57,23 +65,25 @@ export default function WorksheetKPPN() {
 
   const [isLoading, setIsLoading] = useState(true);
 
+  // const { isLoading, setIsLoading } = useLoading();
+
   useEffect(() => {
     getWsJunctionKanwil(id);
     setIsLoading(false);
   }, []);
 
-  function scrollToElement(id: string){
+  const scrollToElement = useCallback((id: string) => {
     const element = document.getElementById(id);
     if(element) {
       window.scrollTo({ 
         top: element.offsetTop - 200,
         behavior: 'smooth' });
     }
-  };
+  }, []);
 
   const content = useMemo(() =>
     subKomponenRef?.filter(item => item?.komponen_id === tabValue)?.map((i) => (
-      <>
+      <React.Fragment key={i.id}>
         <Grid item xs={12} sm={12} md={12} key={i.id} id={"divider"+i.id.toString()}>
             <Stack direction='row' key={i.id}>
               <SubkomponenDivider>
@@ -104,7 +114,7 @@ export default function WorksheetKPPN() {
               />
             );
           })}
-      </>
+      </React.Fragment>
     ))
   , [wsJunction, tabValue]);
 

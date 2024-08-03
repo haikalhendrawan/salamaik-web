@@ -1,5 +1,7 @@
 import {useRef} from "react";
-import { FormControl, TextField} from '@mui/material';
+import TextField from '@mui/material/TextField';
+import FormControl from '@mui/material/FormControl';
+import styled from '@mui/material/styles/styled';
 import { WsJunctionType } from "../../types";
 import useSocket from "../../../../hooks/useSocket";
 import useWsJunction from "../../useWsJunction";
@@ -9,6 +11,14 @@ import useSnackbar from "../../../../hooks/display/useSnackbar";
 interface CatatanPropsType{
   wsJunction: WsJunctionType | null,
 };
+
+const StyledFormControl = styled(FormControl)(({theme}) => ({
+  paddingRight: theme.spacing(1),
+  paddingTop: theme.spacing(0.5),
+  width: '100%',
+  height: '100%',
+}));
+
 // ------------------------------------------------------------
 export default function Catatan({wsJunction}: CatatanPropsType) {
   const initialNoteRef = useRef(wsJunction?.kanwil_note || '');
@@ -53,7 +63,7 @@ export default function Catatan({wsJunction}: CatatanPropsType) {
   };
   return (
     <>
-      <FormControl sx={{width:'100%', height:'100%', pr:1, pt:0.5}} key={wsJunction?.checklist_id}>
+      <StyledFormControl key={wsJunction?.checklist_id}>
         <TextField 
           key={wsJunction?.checklist_id} 
           size='small' 
@@ -63,9 +73,9 @@ export default function Catatan({wsJunction}: CatatanPropsType) {
           minRows={6} 
           maxRows={6}
           fullWidth
-          inputProps={{sx: {fontSize: 12, width:'100%', height:'100%'}, spellCheck: false,}} 
+          inputProps={{sx: {fontSize: 12, width:'100%', height:'100%'}, spellCheck: false}} 
         />
-      </FormControl>
+      </StyledFormControl>
     </>
     
   )
