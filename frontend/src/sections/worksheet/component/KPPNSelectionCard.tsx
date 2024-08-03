@@ -1,8 +1,7 @@
-import {useState, useEffect, Suspense} from 'react';
-import { Navigate, Link } from "react-router-dom";
+import {useState} from 'react';
+import { Link } from "react-router-dom";
 // @mui
-import {Card, Box, CardHeader,  Stack, Grow, Button, Popover, Grid, Container, Typography, IconButton, Tooltip, Skeleton} from '@mui/material';
-import { useTheme } from '@mui/material/styles'; 
+import {Card, Box, CardHeader, Grow, Button,  Grid,  IconButton, Tooltip, Skeleton} from '@mui/material';
 import Iconify from '../../../components/iconify';
 // -----------------------------------------------------------------------
 interface KPPNSelectionCardProps{
@@ -14,8 +13,6 @@ interface KPPNSelectionCardProps{
 };
 // -----------------------------------------------------------------------
 export default function KPPNSelectionCard({header, subheader, lastUpdate, image, link}: KPPNSelectionCardProps){
-  const theme = useTheme();
-
   const [imageLoaded, setImageLoaded] = useState(false);
 
   const handleImageLoad = () => {

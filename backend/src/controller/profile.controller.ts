@@ -30,19 +30,21 @@ const updatePassword = async (req: Request, res: Response, next: NextFunction) =
 
 const updateProfilePicture = async (req: Request, res: Response, next: NextFunction) => {
   uploadPP(req, res, async (err: any) => {
-    if(!req.file){
-      return next(new ErrorDetail(400, 'Incorrect file type', err));
-    };
-
     if(err instanceof multer.MulterError) {
       if(err.message==='LIMIT FILE SIZE'){
-        return next(new ErrorDetail(400, 'File size is too large'));
+        return next(new ErrorDetail(400, 'File size is too large max 12mb'));
       }else{
         return next(err);
       }
     } else if(err) {
       return next(err);
     };
+
+    if(!req.file){
+      return next(new ErrorDetail(400, 'Incorrect file type', err));
+    };
+
+
 
     try {
       const userID = req.payload.id;

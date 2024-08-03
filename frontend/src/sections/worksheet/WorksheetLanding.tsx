@@ -1,17 +1,15 @@
-import {useEffect, useRef} from "react";
+import {useEffect} from "react";
 import { Helmet } from 'react-helmet-async';
 import useWsJunction from "./useWsJunction";
 // @mui
 import { useTheme } from '@mui/material/styles';
-import { Grid, Container, Typography, LinearProgress, Button, Box } from '@mui/material';
+import { Grid, Container, Typography } from '@mui/material';
 // sections
 import KPPNSelectionCard from "./component/KPPNSelectionCard";
 // ----------------------------------------------------------------------
 
 export default function WorksheetLanding() {
-  const theme = useTheme();
-
-  const { setWsJunction } = useWsJunction();
+  const { setWsJunction} = useWsJunction();
 
   useEffect(() => {
     setWsJunction([]);

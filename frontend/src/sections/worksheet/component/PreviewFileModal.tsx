@@ -1,7 +1,6 @@
 import {useState, useEffect} from'react';
 import {Button, Box, Tooltip, Modal, Typography} from '@mui/material';
 import Iconify from '../../../components/iconify';
-import useAxiosJWT from '../../../hooks/useAxiosJWT';
 import useLoading from '../../../hooks/display/useLoading';
 import useSnackbar from '../../../hooks/display/useSnackbar';
 import usePreviewFileModal from '../usePreviewFileModal';
@@ -17,14 +16,6 @@ const style = {
   justifyContent: 'center', alignItems: 'center', height: '100vh'
 };
 
-interface PreviewFileModalProps {
-  open: boolean,
-  modalClose: () => void,
-  file: string | null,
-  fileOption: 1 | 2,
-  isExampleFile: boolean,
-};
-
 // -------------------------------------------------------------------------------------------
 export default function PreviewFileModal(){
   const {
@@ -33,16 +24,10 @@ export default function PreviewFileModal(){
     selectedId, 
     fileOption,
     isExampleFile, 
-    handleSetIsExampleFile, 
-    modalOpen, 
     modalClose, 
-    changeFile, 
-    selectId 
   } = usePreviewFileModal();
 
   const [render, setRender] = useState<string | JSX.Element>('No files');
-
-  const axiosJWT = useAxiosJWT();
 
   const {setIsLoading} = useLoading();
 
@@ -60,28 +45,30 @@ export default function PreviewFileModal(){
     window.location.href=`${currentFileURL}/${file}`;
   };
 
-  const deleteFile = async() => {
-    console.log({
-      id: selectedId,
-      fileName: file,
-      option: fileOption
-    });
+  const deleteFile = () => {
+      if(isExampleFile){
+        return
+      };
 
-    if(isExampleFile){
-      return
-    };
+      socket?.emit("deleteWsJunctionFile", {
+        id: selectedId,
+        fileName: file,
+        option: fileOption,
+      }, async(response: any) => {
+        try{
+          setIsLoading(true);
+          await getWsJunctionKanwil('010');
+          modalClose();
+          setIsLoading(false);
+        }catch(err: any){
+          setIsLoading(false);
+          openSnackbar(err.response.data.message, "error");
+        }finally{
+          setIsLoading(false);
+        }
+      });
 
-    socket?.emit("deleteWsJunctionFile", {
-      id: selectedId,
-      fileName: file,
-      option: fileOption
-    }, async(response: any) => {
-      console.log(response);
-      setIsLoading(true);
-      await getWsJunctionKanwil('010');
-      modalClose();
-      setIsLoading(false);
-    });
+
   };
 
   useEffect(() => {

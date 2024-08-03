@@ -9,7 +9,7 @@ import logger from '../config/logger';
 
 class WorksheetEvent{
 
-  async getWorksheetJunction(data: any, callback: any) {
+  async getWorksheetJunction(socket: Socket, data: any, callback: any) {
      try{
         const {kppn, period} = data;
 
@@ -28,62 +28,78 @@ class WorksheetEvent{
   
         return callback({
           success: true,
-          rows: result
+          rows: result,
+          message: 'Get worksheet success'
         });
       }catch(err: any){
+        logger.error(err);
         return socketError(callback, err.message)
       }
   }
 
-  async updateKanwilScore(data: any, callback: any) {
+  async updateKanwilScore(socket: Socket, data: any, callback: any) {
     try{
-      const {worksheetId, junctionId, kanwilScore, userName} = data;
-      const result = await wsJunction.editWsJunctionKanwilScore( junctionId, worksheetId, kanwilScore, userName);
-      return callback({success: true, rows: result});
+      const {name} = socket.data.payload;
+      const {worksheetId, junctionId, kanwilScore} = data;
+      const result = await wsJunction.editWsJunctionKanwilScore( junctionId, worksheetId, kanwilScore, name);
+      return callback({success: true, rows: result, message: 'Nilai has been updated'});
 
     }catch(err: any){
+      logger.error(err);
       return socketError(callback, err.message)
     }
   }
 
-  async updateKPPNScore(data: any, callback: any) {
+  async updateKPPNScore(socket: Socket, data: any, callback: any) {
     try{
-      const {worksheetId, junctionId, kppnScore, userName} = data;
-      const result = await wsJunction.editWsJunctionKPPNScore( junctionId, worksheetId, kppnScore, userName);
-      return callback({success: true, rows: result});
+      const {name} = socket.data.payload;
+      const {worksheetId, junctionId, kppnScore} = data;
+      const result = await wsJunction.editWsJunctionKPPNScore( junctionId, worksheetId, kppnScore, name);
+      return callback({success: true, rows: result, message: 'Nilai has been updated'});
 
     }catch(err: any){
+      logger.error(err);
       return socketError(callback, err.message)
     }
   }
 
-  async updateKanwilNote(data: any, callback: any) {
+  async updateKanwilNote(socket: Socket, data: any, callback: any) {
     try{
-      const {worksheetId, junctionId, kanwilNote, userName} = data; 
-      const result = await wsJunction.editWsJunctionKanwilNote( junctionId, worksheetId, kanwilNote, userName);
-      return callback({success: true, rows: result});
+      const {name} = socket.data.payload;
+      const {worksheetId, junctionId, kanwilNote} = data; 
+      const result = await wsJunction.editWsJunctionKanwilNote( junctionId, worksheetId, kanwilNote, name);
+      return callback({success: true, rows: result, message: 'Note has been updated'});
     }catch(err: any){
+      logger.error(err);
       return socketError(callback, err.message)
     }
   }
 
-  async deleteWsJunctionFile(data: any, callback: any){
+  async deleteWsJunctionFile(socket: Socket, data: any, callback: any){
     try{
+      const {name} = socket.data.payload;
       const {id, fileName, option} = data;
-      const result = await wsJunction.deleteWsJunctionFile(id, option);
-  
+
+      const result = await wsJunction.deleteWsJunctionFile(id, option, name);
+      
       const filePath = path.join(__dirname,`../uploads/`, fileName);
       fs.unlinkSync(filePath);
-      return callback({success: true, rows: result});
+      return callback({success: true, rows: result, message: 'File deleted successfully'});
    
     }catch(err: any){
+      logger.error(err);
       return socketError(callback, err.message)
     }
   }
 
 }
 
-const worksheetEvent = new WorksheetEvent();
+const wsEvent = new WorksheetEvent();
 
-
-export default worksheetEvent
+export default function worksheetEventListener(socket: Socket) {
+  socket.on("getWorksheetJunction", (data, callback) => wsEvent.getWorksheetJunction(socket, data, callback));
+  socket.on("updateKanwilScore", (data, callback) => wsEvent.updateKanwilScore(socket, data, callback));
+  socket.on("updateKPPNScore", (data, callback) => wsEvent.updateKPPNScore(socket, data, callback));
+  socket.on("updateKanwilNote", (data, callback) => wsEvent.updateKanwilNote(socket, data, callback));
+  socket.on("deleteWsJunctionFile", (data, callback) => wsEvent.deleteWsJunctionFile(socket, data, callback));
+};

@@ -1,8 +1,5 @@
-import {useState} from "react";
-import axios from "axios";
-import { Typography, Grid, Card, CardHeader, CardContent, LinearProgress, Box, Tooltip} from '@mui/material';
+import { Grid, Card, CardHeader, CardContent} from '@mui/material';
 import {useTheme} from '@mui/material/styles';
-import Iconify from "../../../components/iconify";
 import Label from "../../../components/label";
 import LinearProgressWithLabel from "../../../components/linear-progress-with-label/LinearProgressWithLabel";
 // import useWorksheet from "../useWorksheet";
@@ -15,7 +12,6 @@ interface KomponenProgressProps {
 }
 
 export default function KomponenProgress(props: KomponenProgressProps){
-
   // const {batch, checklist, tabValue} = props;
   const theme = useTheme();
   

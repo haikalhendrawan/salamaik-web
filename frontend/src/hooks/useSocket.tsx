@@ -15,22 +15,27 @@ export const SocketProvider = ({children}: {children: ReactNode}) => {
 
   const socketRef = useRef<Socket | null>(null);
 
+  const [counter, setCounter] = useState(0);
+
   useEffect(() => {
     if (!auth?.accessToken) {
       return;
     }
+    console.log(`websocket attempt: ${counter}`);
 
     socketRef.current = io(import.meta.env.VITE_API_URL, {
       auth: {
         token: auth.accessToken,
       },
+      reconnectionDelay: 1000, 
+      reconnectionDelayMax: 5000 
     });
-
-    console.log(socketRef.current);
 
     const socket = socketRef.current;
 
-    socket.on("connect", onConnection);
+    setCounter(counter+1);
+
+    socket.on("connect", () => onConnection(socket));
     socket.on("disconnect", onDisconnect);
     socket.on("error", onError);
     socket.on("connect_error", onError);
@@ -57,8 +62,9 @@ export default function useSocket(): SocketContextType {
 }
 
 // ---------- listener function -----------------------------------------------------
-function onConnection() {
+function onConnection(socket: Socket) {
   console.log("connected to websocket");
+  console.log(socket.connected);
 };
 
 function onDisconnect(){

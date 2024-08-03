@@ -1,9 +1,10 @@
-import {useState, useRef} from "react";
+import {useRef} from "react";
 import { FormControl, TextField} from '@mui/material';
 import { WsJunctionType } from "../../types";
 import useSocket from "../../../../hooks/useSocket";
 import useWsJunction from "../../useWsJunction";
 import {useAuth} from "../../../../hooks/useAuth";
+import useSnackbar from "../../../../hooks/display/useSnackbar";
 // ------------------------------------------------------------
 interface CatatanPropsType{
   wsJunction: WsJunctionType | null,
@@ -18,6 +19,8 @@ export default function Catatan({wsJunction}: CatatanPropsType) {
 
   const {socket} = useSocket();
 
+  const {openSnackbar} = useSnackbar();
+
   const {getWsJunctionKanwil} = useWsJunction();
 
   const handleEditKanwilNote = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -27,9 +30,9 @@ export default function Catatan({wsJunction}: CatatanPropsType) {
       return
     };
 
-    console.log('edit');
-    console.log(auth);
-    console.log(socket);
+    if(socket?.connected === false) {
+      return openSnackbar("websocket failed, check your connection", "error");
+    };
 
     socket?.emit("updateKanwilNote", {
       worksheetId: wsJunction?.worksheet_id, 
@@ -37,10 +40,15 @@ export default function Catatan({wsJunction}: CatatanPropsType) {
       kanwilNote: currentNote,
       userName: auth?.name
     },
-    (response: any) => {
-      console.log(response);
-      getWsJunctionKanwil(wsJunction?.kppn_id || '');
-      lastSavedNoteRef.current = currentNote;
+    async(response: any) => {
+      try{
+        console.log(response);
+        await getWsJunctionKanwil(wsJunction?.kppn_id || '');
+        lastSavedNoteRef.current = currentNote;
+      }catch(err:any){
+        openSnackbar(err?.message, 'error');
+      }
+
     });
   };
   return (

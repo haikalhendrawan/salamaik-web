@@ -6,6 +6,7 @@ import ErrorDetail from '../model/error.model';
 import { uploadWsJunctionFile } from '../config/multer';
 import fs from 'fs';
 import path from 'path';
+import { sanitizeMimeType } from '../utils/mimeTypeSanitizer';
 
 
 // -------------------------------------------------
@@ -122,8 +123,9 @@ const getWsJunctionByKPPN = async(req: Request, res: Response, next: NextFunctio
 
 const editWsJunctionKPPNScore = async(req: Request, res: Response, next: NextFunction) => {
   try{
-    const {worksheetId, junctionId, kppnScore, userName} = req.body;
-    const result = await wsJunction.editWsJunctionKPPNScore(worksheetId, junctionId, kppnScore, userName);
+    const {username} = req.payload;
+    const {worksheetId, junctionId, kppnScore} = req.body;
+    const result = await wsJunction.editWsJunctionKPPNScore(worksheetId, junctionId, kppnScore, username);
     return res.status(200).json({sucess: true, message: 'Edit worksheet junction success', rows: result})
   }catch(err){
     next(err);
@@ -133,8 +135,9 @@ const editWsJunctionKPPNScore = async(req: Request, res: Response, next: NextFun
 //protect endpoint di route
 const editWsJunctionKanwilScore = async(req: Request, res: Response, next: NextFunction) => {
   try{
-    const {worksheetId, junctionId, kanwilScore, userName} = req.body;
-    const result = await wsJunction.editWsJunctionKanwilScore(worksheetId, junctionId, kanwilScore, userName);
+    const {username} = req.payload;
+    const {worksheetId, junctionId, kanwilScore} = req.body;
+    const result = await wsJunction.editWsJunctionKanwilScore(worksheetId, junctionId, kanwilScore, username);
     return res.status(200).json({sucess: true, message: 'Edit worksheet junction success', rows: result})
   }catch(err){
     next(err);
@@ -144,8 +147,9 @@ const editWsJunctionKanwilScore = async(req: Request, res: Response, next: NextF
 //protect endpoint di route
 const editWsJunctionKanwilNote = async(req: Request, res: Response, next: NextFunction) => {
   try{
+    const {username} = req.payload;
     const {worksheetId, junctionId, kanwilNote, userName} = req.body; 
-    const result = await wsJunction.editWsJunctionKanwilNote(worksheetId, junctionId, kanwilNote, userName);
+    const result = await wsJunction.editWsJunctionKanwilNote(worksheetId, junctionId, kanwilNote, username);
     return res.status(200).json({sucess: true, message: 'Edit worksheet junction success', rows: result})
   }catch(err){
     next(err);
@@ -154,13 +158,9 @@ const editWsJunctionKanwilNote = async(req: Request, res: Response, next: NextFu
 
 const editWsJunctionFile = async(req: Request, res: Response, next: NextFunction) => {
   uploadWsJunctionFile(req, res, async (err: any) => {
-    if(!req.file){
-      return next(new ErrorDetail(400, 'Incorrect file type', err));
-    };
-
     if(err instanceof multer.MulterError) {
       if(err.message==='LIMIT FILE SIZE'){
-        return next(new ErrorDetail(400, 'File size is too large'));
+        return next(new ErrorDetail(400, 'File size is too large (max 30mb)'));
       }else{
         return next(err);
       }
@@ -168,13 +168,17 @@ const editWsJunctionFile = async(req: Request, res: Response, next: NextFunction
       return next(err);
     };
 
-    try{
-      const {worksheetId, junctionId, file1, file2, file3, userName} = req.body; 
-      const file1Sanitized = file1 === "null" ? null : file1;
-      const file2Sanitized = file2 === "null" ? null : file2;
-      const file3Sanitized = file3 === "null" ? null : file3;
+    if(!req.file){
+      return next(new ErrorDetail(400, 'File not allowed', err));
+    };
 
-      const result = await wsJunction.editWsJunctionFile(junctionId, worksheetId, file1Sanitized, file2Sanitized, file3Sanitized, userName);
+    try{
+      const {name} = req.payload;
+      const {worksheetId, junctionId, checklistId, kppnId, option} = req.body; 
+      const fileExt = sanitizeMimeType(req.file.mimetype);
+      const fileName = `ch${checklistId}_file${option}_kppn${kppnId}_${worksheetId}.${fileExt}`;
+
+      const result = await wsJunction.editWsJunctionFile(junctionId, worksheetId, fileName, option, name);
       return res.status(200).json({sucess: true, message: 'Edit worksheet junction success', rows: result})
     }catch(err){
       next(err);
@@ -185,8 +189,9 @@ const editWsJunctionFile = async(req: Request, res: Response, next: NextFunction
 
 const deleteWsJunctionFile = async(req: Request, res: Response, next: NextFunction) => {
   try{
+    const {username} = req.payload;
     const {id, fileName, option} = req.body;
-    const result = await wsJunction.deleteWsJunctionFile(id, option);
+    const result = await wsJunction.deleteWsJunctionFile(id, option, username);
 
     const filePath = path.join(__dirname,`../uploads/worksheet/`, fileName);
     fs.unlinkSync(filePath);

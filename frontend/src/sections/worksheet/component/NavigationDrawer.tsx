@@ -13,7 +13,7 @@ import Label from "../../../components/label/Label";
 import Scrollbar from "../../../components/scrollbar";
 import { WsJunctionType } from "../types";
 // --------------------------------------------------------------------
-const StyledFab = styled(Fab)(({theme}) => ({
+const StyledFab = styled(Fab)(({}) => ({
   borderRadius:'12px 0px 0px 12px'
 }));
 
@@ -51,7 +51,7 @@ const SubkomponenDivider = styled(Paper)(({theme}) => ({
   cursor: 'pointer'
 }));
 
-const StyledLabel = styled(Label)(({theme}) => ({
+const StyledLabel = styled(Label)(({}) => ({
   border: `1px solid `, 
   width: 22, 
   cursor: 'pointer'
@@ -209,12 +209,12 @@ export default function NavigationDrawer({tabValue, scrollToElement}: {tabValue:
 
 // --------------------------------------------------------------------------------------------------------------------
 function getLabelColor(item: WsJunctionType, auth: AuthType | null){
-  if(!item?.last_update){
-    return "pink"
-  };
-
   const isKanwil = [3, 4, 99].includes(auth?.role || 0);
   const score = isKanwil?item.kanwil_score: item.kppn_score;
+
+  if(score===null){
+    return "pink"
+  };
 
   if(score<10){
     return "warning"

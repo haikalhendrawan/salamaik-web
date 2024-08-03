@@ -142,7 +142,7 @@ const wsJunctionFileFilter = (req: any, file: any, callback: any) => {
 };
 
 const wsJunctionFileLimit = {
-  fileSize: 12582912
+  fileSize: 31457280
 };
 
 const uploadWsJunctionFile = multer({

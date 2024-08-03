@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Stack, Typography, Tooltip} from '@mui/material';
 import {useTheme, styled} from '@mui/material/styles';
 import usePreviewFileModal from '../../usePreviewFileModal';
@@ -34,7 +34,7 @@ export default function Dokumen({openInstruction, wsJunction}: DokumenProps){
 
   const {auth} = useAuth();
 
-  const { handleSetIsExampleFile, modalOpen, modalClose, changeFile, selectId } = usePreviewFileModal();
+  const { handleSetIsExampleFile, modalOpen, modalClose, changeFile, selectId, setFileOption } = usePreviewFileModal();
 
   const {getWsJunctionKanwil} = useWsJunction();
 
@@ -50,19 +50,17 @@ export default function Dokumen({openInstruction, wsJunction}: DokumenProps){
     modalOpen();
     changeFile(baseDir+ '/' + fileOption || '');
     handleSetIsExampleFile(true);
-  }, [modalOpen]);
+  }, [modalOpen, wsJunction]);
 
   const handleOpenWsJunctionFile = useCallback((option: number) => {
     const baseDir = "worksheet";
     const fileOption = [wsJunction?.file_1, wsJunction?.file_2, wsJunction?.file_3][option-1];
-    console.log(wsJunction);
-    console.log(option);
-    console.log(fileOption);
+    setFileOption(option);
     modalOpen();
     changeFile(baseDir+ '/' + fileOption || '');
     handleSetIsExampleFile(false);
     selectId(wsJunction?.junction_id || 0);
-  }, [modalOpen]);
+  }, [modalOpen, wsJunction]);
 
   const handleChangeFile = async(e: React.ChangeEvent<HTMLInputElement>, wsJunction: WsJunctionType | null) => {
     e.preventDefault();
@@ -80,11 +78,6 @@ export default function Dokumen({openInstruction, wsJunction}: DokumenProps){
     const checklistId = wsJunction?.checklist_id.toString();
     const kppnId = wsJunction?.kppn_id.toString();
     const worksheetId = wsJunction?.worksheet_id;
-    const fileExt = selectedFile.name.split('.').pop()?.toLowerCase() || '';
-
-    const file1 = option ===1 ? `ch${checklistId}_file1_kppn${kppnId}_${worksheetId}.${fileExt}` : wsJunction.file_1;
-    const file2 = option ===2 ? `ch${checklistId}_file2_kppn${kppnId}_${worksheetId}.${fileExt}` : wsJunction.file_2;
-    const file3 = option ===3 ? `ch${checklistId}_file3_kppn${kppnId}_${worksheetId}.${fileExt}` : wsJunction.file_3;
 
     try{
       setIsLoading(true);
@@ -94,9 +87,6 @@ export default function Dokumen({openInstruction, wsJunction}: DokumenProps){
       formData.append("checklistId", checklistId);
       formData.append("kppnId", kppnId);
       formData.append("option", option.toString());
-      formData.append("file1", file1)
-      formData.append("file2", file2)
-      formData.append("file3", file3)
       formData.append("wsJunctionFile", selectedFile);
       await axiosJWT.post(`/editWsJunctionFile`, formData, {
         headers:{"Content-Type": "multipart/form-data"}
@@ -110,6 +100,10 @@ export default function Dokumen({openInstruction, wsJunction}: DokumenProps){
       setIsLoading(false);
     }
   };
+
+  const isMaxFile = useMemo(() => {
+    return wsJunction?.file_1 && wsJunction?.file_2 && wsJunction?.file_3;
+  }, [wsJunction]);
 
   return(
     <>
@@ -232,7 +226,7 @@ export default function Dokumen({openInstruction, wsJunction}: DokumenProps){
                 null
             }
             <Tooltip title='Add file'>
-              <StyledButton variant='contained' component='label' aria-label="delete"   size='small' color='white' sx={{display: wsJunction?.file_3?'none':'flex'}}>
+              <StyledButton variant='contained' component='label' aria-label="delete"   size='small' color='white' sx={{display: isMaxFile?'none':'flex'}}>
                 <Iconify 
                   sx={{color:theme.palette.grey[500]}} 
                   icon="solar:add-circle-bold"

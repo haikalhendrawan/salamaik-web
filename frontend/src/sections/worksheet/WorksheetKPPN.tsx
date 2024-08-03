@@ -1,5 +1,5 @@
 import { Helmet } from 'react-helmet-async';
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Iconify from '../../components/iconify';
 import PreviewFileModal from './component/PreviewFileModal';
@@ -11,7 +11,7 @@ import NavigationDrawer from "./component/NavigationDrawer";
 import PageLoading from '../../components/pageLoading/PageLoading';
 // @mui
 import { Container, Stack, Typography, Tabs, Tab, Grid, Paper, IconButton} from '@mui/material';
-import {useTheme, styled} from '@mui/material/styles';
+import {styled} from '@mui/material/styles';
 import useDictionary from '../../hooks/useDictionary';
 // -----------------------------------------------------------------------
 const SubkomponenDivider = styled(Paper)(({theme}) => ({
@@ -37,8 +37,6 @@ const SELECT_KPPN: {[key: string]: string} = {
 // ----------------------------------------------------------------------
 
 export default function WorksheetKPPN() {
-  const theme = useTheme();
-
   const { wsJunction, getWsJunctionKanwil } = useWsJunction();
 
   const { subKomponenRef } = useDictionary();
@@ -53,7 +51,7 @@ export default function WorksheetKPPN() {
 
   const [tabValue, setTabValue] = useState(1); // ganti menu komponen supervisi
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => { // setiap tab komponen berubah
+  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => { // setiap tab komponen berubah
     setTabValue(newValue);
   };
 
@@ -77,7 +75,7 @@ export default function WorksheetKPPN() {
     subKomponenRef?.filter(item => item?.komponen_id === tabValue)?.map((i) => (
       <>
         <Grid item xs={12} sm={12} md={12} key={i.id} id={"divider"+i.id.toString()}>
-            <Stack direction='row'>
+            <Stack direction='row' key={i.id}>
               <SubkomponenDivider>
                 Subkomponen : {i.title}
               </SubkomponenDivider>
@@ -138,10 +136,10 @@ export default function WorksheetKPPN() {
 
             <Stack direction="row" alignItems="center" justifyContent="center" mb={5}>
                 <Tabs value={tabValue} onChange={handleTabChange}> 
-                  <Tab icon={<Iconify icon="solar:safe-2-bold-duotone" />} label="Treasurer" value={1} />
-                  <Tab icon={<Iconify icon="solar:buildings-2-bold-duotone" />} label="Pengelola Fiskal, Representasi Kemenkeu di Daerah, dan Special Mission" value={2} />
-                  <Tab icon={<Iconify icon="solar:wallet-money-bold" />} label="Financial Advisor" value={3} />
-                  <Tab icon={<Iconify icon="solar:incognito-bold-duotone" />} label="Tata Kelola Internal" value={4} />
+                  <Tab icon={<Iconify icon="solar:safe-2-bold-duotone" />} label="Treasurer" value={1} key={1} />
+                  <Tab icon={<Iconify icon="solar:buildings-2-bold-duotone" />} label="Pengelola Fiskal, Representasi Kemenkeu di Daerah, dan Special Mission" value={2} key={2}/>
+                  <Tab icon={<Iconify icon="solar:wallet-money-bold" />} label="Financial Advisor" value={3} key={3}/>
+                  <Tab icon={<Iconify icon="solar:incognito-bold-duotone" />} label="Tata Kelola Internal" value={4} key={4}/>
                 </Tabs>
             </Stack>
 

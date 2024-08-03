@@ -1,7 +1,8 @@
 import { Socket } from 'socket.io';
+import logger from '../config/logger';
 
-export default function disconnectEvent(socket: Socket) {
+export default function disconnectEventListener(socket: Socket) {
   socket.on('disconnect', () => {
-    console.log('user disconnected' + socket.id);
+    logger.info('user disconnected' + socket.id);
   });
 };

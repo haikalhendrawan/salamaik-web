@@ -145,25 +145,32 @@ class WorksheetJunction{
     }
   }
 
-  async editWsJunctionFile(junctionId: number, worksheetId: string, file1: string, file2: string, file3: string, userName: string){
+  async editWsJunctionFile(junctionId: number, worksheetId: string, fileName: string, option: number, userName: string){
     try{
       const updateTime = new Date(Date.now()).toISOString();
-      const q = "UPDATE worksheet_junction SET file_1 = $1, file_2 = $2, file_3 = $3, last_update = $4, updated_by = $5 WHERE junction_id = $6 AND worksheet_id = $7 RETURNING *";
-      const result = await pool.query(q, [file1, file2, file3, updateTime, userName, junctionId, worksheetId]);
+      const queryOption = [
+        "UPDATE worksheet_junction SET file_1 = $1, last_update = $2, updated_by = $3 WHERE junction_id = $4 AND worksheet_id = $5 RETURNING *",
+        "UPDATE worksheet_junction SET file_2 = $1, last_update = $2, updated_by = $3 WHERE junction_id = $4 AND worksheet_id = $5 RETURNING *",
+        "UPDATE worksheet_junction SET file_3 = $1, last_update = $2, updated_by = $3 WHERE junction_id = $4 AND worksheet_id = $5 RETURNING *",
+      ];
+      const q = queryOption[option-1];
+      const result = await pool.query(q, [fileName, updateTime, userName, junctionId, worksheetId]);
       return result.rows
     }catch(err){
       throw err
     }
   }
 
-  async deleteWsJunctionFile(junctionId: number, option: number){
+  async deleteWsJunctionFile(junctionId: number, option: number, name: string){
     try{
-      const queryOption = ["UPDATE worksheet_junction SET file_1 = null WHERE junction_id = $1 RETURNING *",
-        "UPDATE worksheet_junction SET file_2 = null WHERE junction_id = $1 RETURNING *",
-        "UPDATE worksheet_junction SET file_3 = null WHERE junction_id = $1 RETURNING *"
-      ]
+      const updateTime = new Date(Date.now()).toISOString();
+      const queryOption = [
+        "UPDATE worksheet_junction SET file_1 = null, last_update = $1, updated_by = $2 WHERE junction_id = $3 RETURNING *",
+        "UPDATE worksheet_junction SET file_2 = null, last_update = $1, updated_by = $2 WHERE junction_id = $3 RETURNING *",
+        "UPDATE worksheet_junction SET file_3 = null, last_update = $1, updated_by = $2 WHERE junction_id = $3 RETURNING *"
+      ];
       const q = queryOption[option-1];
-      const result = await pool.query(q, [junctionId]);
+      const result = await pool.query(q, [updateTime, name,  junctionId]);
       return result.rows
     }catch(err){
       throw err
@@ -172,7 +179,7 @@ class WorksheetJunction{
 
   async deleteWsJunctionByWorksheetId(worksheetId: number){
     try{
-      const q = "DELETE FROM worksheet_junction WHERE worksheet_id = $1";
+      const q = "DELETE FROM worksheet_junction WHERE worksheet_id = $1 RETURNING *";
       const result = await pool.query(q, [worksheetId]);
       return result.rows
     }catch(err){

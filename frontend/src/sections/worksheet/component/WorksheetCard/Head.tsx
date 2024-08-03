@@ -10,7 +10,7 @@ interface HeadPropInterface{
 };
 // ------------------------------------------------------------
 export default function Head(props: HeadPropInterface) {  // bagian atas dari card
-  const dateUpdated = props?.dateUpdated ? format(parseISO(props.dateUpdated), 'dd/MM/yyyy - HH:mm') : null;
+  const dateUpdated = props?.dateUpdated ? format(parseISO(props.dateUpdated), 'dd/MM/yyyy - HH:mm:ss') : null;
   const tooltipText = <div>Last update: {dateUpdated} <br/> By: {props.updatedBy}</div>;
   const isUpdate = props?.dateUpdated;
 
