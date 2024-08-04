@@ -54,7 +54,7 @@ export default function PreviewFileModal(){
         id: selectedId,
         fileName: file,
         option: fileOption,
-      }, async(response: any) => {
+      }, async() => {
         try{
           setIsLoading(true);
           await getWsJunctionKanwil('010');

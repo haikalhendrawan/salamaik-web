@@ -3,6 +3,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import {Stack, Button, Box, Typography, SelectChangeEvent, Modal, FormControl, Paper,MenuItem} from '@mui/material';
 import { StyledSelect, StyledSelectLabel } from '../../../../components/styledSelect';
 import { styled } from '@mui/material/styles';
+import { BatchType } from './useBatch';
 import StyledDatePicker from '../../../../components/styledDatePicker';
 import Scrollbar from '../../../../components/scrollbar/Scrollbar';
 import useDictionary from '../../../../hooks/useDictionary';
@@ -34,25 +35,14 @@ const FormDataContainer = styled(Box)(({theme}) => ({
   gap:theme.spacing(3)
 }));
 
-interface BatchType{
-  id: string, 
-  kppn_id: string,
-  name: string, 
-  alias: string,
-  period: number,
-  status: number,
-  open_period: string,
-  close_period: string,
-  created_at: string,
-  updated_at: string
-};
-
 interface BatchFormType{
   id: string, 
   kppnId: string,
   openPeriod: Dayjs | null,
   closePeriod: Dayjs | null,
-}
+  openFollowUp: Dayjs | null,
+  closeFollowUp: Dayjs | null
+};
 
 interface BatchRefModalProps {
   modalOpen: boolean,
@@ -78,6 +68,8 @@ export default function BatchRefModal({modalOpen, modalClose, addState, editID, 
     kppnId: '',
     openPeriod: null,
     closePeriod: null,
+    openFollowUp: null,
+    closeFollowUp: null
   });
 
   const handleChangeAdd = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement> | SelectChangeEvent<unknown>) => {
@@ -93,6 +85,8 @@ export default function BatchRefModal({modalOpen, modalClose, addState, editID, 
       kppnId: '',
       openPeriod: null,
       closePeriod: null,
+      openFollowUp: null,
+      closeFollowUp: null
     })
   };
 
@@ -101,6 +95,8 @@ export default function BatchRefModal({modalOpen, modalClose, addState, editID, 
     kppnId: '',
     openPeriod: null,
     closePeriod: null,
+    openFollowUp: null,
+    closeFollowUp: null
   });
 
   const handleChangeEdit = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement> | SelectChangeEvent<unknown>) => {
@@ -115,7 +111,9 @@ export default function BatchRefModal({modalOpen, modalClose, addState, editID, 
       id: data.filter((row) => row.id===editID)[0].id,
       kppnId: data.filter((row) => row.id===editID)[0].kppn_id,
       openPeriod: dayjs(data.filter((row) => row.id===editID)[0].open_period),
-      closePeriod: dayjs(data.filter((row) => row.id===editID)[0].close_period)
+      closePeriod: dayjs(data.filter((row) => row.id===editID)[0].close_period),
+      openFollowUp: dayjs(data.filter((row) => row.id===editID)[0].open_follow_up),
+      closeFollowUp: dayjs(data.filter((row) => row.id===editID)[0].close_follow_up)
     })
   };
 
@@ -125,7 +123,9 @@ export default function BatchRefModal({modalOpen, modalClose, addState, editID, 
       const data = {
         kppnId: addValue.kppnId, 
         startDate: dayjs(addValue.openPeriod).format('YYYY-MM-DD'), 
-        closeDate: dayjs(addValue.closePeriod).format('YYYY-MM-DD')
+        closeDate: dayjs(addValue.closePeriod).format('YYYY-MM-DD'),
+        openFollowUp: dayjs(addValue.openFollowUp).format('YYYY-MM-DD'), 
+        closeFollowUp: dayjs(addValue.closeFollowUp).format('YYYY-MM-DD'),
       };
       const response = await axiosJWT.post('/addWorksheet', data);
       openSnackbar(response.data.message, "success");
@@ -149,7 +149,9 @@ export default function BatchRefModal({modalOpen, modalClose, addState, editID, 
       const data = {
         worksheetId: editValue.id, 
         startDate: dayjs(editValue.openPeriod).format('YYYY-MM-DD'), 
-        closeDate: dayjs(editValue.closePeriod).format('YYYY-MM-DD')
+        closeDate: dayjs(editValue.closePeriod).format('YYYY-MM-DD'),
+        openFollowUp: dayjs(editValue.openFollowUp).format('YYYY-MM-DD'), 
+        closeFollowUp: dayjs(editValue.closeFollowUp).format('YYYY-MM-DD'),
       };
       const response = await axiosJWT.post('/editWorksheetPeriod', data);
       openSnackbar(response.data.message, "success");
@@ -173,7 +175,9 @@ export default function BatchRefModal({modalOpen, modalClose, addState, editID, 
         id: data.filter((row) => row.id===editID)[0].id,
         kppnId: data.filter((row) => row.id===editID)[0].kppn_id,
         openPeriod: dayjs(data.filter((row) => row.id===editID)[0].open_period),
-        closePeriod: dayjs(data.filter((row) => row.id===editID)[0].close_period)
+        closePeriod: dayjs(data.filter((row) => row.id===editID)[0].close_period),
+        openFollowUp: dayjs(data.filter((row) => row.id===editID)[0].open_follow_up),
+        closeFollowUp: dayjs(data.filter((row) => row.id===editID)[0].close_follow_up)
       })
     }
   }, [data, editID])
@@ -237,6 +241,34 @@ export default function BatchRefModal({modalOpen, modalClose, addState, editID, 
                             onChange={addState
                                       ? (newValue: Dayjs) => setAddValue({...addValue, closePeriod: newValue}) 
                                       : (newValue: Dayjs) => setEditValue({...editValue, closePeriod: newValue})}
+                          />
+                        </FormControl>
+                      </Stack>
+                    </Stack>
+                    <Stack direction='row' spacing={2} sx={{width:'100%'}} justifyContent={'start'}>
+                      <Stack direction='column' spacing={3} sx={{width:'45%'}}>
+                        
+                      </Stack>
+                      <Stack direction='column' spacing={3} sx={{width:'45%'}}>
+                        <FormControl>
+                          <StyledDatePicker 
+                            label="Open Period (Tindak lanjut)"
+                            name= "openFollowUp"
+                            value={addState ? addValue.openFollowUp : editValue.closeFollowUp}
+                            onChange={addState
+                                      ? (newValue: Dayjs) => setAddValue({...addValue, openFollowUp: newValue}) 
+                                      : (newValue: Dayjs) => setEditValue({...editValue, openFollowUp: newValue})}
+                          />
+                        </FormControl>
+
+                        <FormControl>
+                          <StyledDatePicker 
+                            label="Close Period (Tindak lanjut)"
+                            name= "closePeriod"
+                            value={addState ? addValue.closeFollowUp : editValue.closeFollowUp}
+                            onChange={addState
+                                      ? (newValue: Dayjs) => setAddValue({...addValue, closeFollowUp: newValue}) 
+                                      : (newValue: Dayjs) => setEditValue({...editValue, closeFollowUp: newValue})}
                           />
                         </FormControl>
                       </Stack>

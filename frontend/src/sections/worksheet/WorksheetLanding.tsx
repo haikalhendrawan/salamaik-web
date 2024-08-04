@@ -2,7 +2,6 @@ import {useEffect} from "react";
 import { Helmet } from 'react-helmet-async';
 import useWsJunction from "./useWsJunction";
 // @mui
-import { useTheme } from '@mui/material/styles';
 import { Grid, Container, Typography } from '@mui/material';
 // sections
 import KPPNSelectionCard from "./component/KPPNSelectionCard";

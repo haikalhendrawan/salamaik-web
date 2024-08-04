@@ -21,6 +21,8 @@ interface ChecklistType{
   file2: string | null,
   instruksi: string | null,
   contoh_file: string | null
+  peraturan: string | null,
+  uic: string | null
 };
 
 const getAllChecklist = async (req: Request, res: Response, next: NextFunction) => {
@@ -119,12 +121,12 @@ const deleteChecklistFile = async (req: Request, res: Response, next: NextFuncti
 
 const editOpsiById = async (req: Request, res: Response, next: NextFunction) => {
   try{
-    const {id, title, value, checklistId} = req.body;
+    const {id, title, value, checklistId, positiveFallback, negativeFallback, rekomendasi} = req.body;
     const validValue = [0, 5, 7, 10];
     if(validValue.includes(value) === false){
       return next(new ErrorDetail(400, 'Nilai dari opsi harus 0, 5, 7, atau 10'));
     };
-    const result = await checklist.editOpsiById(id, title, value, checklistId);
+    const result = await checklist.editOpsiById(id, title, value, checklistId, positiveFallback, negativeFallback, rekomendasi);
     return res.status(200).json({sucess: true, message: 'Opsi updated successfully', rows: result});
   }catch(err){
     next(err);

@@ -1,5 +1,5 @@
 import {useState,  useMemo} from'react';
-import {Stack, Typography, Table, IconButton, TableSortLabel,
+import {Stack, Table, IconButton, TableSortLabel,
   Tooltip, TableHead,  TableBody, TableRow, TableCell, TableContainer} from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import Iconify from '../../../../components/iconify';
@@ -13,27 +13,6 @@ import useSnackbar from '../../../../hooks/display/useSnackbar';
 import useAxiosJWT from '../../../../hooks/useAxiosJWT';
 import useChecklist from './useChecklist';
 //----------------------------------------------------
-interface ChecklistType{
-  id: number,
-  title: string, 
-  header: string | null,
-  komponen_id: number,
-  subkomponen_id: number | null,
-  subsubkomponen_id: number | number,
-  standardisasi: number | null, 
-  matrix_title: string | null, 
-  file1: string | null,
-  file2: string | null,
-  opsi: OpsiType[] | null
-};
-
-interface OpsiType{
-  id: number,
-  title: string, 
-  value: number,
-  checklist_id: number
-};
-
 const TABLE_HEAD = [
   { id: 'id', label: 'Id', alignRight: false },
   { id: 'checklist', label: 'Judul Checklist', alignRight: false },
@@ -53,10 +32,10 @@ interface ChecklistRefTableProps {
 };
 
 // ---------------------------------------------------
-export default function ChecklistRefTable({tab, handleOpen, fileOpen, setDeleteFile, setFile}: ChecklistRefTableProps) {
+export default function ChecklistRefTable({tab, handleOpen, fileOpen,  setFile}: ChecklistRefTableProps) {
   const theme = useTheme();
 
-  const {isLoading, setIsLoading} = useLoading();
+  const {setIsLoading} = useLoading();
 
   const {openSnackbar} = useSnackbar();
 
@@ -64,9 +43,13 @@ export default function ChecklistRefTable({tab, handleOpen, fileOpen, setDeleteF
 
   const axiosJWT = useAxiosJWT();
 
-  const [order, setOrder] = useState<'asc' | 'desc'>('asc');
+  // const [order, setOrder] = useState<'asc' | 'desc'>('asc');
 
-  const [orderBy, setOrderBy] = useState<string>('id');
+  // const [orderBy, setOrderBy] = useState<string>('id');
+
+  const order = 'asc';
+
+  const orderBy = 'id';
 
   const filteredChecklist= applySortFilter(checklist, getComparator(order, orderBy), tab);
 
@@ -83,10 +66,10 @@ export default function ChecklistRefTable({tab, handleOpen, fileOpen, setDeleteF
     setEditID(0);
   };
 
-  const handleAddOpsi = () => {  // Opsi Modal
-    setAddState(true);
-    setOpen(true); 
-  };
+  // const handleAddOpsi = () => {  // Opsi Modal
+  //   setAddState(true);
+  //   setOpen(true); 
+  // };
 
   const handleEditOpsi = (id: number, opsiID: number) => {
     setEditID(id);
@@ -135,7 +118,7 @@ export default function ChecklistRefTable({tab, handleOpen, fileOpen, setDeleteF
           <Table>
             <TableHead>
               <TableRow>
-                {TABLE_HEAD.map((headCell, index) => (
+                {TABLE_HEAD.map((headCell) => (
                   <TableCell
                     key={headCell.id}
                     align={'center'}
@@ -268,6 +251,7 @@ export default function ChecklistRefTable({tab, handleOpen, fileOpen, setDeleteF
         checklist= {checklist?.filter((row) => row.id===editID)?.map((row) => {return {...row}})}
         opsi={checklist?.filter((row) => row.id===editID)?.flatMap((row) => row.opsi || [])}
         opsiID={opsiID}
+        addState={addState}
       />
     </>
   )

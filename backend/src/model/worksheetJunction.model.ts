@@ -7,7 +7,7 @@ import { PoolClient } from "pg";
  * @class WorksheetJunction
  */
 // -------------------------------------------------
-interface WorksheetJunctionType{
+export interface WorksheetJunctionType{
   junction_id: number,
   worksheet_id: string,
   checklist_id: number,
@@ -19,14 +19,18 @@ interface WorksheetJunctionType{
   kanwil_note: string | null,
   kppn_id: string,
   period: string,
-  last_update: string | null
+  last_update: string | null,
+  updated_by: string | null
 };
 
-interface OpsiType{
+export interface OpsiType{
   id: number,
   title: string, 
   value: number,
-  checklist_id: number
+  checklist_id: number,
+  positive_fallback: string,
+  negative_fallback: string,
+  rekomendasi: string
 };
 
 export interface WsJunctionJoinChecklistType{
@@ -41,7 +45,8 @@ export interface WsJunctionJoinChecklistType{
   kanwil_note: string | null,
   kppn_id: string,
   period: string,
-  last_update: string | null
+  last_update: string | null,
+  updated_by: string | null,
   id: number,
   title: string | null, 
   header: string | null,
@@ -54,6 +59,8 @@ export interface WsJunctionJoinChecklistType{
   file2: string | null,
   instruksi: string | null,
   contoh_file: string | null,
+  peraturan: string | null,
+  uic: string | null,
   opsi: OpsiType[] | [] | null
 };
 

@@ -3,7 +3,7 @@ import useAxiosJWT from '../../../../hooks/useAxiosJWT';
 import useLoading from '../../../../hooks/display/useLoading';
 import useSnackbar from '../../../../hooks/display/useSnackbar';
 //------------------------------------------------------------------
-interface BatchType{
+export interface BatchType{ // di backend module worksheet ref
   id: string, 
   kppn_id: string,
   name: string, 
@@ -13,7 +13,10 @@ interface BatchType{
   open_period: string,
   close_period: string,
   created_at: string,
-  updated_at: string
+  updated_at: string,
+  matrix_status: number,
+  open_follow_up: string,
+  close_follow_up: string
 };
 
 interface BatchContextType{
@@ -25,7 +28,7 @@ type BatchProviderProps = {
   children: ReactNode
 };
 //------------------------------------------------------------------
-const BatchContext = createContext<BatchContextType>({batch: [], getBatch: () => new Promise ((res, rej) => null)});
+const BatchContext = createContext<BatchContextType>({batch: [], getBatch: () => new Promise (() => null)});
 
 const BatchProvider = ({children}: BatchProviderProps) => {
   const axiosJWT = useAxiosJWT();

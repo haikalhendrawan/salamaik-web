@@ -2,21 +2,26 @@ export interface OpsiType{
     id: number,
     title: string, 
     value: number,
-    checklist_id: number
+    checklist_id: number,
+    positive_fallback: string,
+    negative_fallback: string,
+    rekomendasi: string
 };
 
 export interface WsJunctionType{
     junction_id: number,
     worksheet_id: string,
     checklist_id: number,
-    kanwil_score: number,
-    kppn_score: number,
-    file_1: string,
-    file_2: string,
-    file_3: string,
-    kanwil_note: string,
+    kanwil_score: number | null,
+    kppn_score: number | null,
+    file_1: string | null,
+    file_2: string | null,
+    file_3: string | null,
+    kanwil_note: string | null,
     kppn_id: string,
     period: string,
+    last_update: string | null,
+    updated_by: string | null,
     id: number,
     title: string | null, 
     header: string | null,
@@ -29,7 +34,7 @@ export interface WsJunctionType{
     file2: string | null,
     instruksi: string | null,
     contoh_file: string | null,
-    opsi: OpsiType[] | [] | null,
-    last_update: string | null,
-    updated_by: string | null
+    peraturan: string | null,
+    uic: string | null,
+    opsi: OpsiType[] | [] | null
 }

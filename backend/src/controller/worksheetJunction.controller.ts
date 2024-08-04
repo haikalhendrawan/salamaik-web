@@ -1,64 +1,12 @@
 import {Request, Response, NextFunction} from 'express';
 import multer from 'multer';
-import wsJunction from '../model/worksheetJunction.model';
+import wsJunction, {WorksheetJunctionType, WsJunctionJoinChecklistType} from '../model/worksheetJunction.model';
 import worksheet from '../model/worksheet.model';
 import ErrorDetail from '../model/error.model';
 import { uploadWsJunctionFile } from '../config/multer';
 import fs from 'fs';
 import path from 'path';
 import { sanitizeMimeType } from '../utils/mimeTypeSanitizer';
-
-
-// -------------------------------------------------
-interface WorksheetJunctionType{
-  junction_id: number,
-  worksheet_id: string,
-  checklist_id: number,
-  kanwil_score: number | null,
-  kppn_score: number | null,
-  file_1: string | null,
-  file_2: string | null,
-  file_3: string | null,
-  kanwil_note: string | null,
-  kppn_id: string,
-  period: string,
-  last_update: string | null
-};
-
-interface OpsiType{
-  id: number,
-  title: string, 
-  value: number,
-  checklist_id: number
-};
-
-interface WsJunctionJoinChecklistType{
-  junction_id: number,
-  worksheet_id: string,
-  checklist_id: number,
-  kanwil_score: number | null,
-  kppn_score: number | null,
-  file_1: string | null,
-  file_2: string | null,
-  file_3: string | null,
-  kanwil_note: string | null,
-  kppn_id: string,
-  period: string,
-  last_update: string | null
-  id: number,
-  title: string | null, 
-  header: string | null,
-  komponen_id: number,
-  subkomponen_id: number,
-  subsubkomponen_id: number,
-  standardisasi: number, 
-  matrix_title: string | null, 
-  file1: string | null,
-  file2: string | null,
-  instruksi: string | null,
-  contoh_file: string | null,
-  opsi: OpsiType[] | [] | null
-};
 // ------------------------------------------------------
 const getWsJunctionByWorksheetForKPPN = async(req: Request, res: Response, next: NextFunction) => {
   try{
@@ -148,7 +96,7 @@ const editWsJunctionKanwilScore = async(req: Request, res: Response, next: NextF
 const editWsJunctionKanwilNote = async(req: Request, res: Response, next: NextFunction) => {
   try{
     const {username} = req.payload;
-    const {worksheetId, junctionId, kanwilNote, userName} = req.body; 
+    const {worksheetId, junctionId, kanwilNote} = req.body; 
     const result = await wsJunction.editWsJunctionKanwilNote(worksheetId, junctionId, kanwilNote, username);
     return res.status(200).json({sucess: true, message: 'Edit worksheet junction success', rows: result})
   }catch(err){

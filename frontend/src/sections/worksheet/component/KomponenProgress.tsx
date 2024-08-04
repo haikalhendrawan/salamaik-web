@@ -1,19 +1,17 @@
 import { Grid, Card, CardHeader, CardContent} from '@mui/material';
-import {useTheme} from '@mui/material/styles';
 import Label from "../../../components/label";
 import LinearProgressWithLabel from "../../../components/linear-progress-with-label/LinearProgressWithLabel";
 // import useWorksheet from "../useWorksheet";
 
 // --------------------------------------------------------
-interface KomponenProgressProps {
-  batch?: any;
-  checklist?: any;
-  tabValue?: number;
-}
+// interface KomponenProgressProps {
+//   batch?: any;
+//   checklist?: any;
+//   tabValue?: number;
+// }
 
-export default function KomponenProgress(props: KomponenProgressProps){
+export default function KomponenProgress(){
   // const {batch, checklist, tabValue} = props;
-  const theme = useTheme();
   
   const openPeriod = Math.floor(new Date('04/03/2024').getTime());
   const closePeriod = Math.floor(new Date('04/20/2024').getTime());

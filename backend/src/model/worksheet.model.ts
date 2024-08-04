@@ -10,7 +10,7 @@ import logger from "../config/logger";
  * @class Worksheet
  */
 // -------------------------------------------------
-interface WorksheetType{
+export interface WorksheetType{
   id: string, 
   kppn_id: string,
   name: string, 
@@ -20,7 +20,10 @@ interface WorksheetType{
   open_period: string,
   close_period: string,
   created_at: string,
-  updated_at: string
+  updated_at: string,
+  matrix_status: number,
+  open_follow_up: string,
+  close_follow_up: string
 }
 // ------------------------------------------------------
 
@@ -50,13 +53,13 @@ class Worksheet{
     }
   }
 
-  async addWorksheet(kppnId: string, period: number, startDate: string, closeDate: string){
+  async addWorksheet(kppnId: string, period: number, startDate: string, closeDate: string, openFollowUp: string, closeFollowUp: string){
     try{
       const id = uuidv4();
-      const q = ` INSERT INTO worksheet_ref (id, kppn_id, period, status, open_period, close_period) 
-                  VALUES ($1, $2, $3, $4, $5, $6) 
+      const q = ` INSERT INTO worksheet_ref (id, kppn_id, period, status, open_period, close_period, matrix_status, open_follow_up, close_follow_up) 
+                  VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
                   RETURNING *`;
-      const result = await pool.query(q, [id, kppnId, period, 0, startDate, closeDate]);
+      const result = await pool.query(q, [id, kppnId, period, 0, startDate, closeDate, 0, openFollowUp, closeFollowUp]);
       return result.rows[0]
     }catch(err){
       throw err
@@ -75,25 +78,42 @@ class Worksheet{
 
   async editWorksheetStatus(id: string, poolTrx?: PoolClient){
     const poolInstance = poolTrx??pool;
+    const updateTime = new Date(Date.now()).toISOString();
     try{
       const q = ` UPDATE worksheet_ref
-                  SET status = $1
-                  WHERE id = $2
+                  SET status = $1, updated_at = $2
+                  WHERE id = $3
                   RETURNING *`;
-      const result = await poolInstance.query(q, [1, id]);
+      const result = await poolInstance.query(q, [1, updateTime, id]);
       return result.rows[0]
     }catch(err){
       throw err
     }
   }
 
-  async editWorksheetPeriod(id: string, startDate: string, closeDate: string){
+  async editWorksheetMatrixStatus(id: string, poolTrx?: PoolClient){
+    const poolInstance = poolTrx??pool;
+    const updateTime = new Date(Date.now()).toISOString();
     try{
       const q = ` UPDATE worksheet_ref
-                  SET open_period = $1, close_period = $2
+                  SET matrix_status = $1, updated_at = $2
                   WHERE id = $3
                   RETURNING *`;
-      const result = await pool.query(q, [startDate, closeDate, id]);
+      const result = await poolInstance.query(q, [1, updateTime, id]);
+      return result.rows[0]
+    }catch(err){
+      throw err
+    }
+  }
+
+  async editWorksheetPeriod(id: string, startDate: string, closeDate: string, openFollowUp: string, closeFollowUp: string){
+    try{
+      const updateTime = new Date(Date.now()).toISOString();
+      const q = ` UPDATE worksheet_ref
+                  SET open_period = $1, close_period = $2, updated_at = $3, open_follow_up = $4, close_follow_up = $5
+                  WHERE id = $6
+                  RETURNING *`;
+      const result = await pool.query(q, [startDate, closeDate, updateTime, openFollowUp, closeFollowUp, id]);
       return result.rows[0]
     }catch(err){
       throw err

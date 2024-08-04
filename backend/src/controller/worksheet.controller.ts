@@ -1,19 +1,8 @@
 import {Request, Response, NextFunction} from 'express';
-import worksheet from '../model/worksheet.model';
+import worksheet, { WorksheetType } from '../model/worksheet.model';
 import checklist, { ChecklistType } from '../model/checklist.model';
 import wsJunction from '../model/worksheetJunction.model';
 import pool from '../config/db';
-// -------------------------------------------------
-interface WorksheetType{
-  id: string, 
-  kppn_id: string,
-  period: number,
-  status: number,
-  open_period: string,
-  close_period: string,
-  created_at: string,
-  updated_at: string
-}
 // ------------------------------------------------------
 
 const getAllWorksheet = async(req: Request, res: Response, next: NextFunction) => {
@@ -29,7 +18,7 @@ const getAllWorksheet = async(req: Request, res: Response, next: NextFunction) =
 
 const addWorksheet = async(req: Request, res: Response, next: NextFunction) => {
   try {
-    const { kppnId, startDate, closeDate } = req.body;
+    const { kppnId, startDate, closeDate, openFollowUp, closeFollowUp } = req.body;
     const period = req.payload.period;
     const isWorksheetExist = await worksheet.checkWorksheetExist(kppnId, period);
 
@@ -37,7 +26,7 @@ const addWorksheet = async(req: Request, res: Response, next: NextFunction) => {
       return res.status(400).json({sucess: false, message: 'Worksheet already exist'})
     };
 
-    const result = await worksheet.addWorksheet(kppnId, period, startDate, closeDate);
+    const result = await worksheet.addWorksheet(kppnId, period, startDate, closeDate, openFollowUp, closeFollowUp);
     return res.status(200).json({sucess: true, message: 'Add worksheet success', rows: result})
   } catch (err){
     next(err);
@@ -69,8 +58,8 @@ const assignWorksheet = async(req: Request, res: Response, next: NextFunction) =
 
 const editWorksheetPeriod = async(req: Request, res: Response, next: NextFunction) => {
   try{
-    const { worksheetId, startDate, closeDate} = req.body;
-    const result = await worksheet.editWorksheetPeriod(worksheetId, startDate, closeDate);
+    const { worksheetId, startDate, closeDate, openFollowUp, closeFollowUp } = req.body;
+    const result = await worksheet.editWorksheetPeriod(worksheetId, startDate, closeDate, openFollowUp, closeFollowUp);
     return res.status(200).json({sucess: true, message: 'Edit worksheet period success', rows: result})
   }catch(err){
     next(err);

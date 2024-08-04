@@ -1,6 +1,6 @@
 import {useState, useEffect, useMemo, useCallback} from'react';
 import { Card,  Grow, Tabs, Tab} from '@mui/material';
-import { useTheme, styled } from '@mui/material/styles';
+import { useTheme} from '@mui/material/styles';
 import Label from '../../../../components/label';
 import ChecklistRefTable from './ChecklistRefTable';
 import ChecklistRefModal from './ChecklistRefModal';
@@ -64,7 +64,7 @@ export default function ChecklistRef({section, addState, resetAddState}: Checkli
     setFileOption(1);
   };
 
-  const handleTabChange = useCallback((event: React.SyntheticEvent, newValue: 0 | 1 | 2 | 3 | 4) => {
+  const handleTabChange = useCallback((_: React.SyntheticEvent, newValue: 0 | 1 | 2 | 3 | 4) => {
     setTabValue(newValue);
   }, []);
 

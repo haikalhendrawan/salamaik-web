@@ -1,12 +1,12 @@
-import {useState, useEffect, useRef} from'react';
+import {useState, useEffect} from'react';
 import {Stack, Button, Box, Typography, Modal, FormControl, SelectChangeEvent, 
-          Paper, Grid, Select, MenuItem, InputLabel, Divider} from '@mui/material';
+          Paper, Grid, Select, MenuItem, InputLabel} from '@mui/material';
 import { useTheme, styled } from '@mui/material/styles';
 import Scrollbar from '../../../../components/scrollbar';
 import StyledTextField from '../../../../components/styledTextField/StyledTextField';
 import useAxiosJWT from '../../../../hooks/useAxiosJWT';
 import useSnackbar from '../../../../hooks/display/useSnackbar';
-import useChecklist from './useChecklist';
+import useChecklist, {ChecklistType ,OpsiType} from './useChecklist';
 // -------------------------------------------------------------------------------------------
 const style = {
   position: 'absolute',
@@ -31,36 +31,14 @@ const FormDataContainer = styled(Box)(({theme}) => ({
   gap:theme.spacing(3)
 }));
 
-interface ChecklistType{
-  id: number,
-  title: string, 
-  header: string | null,
-  komponen_id: number,
-  subkomponen_id: number | null,
-  subsubkomponen_id: number | null,
-  standardisasi: number | null, 
-  matrix_title: string | null, 
-  file1: string | null,
-  file2: string | null,
-  opsi: OpsiType[] | null,
-  instruksi?: string | null,
-  contoh_file?: string | null
-};
-
-interface OpsiType{
-  id: number,
-  title: string, 
-  value: number,
-  checklist_id: number
-};
-
 interface ChecklistOpsiModalModalProps {
   modalOpen: boolean,
   modalClose: () => void,
   editID: number,
   checklist: ChecklistType[] | [],
   opsi: OpsiType[] | null,
-  opsiID: number
+  opsiID: number,
+  addState: boolean
 };
 
 interface TitleType{
@@ -74,10 +52,9 @@ export default function ChecklistOpsiModal({
   editID,
   checklist,
   opsi, 
-  opsiID}: ChecklistOpsiModalModalProps) {
+  opsiID,
+  addState}: ChecklistOpsiModalModalProps) {
   const theme = useTheme();
-
-  const addState = false; // TODO utk period berikutnya
 
   const axiosJWT = useAxiosJWT();
 
@@ -118,6 +95,9 @@ export default function ChecklistOpsiModal({
     title: '',
     value: 0,
     checklist_id:0,
+    positive_fallback: '',
+    negative_fallback: '',
+    rekomendasi: ''
   });
 
   const handleChangeEdit = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> |  SelectChangeEvent) => {
@@ -133,18 +113,24 @@ export default function ChecklistOpsiModal({
       title: opsi?.filter((row) => row.id===opsiID)[0]?.title || '',
       value: opsi?.filter((row) => row.id===opsiID)[0]?.value || 0,
       checklist_id: opsi?.filter((row) => row.id===opsiID)[0]?.checklist_id || 0,
+      positive_fallback: '',
+      negative_fallback: '',
+      rekomendasi: ''
     })
   };
 
   const handleSubmitEdit = async() => {
     try{
-      const response = await axiosJWT.post("/editOpsi", {
+       await axiosJWT.post("/editOpsi", {
         id: editValue.id,
         title: editValue.title,
         value: editValue.value,
-        checklistId: editValue.checklist_id
+        checklistId: editValue.checklist_id,
+        positiveFallback: editValue.positive_fallback,
+        negativeFallback: editValue.negative_fallback,
+        rekomendasi: editValue.rekomendasi
       });
-      getChecklist();
+      await getChecklist();
       modalClose();
     }catch(err: any){
       if(err.response){
@@ -162,6 +148,9 @@ export default function ChecklistOpsiModal({
         title: opsi?.filter((row) => row.id===opsiID)[0]?.title || '',
         value: opsi?.filter((row) => row.id===opsiID)[0]?.value || 0,
         checklist_id: opsi?.filter((row) => row.id===opsiID)[0]?.checklist_id || 0,
+        positive_fallback: '',
+        negative_fallback: '',
+        rekomendasi: ''
       })
 
       setTitle({
@@ -221,7 +210,7 @@ export default function ChecklistOpsiModal({
                   </Grid>
                 </Grid>
 
-                <Stack direction='row' spacing={2} sx={{width:'100%', ml:4}} justifyContent={'center'}>
+                <Stack direction='column' spacing={2} sx={{width:'100%', ml:4}} justifyContent={'center'}>
                   <Stack direction='row' spacing={3} sx={{width:'100%'}} alignItems={'start'}>
                     <FormControl sx={{width:'20%'}}>
                       <InputLabel id="value-select-label" sx={{typography:'body2'}}>Nilai</InputLabel>
@@ -250,9 +239,42 @@ export default function ChecklistOpsiModal({
                         onChange={handleChangeEdit}
                       />
                     </FormControl>
-
                   </Stack>
+                  <Stack direction='row' spacing={3} sx={{width:'100%'}} alignItems={'start'}>
+                    <FormControl sx={{width:'30%'}}>
+                      <StyledTextField 
+                        name="positive_fallback" 
+                        label="Positive Fallback"
+                        multiline
+                        minRows={2}
+                        value={editValue?.positive_fallback}
+                        onChange={handleChangeEdit}
+                      />
+                    </FormControl>
 
+                    <FormControl sx={{width:'30%'}}>
+                      <StyledTextField 
+                        name="negative_fallback" 
+                        label="Negative Fallback"
+                        multiline
+                        minRows={2}
+                        value={editValue?.negative_fallback}
+                        onChange={handleChangeEdit}
+                      />
+                    </FormControl>
+
+                    <FormControl sx={{width:'30%'}}>
+                      <StyledTextField 
+                        name="rekomendasi" 
+                        label="Rekomendasi"
+                        multiline
+                        minRows={2}
+                        value={editValue?.rekomendasi}
+                        onChange={handleChangeEdit}
+                      />
+                    </FormControl>
+                  </Stack>
+                  
                 </Stack>
 
                 <Stack sx={{width:'100%', pr:3, mt:1}} direction='row' spacing={2} flex={'row'} justifyContent={'end'}>

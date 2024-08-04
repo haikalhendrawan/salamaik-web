@@ -3,29 +3,33 @@ import useAxiosJWT from '../../../../hooks/useAxiosJWT';
 import useLoading from '../../../../hooks/display/useLoading';
 import useSnackbar from '../../../../hooks/display/useSnackbar';
 //------------------------------------------------------------------
-interface ChecklistType{
+export interface ChecklistType{
   id: number,
-  title: string, 
+  title: string | null, 
   header: string | null,
   komponen_id: number,
-  subkomponen_id: number | null,
-  subsubkomponen_id: number | null,
-  standardisasi: number | null, 
+  subkomponen_id: number,
+  subsubkomponen_id: number,
+  standardisasi: number, 
   matrix_title: string | null, 
   file1: string | null,
   file2: string | null,
   opsi: OpsiType[] | null,
-  instruksi?: string | null,
-  contoh_file?: string | null
+  instruksi: string | null,
+  contoh_file: string | null
+  peraturan: string | null,
+  uic: string | null
 };
 
-interface OpsiType{
+export interface OpsiType{
   id: number,
   title: string, 
   value: number,
-  checklist_id: number
+  checklist_id: number,
+  positive_fallback: string,
+  negative_fallback: string,
+  rekomendasi: string
 };
-
 
 interface ChecklistContextType{
   checklist: ChecklistType[] | [],

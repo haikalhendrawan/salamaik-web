@@ -1,16 +1,15 @@
-import {useState, useEffect, useRef, useMemo} from'react';
+import {useState, useEffect} from'react';
 import {Stack, Button, Box, Typography, Modal, FormControl, Paper, InputLabel, 
         Select, MenuItem, SelectChangeEvent} from '@mui/material';
-import { useTheme, styled } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import Scrollbar from '../../../../components/scrollbar';
 import StyledTextField from '../../../../components/styledTextField/StyledTextField';
-import StyledButton from '../../../../components/styledButton/StyledButton';
 import useChecklist from './useChecklist';
 import useDictionary from '../../../../hooks/useDictionary';
 import useAxiosJWT from '../../../../hooks/useAxiosJWT';
 import useSnackbar from '../../../../hooks/display/useSnackbar';
 import useLoading from '../../../../hooks/display/useLoading';
-import PageLoading from '../../../../components/pageLoading';
+import { ChecklistType } from './useChecklist';
 // -------------------------------------------------------------------------------------------
 const style = {
   position: 'absolute',
@@ -34,29 +33,6 @@ const FormDataContainer = styled(Box)(({theme}) => ({
   marginTop:theme.spacing(5),
   gap:theme.spacing(3)
 }));
-
-interface ChecklistType{
-  id: number,
-  title: string, 
-  header: string | null,
-  komponen_id: number,
-  subkomponen_id: number,
-  subsubkomponen_id: number | null,
-  standardisasi: number | null, 
-  matrix_title: string | null, 
-  file1: string | null,
-  file2: string | null,
-  opsi: OpsiType[] | null,
-  instruksi?: string | null,
-  contoh_file?: string | null
-};
-
-interface OpsiType{
-  id: number,
-  title: string, 
-  value: number,
-  checklist_id: number
-};
 
 interface ChecklistRefModalProps {
   modalOpen: boolean,
@@ -91,7 +67,9 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
     file2: null,
     opsi: null,
     instruksi: '',
-    contoh_file: ''
+    contoh_file: '',
+    peraturan: '',
+    uic: ''
   });
 
   const handleChangeAdd = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>) => {
@@ -115,7 +93,9 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
       file2: null,
       opsi: null,
       instruksi: '',
-      contoh_file: ''
+      contoh_file: '',
+      peraturan: '',
+      uic: ''
     })
   };
 
@@ -132,7 +112,9 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
     file2: null,
     opsi: null,
     instruksi: '',
-    contoh_file: ''
+    contoh_file: '',
+    peraturan: '',
+    uic: ''
   });
 
   const handleChangeEdit = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>) => {
@@ -156,7 +138,9 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
       file2: checklist?.filter((row) => row.id===editID)[0]?.file2 || null,
       opsi: checklist?.filter((row) => row.id===editID)[0]?.opsi || null,
       instruksi: checklist?.filter((row) => row.id===editID)[0]?.instruksi || '',
-      contoh_file: checklist?.filter((row) => row.id===editID)[0]?.contoh_file || ''
+      contoh_file: checklist?.filter((row) => row.id===editID)[0]?.contoh_file || '',
+      peraturan: checklist?.filter((row) => row.id===editID)[0]?.peraturan || '',
+      uic: checklist?.filter((row) => row.id===editID)[0]?.uic || ''
     })
   };
 
@@ -173,10 +157,11 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
       file1: editValue.file1===''?null:editValue.file1,
       file2: editValue.file2===''?null:editValue.file2,
       instruksi: editValue.instruksi===''?null:editValue.instruksi,
-      contoh_file: editValue.contoh_file===''?null:editValue.contoh_file
+      contoh_file: editValue.contoh_file===''?null:editValue.contoh_file,
+      peraturan: editValue.peraturan===''?null:editValue.peraturan,
+      uic: editValue.uic===''?null:editValue.uic
     }
     try{
-      console.log(body)
       setIsLoading(true);
       const response = await axiosJWT.post("/editChecklist", body);
       openSnackbar(response.data.message, "success");
@@ -211,7 +196,9 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
         file2: checklist?.filter((row) => row.id===editID)[0]?.file2 || null,
         opsi: checklist?.filter((row) => row.id===editID)[0]?.opsi || null,
         instruksi: checklist?.filter((row) => row.id===editID)[0]?.instruksi || '',
-        contoh_file: checklist?.filter((row) => row.id===editID)[0]?.contoh_file || ''
+        contoh_file: checklist?.filter((row) => row.id===editID)[0]?.contoh_file || '',
+        peraturan: checklist?.filter((row) => row.id===editID)[0]?.peraturan || '',
+        uic: checklist?.filter((row) => row.id===editID)[0]?.uic || ''
       })
     }
 
@@ -247,7 +234,7 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
                         label="Judul Checklist"
                         multiline
                         minRows={2}
-                        value={ addState? addValue.title : editValue.title}
+                        value={ addState? addValue?.title : editValue?.title}
                         onChange={addState? handleChangeAdd : handleChangeEdit}
                       />
                     </FormControl>
@@ -293,7 +280,18 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
                         label="Instruksi"
                         multiline
                         minRows={2}
-                        value={ addState? addValue.instruksi : editValue.instruksi}
+                        value={ addState? addValue?.instruksi : editValue?.instruksi}
+                        onChange={addState? handleChangeAdd : handleChangeEdit}
+                      />
+                    </FormControl>
+
+                    <FormControl>
+                      <StyledTextField 
+                        name="peraturan" 
+                        label="Peraturan terkait"
+                        multiline
+                        minRows={2}
+                        value={ addState? addValue?.peraturan : editValue?.peraturan}
                         onChange={addState? handleChangeAdd : handleChangeEdit}
                       />
                     </FormControl>
@@ -351,6 +349,17 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
                         multiline
                         minRows={2}
                         value={addState? (addValue.contoh_file ?? '') : (editValue.contoh_file ?? '')}
+                        onChange={addState? handleChangeAdd : handleChangeEdit}
+                      />
+                    </FormControl>
+
+                    <FormControl>
+                      <StyledTextField 
+                        name="uic" 
+                        label="UIC pada KPPN"
+                        multiline
+                        minRows={2}
+                        value={addState? (addValue.uic ?? '') : (editValue.uic ?? '')}
                         onChange={addState? handleChangeAdd : handleChangeEdit}
                       />
                     </FormControl>

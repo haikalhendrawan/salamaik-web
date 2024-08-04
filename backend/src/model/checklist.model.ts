@@ -14,15 +14,9 @@ export interface ChecklistType{
   file2: string | null,
   instruksi: string | null,
   contoh_file: string | null
+  peraturan: string | null,
+  uic: string | null
 };
-
-interface OpsiType{
-  id: number,
-  title: string, 
-  value: number,
-  checklist_id: number
-};
-
 //-----------------------------------------------------------------------------
 class Checklist{
   async getAllChecklist(poolTrx?: PoolClient){
@@ -51,7 +45,9 @@ class Checklist{
         file1,
         file2,
         instruksi,
-        contoh_file
+        contoh_file,
+        peraturan,
+        uic
       } = body;
 
       const q = ` UPDATE checklist_ref
@@ -66,10 +62,12 @@ class Checklist{
                     file1 = $8, 
                     file2 = $9, 
                     instruksi = $10, 
-                    contoh_file = $11
-                  WHERE id = $12 
+                    contoh_file = $11,
+                    peraturan = $12,
+                    uic = $13
+                  WHERE id = $14 
                   RETURNING *`;
-      const result = await pool.query(q, [title, header, komponen_id, subkomponen_id, subsubkomponen_id, standardisasi, matrix_title, file1, file2, instruksi, contoh_file, id]);
+      const result = await pool.query(q, [title, header, komponen_id, subkomponen_id, subsubkomponen_id, standardisasi, matrix_title, file1, file2, instruksi, contoh_file, peraturan, uic, id]);
       return result.rows
     }catch(err){
       throw err
@@ -111,18 +109,15 @@ class Checklist{
     }
   }
 
-  async editOpsiById(id: number, title: string, value: number, checklistId: number){
+  async editOpsiById(id: number, title: string, value: number, checklistId: number, positiveFallback: string, negativeFallback: string, rekomendasi: string){
     try{
-      const q = "UPDATE opsi_ref SET title = $1, value = $2, checklist_id = $3 WHERE id = $4 RETURNING *";
-      const result = await pool.query(q, [title, value, checklistId, id]);
+      const q = "UPDATE opsi_ref SET title = $1, value = $2, checklist_id = $3, positive_fallback = $4, negative_fallback = $5, rekomendasi = $6 WHERE id = $7 RETURNING *";
+      const result = await pool.query(q, [title, value, checklistId, positiveFallback, negativeFallback, rekomendasi, id]);
       return result.rows
     }catch(err){
       throw err
     }
   }
-
-  //utk integritas kertas kerja, better tidak buat endpoint delete dan add for now (TODO)
-
 
 }
 

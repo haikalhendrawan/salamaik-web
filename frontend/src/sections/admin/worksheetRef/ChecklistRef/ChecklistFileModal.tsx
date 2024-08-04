@@ -1,7 +1,6 @@
-import {useState, useEffect, useRef} from'react';
+import {useState, useEffect} from'react';
 import {Stack, Button, Box, Paper, Modal} from '@mui/material';
-import { useTheme, styled } from '@mui/material/styles';
-import Iconify from '../../../../components/iconify';
+import { useTheme } from '@mui/material/styles';
 import Scrollbar from '../../../../components/scrollbar';
 import useAxiosJWT from '../../../../hooks/useAxiosJWT';
 import useSnackbar from '../../../../hooks/display/useSnackbar';
@@ -59,7 +58,7 @@ export default function ChecklistFileModal({
 
   const handleDelete = async() => {
     try{
-      const response = await axiosJWT.post('/deleteChecklistFile', {
+      await axiosJWT.post('/deleteChecklistFile', {
         id: editID, 
         filename: fileName, 
         option: fileOption});

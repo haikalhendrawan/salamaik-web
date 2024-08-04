@@ -1,9 +1,9 @@
-import {useState, useEffect, useRef} from'react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import {Stack, Table, Card, TableSortLabel,Tooltip, TableHead, Grow, TableBody, 
   TableRow, TableCell} from '@mui/material';
-import { useTheme, styled } from '@mui/material/styles';
+import { useTheme} from '@mui/material/styles';
+import { BatchType } from './useBatch';
 import Iconify from '../../../../components/iconify';
 import Label from '../../../../components/label';
 import StyledButton from '../../../../components/styledButton/StyledButton';
@@ -22,21 +22,8 @@ const TABLE_HEAD = [
   { id: 'action', label: 'Action', alignRight: false },
 ];
 
-interface BatchData{
-  id: string, 
-  kppn_id: string,
-  name: string, 
-  alias: string,
-  period: number,
-  status: number,
-  open_period: string,
-  close_period: string,
-  created_at: string,
-  updated_at: string
-};
-
 interface BatchRefTableProps {
-  tableData: BatchData[],
+  tableData: BatchType[],
   handleOpen: (id: string) => void
 };
 

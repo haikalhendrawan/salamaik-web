@@ -1,23 +1,18 @@
-import {useState} from "react";
-import axios from "axios";
-import { Typography, Grid, Card, CardHeader, CardContent, LinearProgress, Box, Tooltip} from '@mui/material';
-import {useTheme} from '@mui/material/styles';
-import Iconify from "../../../components/iconify";
+import { Grid, Card, CardHeader, CardContent} from '@mui/material';
 import Label from "../../../components/label";
 import LinearProgressWithLabel from "../../../components/linear-progress-with-label/LinearProgressWithLabel";
 // import useWorksheet from "../useWorksheet";
 
 // --------------------------------------------------------
-interface WorksheetInfoProps {
-  batch?: any;
-  checklist?: any;
-  tabValue?: number;
-}
+// interface WorksheetInfoProps {
+//   batch?: any;
+//   checklist?: any;
+//   tabValue?: number;
+// }
 
-export default function WorksheetInfo(props: WorksheetInfoProps){
+export default function WorksheetInfo(){
 
   // const {batch, checklist, tabValue} = props;
-  const theme = useTheme();
   
   const openPeriod = Math.floor(new Date('04/03/2024').getTime());
   const closePeriod = Math.floor(new Date('04/20/2024').getTime());
