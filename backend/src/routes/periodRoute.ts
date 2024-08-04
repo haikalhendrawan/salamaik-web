@@ -6,5 +6,7 @@ const router = express.Router();
 
 router.get("/getAllPeriod", authenticate, periodController.getAllPeriod);
 router.get("/getPeriodById", authenticate, periodController.getPeriodById);
+router.post("/addPeriod", authenticate, periodController.addPeriod);
+router.post("/deletePeriodById", authenticate, periodController.deletePeriodById);
 
 export default router

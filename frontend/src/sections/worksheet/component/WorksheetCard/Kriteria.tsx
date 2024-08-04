@@ -1,5 +1,6 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import Scrollbar from "../../../../components/scrollbar/Scrollbar";
+import Skeleton  from "@mui/material/Skeleton";
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { OpsiType } from "../../types";
@@ -52,12 +53,14 @@ const gradientOverlayStyle: React.CSSProperties = {
   left: 0,
   width: '100%',
   height: '20px',
-  background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%)',
-  pointerEvents: 'none' // Ensures it does not interfere with scrolling
+  background: `linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%)`,
+  pointerEvents: 'none' 
 };
 
 // ------------------------------------------------------------
 export default function Kriteria({kriteria, opsi}: KriteriaProps) {
+  const [isMounted, setIsMounted] = useState(true);
+
   const descriptionText = opsi?.map((item, index) => (
     <tr style={rowStyle} key={index}>
       <td style={col1Style}>
@@ -72,6 +75,27 @@ export default function Kriteria({kriteria, opsi}: KriteriaProps) {
     </tr>
   ));
 
+  useEffect(() => {
+    setIsMounted(false);
+  }, []);
+
+  if(isMounted) {
+    return (
+    <>
+      <Box>
+        <Skeleton variant="rounded" height={'1em'} width={'80%'} />
+        <br/>
+        <Skeleton variant="rounded" height={'1em'} width={'50%'} />
+        <br/>
+        <Skeleton variant="rounded" height={'1em'} width={'50%'} />
+        <br/>
+        <Skeleton variant="rounded" height={'1em'} width={'50%'} />
+      </Box>
+
+    </>
+    )
+  }
+
   return(
     <Box sx={{ position: 'relative' }}>
     <Scrollbar sx={scrollBarStyle}>
@@ -83,9 +107,9 @@ export default function Kriteria({kriteria, opsi}: KriteriaProps) {
         <table style={tableStyle}>
           <tbody>
             {descriptionText}
-            <br></br>
           </tbody>
         </table>
+        <br></br>
       </Box>
     </Scrollbar>
 

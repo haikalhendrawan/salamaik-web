@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
-import axios from "axios";
+import { useState, useEffect, useMemo } from 'react';
 import {NavLink, NavLinkProps} from "react-router-dom"
 // @mui
 import { alpha } from '@mui/material/styles';
 import { Box, Divider, Typography, Stack, MenuItem, Avatar,
         IconButton, Popover} from '@mui/material';
 import Iconify from '../../../components/iconify';
+import useSnackbar from '../../../hooks/display/useSnackbar';
 // hooks and other stuff
 import {useAuth} from "../../../hooks/useAuth";
 import useAxiosJWT from '../../../hooks/useAxiosJWT';
@@ -17,35 +17,21 @@ interface MenuOptionType{
   component: React.ForwardRefExoticComponent<NavLinkProps & React.RefAttributes<HTMLAnchorElement>>
 }
 
-const MENU_OPTIONS: Array<MenuOptionType> = [
-  {
-    label: 'Profile',
-    icon: 'eva:person-fill',
-    link : '/profile',
-    component:NavLink
-  },
-  // {
-  //   label: 'Settings',
-  //   icon: 'eva:settings-2-fill',
-  // },
-  {
-    label: 'Smt 1 2024',
-    icon: 'mdi:calendar',
-    link: '',
-    component:NavLink
-  },
-];
 
 // ----------------------------------------------------------------------
 
 export default function AccountPopover() {
   const [open, setOpen] = useState<null | EventTarget & HTMLButtonElement>(null);
 
+  const [periodText, setPeriodText] = useState<string>("");
+
   const {auth, setAuth} = useAuth() as AuthType;
 
   const [anchorEl, setAnchorEl] = useState(null); 
 
   const openPeriod = Boolean(anchorEl); 
+
+  const {openSnackbar} = useSnackbar();
 
   const axiosJWT = useAxiosJWT();
 
@@ -62,15 +48,47 @@ export default function AccountPopover() {
   //   console.log(openPeriod)
   // }
 
+  const getPeriod = async() => {
+    try{
+      const response = await axiosJWT.get("/getPeriodById");
+      const semester = response?.data?.rows[0]?.semester;
+      const tahun = response?.data?.rows[0]?.tahun;
+      const periodText = `Smt ${semester} ${tahun}`;
+      setPeriodText(periodText);
+    }catch(err: any){
+      openSnackbar(err?.response?.data?.message, "error");
+    }
+  }
+
   const logout = async () => {
     setAuth(null);
     try {
       const response = await axiosJWT.get("/logout");
-      console.log(response);
-    } catch (err) {
-      console.log(err);
+      openSnackbar(response.data.message, "success");
+    } catch (err: any) {
+      openSnackbar(err?.response?.data?.message, "error");
     }
   };
+
+  useEffect(() => {
+    getPeriod();
+  }, [auth?.period]);
+
+  
+  const MENU_OPTIONS: Array<MenuOptionType> =  [
+    {
+      label: 'Profile',
+      icon: 'eva:person-fill',
+      link : '/profile',
+      component:NavLink
+    },
+    {
+      label: periodText,
+      icon: 'mdi:calendar',
+      link: '',
+      component:NavLink
+    },
+  ];
 
 
 // -----------------------------------------------------------------------------------------------

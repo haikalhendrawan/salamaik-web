@@ -1,8 +1,6 @@
 import { ReactNode, useState, createContext, useContext, useEffect } from 'react';
 import useAxiosJWT from './useAxiosJWT';
 import { useAuth } from './useAuth';
-import useLoading from './display/useLoading';
-import useSnackbar from './display/useSnackbar';
 //------------------------------------------------------------------
 interface DictionaryType {
   [key: string | number]: string | number | any[];
@@ -14,7 +12,7 @@ interface PeriodType{
   name: string; 
   evenPeriod: 0;
   semester: number;
-  tahun: string
+  tahun: number
 };
 
 interface PeriodRefType{
@@ -71,6 +69,7 @@ interface DictionaryContextType{
   komponenRef: KomponenRefType[] | null,
   subKomponenRef: SubKomponenRefType[] | null,
   subSubKomponenRef: SubSubKomponenRefType[] | null,
+  getDictionary: () => void,
 };
 
 type DictionaryProviderProps = {
@@ -85,7 +84,8 @@ const DictionaryContext = createContext<DictionaryContextType>({
   roleRef: null,
   komponenRef: null,
   subKomponenRef: null,
-  subSubKomponenRef: null
+  subSubKomponenRef: null,
+  getDictionary: () => {},
 });
 
 const DictionaryProvider = ({children}: DictionaryProviderProps) => {
@@ -180,17 +180,17 @@ const DictionaryProvider = ({children}: DictionaryProviderProps) => {
     }
   };
 
+  const getDictionary = async() => {
+    getPeriod();
+    getKPPN();
+    getRole();
+    getKomponen();
+    getSubKomponen();
+    getSubSubKomponen();
+  };
+
   useEffect(() => {
-    const render = async() => {
-      getPeriod();
-      getKPPN();
-      getRole();
-      getKomponen();
-      getSubKomponen();
-      getSubSubKomponen();
-    };
-    
-    auth?render():null
+    auth?getDictionary():null
   }, [auth])
 
   return(
@@ -201,8 +201,9 @@ const DictionaryProvider = ({children}: DictionaryProviderProps) => {
       roleRef, 
       komponenRef, 
       subKomponenRef,
-      subSubKomponenRef
-      }}>
+      subSubKomponenRef,
+      getDictionary
+    }}>
       {children}
     </DictionaryContext.Provider>
   )

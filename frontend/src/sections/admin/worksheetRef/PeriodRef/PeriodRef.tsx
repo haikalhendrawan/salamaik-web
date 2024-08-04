@@ -1,29 +1,10 @@
-import {useState, useEffect, useRef} from'react';
-import {Stack, Button, Box, Typography, Table, Card, Modal, FormControl, Paper, InputLabel, TableSortLabel,
-  Tooltip, TableHead, Grow, TableBody, TableRow, TableCell, Select, MenuItem} from '@mui/material';
-import { useTheme, styled } from '@mui/material/styles';
-import Iconify from '../../../../components/iconify';
-import Label from '../../../../components/label';
-import Scrollbar from '../../../../components/scrollbar';
-import StyledTextField from '../../../../components/styledTextField/StyledTextField';
-import StyledButton from '../../../../components/styledButton/StyledButton';
+import {useState, useEffect} from'react';
+import {Card, Grow} from '@mui/material';
+import { useTheme} from '@mui/material/styles';
 import PeriodRefTable from './PeriodRefTable';
 import PeriodRefModal from './PeriodRefModal';
 import useDictionary from '../../../../hooks/useDictionary';
 //----------------------------------------------------
-interface DictionaryType {
-  [key: string | number]: string | number | any[];
-  list: any[];
-};
-
-interface PeriodType{
-  id: number;
-  name: string; 
-  evenPeriod: 0;
-  semester: number;
-  tahun: string
-};
-
 interface PeriodRefProps {
   section: number,
   addState: boolean,

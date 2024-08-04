@@ -47,7 +47,7 @@ const BodyGrid = styled(Grid)(({theme}) => ({
 
 const StyledDivider = styled(Divider)(({theme}) => ({
   borderStyle: 'dashed', 
-  maringTop: theme.spacing(3)
+  marginTop: theme.spacing(3)
 }));
 
 // ------------------------------------------------------------

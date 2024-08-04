@@ -1,9 +1,10 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
+import Skeleton  from "@mui/material/Skeleton";
 import styled  from '@mui/material/styles/styled';
 import { WsJunctionType } from "../../types";
 import useSocket from "../../../../hooks/useSocket";
@@ -31,6 +32,8 @@ const StyledMenuItem = styled(MenuItem)(({}) => ({
 }))
 // ------------------------------------------------------------
 export default function Nilai({wsJunction}: NilaiPropsType) {
+  const [isMounted, setIsMounted] = useState(true);
+
   const {socket} = useSocket();
 
   const { auth } = useAuth();
@@ -99,6 +102,22 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
     });
 
   };
+
+  useEffect(() => {
+    setIsMounted(false);
+  }, []);
+
+  if(isMounted) {
+    return (
+      <>
+        <br/>
+        <Skeleton variant="rounded" height={'1.4375em'} width={'100%'} />
+        <br/>
+        <br/>
+        <Skeleton variant="rounded" height={'1.4375em'} width={'100%'} />
+      </>
+    )
+  }
 
 
   return (

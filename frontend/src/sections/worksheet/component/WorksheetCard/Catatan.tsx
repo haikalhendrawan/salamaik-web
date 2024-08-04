@@ -1,6 +1,7 @@
-import {useRef} from "react";
+import {useRef, useState, useEffect} from "react";
 import TextField from '@mui/material/TextField';
 import FormControl from '@mui/material/FormControl';
+import Skeleton  from "@mui/material/Skeleton";
 import styled from '@mui/material/styles/styled';
 import { WsJunctionType } from "../../types";
 import useSocket from "../../../../hooks/useSocket";
@@ -21,6 +22,8 @@ const StyledFormControl = styled(FormControl)(({theme}) => ({
 
 // ------------------------------------------------------------
 export default function Catatan({wsJunction}: CatatanPropsType) {
+  const [isMounted, setIsMounted] = useState(true);
+
   const initialNoteRef = useRef(wsJunction?.kanwil_note || '');
 
   const lastSavedNoteRef = useRef(wsJunction?.kanwil_note || "");
@@ -61,6 +64,15 @@ export default function Catatan({wsJunction}: CatatanPropsType) {
 
     });
   };
+
+  useEffect(() => {
+    setIsMounted(false);
+  }, []);
+
+  if(isMounted) {
+    return <Skeleton variant="rounded" height={'150px'} width={'100%'} />;
+  ;}
+
   return (
     <>
       <StyledFormControl key={wsJunction?.checklist_id}>

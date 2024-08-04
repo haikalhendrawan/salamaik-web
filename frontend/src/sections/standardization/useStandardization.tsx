@@ -40,7 +40,7 @@ const StandardizationProvider = ({children}: StandardizationProviderProps) => {
       setIsLoading(false);
     }catch(err: any){
       setIsLoading(false);
-      openSnackbar(err.response.data.message, "error");
+      openSnackbar(err?.response?.data?.message, "error");
     }finally{
       setIsLoading(false);
     }

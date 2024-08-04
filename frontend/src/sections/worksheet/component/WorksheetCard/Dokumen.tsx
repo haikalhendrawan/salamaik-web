@@ -1,7 +1,8 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState, useEffect } from 'react';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Tooltip from '@mui/material/Tooltip';
+import Skeleton  from "@mui/material/Skeleton";
 import useTheme  from '@mui/material/styles/useTheme';
 import styled  from '@mui/material/styles/styled';
 import usePreviewFileModal from '../../usePreviewFileModal';
@@ -32,6 +33,8 @@ interface DokumenProps{
 
 // ----------------------------------------------------------------------------
 export default function Dokumen({openInstruction, wsJunction}: DokumenProps){
+  const [isMounted, setIsMounted] = useState(true);
+
   const theme = useTheme();
 
   const { handleSetIsExampleFile, modalOpen, changeFile, selectId, setFileOption } = usePreviewFileModal();
@@ -104,6 +107,21 @@ export default function Dokumen({openInstruction, wsJunction}: DokumenProps){
   const isMaxFile = useMemo(() => {
     return wsJunction?.file_1 && wsJunction?.file_2 && wsJunction?.file_3;
   }, [wsJunction]);
+
+  useEffect(() => {
+    setIsMounted(false);
+  }, []);
+
+  if(isMounted) {
+    return (
+      <>
+        <Skeleton variant="rounded" height={'3em'} width={'50%'} />
+        <br/>
+        <br/>
+        <Skeleton variant="rounded" height={'3em'} width={'50%'} />
+      </>
+    )
+  }
 
   return(
     <>

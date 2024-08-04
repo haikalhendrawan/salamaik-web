@@ -86,7 +86,7 @@ export default function General(){
     picture: auth?.picture || '',
     kppn: auth?.kppn || '',
     role: auth?.role || 0,
-    period: auth?.period || '',
+    period: auth?.period || '0',
     status: auth?.status || 0
   });
 

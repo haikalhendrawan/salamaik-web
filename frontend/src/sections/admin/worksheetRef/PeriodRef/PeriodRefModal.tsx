@@ -1,10 +1,13 @@
-import {useState, useEffect, useRef} from'react';
-import {Stack, Button, Box, Typography, InputLabel, Select, MenuItem, Modal, FormControl, Paper, SelectChangeEvent} from '@mui/material';
-import { useTheme, styled } from '@mui/material/styles';
-import StyledDatePicker from '../../../../components/styledDatePicker/StyledDatePicker';
+import {useState, useEffect} from'react';
+import {Stack, Button, Box, Typography, MenuItem, Modal, FormControl, Paper, SelectChangeEvent} from '@mui/material';
+import { styled } from '@mui/material/styles';
 import Scrollbar from '../../../../components/scrollbar';
 import StyledTextField from '../../../../components/styledTextField/StyledTextField';
 import { StyledSelect, StyledSelectLabel } from '../../../../components/styledSelect';
+import useSnackbar from '../../../../hooks/display/useSnackbar';
+import useLoading from '../../../../hooks/display/useLoading';
+import useDictionary from '../../../../hooks/useDictionary';
+import useAxiosJWT from '../../../../hooks/useAxiosJWT';
 // -------------------------------------------------------------------------------------------
 const style = {
   position: 'absolute',
@@ -20,23 +23,21 @@ const style = {
 };
 
 const FormDataContainer = styled(Box)(({theme}) => ({
-height:'100%',
-display: 'flex', 
-flexDirection:'column', 
-alignItems:'start', 
-justifyContent:'start', 
-marginTop:theme.spacing(5),
-gap:theme.spacing(3)
+  height:'100%',
+  display: 'flex', 
+  flexDirection:'column', 
+  alignItems:'start', 
+  justifyContent:'start', 
+  marginTop:theme.spacing(5),
+  gap:theme.spacing(3)
 }));
-
-
 
 interface PeriodType{
   id: number;
   name: string; 
   evenPeriod: 0;
   semester: number;
-  tahun: string
+  tahun: number
 };
 
 interface PeriodRefModalProps {
@@ -50,15 +51,47 @@ interface PeriodRefModalProps {
 
 //----------------------------------------------------------------
 export default function PeriodRefModal({modalOpen, modalClose, addState, editID, data}: PeriodRefModalProps) {
+  const {setIsLoading} = useLoading();
+
+  const {openSnackbar} = useSnackbar();
+
+  const {getDictionary} = useDictionary();
+
+  const axiosJWT = useAxiosJWT();
+
   const [addValue, setAddValue] = useState<PeriodType>({
     id: 0,
     name: '',
     evenPeriod: 0,
-    semester: 0,
-    tahun: '',
+    semester: 1,
+    tahun: new Date().getFullYear(),
   });
 
-  const handleChangeAdd = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>) => {
+  const handleSubmitAdd = async() => {
+    console.log(addValue);
+    try{
+      setIsLoading(true);
+      const data = {
+        semester: addValue.semester,
+        tahun: addValue.tahun,
+      };
+      const response = await axiosJWT.post('/addPeriod', data);
+      openSnackbar(response.data.message, "success");
+      getDictionary();
+      setIsLoading(false);
+      modalClose();
+    }catch(err: any){
+      if(err.response){
+        openSnackbar(err.response.data.message, "error");
+        setIsLoading(false);
+      }else{
+        openSnackbar("Network Error", "error");
+        setIsLoading(false);
+      }
+    }
+  };
+
+  const handleChangeAdd = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement> | SelectChangeEvent<unknown>) => {
     setAddValue({
       ...addValue,
       [e.target.name]:e.target.value
@@ -70,8 +103,8 @@ export default function PeriodRefModal({modalOpen, modalClose, addState, editID,
       id: 0,
       name: '',
       evenPeriod: 0,
-      semester: 0,
-      tahun: '',
+      semester: 1,
+      tahun: new Date().getFullYear(),
     })
   };
 
@@ -79,11 +112,15 @@ export default function PeriodRefModal({modalOpen, modalClose, addState, editID,
     id: 0,
     name: '',
     evenPeriod: 0,
-    semester: 0,
-    tahun: '',
+    semester: 1,
+    tahun: new Date().getFullYear(),
   });
 
-  const handleChangeEdit = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>) => {
+  const handleSubmitEdit = () => {
+   
+  };
+
+  const handleChangeEdit = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement> | SelectChangeEvent<unknown>) => {
     setEditValue({
       ...editValue,
       [e.target.name]:e.target.value
@@ -95,8 +132,8 @@ export default function PeriodRefModal({modalOpen, modalClose, addState, editID,
       id: data?.filter((row) => row.id===editID)[0].id || 0,
       name: data?.filter((row) => row.id===editID)[0].name || '',
       evenPeriod: data?.filter((row) => row.id===editID)[0].evenPeriod || 0,
-      semester: data?.filter((row) => row.id===editID)[0].semester || 0,
-      tahun: data?.filter((row) => row.id===editID)[0].tahun || '',
+      semester: data?.filter((row) => row.id===editID)[0].semester || 1,
+      tahun: data?.filter((row) => row.id===editID)[0].tahun || new Date().getFullYear(),
     })
   };
 
@@ -106,11 +143,24 @@ export default function PeriodRefModal({modalOpen, modalClose, addState, editID,
         id: data?.filter((row) => row.id===editID)[0].id || 0,
         name: data?.filter((row) => row.id===editID)[0].name || '',
         evenPeriod: data?.filter((row) => row.id===editID)[0].evenPeriod || 0,
-        semester: data?.filter((row) => row.id===editID)[0].semester || 0,
-        tahun: data?.filter((row) => row.id===editID)[0].tahun || '',
+        semester: data?.filter((row) => row.id===editID)[0].semester || 1,
+        tahun: data?.filter((row) => row.id===editID)[0].tahun || new Date().getFullYear(),
       })
     }
-  }, [data, editID])
+  }, [data, editID]);
+
+  function getYearRange() {
+    const currentYear = new Date().getFullYear();
+    const startYear = currentYear - 2;
+    const endYear = currentYear + 5;
+    const years = [];
+  
+    for (let year = startYear; year <= endYear; year++) {
+      years.push(year);
+    }
+  
+    return years;
+  };
 
 
   // ----------------------------------------------------------------------------------------
@@ -128,31 +178,37 @@ export default function PeriodRefModal({modalOpen, modalClose, addState, editID,
                   <FormDataContainer>
                     <Stack direction='row' spacing={2} sx={{width:'100%'}} justifyContent={'start'}>
                       <Stack direction='column' spacing={3} sx={{width:'45%'}}>
-                        <FormControl>
-                          <StyledTextField 
-                            name="name" 
-                            label="Nama Periode"
-                            multiline
-                            minRows={2}
-                            value={ addState? addValue.name : editValue.name}
-                            onChange={addState? handleChangeAdd : handleChangeEdit}
-                          />
+                      <FormControl>
+                          <StyledSelectLabel id="tahun-select-label" sx={{typography:'body2'}}>Tahun</StyledSelectLabel>
+                            <StyledSelect 
+                              name="tahun" 
+                              label='Tahun'
+                              labelId="tahun-select-label"
+                              value={addState? addValue.tahun.toString() : editValue.tahun.toString()}
+                              onChange={addState? handleChangeAdd : handleChangeEdit}
+                              sx={{typography:'body2', fontSize:14, height:'100%'}}
+                            >
+                              {getYearRange().map((year, index) => (
+                                <MenuItem key={index} sx={{fontSize:14}} value={year}>{year}</MenuItem>
+                              ))}
+                          </StyledSelect>
                         </FormControl>
-
                       </Stack>
                       <Stack direction='column' spacing={3} sx={{width:'45%'}}>
-                        <InputLabel id="evenPeriod-select-label" sx={{typography:'body2'}}>Jenis</InputLabel>
-                        <Select 
-                          name="evenPeriod" 
-                          label='Komponen'
-                          labelId="komponen-select-label"
-                          value={addState? addValue.evenPeriod.toString() : editValue.evenPeriod.toString()}
-                          onChange={addState? handleChangeAdd : handleChangeEdit}
-                          sx={{typography:'body2', fontSize:14, height:'100%'}}
-                        >
-                          <MenuItem key={0} sx={{fontSize:14}} value={0}>Ganjil</MenuItem>
-                          <MenuItem key={1} sx={{fontSize:14}} value={1}>Genap</MenuItem>
-                        </Select>
+                        <FormControl>
+                          <StyledSelectLabel id="semester-select-label" sx={{typography:'body2'}}>Semester</StyledSelectLabel>
+                            <StyledSelect 
+                              name="semester" 
+                              label='Semester'
+                              labelId="semester-select-label"
+                              value={addState? addValue.semester.toString() : editValue.semester.toString()}
+                              onChange={addState? handleChangeAdd : handleChangeEdit}
+                              sx={{typography:'body2', fontSize:14, height:'100%'}}
+                            >
+                              <MenuItem key={0} sx={{fontSize:14}} value={1}>1 (Ganjil)</MenuItem>
+                              <MenuItem key={1} sx={{fontSize:14}} value={2}>2 (Genap)</MenuItem>
+                          </StyledSelect>
+                        </FormControl>
                       </Stack>
                     </Stack>
 
@@ -161,6 +217,7 @@ export default function PeriodRefModal({modalOpen, modalClose, addState, editID,
                         variant='contained'
                         color={addState? 'primary' : 'warning'} 
                         sx={{borderRadius:'8px'}}
+                        onClick={addState? handleSubmitAdd : handleSubmitEdit}
                       >
                         {addState? 'Add' : 'Edit'} 
                       </Button>
