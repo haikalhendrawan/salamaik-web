@@ -82,7 +82,7 @@ export default function Kriteria({kriteria, opsi}: KriteriaProps) {
   if(isMounted) {
     return (
     <>
-      <Box>
+      <Box marginLeft={4}>
         <Skeleton variant="rounded" height={'1em'} width={'80%'} />
         <br/>
         <Skeleton variant="rounded" height={'1em'} width={'50%'} />

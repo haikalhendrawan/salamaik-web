@@ -77,71 +77,69 @@ export default function WorksheetCard(props: WorksheetCardProps) {
 
   return (
     <>
-      <Grow in>
-        <Grid item xs={12} sm={12} md={12}>
-          <Card sx={{ minHeight: '300px' }} id={props.id} key={props.wsJunction?.checklist_id}>
-            <StyledCardHeader
-              title={
-                <Head
-                  num={props.wsJunction?.checklist_id}
-                  title={props.wsJunction?.title || ""}
-                  dateUpdated={props.wsJunction?.last_update || null}
-                  updatedBy={props.wsJunction?.updated_by || null}
-                />
-              }
-            />
+      <Grid item xs={12} sm={12} md={12}>
+        <Card sx={{ minHeight: '300px' }} id={props.id} key={props.wsJunction?.checklist_id}>
+          <StyledCardHeader
+            title={
+              <Head
+                num={props.wsJunction?.checklist_id}
+                title={props.wsJunction?.title || ""}
+                dateUpdated={props.wsJunction?.last_update || null}
+                updatedBy={props.wsJunction?.updated_by || null}
+              />
+            }
+          />
 
-            <HeadGrid container spacing={0}>
-              {/* Table Header */}
-              <Grid item xs={6}>
-                <Typography variant="body2">
-                  Kriteria
-                </Typography>
-              </Grid>
+          <HeadGrid container spacing={0}>
+            {/* Table Header */}
+            <Grid item xs={6}>
+              <Typography variant="body2">
+                Kriteria
+              </Typography>
+            </Grid>
 
-              <Grid item xs={1.5}>
-                <Typography variant="body2">Dokumen</Typography>
-              </Grid>
+            <Grid item xs={1.5}>
+              <Typography variant="body2">Dokumen</Typography>
+            </Grid>
 
-              <Grid item xs={1.5}>
-                <Typography variant="body2">Nilai</Typography>
-              </Grid>
+            <Grid item xs={1.5}>
+              <Typography variant="body2">Nilai</Typography>
+            </Grid>
 
-              <Grid item xs={3}>
-                <Typography variant="body2">Catatan Kanwil</Typography>
-              </Grid>
-            </HeadGrid>
+            <Grid item xs={3}>
+              <Typography variant="body2">Catatan Kanwil</Typography>
+            </Grid>
+          </HeadGrid>
 
-            <Divider flexItem />
+          <Divider flexItem />
 
-            <BodyGrid
-              container
-              spacing={1}
-            >
-              <Grid item xs={6}>
-                <Kriteria
-                  kriteria={props.wsJunction?.header || ""}
-                  opsi={props?.wsJunction?.opsi || []}
-                />
-              </Grid>
+          <BodyGrid
+            container
+            spacing={1}
+          >
+            <Grid item xs={6}>
+              <Kriteria
+                kriteria={props.wsJunction?.header || ""}
+                opsi={props?.wsJunction?.opsi || []}
+              />
+            </Grid>
 
-              <Grid item xs={1.5}>
-                <Dokumen openInstruction={handleOpenInstruction} wsJunction={props.wsJunction} />
-              </Grid>
+            <Grid item xs={1.5}>
+              <Dokumen openInstruction={handleOpenInstruction} wsJunction={props.wsJunction} />
+            </Grid>
 
-              <Grid item xs={1.5}>
-                <Nilai wsJunction={props.wsJunction} />
-              </Grid>
+            <Grid item xs={1.5}>
+              <Nilai wsJunction={props.wsJunction} />
+            </Grid>
 
-              <Grid item xs={3}>
-                <Catatan key={props.wsJunction?.checklist_id} wsJunction={props.wsJunction}/>
-              </Grid>
-            </BodyGrid>
+            <Grid item xs={3}>
+              <Catatan key={props.wsJunction?.checklist_id} wsJunction={props.wsJunction}/>
+            </Grid>
+          </BodyGrid>
 
-            <StyledDivider  />
-          </Card>
-        </Grid>
-      </Grow>
+          <StyledDivider  />
+        </Card>
+      </Grid>
 
       <InstructionPopover
         open={openInstruction}

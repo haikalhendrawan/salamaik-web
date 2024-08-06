@@ -1,11 +1,8 @@
 import { Helmet } from 'react-helmet-async';
-import {useState, useEffect} from 'react';
+import {useState} from 'react';
 // @mui
-import { styled, useTheme } from '@mui/material/styles';
-import { Link, Container, Typography, Divider, Stack, Button, Card, Alert, Box, LinearProgress} from '@mui/material';
-import LoadingButton from '@mui/lab/LoadingButton';
-// hooks
-import useResponsive from '../../hooks/display/useResponsive';
+import { styled } from '@mui/material/styles';
+import {  Container, Typography,  Stack,  Box} from '@mui/material';
 // sections
 import ForgotPassIdentifier from '../../sections/auth/resetPassword/ForgotPassIdentifier';
 import ForgotPassOtp from '../../sections/auth/resetPassword/ForgotPassOtp';
@@ -41,11 +38,6 @@ interface ValueType{
   username: string;
   email: string;
 };
-
-interface SubmitValueType{
-  password: string;
-  confirmPassword: string;
-};
 // ----------------------------------------------------------------------
 
 export default function ResetPasswordPage() {
@@ -59,11 +51,6 @@ export default function ResetPasswordPage() {
     username:"",
     email:"",
   }); 
-
-  const [submitvalue, setSubmitValue] = useState<SubmitValueType>({
-    password: "",
-    confirmPassword:""
-  });
 
   const handleChangeIdentifier = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setIdentityValue({...identityValue, [event.target.name]: event.target.value});

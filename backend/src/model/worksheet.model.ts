@@ -57,7 +57,7 @@ class Worksheet{
     try{
       const id = uuidv4();
       const q = ` INSERT INTO worksheet_ref (id, kppn_id, period, status, open_period, close_period, matrix_status, open_follow_up, close_follow_up) 
-                  VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
+                  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
                   RETURNING *`;
       const result = await pool.query(q, [id, kppnId, period, 0, startDate, closeDate, 0, openFollowUp, closeFollowUp]);
       return result.rows[0]

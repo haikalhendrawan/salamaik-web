@@ -1,7 +1,8 @@
-import {useRef, useState, useEffect} from "react";
+import {useRef, useState, useEffect, useMemo} from "react";
 import TextField from '@mui/material/TextField';
 import FormControl from '@mui/material/FormControl';
 import Skeleton  from "@mui/material/Skeleton";
+import Box from '@mui/material/Box';
 import styled from '@mui/material/styles/styled';
 import { WsJunctionType } from "../../types";
 import useSocket from "../../../../hooks/useSocket";
@@ -35,6 +36,10 @@ export default function Catatan({wsJunction}: CatatanPropsType) {
   const {openSnackbar} = useSnackbar();
 
   const {getWsJunctionKanwil} = useWsJunction();
+
+  const isKanwil = useMemo(() =>{
+    return auth?.kppn==='03010';
+  }, [auth]);
 
   const handleEditKanwilNote = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const currentNote = e.target.value;
@@ -70,7 +75,7 @@ export default function Catatan({wsJunction}: CatatanPropsType) {
   }, []);
 
   if(isMounted) {
-    return <Skeleton variant="rounded" height={'150px'} width={'100%'} />;
+    return <Box marginRight={2}> <Skeleton variant="rounded" height={'150px'} width={'100%'} /> </Box>;
   ;}
 
   return (
@@ -86,6 +91,7 @@ export default function Catatan({wsJunction}: CatatanPropsType) {
           maxRows={6}
           fullWidth
           inputProps={{sx: {fontSize: 12, width:'100%', height:'100%'}, spellCheck: false}} 
+          disabled={!isKanwil}
         />
       </StyledFormControl>
     </>

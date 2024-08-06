@@ -32,7 +32,7 @@ export default function Page403() {
           </Typography>
 
           <Typography sx={{ color: 'text.secondary' }}>
-            This module will be accessible in the future, stay tune!
+            This module is not accessible!
           </Typography>
 
           <Box

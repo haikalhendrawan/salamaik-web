@@ -13,7 +13,7 @@ export interface ChecklistType{
   file1: string | null,
   file2: string | null,
   instruksi: string | null,
-  contoh_file: string | null
+  contoh_file: string | null,
   peraturan: string | null,
   uic: string | null
 };

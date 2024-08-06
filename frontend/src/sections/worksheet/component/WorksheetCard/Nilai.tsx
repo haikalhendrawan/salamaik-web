@@ -5,6 +5,10 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Skeleton  from "@mui/material/Skeleton";
+import Tooltip from '@mui/material/Tooltip';
+import StyledButton from '../../../../components/styledButton/StyledButton';
+import Iconify from '../../../../components/iconify/Iconify';
+import { TextField } from '@mui/material';
 import styled  from '@mui/material/styles/styled';
 import { WsJunctionType } from "../../types";
 import useSocket from "../../../../hooks/useSocket";
@@ -29,6 +33,24 @@ const StyledSelect = styled(Select)(({}) => ({
 
 const StyledMenuItem = styled(MenuItem)(({}) => ({
   fontSize: 12,
+}));
+
+const StyledNumberTextField = styled(TextField)(({}) => ({
+  typography:'body2',
+  '& .MuiInputBase-input': {
+    fontSize: 12,
+    height:'1.4375em',
+    borderRadius:'12px',
+  },
+  "& .MuiInputLabel-root": {
+    fontSize: "13px"
+  },
+  "& .MuiInputLabel-shrink": {
+    fontSize: '1rem',
+    fontWeight: 600,
+  },
+  width:'50%',
+
 }))
 // ------------------------------------------------------------
 export default function Nilai({wsJunction}: NilaiPropsType) {
@@ -46,7 +68,7 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
 
   const isKanwil = useMemo(() =>{
     return auth?.kppn==='03010';
-  }, [auth])
+  }, [auth]);
 
   const opsiSelection = wsJunction?.opsi?.map((item, index) => (
     <StyledMenuItem key={index+1} value={item?.value?.toString() || ''}>{item?.value}</StyledMenuItem>
@@ -103,6 +125,88 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
 
   };
 
+  const handleChangeKanwilScoreStd = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const regex = /^(12(\.0{1,2})?|11(\.\d{1,2})?|10(\.\d{1,2})?|[0-9](\.\d{1,2})?|0(\.\d{1,2})?)$/;
+
+    const newScore = e.target.value;
+    
+    if (!regex.test(newScore)) {
+      e.target.value = '';
+      return openSnackbar("Nilai harus berupa angka 0 - 12, (desimal gunakan titik)", "error");
+    };
+
+    const score = parseFloat(newScore);
+
+    if (score < 0 || score > 12) {
+      e.target.value = '';
+      return openSnackbar("Nilai maksimal 12", "error");
+    };
+
+    setIsLoading(true);
+
+    if(socket?.connected === false) {
+      return openSnackbar("websocket failed, check your connection", "error");
+    };
+
+    socket?.emit("updateKanwilScore", {
+      worksheetId: wsJunction?.worksheet_id, 
+      junctionId: wsJunction?.junction_id, 
+      kanwilScore: score,
+      userName: auth?.name
+    }, async(response: any) => {
+      try{
+        console.log(response.success);
+        await getWsJunctionKanwil(wsJunction?.kppn_id || '');
+        setIsLoading(false);
+      }catch(err: any){
+        openSnackbar(err?.message, 'error');
+      }
+
+    });
+  };
+
+  const handleChangeKPPNScoreStd = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const regex = /^(12(\.0{1,2})?|11(\.\d{1,2})?|10(\.\d{1,2})?|[0-9](\.\d{1,2})?|0(\.\d{1,2})?)$/;
+
+    const newScore = e.target.value;
+    
+    if (!regex.test(newScore)) {
+      e.target.value = '';
+      return openSnackbar("Nilai harus berupa angka 0 - 12, (desimal gunakan titik)", "error");
+    };
+
+    const score = parseFloat(newScore);
+
+    if (score < 0 || score > 12) {
+      e.target.value = '';
+      return openSnackbar("Nilai maksimal 12", "error");
+    };
+
+    setIsLoading(true);
+
+    if(socket?.connected === false) {
+      return openSnackbar("websocket failed, check your connection", "error");
+    };
+
+    socket?.emit("updateKPPNScore", {
+      worksheetId: wsJunction?.worksheet_id, 
+      junctionId: wsJunction?.junction_id, 
+      kppnScore: score,
+      userName: auth?.name
+    }, async (response: any) => {
+      try{
+        console.log(response);
+        await getWsJunctionKanwil(wsJunction?.kppn_id || '');
+        setIsLoading(false);
+      }catch(err: any){
+        openSnackbar(err?.message, 'error');
+      }
+
+    });
+
+
+  };
+
   useEffect(() => {
     setIsMounted(false);
   }, []);
@@ -125,34 +229,90 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
       <Stack direction='column' spacing={1} >
         <Typography variant='body3' fontSize={12} textAlign={'left'}>Nilai KPPN :</Typography>
         <StyledFormControl>
-          <StyledSelect
-            required 
-            name="kppnScore" 
-            value={wsJunction?.kppn_score !== null ? String(wsJunction?.kppn_score) : ''}
-            onChange = {(e) => handleChangeKPPNScore(e.target.value as string)}
-            size='small' 
-            disabled ={isKanwil}
-          >
-            {opsiSelection}
-            <StyledMenuItem key={null} value={''}>{null}</StyledMenuItem>
-          </StyledSelect>
+          {
+            wsJunction?.standardisasi === 1
+            ?
+              <Stack direction='row' spacing={2}>
+                <StyledNumberTextField  
+                  size='small'
+                  type="number"
+                  onBlur={(e) => handleChangeKPPNScoreStd(e)}
+                  disabled ={isKanwil}
+                />
+                <Tooltip title='Ambil nilai standardisasi'>
+                    <span>
+                      <StyledButton 
+                        aria-label="edit" 
+                        variant='contained' 
+                        size='small' 
+                        color='warning'
+                        disabled ={isKanwil}
+                        // onClick={() => handleOpenExampleFile(1)}
+                      >
+                        <Iconify icon="solar:refresh-bold-duotone"/>
+                      </StyledButton>
+                    </span>
+                  </Tooltip>
+              </Stack>
+
+            :
+              <StyledSelect
+                required 
+                name="kppnScore" 
+                value={wsJunction?.kppn_score !== null ? String(wsJunction?.kppn_score) : ''}
+                onChange = {(e) => handleChangeKPPNScore(e.target.value as string)}
+                size='small' 
+                disabled ={isKanwil}
+              >
+                {opsiSelection}
+                <StyledMenuItem key={null} value={''}>{null}</StyledMenuItem>
+              </StyledSelect>
+          }
         </StyledFormControl>
       </Stack>
       
       <Stack direction='column' spacing={1}>
         <Typography variant='body3' fontSize={12} textAlign={'left'}>Nilai Kanwil :</Typography>
         <StyledFormControl>
-          <StyledSelect 
-            required 
-            name="kanwilScore" 
-            value={wsJunction?.kanwil_score !== null ? String(wsJunction?.kanwil_score) : ''} 
-            onChange={(e) => handleChangeKanwilScore(e.target.value as string)}
-            size='small' 
-            disabled={!isKanwil}
-          >
-            {opsiSelection}
-            <StyledMenuItem key={null} value={''}>{null}</StyledMenuItem>
-          </StyledSelect>
+          {
+            wsJunction?.standardisasi === 1
+            ?
+              <Stack direction='row' spacing={2}>
+                <StyledNumberTextField  
+                  size='small'
+                  type="number"
+                  onBlur={(e) => handleChangeKanwilScoreStd(e)}
+                  disabled ={!isKanwil}
+                />
+                <Tooltip title='Ambil nilai standardisasi'>
+                    <span>
+                      <StyledButton 
+                        aria-label="edit" 
+                        variant='contained' 
+                        size='small' 
+                        color='warning'
+                        disabled ={!isKanwil}
+                        // onClick={() => handleOpenExampleFile(1)}
+                      >
+                        <Iconify icon="solar:refresh-bold-duotone"/>
+                      </StyledButton>
+                    </span>
+                  </Tooltip>
+              </Stack>
+            :
+              <StyledSelect 
+                required 
+                name="kanwilScore" 
+                value={wsJunction?.kanwil_score !== null ? String(wsJunction?.kanwil_score) : ''} 
+                onChange={(e) => handleChangeKanwilScore(e.target.value as string)}
+                size='small' 
+                disabled={!isKanwil}
+              >
+                {opsiSelection}
+                <StyledMenuItem key={null} value={''}>{null}</StyledMenuItem>
+              </StyledSelect>
+          }
+          
         </StyledFormControl>
       </Stack>
       

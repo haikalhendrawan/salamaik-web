@@ -1,14 +1,7 @@
 import { Helmet } from 'react-helmet-async';
-import {useState, useEffect} from 'react';
 // @mui
-import { styled, useTheme, alpha } from '@mui/material/styles';
-import { Link, Container, Typography, Divider, Stack, Button, Card, Alert, Box, LinearProgress} from '@mui/material';
-import LoadingButton from '@mui/lab/LoadingButton';
-// hooks
-import useResponsive from '../../hooks/display/useResponsive';
-// components
-import Logo from '../../components/logo';
-import Iconify from '../../components/iconify';
+import { styled } from '@mui/material/styles';
+import { Link, Container, Typography, Box} from '@mui/material';
 // sections
 import { LoginForm } from '../../sections/auth/login';
 
@@ -28,7 +21,7 @@ const StyledSection = styled('div')(({ theme }) => ({
   flexDirection: 'column',
   justifyContent: 'center',
   boxShadow: theme.customShadows.card,
-  // backgroundImage:'url(/assets/bg.png)'
+  backgroundColor: theme.palette.primary.main
 }));
 
 
@@ -46,18 +39,6 @@ const StyledContent = styled('div')(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 export default function LoginPage() {
-  const theme = useTheme();
-
-  const primaryLight = theme.palette.primary.dark;
-
-  const primaryDark = theme.palette.primary.darker;
-
-  const [showAlert, setShowAlert] = useState(false);
-
-  const handleClick=()=>{
-    setShowAlert((prevState)=>{return !prevState})
-  };
-
   return (
     <>
       <Helmet>
@@ -73,7 +54,7 @@ export default function LoginPage() {
           left: { xs: 16, md: 24 }, }}
         />
           <StyledSection>
-            <img
+            {/* <img
               src={'/image/Other 14.png'}
               alt="background"
               style={{
@@ -82,7 +63,7 @@ export default function LoginPage() {
                 background:'cover',
                 fill: '#FFFFFF',
               }}
-            />
+            /> */}
           </ StyledSection>
           
         <Container maxWidth="sm" >
@@ -96,11 +77,14 @@ export default function LoginPage() {
 
             <LoginForm />   {/* logika dihandle di komponen ini */}
             
-            <Stack direction="column" justifyContent="center" alignItems="center" spacing={0} sx={{bottom:10, position:'fixed', width:'38%'}}>
-                {/* <Typography variant='body2'>Modul Monev TIK</Typography> */}
-                <Typography variant='body2'>Copyright © 2024 Kanwil DJPb Prov Sumbar</Typography>
-            </Stack>
+            <div style={{width: 480, textAlign:'center', position:'fixed', bottom: 0, margin: 'auto', marginBottom: 10}}>
+              <Typography variant='body2' color="text.secondary">Copyright © 2024 Kanwil DJPb Prov Sumbar</Typography>
+            </div>
           </StyledContent>
+          {/* <Stack direction="column" justifyContent="center" alignItems="center" spacing={0} sx={{bottom:10, position:'fixed', width:'100%'}}> */}
+
+              
+          {/* </Stack> */}
         </Container>
       </StyledRoot>
     </>

@@ -3,8 +3,8 @@ import worksheet, { WorksheetType } from '../model/worksheet.model';
 import checklist, { ChecklistType } from '../model/checklist.model';
 import wsJunction from '../model/worksheetJunction.model';
 import pool from '../config/db';
+import dayjs from 'dayjs';
 // ------------------------------------------------------
-
 const getAllWorksheet = async(req: Request, res: Response, next: NextFunction) => {
   try {
     const period = req.payload.period;
@@ -19,6 +19,12 @@ const getAllWorksheet = async(req: Request, res: Response, next: NextFunction) =
 const addWorksheet = async(req: Request, res: Response, next: NextFunction) => {
   try {
     const { kppnId, startDate, closeDate, openFollowUp, closeFollowUp } = req.body;
+    const isValidDate = validateDates(startDate, closeDate, openFollowUp, closeFollowUp);
+
+    if (!isValidDate.success) {
+      return res.status(400).json({sucess: false, message: isValidDate.message})
+    };
+
     const period = req.payload.period;
     const isWorksheetExist = await worksheet.checkWorksheetExist(kppnId, period);
 
@@ -84,3 +90,29 @@ export {
   editWorksheetPeriod,
   deleteWorksheet
 }
+
+// ------------------------------------------------------------------------------------------------------
+function validateDates (startDateStr: string, closeDateStr: string, openFollowUpStr: string, closeFollowUpStr: string){
+  const startDate = dayjs(startDateStr);
+  const closeDate = dayjs(closeDateStr);
+  const openFollowUp = dayjs(openFollowUpStr);
+  const closeFollowUp = dayjs(closeFollowUpStr);
+
+  if (!startDate.isValid() || !closeDate.isValid() || !openFollowUp.isValid() || !closeFollowUp.isValid()) {
+    return { success: false, message: 'Invalid date format.' };
+  }
+
+  if (startDate.isAfter(closeDate)) {
+    return { success: false, message: 'Open period must be earlier than close period.' };
+  }
+
+  if (openFollowUp.isAfter(closeFollowUp)) {
+    return { success: false, message: 'Open period tindak lanjut must be earlier than close period tindak lanjut.' };
+  }
+
+  if (openFollowUp.isBefore(closeDate)) {
+    return { success: false, message: 'Open period tindak lanjut must happen after close period.' };
+  }
+
+  return { success: true };
+};
