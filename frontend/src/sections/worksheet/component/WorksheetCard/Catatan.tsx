@@ -80,9 +80,8 @@ export default function Catatan({wsJunction}: CatatanPropsType) {
 
   return (
     <>
-      <StyledFormControl key={wsJunction?.checklist_id}>
+      <StyledFormControl>
         <TextField 
-          key={wsJunction?.checklist_id} 
           size='small' 
           defaultValue={initialNoteRef.current}
           onBlur={(e) => handleEditKanwilNote(e)} 

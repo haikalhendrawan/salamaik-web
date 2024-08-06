@@ -22,7 +22,8 @@ interface ChecklistType{
   instruksi: string | null,
   contoh_file: string | null
   peraturan: string | null,
-  uic: string | null
+  uic: string | null, 
+  checklist_id: number | null
 };
 
 const getAllChecklist = async (req: Request, res: Response, next: NextFunction) => {

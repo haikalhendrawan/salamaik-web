@@ -98,7 +98,7 @@ export default function Dokumen({openInstruction, wsJunction}: DokumenProps){
       setIsLoading(false); 
     }catch(err: any){
       setIsLoading(false);
-      openSnackbar(`Upload failed, ${err.response.data.message}`, "error");
+      openSnackbar(`Upload failed, ${err?.response?.data?.message}`, "error");
     }finally{
       setIsLoading(false);
     }

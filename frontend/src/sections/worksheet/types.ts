@@ -36,5 +36,6 @@ export interface WsJunctionType{
     contoh_file: string | null,
     peraturan: string | null,
     uic: string | null,
+    standardisasi_id: number | null,
     opsi: OpsiType[] | [] | null
 }

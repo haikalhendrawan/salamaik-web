@@ -3,7 +3,6 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
-import Grow from '@mui/material/Grow';
 import Divider from '@mui/material/Divider';
 import Skeleton from '@mui/material/Skeleton';
 import InstructionPopover from "../InstructionPopover";
@@ -133,7 +132,7 @@ export default function WorksheetCard(props: WorksheetCardProps) {
             </Grid>
 
             <Grid item xs={3}>
-              <Catatan key={props.wsJunction?.checklist_id} wsJunction={props.wsJunction}/>
+              <Catatan wsJunction={props.wsJunction}/>
             </Grid>
           </BodyGrid>
 

@@ -16,6 +16,9 @@ import useWsJunction from "../../useWsJunction";
 import {useAuth} from "../../../../hooks/useAuth";
 import useLoading from "../../../../hooks/display/useLoading";
 import useSnackbar from "../../../../hooks/display/useSnackbar";
+import useAxiosJWT from '../../../../hooks/useAxiosJWT';
+import { StandardizationType } from '../../../standardization/types';
+
 // ------------------------------------------------------------
 interface NilaiPropsType{
   wsJunction: WsJunctionType | null,
@@ -50,15 +53,20 @@ const StyledNumberTextField = styled(TextField)(({}) => ({
     fontWeight: 600,
   },
   width:'50%',
+}));
 
-}))
 // ------------------------------------------------------------
 export default function Nilai({wsJunction}: NilaiPropsType) {
   const [isMounted, setIsMounted] = useState(true);
 
+  const [stdScoreKanwil, setStdScoreKanwil] = useState(wsJunction?.kanwil_score || '');
+  const [stdScoreKPPN, setStdScoreKPPN] = useState(wsJunction?.kppn_score || '');
+
   const {socket} = useSocket();
 
   const { auth } = useAuth();
+
+  const axiosJWT = useAxiosJWT();
 
   const {setIsLoading} = useLoading();
 
@@ -70,9 +78,9 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
     return auth?.kppn==='03010';
   }, [auth]);
 
-  const opsiSelection = wsJunction?.opsi?.map((item, index) => (
+  const opsiSelection = useMemo(() => wsJunction?.opsi?.map((item, index) => (
     <StyledMenuItem key={index+1} value={item?.value?.toString() || ''}>{item?.value}</StyledMenuItem>
-  ) || null);
+  ) || null), [wsJunction]);
 
   const handleChangeKanwilScore = (newScore: string) => {
     setIsLoading(true);
@@ -95,7 +103,6 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
       }catch(err: any){
         openSnackbar(err?.message, 'error');
       }
-
     });
   };
 
@@ -120,9 +127,7 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
       }catch(err: any){
         openSnackbar(err?.message, 'error');
       }
-
     });
-
   };
 
   const handleChangeKanwilScoreStd = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -132,16 +137,19 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
     
     if (!regex.test(newScore)) {
       e.target.value = '';
+      setStdScoreKanwil('');
       return openSnackbar("Nilai harus berupa angka 0 - 12, (desimal gunakan titik)", "error");
     };
 
     const score = parseFloat(newScore);
 
     if (score < 0 || score > 12) {
-      e.target.value = '';
+      e.target.value = wsJunction?.kanwil_score?.toString() || '';
+      setStdScoreKanwil(wsJunction?.kanwil_score?.toString() || '');
       return openSnackbar("Nilai maksimal 12", "error");
     };
 
+    setStdScoreKanwil(newScore);
     setIsLoading(true);
 
     if(socket?.connected === false) {
@@ -153,15 +161,13 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
       junctionId: wsJunction?.junction_id, 
       kanwilScore: score,
       userName: auth?.name
-    }, async(response: any) => {
+    }, async() => {
       try{
-        console.log(response.success);
         await getWsJunctionKanwil(wsJunction?.kppn_id || '');
         setIsLoading(false);
       }catch(err: any){
         openSnackbar(err?.message, 'error');
       }
-
     });
   };
 
@@ -172,16 +178,19 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
     
     if (!regex.test(newScore)) {
       e.target.value = '';
+      setStdScoreKPPN('');
       return openSnackbar("Nilai harus berupa angka 0 - 12, (desimal gunakan titik)", "error");
     };
 
     const score = parseFloat(newScore);
 
     if (score < 0 || score > 12) {
-      e.target.value = '';
+      e.target.value = wsJunction?.kppn_score?.toString() || '';
+      setStdScoreKPPN(wsJunction?.kppn_score?.toString() || '');
       return openSnackbar("Nilai maksimal 12", "error");
     };
 
+    setStdScoreKPPN(newScore);
     setIsLoading(true);
 
     if(socket?.connected === false) {
@@ -193,18 +202,80 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
       junctionId: wsJunction?.junction_id, 
       kppnScore: score,
       userName: auth?.name
-    }, async (response: any) => {
+    }, async () => {
       try{
-        console.log(response);
         await getWsJunctionKanwil(wsJunction?.kppn_id || '');
         setIsLoading(false);
       }catch(err: any){
         openSnackbar(err?.message, 'error');
       }
-
     });
+  };
 
+  const handleFetchStdScoreKanwil = async() => {
+    try{
+      setIsLoading(true);
+      const response = await axiosJWT.get(`/getStdWorksheet/${wsJunction?.kppn_id}`);
+      const stdArray = response?.data?.rows;
+      const score = stdArray?.filter((s: StandardizationType) => s?.id === wsJunction?.standardisasi_id)?.[0]?.score || 0;
 
+      socket?.emit("updateKanwilScore", {
+        worksheetId: wsJunction?.worksheet_id, 
+        junctionId: wsJunction?.junction_id, 
+        kanwilScore: score,
+        userName: auth?.name
+      }, async(response: any) => {
+        try{
+          await getWsJunctionKanwil(wsJunction?.kppn_id || '');
+          setStdScoreKanwil(score.toString());
+          setIsLoading(false);
+        }catch(err: any){
+          openSnackbar(err?.message, 'error');
+          setStdScoreKanwil(wsJunction?.kanwil_score?.toString() || '');
+        }
+      });
+
+      setIsLoading(false);
+    }catch(err: any){
+      setIsLoading(false);
+      openSnackbar(`Upload failed, ${err?.response?.data?.message || err.message}`, "error");
+      setStdScoreKanwil(wsJunction?.kanwil_score?.toString() || '');
+    }finally{
+      setIsLoading(false);
+    }
+  };
+
+  const handleFetchStdScoreKPPN= async() => {
+    try{
+      setIsLoading(true);
+      const response = await axiosJWT.get(`/getStdWorksheet/${wsJunction?.kppn_id}`);
+      const stdArray = response?.data?.rows;
+      const score = stdArray?.filter((s: StandardizationType) => s?.id === wsJunction?.standardisasi_id)?.[0]?.score || 0;
+
+      socket?.emit("updateKPPNScore", {
+        worksheetId: wsJunction?.worksheet_id, 
+        junctionId: wsJunction?.junction_id, 
+        kppnScore: score,
+        userName: auth?.name
+      }, async(response: any) => {
+        try{
+          await getWsJunctionKanwil(wsJunction?.kppn_id || '');
+          setStdScoreKPPN(score.toString());
+          setIsLoading(false);
+        }catch(err: any){
+          openSnackbar(err?.message, 'error');
+          setStdScoreKanwil(wsJunction?.kanwil_score?.toString() || '');
+        }
+      });
+
+      setIsLoading(false);
+    }catch(err: any){
+      setIsLoading(false);
+      openSnackbar(`Upload failed, ${err?.response?.data?.message || err.message}`, "error");
+      setStdScoreKanwil(wsJunction?.kanwil_score?.toString() || '');
+    }finally{
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -220,13 +291,12 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
         <br/>
         <Skeleton variant="rounded" height={'1.4375em'} width={'100%'} />
       </>
-    )
+    );
   }
-
 
   return (
     <Stack direction='column' spacing={2}>
-      <Stack direction='column' spacing={1} >
+      <Stack direction='column' spacing={1}>
         <Typography variant='body3' fontSize={12} textAlign={'left'}>Nilai KPPN :</Typography>
         <StyledFormControl>
           {
@@ -235,34 +305,35 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
               <Stack direction='row' spacing={2}>
                 <StyledNumberTextField  
                   size='small'
-                  type="number"
+                  type="text"
+                  onChange={(e) => setStdScoreKPPN(e.target.value)}
                   onBlur={(e) => handleChangeKPPNScoreStd(e)}
-                  disabled ={isKanwil}
+                  disabled={isKanwil}
+                  value={stdScoreKPPN}
                 />
                 <Tooltip title='Ambil nilai standardisasi'>
-                    <span>
-                      <StyledButton 
-                        aria-label="edit" 
-                        variant='contained' 
-                        size='small' 
-                        color='warning'
-                        disabled ={isKanwil}
-                        // onClick={() => handleOpenExampleFile(1)}
-                      >
-                        <Iconify icon="solar:refresh-bold-duotone"/>
-                      </StyledButton>
-                    </span>
-                  </Tooltip>
+                  <span>
+                    <StyledButton 
+                      aria-label="edit" 
+                      variant='contained' 
+                      size='small' 
+                      color='warning'
+                      disabled={isKanwil}
+                      onClick={() => handleFetchStdScoreKPPN()}
+                    >
+                      <Iconify icon="solar:refresh-bold-duotone"/>
+                    </StyledButton>
+                  </span>
+                </Tooltip>
               </Stack>
-
             :
               <StyledSelect
                 required 
                 name="kppnScore" 
                 value={wsJunction?.kppn_score !== null ? String(wsJunction?.kppn_score) : ''}
-                onChange = {(e) => handleChangeKPPNScore(e.target.value as string)}
+                onChange={(e) => handleChangeKPPNScore(e.target.value as string)}
                 size='small' 
-                disabled ={isKanwil}
+                disabled={isKanwil}
               >
                 {opsiSelection}
                 <StyledMenuItem key={null} value={''}>{null}</StyledMenuItem>
@@ -280,24 +351,26 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
               <Stack direction='row' spacing={2}>
                 <StyledNumberTextField  
                   size='small'
-                  type="number"
+                  type="text"
+                  onChange={(e) => setStdScoreKanwil(e.target.value)}
                   onBlur={(e) => handleChangeKanwilScoreStd(e)}
-                  disabled ={!isKanwil}
+                  disabled={!isKanwil}
+                  value={stdScoreKanwil}
                 />
                 <Tooltip title='Ambil nilai standardisasi'>
-                    <span>
-                      <StyledButton 
-                        aria-label="edit" 
-                        variant='contained' 
-                        size='small' 
-                        color='warning'
-                        disabled ={!isKanwil}
-                        // onClick={() => handleOpenExampleFile(1)}
-                      >
-                        <Iconify icon="solar:refresh-bold-duotone"/>
-                      </StyledButton>
-                    </span>
-                  </Tooltip>
+                  <span>
+                    <StyledButton 
+                      aria-label="edit" 
+                      variant='contained' 
+                      size='small' 
+                      color='warning'
+                      disabled={!isKanwil}
+                      onClick={() => handleFetchStdScoreKanwil()}
+                    >
+                      <Iconify icon="solar:refresh-bold-duotone"/>
+                    </StyledButton>
+                  </span>
+                </Tooltip>
               </Stack>
             :
               <StyledSelect 
@@ -312,10 +385,8 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
                 <StyledMenuItem key={null} value={''}>{null}</StyledMenuItem>
               </StyledSelect>
           }
-          
         </StyledFormControl>
       </Stack>
-      
     </Stack>    
-  )
+  );
 }

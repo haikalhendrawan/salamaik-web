@@ -69,7 +69,8 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
     instruksi: '',
     contoh_file: '',
     peraturan: '',
-    uic: ''
+    uic: '',
+    checklist_id: null
   });
 
   const handleChangeAdd = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>) => {
@@ -95,7 +96,8 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
       instruksi: '',
       contoh_file: '',
       peraturan: '',
-      uic: ''
+      uic: '',
+      checklist_id: null
     })
   };
 
@@ -114,7 +116,8 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
     instruksi: '',
     contoh_file: '',
     peraturan: '',
-    uic: ''
+    uic: '',
+    checklist_id: null
   });
 
   const handleChangeEdit = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>) => {
@@ -140,7 +143,8 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
       instruksi: checklist?.filter((row) => row.id===editID)[0]?.instruksi || '',
       contoh_file: checklist?.filter((row) => row.id===editID)[0]?.contoh_file || '',
       peraturan: checklist?.filter((row) => row.id===editID)[0]?.peraturan || '',
-      uic: checklist?.filter((row) => row.id===editID)[0]?.uic || ''
+      uic: checklist?.filter((row) => row.id===editID)[0]?.uic || '',
+      checklist_id: checklist?.filter((row) => row.id===editID)[0]?.checklist_id || null
     })
   };
 
@@ -159,7 +163,8 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
       instruksi: editValue.instruksi===''?null:editValue.instruksi,
       contoh_file: editValue.contoh_file===''?null:editValue.contoh_file,
       peraturan: editValue.peraturan===''?null:editValue.peraturan,
-      uic: editValue.uic===''?null:editValue.uic
+      uic: editValue.uic===''?null:editValue.uic,
+      checklist_id: editValue.checklist_id
     }
     try{
       setIsLoading(true);
@@ -198,7 +203,8 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
         instruksi: checklist?.filter((row) => row.id===editID)[0]?.instruksi || '',
         contoh_file: checklist?.filter((row) => row.id===editID)[0]?.contoh_file || '',
         peraturan: checklist?.filter((row) => row.id===editID)[0]?.peraturan || '',
-        uic: checklist?.filter((row) => row.id===editID)[0]?.uic || ''
+        uic: checklist?.filter((row) => row.id===editID)[0]?.uic || '',
+        checklist_id: checklist?.filter((row) => row.id===editID)[0]?.checklist_id || null
       })
     }
 
