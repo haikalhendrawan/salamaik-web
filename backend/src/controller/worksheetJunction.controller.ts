@@ -7,6 +7,7 @@ import { uploadWsJunctionFile } from '../config/multer';
 import fs from 'fs';
 import path from 'path';
 import { sanitizeMimeType } from '../utils/mimeTypeSanitizer';
+import { validateScore } from '../utils/worksheetJunction.utils';
 // ------------------------------------------------------
 const getWsJunctionByWorksheetForKPPN = async(req: Request, res: Response, next: NextFunction) => {
   try{
@@ -73,6 +74,16 @@ const editWsJunctionKPPNScore = async(req: Request, res: Response, next: NextFun
   try{
     const {username} = req.payload;
     const {worksheetId, junctionId, kppnScore} = req.body;
+
+    const wsJunctionDetail = await wsJunction.getWsJunctionByJunctionId(junctionId);
+    const availableOpsi = wsJunctionDetail?.opsi;
+    const isStandardisasi = wsJunctionDetail?.standardisasi===1? true : false;
+    const isValidScore = validateScore(kppnScore, availableOpsi, isStandardisasi);
+
+    if(!isValidScore){
+      return next(new ErrorDetail(400, 'Score Invalid'));
+    };
+
     const result = await wsJunction.editWsJunctionKPPNScore(worksheetId, junctionId, kppnScore, username);
     return res.status(200).json({sucess: true, message: 'Edit worksheet junction success', rows: result})
   }catch(err){
@@ -85,6 +96,16 @@ const editWsJunctionKanwilScore = async(req: Request, res: Response, next: NextF
   try{
     const {username} = req.payload;
     const {worksheetId, junctionId, kanwilScore} = req.body;
+
+    const wsJunctionDetail = await wsJunction.getWsJunctionByJunctionId(junctionId);
+    const availableOpsi = wsJunctionDetail?.opsi;
+    const isStandardisasi = wsJunctionDetail?.standardisasi===1? true : false;
+    const isValidScore = validateScore(kanwilScore, availableOpsi, isStandardisasi);
+
+    if(!isValidScore){
+      return next(new ErrorDetail(400, 'Score Invalid'));
+    };
+
     const result = await wsJunction.editWsJunctionKanwilScore(worksheetId, junctionId, kanwilScore, username);
     return res.status(200).json({sucess: true, message: 'Edit worksheet junction success', rows: result})
   }catch(err){

@@ -79,7 +79,7 @@ export default function StandardizationKanwil() {
           <Grid item xs={4}>
             <AmountShort 
               header='Jumlah Kekurangan Dokumen' 
-              subheader={`Periode Pelaporan ${getReportingMonth(reportingDate)}`}
+              subheader={`Periode Pelaporan ${getReportingMonth(reportingDate)} ${new Date().getFullYear()}`}
               short={amountShort*-1} 
             />
           </Grid>

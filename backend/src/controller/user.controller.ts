@@ -3,14 +3,7 @@ import user from '../model/user.model';
 import ErrorDetail from '../model/error.model';
 import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from 'uuid';
-import {z} from 'zod';
-// --------------------------------------------------
-const passwordSchema =  z
-                      .string()
-                      .regex(
-                        /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
-                        'Minimum 8 characters, at least one letter and one number'
-                      );
+import { passwordSchema } from '../utils/schema';
 // ------------------------------------------------------
 const getUser = async (req: Request, res: Response, next: NextFunction) => {
   try{

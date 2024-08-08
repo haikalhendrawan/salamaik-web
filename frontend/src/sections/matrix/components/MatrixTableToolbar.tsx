@@ -29,11 +29,15 @@ export default function MatrixTableToolbar(){
           <MenuItem key={3} sx={{fontSize:14}} value={3}>Tata Kelola Internal</MenuItem>
         </Select>
       </FormControl>
+      <Button variant='contained' endIcon={ <Iconify icon="solar:refresh-bold-duotone"/>}>Update Matriks</Button>
       <div style={{flexGrow:1}} />
       <Button variant="text"  endIcon={ <Iconify icon="vscode-icons:file-type-pdf2"/>}>
         Export
       </Button>
       <Button variant="text"  endIcon={ <Iconify icon="vscode-icons:file-type-excel"/>}>
+        Export
+      </Button>
+      <Button variant="text"  endIcon={ <Iconify icon="vscode-icons:file-type-powerpoint"/>}>
         Export
       </Button>
     </StyledDiv>

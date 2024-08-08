@@ -5,6 +5,7 @@ import { socketError } from '../model/error.model';
 import fs from 'fs';
 import path from 'path';
 import logger from '../config/logger';
+import { validateScore } from '../utils/worksheetJunction.utils';
 // ---------------------------------------------------------------------------------------------------
 
 class WorksheetEvent{
@@ -41,6 +42,16 @@ class WorksheetEvent{
     try{
       const {name} = socket.data.payload;
       const {worksheetId, junctionId, kanwilScore} = data;
+
+      const wsJunctionDetail = await wsJunction.getWsJunctionByJunctionId(junctionId);
+      const availableOpsi = wsJunctionDetail?.opsi;
+      const isStandardisasi = wsJunctionDetail?.standardisasi===1? true : false;
+      const isValidScore = validateScore(kanwilScore, availableOpsi, isStandardisasi);
+
+      if(!isValidScore){
+        return socketError(callback, 'Score invalid')
+      };
+
       const result = await wsJunction.editWsJunctionKanwilScore( junctionId, worksheetId, kanwilScore, name);
       return callback({success: true, rows: result, message: 'Nilai has been updated'});
 
@@ -54,6 +65,16 @@ class WorksheetEvent{
     try{
       const {name} = socket.data.payload;
       const {worksheetId, junctionId, kppnScore} = data;
+
+      const wsJunctionDetail = await wsJunction.getWsJunctionByJunctionId(junctionId);
+      const availableOpsi = wsJunctionDetail?.opsi;
+      const isStandardisasi = wsJunctionDetail?.standardisasi===1? true : false;
+      const isValidScore = validateScore(kppnScore, availableOpsi, isStandardisasi);
+
+      if(!isValidScore){
+        return socketError(callback, 'Score invalid')
+      };
+
       const result = await wsJunction.editWsJunctionKPPNScore( junctionId, worksheetId, kppnScore, name);
       return callback({success: true, rows: result, message: 'Nilai has been updated'});
 

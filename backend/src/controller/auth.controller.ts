@@ -7,7 +7,8 @@ import user from '../model/user.model';
 import transporter from '../config/mailer';
 import "dotenv/config";
 import {z} from 'zod';
-import logger from 'config/logger';
+import logger from '../config/logger';
+import { passwordSchema } from '../utils/schema';
 // -------------------------------------------------
 type JwtPayloadType = {
   id: string;
@@ -20,13 +21,6 @@ type JwtPayloadType = {
   period: number;
   status: number;
 };
-
-const passwordSchema =  z
-                      .string()
-                      .regex(
-                        /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
-                        'Minimum 8 characters, at least one letter and one number'
-                      );
 // ------------------------------------------------------
 
 const login = async (req: Request, res: Response, next: NextFunction) => {

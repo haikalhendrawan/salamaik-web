@@ -97,11 +97,15 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
       userName: auth?.name
     }, async(response: any) => {
       try{
-        console.log(response.success);
+        if(!response?.success){
+          openSnackbar(response?.message, 'error');
+        };
         await getWsJunctionKanwil(wsJunction?.kppn_id || '');
         setIsLoading(false);
       }catch(err: any){
         openSnackbar(err?.message, 'error');
+      }finally{
+        setIsLoading(false);
       }
     });
   };
@@ -121,11 +125,15 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
       userName: auth?.name
     }, async (response: any) => {
       try{
-        console.log(response);
+        if(!response?.success){
+          openSnackbar(response?.message, 'error');
+        };
         await getWsJunctionKanwil(wsJunction?.kppn_id || '');
         setIsLoading(false);
       }catch(err: any){
         openSnackbar(err?.message, 'error');
+      }finally{
+        setIsLoading(false);
       }
     });
   };
@@ -137,7 +145,7 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
     
     if (!regex.test(newScore)) {
       e.target.value = '';
-      setStdScoreKanwil('');
+      setStdScoreKanwil(wsJunction?.kanwil_score || 0);
       return openSnackbar("Nilai harus berupa angka 0 - 12, (desimal gunakan titik)", "error");
     };
 
@@ -145,7 +153,7 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
 
     if (score < 0 || score > 12) {
       e.target.value = wsJunction?.kanwil_score?.toString() || '';
-      setStdScoreKanwil(wsJunction?.kanwil_score?.toString() || '');
+      setStdScoreKanwil(wsJunction?.kanwil_score || 0);
       return openSnackbar("Nilai maksimal 12", "error");
     };
 
@@ -178,7 +186,7 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
     
     if (!regex.test(newScore)) {
       e.target.value = '';
-      setStdScoreKPPN('');
+      setStdScoreKPPN(wsJunction?.kppn_score || 0);
       return openSnackbar("Nilai harus berupa angka 0 - 12, (desimal gunakan titik)", "error");
     };
 
@@ -186,7 +194,7 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
 
     if (score < 0 || score > 12) {
       e.target.value = wsJunction?.kppn_score?.toString() || '';
-      setStdScoreKPPN(wsJunction?.kppn_score?.toString() || '');
+      setStdScoreKPPN(wsJunction?.kppn_score || 0);
       return openSnackbar("Nilai maksimal 12", "error");
     };
 
@@ -224,14 +232,14 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
         junctionId: wsJunction?.junction_id, 
         kanwilScore: score,
         userName: auth?.name
-      }, async(response: any) => {
+      }, async() => {
         try{
-          await getWsJunctionKanwil(wsJunction?.kppn_id || '');
           setStdScoreKanwil(score.toString());
+          await getWsJunctionKanwil(wsJunction?.kppn_id || '');
           setIsLoading(false);
         }catch(err: any){
           openSnackbar(err?.message, 'error');
-          setStdScoreKanwil(wsJunction?.kanwil_score?.toString() || '');
+          setStdScoreKanwil((prev) => prev);
         }
       });
 
@@ -239,13 +247,13 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
     }catch(err: any){
       setIsLoading(false);
       openSnackbar(`Upload failed, ${err?.response?.data?.message || err.message}`, "error");
-      setStdScoreKanwil(wsJunction?.kanwil_score?.toString() || '');
+      setStdScoreKanwil((prev) => prev);
     }finally{
       setIsLoading(false);
     }
   };
 
-  const handleFetchStdScoreKPPN= async() => {
+  const handleFetchStdScoreKPPN = async() => {
     try{
       setIsLoading(true);
       const response = await axiosJWT.get(`/getStdWorksheet/${wsJunction?.kppn_id}`);
@@ -257,14 +265,14 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
         junctionId: wsJunction?.junction_id, 
         kppnScore: score,
         userName: auth?.name
-      }, async(response: any) => {
+      }, async() => {
         try{
           await getWsJunctionKanwil(wsJunction?.kppn_id || '');
           setStdScoreKPPN(score.toString());
           setIsLoading(false);
         }catch(err: any){
           openSnackbar(err?.message, 'error');
-          setStdScoreKanwil(wsJunction?.kanwil_score?.toString() || '');
+          setStdScoreKPPN((prev) => prev);
         }
       });
 
@@ -277,6 +285,20 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
       setIsLoading(false);
     }
   };
+
+  const handleFindings = async() => {
+    try{
+      const response = await axiosJWT.post("/createFindings", {
+        worksheetId: wsJunction?.worksheet_id, 
+        wsJunctionId: wsJunction?.junction_id, 
+        checklistId: wsJunction?.checklist_id, 
+        scoreBefore: wsJunction?.kanwil_score
+      })
+      console.log(response);
+    }catch(err: any){
+      console.log(err)
+    }
+  }
 
   useEffect(() => {
     setIsMounted(false);
@@ -299,6 +321,7 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
       <Stack direction='column' spacing={1}>
         <Typography variant='body3' fontSize={12} textAlign={'left'}>Nilai KPPN :</Typography>
         <StyledFormControl>
+          <StyledButton onClick={handleFindings}>Findings</StyledButton>
           {
             wsJunction?.standardisasi === 1
             ?

@@ -41,7 +41,7 @@ class Worksheet{
     }  
   }
 
-  async getWorksheetByPeriodAndKPPN(period: number, kppnId: string){
+  async getWorksheetByPeriodAndKPPN(period: number, kppnId: string): Promise<WorksheetType[]>{
     try{
       const q = ` SELECT *
                   FROM worksheet_ref

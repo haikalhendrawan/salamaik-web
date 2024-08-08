@@ -3,6 +3,7 @@ import profile from '../model/profile.model';
 import multer from 'multer';
 import {uploadPP} from '../config/multer';
 import ErrorDetail from '../model/error.model';
+import { passwordSchema } from '../utils/schema';
 // -------------------------------------------------
 
 // ------------------------------------------------------
@@ -21,6 +22,12 @@ const updatePassword = async (req: Request, res: Response, next: NextFunction) =
   try {
     const userID = req.payload.id;
     const { oldPassword, newPassword } = req.body;
+    const validPassword = passwordSchema.safeParse(newPassword);
+
+    if(!validPassword){
+      return next(new ErrorDetail(400,'Password criteria is not fulfilled'))
+    };
+
     const response = await profile.updatePassword(userID, oldPassword, newPassword );
     return res.status(200).json({sucess: true, message: 'Password has been updated'});
   } catch (err) {

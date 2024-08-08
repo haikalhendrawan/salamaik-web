@@ -5,7 +5,6 @@ import {useTheme, styled, alpha} from '@mui/material/styles';
 import {Button, IconButton, Container} from '@mui/material';
 // sections
 import MatrixTable from './components/MatrixTable';
-import MatrixTableToolbar from './components/MatrixTableToolbar';
 
 export default function MatrixDetail() {
   const theme = useTheme();

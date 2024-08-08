@@ -20,6 +20,8 @@ import standardizationRoute from './routes/standardizationRoute';
 import WorksheetRoute from './routes/worksheetRoute';
 import WsJunctionRoute from './routes/worksheetJunctionRoute';
 import notFoundRoute from './routes/notFoundRoute';
+import findingsRoute from './routes/findingsRoute';
+import matrixRoute from './routes/matrixRoute';
 //middleware
 import errorHandler from './middleware/errorHandler';
 import rateLimiter from './middleware/rateLimiter';
@@ -52,6 +54,8 @@ app.use(checklistRoute);
 app.use(standardizationRoute);
 app.use(WorksheetRoute);
 app.use(WsJunctionRoute);
+app.use(matrixRoute);
+app.use(findingsRoute);
 app.use(notFoundRoute);
 app.use(errorHandler);
 
