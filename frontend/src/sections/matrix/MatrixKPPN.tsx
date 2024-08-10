@@ -2,9 +2,8 @@ import { Helmet } from 'react-helmet-async';
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 // @mui
-import { Container, Stack, Typography, Tabs, Tab, Grid, Paper, IconButton, Box, LinearProgress} from '@mui/material';
+import { Container, Stack, Typography, Grid } from '@mui/material';
 import {useTheme, styled} from '@mui/material/styles';
-import Iconify from '../../components/iconify/Iconify';
 // sections
 import ScorePembinaan from '../home/components/ScorePembinaan';
 import ProgressPembinaan from '../home/components/ProgressPembinaan';

@@ -1,6 +1,8 @@
 import {useEffect} from "react";
 import { Helmet } from 'react-helmet-async';
 import useWsJunction from "./useWsJunction";
+import {useAuth} from "../../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 // @mui
 import { Grid, Container, Typography } from '@mui/material';
 // sections
@@ -10,9 +12,17 @@ import KPPNSelectionCard from "./component/KPPNSelectionCard";
 export default function WorksheetLanding() {
   const { setWsJunction} = useWsJunction();
 
+  const {auth} = useAuth();
+
+  const navigate = useNavigate();
+
   useEffect(() => {
     setWsJunction([]);
   }, []);
+
+  if(auth?.kppn !== '03010' ){
+    navigate(`kppn?id=${auth?.kppn}`)
+  };
 
   return (
     <>

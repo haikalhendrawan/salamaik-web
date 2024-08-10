@@ -4,6 +4,7 @@ import checklist, { ChecklistType } from '../model/checklist.model';
 import wsJunction from '../model/worksheetJunction.model';
 import pool from '../config/db';
 import dayjs from 'dayjs';
+import ErrorDetail from '../model/error.model';
 // ------------------------------------------------------
 const getAllWorksheet = async(req: Request, res: Response, next: NextFunction) => {
   try {
@@ -12,7 +13,25 @@ const getAllWorksheet = async(req: Request, res: Response, next: NextFunction) =
 
     return res.status(200).json({sucess: true, message: 'Get worksheet success', rows: worksheets})
   } catch (err){
-    next(err);
+    next(err)
+  }
+}
+
+const getWorksheetByPeriodAndKPPN = async(req: Request, res: Response, next: NextFunction) => {
+  try {
+    const {period} = req.payload;
+    const {kppnId} = req.params;
+    const worksheets: WorksheetType[] = await worksheet.getWorksheetByPeriodAndKPPN(period, kppnId);
+    console.log(period, kppnId.slice(1));
+
+    if(worksheets.length === 0) {
+      throw new ErrorDetail(400, 'Worksheet not found');
+    };
+
+
+    return res.status(200).json({sucess: true, message: 'Get worksheet success', rows: worksheets})
+  }catch(err){
+    next(err)
   }
 }
 
@@ -35,7 +54,7 @@ const addWorksheet = async(req: Request, res: Response, next: NextFunction) => {
     const result = await worksheet.addWorksheet(kppnId, period, startDate, closeDate, openFollowUp, closeFollowUp);
     return res.status(200).json({sucess: true, message: 'Add worksheet success', rows: result})
   } catch (err){
-    next(err);
+    next(err)
   }
 }
 
@@ -56,7 +75,7 @@ const assignWorksheet = async(req: Request, res: Response, next: NextFunction) =
     return res.status(200).json({sucess: true, message: 'Assign worksheet success', rows: result, detail: mapChecklist})
   } catch (err){
     await client.query('ROLLBACK');
-    next(err);
+    next(err)
   } finally{
     client.release();
   }
@@ -68,7 +87,7 @@ const editWorksheetPeriod = async(req: Request, res: Response, next: NextFunctio
     const result = await worksheet.editWorksheetPeriod(worksheetId, startDate, closeDate, openFollowUp, closeFollowUp);
     return res.status(200).json({sucess: true, message: 'Edit worksheet period success', rows: result})
   }catch(err){
-    next(err);
+    next(err)
   }
 }
 
@@ -78,13 +97,14 @@ const deleteWorksheet = async(req: Request, res: Response, next: NextFunction) =
     const result = await worksheet.deleteWorksheet(worksheetId);
     return res.status(200).json({sucess: true, message: 'Delete worksheet success', rows: result})
   }catch(err){
-    next(err);
+    next(err)
   }
 }
 
 
 export {
   getAllWorksheet,
+  getWorksheetByPeriodAndKPPN,
   addWorksheet,
   assignWorksheet,
   editWorksheetPeriod,

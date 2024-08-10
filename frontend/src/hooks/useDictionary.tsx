@@ -17,7 +17,7 @@ interface PeriodType{
 
 interface PeriodRefType{
   [key: string | number]: string | number | any[] | null;
-  list: PeriodType[] | null ;
+  list: PeriodType[] ;
 };
 
 interface KomponenRefType{

@@ -1,9 +1,15 @@
-import {useState, useEffect} from'react';
-import {Stack, Toolbar, Typography, Table, Card, TableContainer, TableSortLabel,
-          Tooltip, TableHead, Grow, TableBody, TableRow, TableCell} from '@mui/material';
-import { useTheme, styled } from '@mui/material/styles';
+import {useMemo, useEffect} from 'react';
+import { Typography, Table, Card, TableContainer, TableSortLabel, 
+  TableHead, Grow, TableBody, TableRow, TableCell} from '@mui/material';
+import {useAuth} from '../../../hooks/useAuth';
+import { useTheme} from '@mui/material/styles';
 import Label from '../../../components/label';
 import MatrixTableToolbar from './MatrixTableToolbar';
+import MatrixDetailHeader from './MatrixDetailHeader';
+import useSnackbar from '../../../hooks/display/useSnackbar';
+import { useLocation } from 'react-router-dom';
+import { sanitizeRole } from '../../admin/userRef/utils';
+import useAxiosJWT from '../../../hooks/useAxiosJWT';
 // ---------------------------------------------------
 const TABLE_HEAD = [
   { id: 'no', label: 'No', alignRight: false },
@@ -133,13 +139,36 @@ const TABLE_DATA: MatrixTableData[] = [
 export default function MatrixTable() {
   const theme = useTheme();
 
+  const {auth} = useAuth();
+
+  const axiosJWT = useAxiosJWT();
+
+  const {openSnackbar} = useSnackbar();
+
+  const kppnId = new URLSearchParams(useLocation().search).get("id");
+
+  const getMatrix = async() => {
+    try{
+      const response = await axiosJWT.get(`/getWorksheetByPeriodAndKPPN/${kppnId}`);
+      console.log(response.data);
+    }catch(err: any){
+      if(err.response){
+        openSnackbar(err.response.data.message, "error");
+        console.log(err);
+      }else{
+        console.log(err);
+        openSnackbar('network error', "error");
+      }
+    }
+  }
+
+  useEffect(() => {
+    getMatrix();
+  }, []);
+
   return (
     <>
-      <Stack direction='column' marginBottom={2} sx={{mb: 5}}>
-        <Typography variant='h6' textAlign={'center'}>Matriks Hasil Supervisi Pada KPPN Padang</Typography>
-        <Typography variant='h6' textAlign={'center'}>Kanwil Direktorat Jenderal Perbendaharaan Provinsi Sumatera Barat</Typography>
-        <Typography variant='h6' textAlign={'center'}>Periode Semester 1 Tahun 2024</Typography>
-      </Stack>
+      <MatrixDetailHeader />
 
       <MatrixTableToolbar />
       
@@ -147,8 +176,8 @@ export default function MatrixTable() {
         <Card sx={{height:'auto', display:'flex', flexDirection:'column', gap:theme.spacing(1), mb: 1}}>
           <TableContainer sx={{ maxHeight: 480 }}>
           <Table stickyHeader>
-            <TableHead >
-              <TableRow >
+            <TableHead>
+              <TableRow>
                 {TABLE_HEAD.map((headCell) => (
                   <TableCell
                     key={headCell.id}

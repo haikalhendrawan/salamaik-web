@@ -86,7 +86,7 @@ const createMatrix = async(req: Request, res: Response, next: NextFunction) => {
       await findings.createFindings(item);
     }));
 
-    return res.status(200).json({sucess: true, message: 'Matrix created successfully', rows: result})
+    return res.status(200).json({sucess: true, message: 'Matrix created successfully', rows: {result, result2}})
   }catch(err){
     next(err)
   }
