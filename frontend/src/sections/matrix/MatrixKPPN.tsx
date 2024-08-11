@@ -1,24 +1,23 @@
 import { Helmet } from 'react-helmet-async';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 // @mui
 import { Container, Stack, Typography, Grid } from '@mui/material';
 import {useTheme, styled} from '@mui/material/styles';
+import useDictionary from '../../hooks/useDictionary';
+import { useAuth } from '../../hooks/useAuth';
+import useAxiosJWT from '../../hooks/useAxiosJWT';
+import useLoading from '../../hooks/display/useLoading';
+import useSnackbar from '../../hooks/display/useSnackbar';
 // sections
 import ScorePembinaan from '../home/components/ScorePembinaan';
 import ProgressPembinaan from '../home/components/ProgressPembinaan';
 import RekapitulasiNilaiTable from './components/RekapitulasiNilaiTable';
 import MatrixGateway from './components/MatrixGateway';
 import SelectionTab from './components/SelectionTab';
+import { MatrixScoreAndProgressType } from './types';
 // --------------------------------------------------------------
-const SELECT_KPPN: {[key: string]: string} = {
-  '010': 'Padang',
-  '011': 'Bukittinggi',
-  '090': 'Solok',
-  '091': 'Lubuk Sikaping',
-  '077': 'Sijunjung',
-  '142': 'Painan',
-};
+
 
 // --------------------------------------------------------------
 export default function MatrixKPPN() {
@@ -28,13 +27,68 @@ export default function MatrixKPPN() {
 
   const params = new URLSearchParams(useLocation().search);
 
-  const id= params.get('id');
+  const kppnId = params.get('id');
 
-  const [tabValue, setTabValue] = useState(0); // ganti menu komponen supervisi
+  const {kppnRef} = useDictionary();
+  
+  const {auth} = useAuth();
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => { // setiap tab komponen berubah
+  const {setIsLoading} = useLoading();
+
+  const { openSnackbar} = useSnackbar();
+
+  const axiosJWT = useAxiosJWT();
+
+  const [matrixScore, setMatrixScore] = useState<MatrixScoreAndProgressType | null>(null);
+
+  const [tabValue, setTabValue] = useState('010'); // ganti menu komponen supervisi
+
+  const kppnName = kppnRef?.list.filter((item) => item.id === kppnId)[0]?.alias || ''
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: string) => { // setiap tab komponen berubah
     setTabValue(newValue);
+    navigate(`?id=${newValue}`);
+    setMatrixScore(null);
   };
+
+  const getMatrixScoreAndProgress = async() => {
+    try{
+      if(!kppnId){
+        return null
+      };
+      
+      const response = await axiosJWT.post(`/getWsJunctionScoreAndProgress`, {kppnId: kppnId, period: auth?.period});
+      setMatrixScore(response.data.rows);
+      console.log(response.data.rows)
+    }catch(err: any){
+      if(err.response){
+        openSnackbar(err.response.data.message, "error");
+      }else{
+        openSnackbar('network error', "error");
+      }
+    }finally{
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const id = params.get('id');
+
+    if(!id){
+      navigate(`?id=010`);
+    };
+    if (id !== tabValue) {
+      setTabValue(id || '010'); // Sync tabValue with URL on location change
+    };
+
+    getMatrixScoreAndProgress();
+  }, [location.search, tabValue]);
+
+  const isKanwil = auth?.kppn === '03010';
+  const totalChecklist = matrixScore?.totalChecklist || 0;
+  const countProgress = isKanwil ? ((matrixScore?.totalProgressKanwil) || 0 ): ((matrixScore?.totalProgressKPPN) || 0 );
+  const progressPercentPembinaan = ((countProgress/totalChecklist) * 100) || 0; 
+
 
   return (
     <>
@@ -56,15 +110,15 @@ export default function MatrixKPPN() {
             <Grid item xs={5}>
               <Stack direction='column' spacing={2}>
                 <ScorePembinaan
-                  header={`Nlai Kinerja KPPN Padang`}
-                  selfScore={9.77}
-                  kanwilScore={9.45} 
+                  header={`Nlai Kinerja ${kppnName}`}
+                  selfScore={matrixScore?.scoreByKPPN || 0}
+                  kanwilScore={matrixScore?.scoreByKanwil || 0} 
                 />
                 <ProgressPembinaan 
                   header={`Progress Kertas Kerja`}
-                  number={40.3}
-                  footer={`KPPN Padang`}
-                  detail={`20/20`}
+                  number={progressPercentPembinaan}
+                  footer={kppnName}
+                  detail={`${countProgress}/${totalChecklist}`}
                   icon={`mdi:cash-register`}
                   color={theme.palette.primary.main}
                 />
@@ -73,13 +127,13 @@ export default function MatrixKPPN() {
             </Grid>
             <Grid item xs={7}>
               <MatrixGateway
-                title='Detail Matriks KPPN Padang'
+                title={`Detail Matriks ${kppnName}`}
                 subheader='Lihat matriks Pembinaan dan Supervisi' 
               />
             </Grid>
 
             <Grid item xs={12}>
-              <RekapitulasiNilaiTable />
+              <RekapitulasiNilaiTable matrixScore={matrixScore} kppnName={kppnName}/>
             </Grid>
           </Grid>
           

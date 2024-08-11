@@ -1,13 +1,32 @@
 import {Request, Response, NextFunction} from 'express';
 import multer from 'multer';
-import wsJunction, {WorksheetJunctionType, WsJunctionJoinChecklistType} from '../model/worksheetJunction.model';
+import wsJunction, {WorksheetJunctionType, WsJunctionJoinChecklistType, WsJunctionWithKomponenType} from '../model/worksheetJunction.model';
 import worksheet from '../model/worksheet.model';
+import { komponen } from '../model/komponen.model';
 import ErrorDetail from '../model/error.model';
 import { uploadWsJunctionFile } from '../config/multer';
 import fs from 'fs';
 import path from 'path';
 import { sanitizeMimeType } from '../utils/mimeTypeSanitizer';
 import { validateScore } from '../utils/worksheetJunction.utils';
+import { getScoreForMatrix } from '../utils/getScorePembinaan';
+// ------------------------------------------------------------------
+
+interface ScorePerKomponenType{
+  komponenId: number,
+  komponenTitle: string,
+  komponenBobot: number,
+  wsJunction: WorksheetJunctionType[],
+}
+interface WsJunctionScoreAndProgress{
+  scoreByKanwil : number,
+  scoreByKPPN: number,
+  isFinal: boolean,
+  totalChecklist: number,
+  totalProgressKanwil: number,
+  totalProgressKPPN: number,
+  scorePerKomponen: ScorePerKomponenType[],
+}
 // ------------------------------------------------------
 const getWsJunctionByWorksheetForKPPN = async(req: Request, res: Response, next: NextFunction) => {
   try{
@@ -67,6 +86,39 @@ const getWsJunctionByKPPN = async(req: Request, res: Response, next: NextFunctio
     return res.status(200).json({sucess: true, message: 'Get worksheet junction success', rows: result})
   }catch(err){
     next(err);
+  }
+}
+
+const getWsJunctionScoreAndProgress = async(req: Request, res: Response, next: NextFunction) => {
+  try{
+    const {kppnId, period} = req.body;
+    const mainWorksheet = await worksheet.getWorksheetByPeriodAndKPPN(period, kppnId);
+    const worksheetId = mainWorksheet.length>0? mainWorksheet[0].id : null;
+
+    if(!worksheetId) {
+      throw new ErrorDetail(404, 'Worksheet not found');
+    };
+
+    const komponenAll = await komponen.getAllKomponenWithSubKomponen();
+    const wsJunctionDetail = await wsJunction.getWsJunctionWithKomponenDetail(worksheetId);
+
+    if(!wsJunctionDetail || wsJunctionDetail.length===0) {
+      throw new ErrorDetail(404, 'Worksheet not assigned');
+    };
+
+    const responseBody = {
+      scoreByKanwil : getScoreForMatrix(komponenAll, wsJunctionDetail, true)?.reduce((a, c) => a+c.weightedScore, 0) || 0,
+      scoreByKPPN: getScoreForMatrix(komponenAll, wsJunctionDetail, false)?.reduce((a, c) => a+c.weightedScore, 0) || 0,
+      isFinal: 0,
+      totalChecklist: wsJunctionDetail?.length,
+      totalProgressKanwil: wsJunctionDetail?.filter((item) => item?.kanwil_score !== null).length,
+      totalProgressKPPN: wsJunctionDetail?.filter((item) => item?.kppn_score !== null).length,
+      scorePerKomponen: getScoreForMatrix(komponenAll, wsJunctionDetail, true),
+      scorePerKomponenKPPN: getScoreForMatrix(komponenAll, wsJunctionDetail, false)
+    };
+    return res.status(200).json({sucess: true, message: 'Get worksheet junction success', rows: responseBody})
+  }catch(err){
+    next(err)
   }
 }
 
@@ -188,6 +240,7 @@ export {
   getWsJunctionByWorksheetForKanwil,
   getWsJunctionByPeriod,
   getWsJunctionByKPPN,
+  getWsJunctionScoreAndProgress,
   editWsJunctionKPPNScore,
   editWsJunctionKanwilScore,
   editWsJunctionKanwilNote,
@@ -195,3 +248,5 @@ export {
   deleteWsJunctionByWorksheetId,
   deleteWsJunctionFile
 }
+
+// ------------------------------

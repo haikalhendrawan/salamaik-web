@@ -1,8 +1,9 @@
 import {useState, useEffect} from'react';
-import {Stack, Toolbar, Typography, Table, Card, CardHeader, TableSortLabel,
-          Tooltip, TableHead, Grow, TableBody, TableRow, TableCell} from '@mui/material';
+import {Stack, Toolbar, Typography, Table, Card, CardHeader, TableSortLabel, IconButton, TableHead, Grow, TableBody, TableRow, TableCell} from '@mui/material';
 import { useTheme, styled } from '@mui/material/styles';
 import Label from '../../../components/label';
+import { MatrixScoreAndProgressType } from '../types';
+import Iconify from '../../../components/iconify/Iconify';
 // ---------------------------------------------------
 const StyledRoot = styled(Toolbar)(({ theme }) => ({
   height: 72,
@@ -21,32 +22,52 @@ const TABLE_HEAD = [
   { id: 'weightedScore', label: 'Nilai Tertimbang', alignRight: false },
 ];
 
-interface RekapitulasiNilaiData{
-  id: number,
-  komponen: string,
-  totalKomponen: number,
-  bilanganPembagi: number,
-  averageScore?: number,
-  bobot?: number,
-  weightedScore?: number,
-};
-
-const TABLE_DATA: RekapitulasiNilaiData[] = [
-  {id:1, komponen:'Treasurer', totalKomponen: 140, bilanganPembagi:14, averageScore:10, bobot: 20, weightedScore: 20},
-  {id:2, komponen:'Pengelola Fiskal, Representasi Kemenkeu di Daerah, dan Special Mission', totalKomponen: 100, bilanganPembagi:10, averageScore:10, bobot: 30, weightedScore: 30},
-  {id:3, komponen:'Financial Advisor', totalKomponen: 210, bilanganPembagi:21, averageScore:10, bobot: 20, weightedScore: 20},
-  {id:4, komponen:'Tata Kelola Internal', totalKomponen: 150, bilanganPembagi:15, averageScore:10, bobot: 30, weightedScore: 30},
-];
+interface RekapitulasiNilaiTableProps{
+  matrixScore: MatrixScoreAndProgressType | null,
+  kppnName: string
+}
 
 // ----------------------------------------------------------------------------------
-export default function RekapitulasiNilaiTable() {
+export default function RekapitulasiNilaiTable({matrixScore, kppnName}: RekapitulasiNilaiTableProps) {
   const theme = useTheme();
+
+  const [value, setValue] = useState<number>(0);
+
+  const scoreVersion = value === 0 ? matrixScore?.scorePerKomponenKPPN : matrixScore?.scorePerKomponen;
+
+  const title = (
+    <>
+    <Stack direction={'row'} alignItems="center">
+      <IconButton 
+        disabled={value===0?true:false} 
+        sx={{height:'40px', width:'40px', visibility: value==1?'visible':'hidden'}}
+        onClick={() => setValue(0)}
+      >
+        <Iconify icon={'eva:arrow-ios-back-outline'}/> 
+      </IconButton>
+
+      <Stack direction='column'>
+        <Typography variant='h6'>Rekapitulasi Penilaian Kinerja KPPN</Typography>
+        <Typography variant='body3' sx={{fontWeight: 'normal'}}>Berdasarkan {value===1?'Penilaian Kanwil' : 'Self Assessment'}</Typography>
+      </Stack>
+
+      <IconButton
+        disabled={value===1?true:false}   
+        sx={{height:'40px', width:'40px', visibility: value==1?'hidden':'visible' }}
+        onClick={() => setValue(1)}
+      >
+        <Iconify icon={'eva:arrow-ios-forward-outline'} />
+      </IconButton>
+    </Stack> 
+      
+    </>
+  )
 
   return (
     <>
       <Grow in>
         <Card sx={{height:'auto', display:'flex', flexDirection:'column', gap:theme.spacing(1), mb: 1}}>
-          <CardHeader title={<Typography variant='h6'>Rekapitulasi Penilaian Kinerja KPPN</Typography>} sx={{mb:2}}/>
+          <CardHeader title={title} sx={{mb:2, gap: 0}}/>
 
           <Table>
             <TableHead>
@@ -64,28 +85,28 @@ export default function RekapitulasiNilaiTable() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {TABLE_DATA.map((row) => 
-                <TableRow hover key={row.id} tabIndex={-1}>
-                  <TableCell align="justify">{row.id}</TableCell>
+              {scoreVersion?.map((item, index) => 
+                <TableRow hover key={index} tabIndex={-1}>
+                  <TableCell align="justify">{index+1}</TableCell>
 
-                  <TableCell align="left">{row.komponen}</TableCell>
+                  <TableCell align="left">{item?.komponenTitle}</TableCell>
 
-                  <TableCell align="left">{row.totalKomponen}</TableCell>
+                  <TableCell align="left">{item?.totalNilai?.toFixed(2)}</TableCell>
 
-                  <TableCell align="left">{`${row.bilanganPembagi}`}</TableCell>
+                  <TableCell align="left">{`${item?.bilanganPembagi}`}</TableCell>
 
                   <TableCell align="left">
-                    {`${row.averageScore}`}
+                    {`${item?.avgPerKomponen?.toFixed(2)}`}
                   </TableCell> 
 
                   <TableCell align="left">
                     <Label color={'success'}>
-                    {`${row.bobot}%`}
+                    {`${item?.komponenBobot?.toFixed(2)}%`}
                     </Label>
                   </TableCell>
 
                   <TableCell align="left">
-                    {row.weightedScore}
+                    {item?.weightedScore?.toFixed(2)}
                   </TableCell> 
                 </TableRow>
               )}
@@ -96,7 +117,7 @@ export default function RekapitulasiNilaiTable() {
                   Nilai Akhir
                 </TableCell>
                 <TableCell align='left' sx={{fontWeight:'bold', backgroundColor: theme.palette.warning.main}}>
-                  10.00
+                  {value===0?matrixScore?.scoreByKPPN?.toFixed(2):matrixScore?.scoreByKanwil?.toFixed(2)}
                 </TableCell>
               </TableRow>
             </TableBody>

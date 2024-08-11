@@ -49,11 +49,11 @@ export default function ScorePembinaan({header, selfScore, kanwilScore}: ScorePe
               </IconButton>
               
               <Slide direction="left" in={value===0}>
-               <Typography variant="h2" sx={{display:value===0?'block':'none'}} color='primary'>{selfScore}</Typography>
+               <Typography variant="h2" sx={{display:value===0?'block':'none'}} color='primary'>{selfScore.toFixed(2)}</Typography>
               </Slide>
 
               <Slide direction="left" in={value===1}>
-               <Typography variant="h2" sx={{display:value===1?'block':'none'}} color='primary'>{kanwilScore}</Typography>
+               <Typography variant="h2" sx={{display:value===1?'block':'none'}} color='primary'>{kanwilScore.toFixed(2)}</Typography>
               </Slide>
               
               <IconButton

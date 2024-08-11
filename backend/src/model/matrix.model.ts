@@ -1,6 +1,9 @@
 import pool from "../config/db";
 import "dotenv/config";
 import { PoolClient } from "pg";
+import { WorksheetJunctionType } from "./worksheetJunction.model";
+import { ChecklistType } from "./checklist.model";
+import { FindingsType } from "./findings.model";
 /**
  *
  *
@@ -9,7 +12,7 @@ import { PoolClient } from "pg";
 // -------------------------------------------------
 export interface MatrixType{
   id: number,
-  wsJunction_id: number,
+  ws_junction_id: number,
   worksheet_id: string,
   checklist_id: number,
   hasil_implementasi: string,
@@ -18,7 +21,7 @@ export interface MatrixType{
   peraturan: string,
   uic: string,
   tindak_lanjut: string, 
-  isFinding: number
+  is_finding: number
 };
 
 export interface MatrixBodyType{
@@ -33,32 +36,26 @@ export interface MatrixBodyType{
   uic: string | null,
   tindakLanjut: string | null, 
   isFinding: number
-}
+};
 
 export interface MatrixWithWsJunctionType{
   id: number,
-  wsJunction_id: number,
   worksheet_id: string,
+  ws_junction_id: number,
   checklist_id: number,
-  hasil_implementasi: string,
-  permasalahan: string, 
-  rekomendasi: string,
-  peraturan: string,
-  uic: string,
-  tindak_lanjut: string, 
-  isFinding: number,
-  junction_id: number,
-  kanwil_score: number | null,
-  kppn_score: number | null,
-  file_1: string | null,
-  file_2: string | null,
-  file_3: string | null,
-  kanwil_note: string | null,
-  kppn_id: string,
-  period: string,
-  last_update: string | null,
-  updated_by: string | null
-}
+  hasil_implementasi: string | null,
+  permasalahan: string | null,
+  rekomendasi: string | null,
+  peraturan: string | null,
+  uic: string | null,
+  tindak_lanjut: string | null,
+  is_finding: number,
+  komponen_string: string | null,
+  subkomponen_string: string | null,
+  ws_junction: WorksheetJunctionType[],
+  checklist: ChecklistType[],
+  findings: FindingsType[]
+};
 
 // --------------------------------------------------
 class Matrix{
@@ -69,7 +66,7 @@ class Matrix{
       const {worksheetId, wsJunctionId, checklistId, hasilImplementasi, permasalahan, rekomendasi, peraturan, uic, tindakLanjut, isFinding} = body;
       const q = ` INSERT INTO matrix_data (
                     worksheet_id, 
-                    wsJunction_id, 
+                    ws_junction_id, 
                     checklist_id,
                     hasil_implementasi,
                     permasalahan, 
@@ -77,7 +74,7 @@ class Matrix{
                     peraturan,
                     uic, 
                     tindak_lanjut, 
-                    isFinding
+                    is_finding
                   ) 
                   VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
                   RETURNING *`;
@@ -115,10 +112,27 @@ class Matrix{
   async getMatrixWithWsJunction(worksheetId: string, poolTrx?: PoolClient): Promise<MatrixWithWsJunctionType[]>{
     const poolInstance = poolTrx??pool;
     try{
-      const q = ` SELECT * FROM matrix_data.*, worksheet_junction.*
+      const q = ` SELECT 
+                    matrix_data.*, 
+                    json_agg(worksheet_junction.* ORDER BY worksheet_junction.junction_id ASC) AS ws_junction, 
+                    json_agg(checklist_ref.* ORDER BY checklist_ref.id ASC) AS checklist,
+                    json_agg(findings_data.* ORDER BY findings_data.id ASC) AS findings,
+                    komponen_ref.title AS komponen_string,
+                    subkomponen_ref.title AS subkomponen_string
+                  FROM matrix_data 
                   LEFT JOIN worksheet_junction
-                  ON matrix_data.wsJunction_id = worksheet_junction.junction_id
-                  WHERE matrix_data.worksheet_id = $1`;
+                  ON matrix_data.ws_junction_id = worksheet_junction.junction_id
+                  LEFT JOIN checklist_ref
+                  ON matrix_data.checklist_id = checklist_ref.id
+                  LEFT JOIN komponen_ref
+                  ON komponen_ref.id = checklist_ref.komponen_id
+                  LEFT JOIN subkomponen_ref
+                  ON subkomponen_ref.id = checklist_ref.subkomponen_id
+                  LEFT JOIN findings_data
+                  ON findings_data.matrix_id = matrix_data.id
+                  WHERE matrix_data.worksheet_id = $1
+                  GROUP BY matrix_data.id, worksheet_junction.junction_id, komponen_ref.title, subkomponen_ref.title
+                  `;
       const result = await poolInstance.query(q, [worksheetId]);
       return result.rows
     }catch(err){
@@ -132,12 +146,12 @@ class Matrix{
       const {id, hasilImplementasi, permasalahan, rekomendasi, peraturan, uic, tindakLanjut, isFinding} = body;
       const q = `UPDATE matrix_data SET
                   hasil_implementasi = $1,
-                  rekomendasi = $2, 
-                  permasalahan = $3, 
+                  permasalahan= $2, 
+                  rekomendasi = $3, 
                   peraturan = $4, 
                   uic = $5, 
                   tindak_lanjut = $6, 
-                  isFinding = $7
+                  is_finding = $7
                   WHERE id = $8
                   RETURNING *`;
       const result = await poolInstance.query(q, [
@@ -161,6 +175,17 @@ class Matrix{
     try{
       const q = `DELETE FROM matrix_data WHERE id = $1`;
       const result = await poolInstance.query(q, [id]);
+      return result.rows[0]
+    }catch(err){
+      throw err
+    }
+  }
+
+  async deleteMatrixByWorksheetId(worksheetId: string, poolTrx?: PoolClient){
+    const poolInstance = poolTrx??pool;
+    try{
+      const q = `DELETE FROM matrix_data WHERE worksheet_id = $1`;
+      const result = await poolInstance.query(q, [worksheetId]);
       return result.rows[0]
     }catch(err){
       throw err

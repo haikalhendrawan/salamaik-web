@@ -254,7 +254,7 @@ export default function BatchRefModal({modalOpen, modalClose, addState, editID, 
                           <StyledDatePicker 
                             label="Open Period (Tindak lanjut)"
                             name= "openFollowUp"
-                            value={addState ? addValue.openFollowUp : editValue.closeFollowUp}
+                            value={addState ? addValue.openFollowUp : editValue.openFollowUp}
                             onChange={addState
                                       ? (newValue: Dayjs) => setAddValue({...addValue, openFollowUp: newValue}) 
                                       : (newValue: Dayjs) => setEditValue({...editValue, openFollowUp: newValue})}
@@ -264,7 +264,7 @@ export default function BatchRefModal({modalOpen, modalClose, addState, editID, 
                         <FormControl>
                           <StyledDatePicker 
                             label="Close Period (Tindak lanjut)"
-                            name= "closePeriod"
+                            name= "closeFollowUp"
                             value={addState ? addValue.closeFollowUp : editValue.closeFollowUp}
                             onChange={addState
                                       ? (newValue: Dayjs) => setAddValue({...addValue, closeFollowUp: newValue}) 

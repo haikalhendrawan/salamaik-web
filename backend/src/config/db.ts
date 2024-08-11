@@ -1,6 +1,14 @@
 import pg from 'pg';
-const { Pool } = pg;
+const { Pool, types } = pg;
 import "dotenv/config"; 
+
+const NUMERIC_OID = 1700;
+
+// Override NUMERIC type dari string ke number
+types.setTypeParser(NUMERIC_OID, (value) => {
+  return parseFloat(value);
+});
+
  
 const pool = new Pool({
   host: process.env.PGHOST,

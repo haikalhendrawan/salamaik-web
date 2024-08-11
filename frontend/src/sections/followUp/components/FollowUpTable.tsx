@@ -5,6 +5,7 @@ import {Stack, Toolbar, Typography, Table, Card, CardHeader, TableSortLabel,
 import { useTheme, styled } from '@mui/material/styles';
 import Label from '../../../components/label';
 import Iconify from '../../../components/iconify/Iconify';
+import { FindingsResponseType } from '../types';
 // ---------------------------------------------------
 const StyledRoot = styled(Toolbar)(({ theme }) => ({
   height: 72,
@@ -35,44 +36,12 @@ const TABLE_HEAD = [
   { id: 'action', label: 'Action', alignRight: false },
 ];
 
-interface FollowUpData{
-  id: number,
-  komponen: string,
-  checklist: string,
-  finding: string,
-  pic: string,
-  status: number,
-};
-
-const TABLE_DATA: FollowUpData[] = [
-  {
-    id: 1,
-    komponen: 'Treasurer',
-    checklist: 'Digitalisasi Pembayaran',
-    finding: 'Tren KKP Digipay Fluktuatif',
-    pic: 'MSKI/PDMS',
-    status: 0,
-  },
-  {
-    id: 2,
-    komponen: 'Treasurer',
-    checklist: 'Penyaluran atas Beban APBN',
-    finding: 'Belum terdapat karya tulis pada media massa tingkat nasional/regional, terdapat karya tulis dengan judul insentif fiskal wujud Apresiasi Pemerintah atas Kinerja keuangan daerah dengan penulis Ika Sari Heniyatun dimuat pada tanggal media sosial kantor tanggal 15 November 2023',
-    pic: 'Umum',
-    status: 1,
-  },
-  {
-    id: 3,
-    komponen: 'Treasurer',
-    checklist: 'Digitalisasi Pembayaran',
-    finding: 'Tren KKP Digipay Fluktuatif',
-    pic: 'MSKI/PDMS',
-    status: 0,
-  },
-];
+interface FollowUpTableProps{
+  findings: FindingsResponseType[] | [],
+}
 
 // ----------------------------------------------------------------------------------
-export default function FollowUpTable() {
+export default function FollowUpTable({findings}: FollowUpTableProps) {
   const theme = useTheme();
 
   return (
@@ -97,25 +66,34 @@ export default function FollowUpTable() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {TABLE_DATA.map((row) => 
-                <TableRow hover key={row.id} tabIndex={-1}>
-                  <TableCell align="justify" sx={{fontSize: '13px'}}>{row.id}</TableCell>
+              {findings.map((item, index) => 
+                <TableRow hover key={item.id} tabIndex={-1}>
+                  <TableCell align="justify" sx={{fontSize: '13px'}}>{index+1}</TableCell>
 
-                  <TableCell align="left" sx={{fontSize: '13px'}}>{row.komponen}</TableCell>
+                  <TableCell align="left" sx={{fontSize: '13px'}}>
+                    <Typography variant='body2' fontWeight={'bold'} fontSize={'13px'}>Komponen {item.matrixDetail[0]?.komponen_string}</Typography>
+                    <Typography variant='body2' fontSize={'13px'}>Subkomponen {item.matrixDetail[0]?.subkomponen_string}</Typography>
+                  </TableCell>
 
-                  <TableCell align="left" sx={{fontSize: '13px'}}>{row.checklist}</TableCell>
+                  <TableCell align="left" sx={{fontSize: '13px'}}>
+                    {item.matrixDetail[0].checklist[0].matrix_title}
+                  </TableCell>
 
-                  <TableCell align="left" sx={{fontSize: '13px'}}>{`${row.finding}`}</TableCell>
+                  <TableCell align="left" sx={{fontSize: '13px'}}>{item.matrixDetail[0].permasalahan}</TableCell>
 
                   <TableCell align="left">
-                    {row.status===0
+                    {item.status===0
                       ? <Label color={'error'}> Belum </Label>
-                      : <Label color={'success'}> approved </Label>
+                      : item.status===1
+                        ? <Label color={'warning'}> Proses </Label>
+                        : item.status===2
+                          ? <Label color={'error'}> Ditolak </Label>
+                          : <Label color={'success'}> Disetujui </Label>
                     }
                   </TableCell>
 
                   <TableCell align="left" sx={{fontSize: '13px'}}>
-                    {`${row.pic}`}
+                    {item.matrixDetail[0].uic}
                   </TableCell> 
 
                   <TableCell align="left">
@@ -142,10 +120,10 @@ export default function FollowUpTable() {
       <Grow in>
         <Stack direction='column' spacing={1} sx={{pl: 2}}>
           <Typography variant='body2' fontWeight='bold' sx={{fontSize: '12px'}}>*Status:</Typography>
-          <Typography variant='body2' sx={{fontSize: '12px'}}>1. Belum: belum ditindaklanjuti KPPN (belum terhitung progress)</Typography>
-          <Typography variant='body2' sx={{fontSize: '12px'}}>2. Process: proses verifikasi Kanwil </Typography>
-          <Typography variant='body2' sx={{fontSize: '12px'}}>3. Reject: tindak lanjut ditolak Kanwil </Typography>
-          <Typography variant='body2' sx={{fontSize: '12px'}}>4. Approved: tindak lanjut disetujui Kanwil </Typography>
+          <Typography variant='body2' sx={{fontSize: '12px'}}>1. Belum: belum ditindaklanjuti KPPN </Typography>
+          <Typography variant='body2' sx={{fontSize: '12px'}}>2. Proses: sudah ditindaklanjuti & proses verifikasi Kanwil </Typography>
+          <Typography variant='body2' sx={{fontSize: '12px'}}>3. Ditolak: tindak lanjut ditolak Kanwil </Typography>
+          <Typography variant='body2' sx={{fontSize: '12px'}}>4. Disetujui: tindak lanjut disetujui Kanwil </Typography>
         </Stack>
       </Grow>
     </>

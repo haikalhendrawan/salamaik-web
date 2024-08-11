@@ -148,9 +148,9 @@ export default function ChecklistOpsiModal({
         title: opsi?.filter((row) => row.id===opsiID)[0]?.title || '',
         value: opsi?.filter((row) => row.id===opsiID)[0]?.value || 0,
         checklist_id: opsi?.filter((row) => row.id===opsiID)[0]?.checklist_id || 0,
-        positive_fallback: '',
-        negative_fallback: '',
-        rekomendasi: ''
+        positive_fallback: opsi?.filter((row) => row.id===opsiID)[0]?.positive_fallback || '',
+        negative_fallback: opsi?.filter((row) => row.id===opsiID)[0]?.negative_fallback || '',
+        rekomendasi: opsi?.filter((row) => row.id===opsiID)[0]?.rekomendasi || ''
       })
 
       setTitle({
@@ -247,7 +247,7 @@ export default function ChecklistOpsiModal({
                         label="Positive Fallback"
                         multiline
                         minRows={2}
-                        value={editValue?.positive_fallback}
+                        value={editValue.positive_fallback}
                         onChange={handleChangeEdit}
                       />
                     </FormControl>
@@ -258,7 +258,7 @@ export default function ChecklistOpsiModal({
                         label="Negative Fallback"
                         multiline
                         minRows={2}
-                        value={editValue?.negative_fallback}
+                        value={editValue.negative_fallback}
                         onChange={handleChangeEdit}
                       />
                     </FormControl>
@@ -269,7 +269,7 @@ export default function ChecklistOpsiModal({
                         label="Rekomendasi"
                         multiline
                         minRows={2}
-                        value={editValue?.rekomendasi}
+                        value={editValue.rekomendasi}
                         onChange={handleChangeEdit}
                       />
                     </FormControl>

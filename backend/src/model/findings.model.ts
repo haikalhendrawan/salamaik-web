@@ -9,7 +9,7 @@ import { PoolClient } from "pg";
 // -------------------------------------------------
 export interface FindingsType{
   id: number,
-  wsJunction_id: number,
+  ws_junction_id: number,
   worksheet_id: string,
   checklist_id: number,
   matrix_id: number, 
@@ -18,6 +18,7 @@ export interface FindingsType{
   score_before: number,
   score_after: number,
   last_update: string,
+  status: number,
   updated_by: string
 };
 
@@ -30,17 +31,18 @@ interface FindingsBodyType{
 };
 // --------------------------------------------------
 class Findings{
-  async createFindings({worksheetId, wsJunctionId, checklistId, matrixId, scoreBefore}: FindingsBodyType){
+  async createFindings({worksheetId, wsJunctionId, checklistId, matrixId, scoreBefore}: FindingsBodyType, poolTrx?: PoolClient){
     try{
-      const q = `INSERT INTO findings_data (worksheet_id, junction_id, checklist_id, score_before) VALUES ($1, $2, $3, $4) RETURNING *`;
-      const result = await pool.query(q, [worksheetId, wsJunctionId, checklistId, matrixId, scoreBefore]);
+      const poolInstance = poolTrx || pool;
+      const q = `INSERT INTO findings_data (worksheet_id, ws_junction_id, checklist_id, matrix_id, score_before) VALUES ($1, $2, $3, $4, $5) RETURNING *`;
+      const result = await poolInstance.query(q, [worksheetId, wsJunctionId, checklistId, matrixId, scoreBefore]);
       return result.rows[0]
     }catch(err){
       throw err
     }
   }
 
-  async getFindingsByWorksheetId(worksheetId: string){
+  async getFindingsByWorksheetId(worksheetId: string): Promise<FindingsType[]>{
     try{
       const q = `SELECT * FROM findings_data WHERE worksheet_id = $1`;
       const result = await pool.query(q, [worksheetId]);
@@ -82,6 +84,17 @@ class Findings{
     try{
       const q = `DELETE FROM findings_data WHERE id = $1`;
       const result = await pool.query(q, [id]);
+      return result
+    }catch(err){
+      throw err
+    }
+  }
+
+  async deleteFindingsByWorksheetId(worksheetId: string, poolTrx?: PoolClient){
+    const poolInstance = poolTrx || pool;
+    try{
+      const q = `DELETE FROM findings_data WHERE worksheet_id = $1`;
+      const result = await poolInstance.query(q, [worksheetId]);
       return result
     }catch(err){
       throw err

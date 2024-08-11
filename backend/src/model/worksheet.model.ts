@@ -91,7 +91,7 @@ class Worksheet{
     }
   }
 
-  async editWorksheetMatrixStatus(id: string, poolTrx?: PoolClient){
+  async editWorksheetMatrixStatus(id: string, matrixStatus: number, poolTrx?: PoolClient){
     const poolInstance = poolTrx??pool;
     const updateTime = new Date(Date.now()).toISOString();
     try{
@@ -99,7 +99,7 @@ class Worksheet{
                   SET matrix_status = $1, updated_at = $2
                   WHERE id = $3
                   RETURNING *`;
-      const result = await poolInstance.query(q, [1, updateTime, id]);
+      const result = await poolInstance.query(q, [matrixStatus, updateTime, id]);
       return result.rows[0]
     }catch(err){
       throw err

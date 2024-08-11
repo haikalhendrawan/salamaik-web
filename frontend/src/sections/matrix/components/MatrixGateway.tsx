@@ -1,5 +1,5 @@
 import {useState, useEffect} from'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 // @mui
 import { Card, CardHeader, Box, Button, Stack, CardContent, Typography } from '@mui/material';
 import { useTheme, alpha } from '@mui/material/styles';
@@ -20,7 +20,7 @@ export default function MatrixGateway({ title, subheader, ...other }: DasarHukum
 
   const primaryDark = theme.palette.primary.light;
 
-  const kppn = '010';
+  const kppn = new URLSearchParams(useLocation().search).get("id");
 
   return (
     <>

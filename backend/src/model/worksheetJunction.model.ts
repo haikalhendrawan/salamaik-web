@@ -1,6 +1,8 @@
 import pool from "../config/db";
 import "dotenv/config";
 import { PoolClient } from "pg";
+import { ChecklistType } from "./checklist.model";
+import { KomponenType, SubKomponenType } from "./komponen.model";
 /**
  *
  *
@@ -65,6 +67,25 @@ export interface WsJunctionJoinChecklistType{
   opsi: OpsiType[] | [] | null
 };
 
+export interface WsJunctionWithKomponenType{
+  junction_id: number,
+  worksheet_id: string,
+  checklist_id: number,
+  kanwil_score: number | null,
+  kppn_score: number | null,
+  file_1: string | null,
+  file_2: string | null,
+  file_3: string | null,
+  kanwil_note: string | null,
+  kppn_id: string,
+  period: string,
+  last_update: string | null,
+  updated_by: string | null,
+  checklist: ChecklistType[],
+  komponen: KomponenType[],
+  subkomponen: SubKomponenType[],
+}
+
 
 // ------------------------------------------------------
 
@@ -101,6 +122,29 @@ class WorksheetJunction{
                   `;
       const result = await pool.query(q, [junctionId]);
       return result.rows[0]
+    }catch(err){
+      throw err
+    }
+  }
+
+  async getWsJunctionWithKomponenDetail(worksheetId: string): Promise<WsJunctionWithKomponenType[]>{
+    try{
+      const q = ` SELECT  worksheet_junction.*, 
+                          json_agg(komponen_ref.* ORDER BY komponen_ref.id ASC) AS komponen, 
+                          json_agg(subkomponen_ref.* ORDER BY subkomponen_ref.id ASC) AS subkomponen,
+                          json_agg(checklist_ref.* ORDER BY checklist_ref.id ASC) AS checklist
+                  FROM worksheet_junction
+                  LEFT JOIN checklist_ref
+                  ON worksheet_junction.checklist_id = checklist_ref.id
+                  LEFT JOIN komponen_ref
+                  ON komponen_ref.id = checklist_ref.komponen_id
+                  LEFT JOIN subkomponen_ref
+                  ON subkomponen_ref.id = checklist_ref.subkomponen_id
+                  WHERE worksheet_junction.worksheet_id = $1
+                  GROUP BY worksheet_junction.junction_id
+                  `;
+      const result = await pool.query(q, [worksheetId]);
+      return result.rows
     }catch(err){
       throw err
     }

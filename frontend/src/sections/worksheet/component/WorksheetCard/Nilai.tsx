@@ -286,20 +286,6 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
     }
   };
 
-  const handleFindings = async() => {
-    try{
-      const response = await axiosJWT.post("/createFindings", {
-        worksheetId: wsJunction?.worksheet_id, 
-        wsJunctionId: wsJunction?.junction_id, 
-        checklistId: wsJunction?.checklist_id, 
-        scoreBefore: wsJunction?.kanwil_score
-      })
-      console.log(response);
-    }catch(err: any){
-      console.log(err)
-    }
-  }
-
   useEffect(() => {
     setIsMounted(false);
   }, []);
@@ -321,7 +307,6 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
       <Stack direction='column' spacing={1}>
         <Typography variant='body3' fontSize={12} textAlign={'left'}>Nilai KPPN :</Typography>
         <StyledFormControl>
-          <StyledButton onClick={handleFindings}>Findings</StyledButton>
           {
             wsJunction?.standardisasi === 1
             ?

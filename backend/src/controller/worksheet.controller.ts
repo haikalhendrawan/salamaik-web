@@ -22,14 +22,13 @@ const getWorksheetByPeriodAndKPPN = async(req: Request, res: Response, next: Nex
     const {period} = req.payload;
     const {kppnId} = req.params;
     const worksheets: WorksheetType[] = await worksheet.getWorksheetByPeriodAndKPPN(period, kppnId);
-    console.log(period, kppnId.slice(1));
+    const mainWorksheet = worksheets[0];
 
     if(worksheets.length === 0) {
-      throw new ErrorDetail(400, 'Worksheet not found');
+      throw new ErrorDetail(400, 'Worksheet not found')
     };
 
-
-    return res.status(200).json({sucess: true, message: 'Get worksheet success', rows: worksheets})
+    return res.status(200).json({sucess: true, message: 'Get worksheet success', rows: mainWorksheet})
   }catch(err){
     next(err)
   }

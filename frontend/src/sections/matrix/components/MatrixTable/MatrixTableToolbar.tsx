@@ -1,7 +1,8 @@
 // @mui
 import { Button, Select, FormControl, InputLabel, MenuItem} from '@mui/material';
 import {useTheme, styled} from '@mui/material/styles';
-import Iconify from '../../../components/iconify/Iconify';
+import Iconify from '../../../../components/iconify/Iconify';
+import useDictionary from '../../../../hooks/useDictionary';
 
 const StyledDiv = styled('div')(({theme}) => ({
   display:'flex',
@@ -9,9 +10,17 @@ const StyledDiv = styled('div')(({theme}) => ({
   gap: theme.spacing(1)
 }));
 
-export default function MatrixTableToolbar(){
+interface MatrixTableToolbarProps{
+  matrixStatus: number | null,
+  selectedKomponen: string  | null,
+  setSelectedKomponen: React.Dispatch<React.SetStateAction<string | null>>,
+}
+
+export default function MatrixTableToolbar({matrixStatus, selectedKomponen, setSelectedKomponen}: MatrixTableToolbarProps) {
   const theme = useTheme();
-  
+
+  const {komponenRef} = useDictionary();
+
   return(
     <StyledDiv>
       <FormControl sx={{height:'45px', width:'30%'}}>
@@ -20,16 +29,20 @@ export default function MatrixTableToolbar(){
           name="komponen" 
           label='Komponen'
           labelId="komponen-select-label"
-          value= {1}
+          onChange={(e) => setSelectedKomponen(e.target.value)}
+          value= {selectedKomponen}
           sx={{typography:'body2', fontSize:14, height:'100%'}}
         >
-          <MenuItem key={0} sx={{fontSize:14}} value={0}>Treasurer</MenuItem>
-          <MenuItem key={1} sx={{fontSize:14}} value={1}>Pengelola Fiskal, Representasi Kemenkeu di Daerah, dan Special Mission</MenuItem>
-          <MenuItem key={2} sx={{fontSize:14}} value={2}>Financial Advisor</MenuItem>
-          <MenuItem key={3} sx={{fontSize:14}} value={3}>Tata Kelola Internal</MenuItem>
+          {
+            komponenRef?.map((item) => (
+              <MenuItem key={item?.id} sx={{fontSize:14}} value={item?.id}>{item?.title}</MenuItem>
+            ))
+          }
         </Select>
       </FormControl>
-      <Button variant='contained' endIcon={ <Iconify icon="solar:refresh-bold-duotone"/>}>Update Matriks</Button>
+      {
+        matrixStatus === 1 ?<Button variant='contained' endIcon={ <Iconify icon="solar:refresh-bold-duotone"/>}>Update Matriks</Button> : null
+      }
       <div style={{flexGrow:1}} />
       <Button variant="text"  endIcon={ <Iconify icon="vscode-icons:file-type-pdf2"/>}>
         Export
