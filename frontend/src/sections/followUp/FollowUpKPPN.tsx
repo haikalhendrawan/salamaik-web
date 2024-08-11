@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 // @mui
-import { Container, Stack, Typography, Grid, IconButton, Breadcrumbs, Link} from '@mui/material';
-import {useTheme, styled} from '@mui/material/styles';
-import Iconify from '../../components/iconify/Iconify';
+import { Container, Stack, Typography, Grid} from '@mui/material';
+import {useTheme} from '@mui/material/styles';
 // sections
 import FollowUpProgress from './components/FollowUpProgress';
 import AmountTemuan from './components/AmountTemuan';
@@ -76,7 +75,7 @@ export default function FollowUpKPPN() {
     }finally{
       setIsLoading(false);
     }
-  }
+  };
 
   const getWorksheet = async() => {
     try{
@@ -166,7 +165,7 @@ export default function FollowUpKPPN() {
             </Grid>
 
             <Grid item xs={12}>
-              <FollowUpTable findings={findings} />
+              <FollowUpTable findings={findings} kppnId={kppnId} />
             </Grid>
 
           </Grid>

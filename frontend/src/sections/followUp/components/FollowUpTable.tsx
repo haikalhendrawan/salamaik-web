@@ -38,10 +38,11 @@ const TABLE_HEAD = [
 
 interface FollowUpTableProps{
   findings: FindingsResponseType[] | [],
+  kppnId: string | null
 }
 
 // ----------------------------------------------------------------------------------
-export default function FollowUpTable({findings}: FollowUpTableProps) {
+export default function FollowUpTable({findings, kppnId}: FollowUpTableProps) {
   const theme = useTheme();
 
   return (
@@ -103,7 +104,7 @@ export default function FollowUpTable({findings}: FollowUpTableProps) {
                         variant="contained" 
                         color="warning"
                         component={Link}  
-                        to={`/followUp/detail?id=010`}
+                        to={`/followUp/detail?id=${kppnId}&findingsId=${item.id}`}
                       >
                         Follow Up
                       </StyledButton>

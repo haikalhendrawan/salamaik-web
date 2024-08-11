@@ -1,17 +1,48 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Iconify from '../../components/iconify/Iconify';
 // @mui
-import {useTheme, styled, alpha} from '@mui/material/styles';
+import {useTheme} from '@mui/material/styles';
 import {Button, IconButton, Container, Grid, Stack, Typography} from '@mui/material';
 // sections
 import FollowUpCard from './components/FollowUpCard';
 import FollowUpHeader from './components/FollowUpHeader';
+import useAxiosJWT from '../../hooks/useAxiosJWT';
+import useSnackbar from '../../hooks/display/useSnackbar';
+import useLoading from '../../hooks/display/useLoading';
+import {useAuth} from '../../hooks/useAuth';
+import useDictionary from '../../hooks/useDictionary';
+import { FindingsResponseType } from './types';
+import { WorksheetType } from '../worksheet/types';
+// --------------------------------------------------------------
+
+
+// --------------------------------------------------------------
 
 export default function FollowUpDetail() {
   const theme = useTheme();
 
   const navigate = useNavigate();
+
+  const params = new URLSearchParams(useLocation().search);
+
+  const {auth} = useAuth();
+
+  const {kppnRef} = useDictionary();
+
+  const isKanwil = auth?.kppn === '03010';
+
+  const {openSnackbar} = useSnackbar();
+
+  const {setIsLoading} = useLoading();
+
+  const axiosJWT = useAxiosJWT();
+
+  const kppnId= params.get('id');
+
+  const [findings, setFindings] = useState<FindingsResponseType[] | []>([]);
+
+  const selectedFindings = findings?.find((item) =>item?.id === Number(params.get('findingsId'))) || null;
 
   const [open, setOpen] = useState<boolean>(false); // for preview file modal
 
@@ -38,6 +69,31 @@ export default function FollowUpDetail() {
     setOpenInstruction(false)
   };
 
+  const getFindings = async() => {
+    try{
+      if(!kppnId){
+        return null
+      };
+
+      const response = await axiosJWT.get(`/getFindingsByWorksheetId/${kppnId}`);
+      setFindings(response.data.rows);
+
+    }catch(err: any){
+      setIsLoading(false);
+      if(err.response){
+        openSnackbar(err.response.data.message, "error");
+      }else{
+        openSnackbar('network error', "error");
+      }
+    }finally{
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getFindings();
+  }, []);
+
   return (
     <>
     <Container maxWidth="xl">
@@ -57,7 +113,7 @@ export default function FollowUpDetail() {
 
       <Grid container spacing={2}>
         <Grid item xs={12}>
-          <FollowUpHeader />
+          <FollowUpHeader selectedFindings={selectedFindings} />
         </Grid>
 
         <Grid item xs={12}>
