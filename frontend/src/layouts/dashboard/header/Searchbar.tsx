@@ -1,6 +1,6 @@
 import { useState } from 'react';
 // @mui
-import { CustomThemeOptions, styled } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import { Input, Slide, Button, IconButton, InputAdornment, ClickAwayListener } from '@mui/material';
 // utils
 import { bgBlur } from '../../../utils/cssStyles';

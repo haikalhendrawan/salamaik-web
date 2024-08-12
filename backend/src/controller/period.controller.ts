@@ -4,7 +4,7 @@ import period from '../model/period.model';
 interface PeriodType{
   id: number;
   name: string; 
-  isEven: 0;
+  even_period: 0;
   semester: number;
   tahun: number
 }

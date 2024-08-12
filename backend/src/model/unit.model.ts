@@ -4,7 +4,7 @@ import jwt, {JwtPayload, VerifyErrors} from "jsonwebtoken";
 import ErrorDetail  from "./error.model";
 import "dotenv/config"; 
 // -------------------------------------------------
-interface UnitType{
+export interface UnitType{
   id: string;
   name: string;
   alias: string;
@@ -16,7 +16,7 @@ interface UnitType{
 };
 // ------------------------------------------------------
 class Unit{
-  async getAllUnit(){
+  async getAllUnit(): Promise<UnitType[]> {
     try{
       const q = "SELECT * FROM kppn_ref ORDER BY col_order ASC";
       const result = await pool.query(q);
@@ -26,7 +26,7 @@ class Unit{
     }
   }
 
-  async getAllKPPN(){
+  async getAllKPPN(): Promise<UnitType[]> {
     try{
       const q = "SELECT * FROM kppn_ref WHERE level = $1 ORDER BY col_order ASC";
       const result = await pool.query(q, [0]);
@@ -36,7 +36,7 @@ class Unit{
     }
   }
 
-  async getUnitById(id: string){
+  async getUnitById(id: string): Promise<UnitType[]> {
     try{
       const q = "SELECT * FROM kppn_ref WHERE id = $1 ORDER BY col_order ASC";
       const result = await pool.query(q, [id]);;

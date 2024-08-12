@@ -17,7 +17,7 @@ const style = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  height:'55vh',
+  height:'70vh',
   width: '50vw',
   bgcolor: 'background.paper',
   boxShadow: 24,
@@ -189,7 +189,7 @@ export default function BatchRefModal({modalOpen, modalClose, addState, editID, 
       <Modal open={modalOpen} onClose={modalClose} keepMounted>
         <Box sx={style}>
           <Scrollbar>
-            <Paper sx={{height:'50vh', width:'auto', p:2}}>
+            <Paper sx={{height:'65vh', width:'auto', p:2}}>
               <Typography variant="h6" sx={{ mb: 2 }}>
                 {addState? 'Add ':'Edit '} 
                 Period

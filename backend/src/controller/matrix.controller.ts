@@ -5,6 +5,7 @@ import wsJunction from "../model/worksheetJunction.model";
 import pool from '../config/db';
 import findings from "../model/findings.model";
 import ErrorDetail from "../model/error.model";
+import logger from "../config/logger";
 // ------------------------------------------------------------------------
 const getMatrixByWorksheetId = async(req: Request, res: Response, next: NextFunction) => {
   try{
@@ -125,6 +126,87 @@ const createMatrix = async(req: Request, res: Response, next: NextFunction) => {
   }
 }
 
+const reAssignMatrix = async(req: Request, res: Response, next: NextFunction) => {
+  const connection = await pool.connect();
+  try{
+    await connection.query('BEGIN');
+    const {kppnId} = req.body;
+    const {period} = req.payload;
+
+    if(!kppnId ) {
+      throw new ErrorDetail(400, 'Insufficient request body');
+    };
+    
+    // query #1 dapatkan worksheet Id dan cek matrix
+    const worksheetProfile: WorksheetType[] = await worksheet.getWorksheetByPeriodAndKPPN(period, kppnId, connection); 
+    const worksheetId = worksheetProfile[0]?.id || null;
+
+    if(!worksheetId) {
+      throw new ErrorDetail(404, 'Worksheet not found');
+    };
+
+    const matrixStatus = worksheetProfile[0]?.matrix_status || 0;
+    if(matrixStatus === 0){
+      throw new ErrorDetail(400, 'Matrix not assigned');
+    };
+
+    // query #2 get all ws junction
+    const wsJunctions = await wsJunction.getWsJunctionByWorksheetId(worksheetId, connection);
+
+    if(wsJunctions?.length === 0) {
+      throw new ErrorDetail(404, 'Worksheet not assigned');
+    };
+
+    //query #3 for each wsJunction, compare to current matrix and Add or remove matrix dan finding korespondensi
+    const result = await Promise.all(wsJunctions.map(async(item) => {
+      const connectedMatrix = await matrix.getSingleMatrixByWsJunctionId(item?.junction_id, connection);
+      const isFindingMatrix = connectedMatrix?.is_finding === 1;
+      const isStandardisasi = item?.standardisasi === 1;
+      const isFindingCurrent = isStandardisasi 
+                        ? item?.kanwil_score === 12 ? false : true 
+                        : item?.kanwil_score === 10 ? false : true;
+      const isAddFinding = ((isFindingCurrent === true) && (isFindingMatrix === false));
+      const isRemoveFinding = ((isFindingCurrent === false) && (isFindingMatrix === true));
+
+      if(isFindingMatrix !== isFindingCurrent) {
+          const hasilImplementasi = item?.opsi?.find((op) => op?.value === item?.kanwil_score)?.positive_fallback || '';
+          const permasalahan = item?.opsi?.find((op) => op?.value === item?.kanwil_score)?.negative_fallback || '';
+          const isFindingNewAdd = 1;
+          const isFindingNewRemove = 0;
+          const wsJunctionId = item?.junction_id;
+
+          if(isAddFinding) {
+            // #3.1 update matrix with isFinding status of false to true, dan tambah findings to findings table
+            await matrix.updateMatrixFindings(wsJunctionId, hasilImplementasi, permasalahan, isFindingNewAdd, connection);
+            const findingBody = {
+              worksheetId: worksheetId,
+              wsJunctionId: wsJunctionId,
+              checklistId: item?.checklist_id,
+              matrixId: connectedMatrix?.id,
+              scoreBefore: item?.kanwil_score
+            };
+            await findings.createFindings(findingBody, connection);
+          }
+
+          if(isRemoveFinding) {
+            // #3.2 update matrix with isFinding status of true to false, dan hapus findings from findings table
+            await matrix.updateMatrixFindings(wsJunctionId, hasilImplementasi, permasalahan, isFindingNewRemove, connection);
+            await findings.deleteFindingsByWsJunctionId(wsJunctionId, connection);
+          }
+      }
+    }))
+    // const {hasilImplementasi, permasalahan, isFinding} = matrix
+    await connection.query('COMMIT');
+    return res.status(200).json({sucess: true, message: 'Repost matrix success', rows: result})
+  }catch(err){
+    logger.error(err);
+    await connection.query('ROLLBACK');
+    next(err)
+  }finally{
+    connection.release();
+  }
+}
+
 const updateMatrix = async(req: Request, res: Response, next: NextFunction) => {
   try{
     // const {id, hasilImplementasi, permasalahan, rekomendasi, peraturan, uic, tindakLanjut, isFinding} = req.body;
@@ -167,5 +249,6 @@ export {
   getMatrixWithWsDetailById,
   createMatrix,
   updateMatrix,
+  reAssignMatrix,
   deleteMatrix
 }

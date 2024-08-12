@@ -33,7 +33,8 @@ class Worksheet{
       const q = ` SELECT worksheet_ref.*, kppn_ref.name, kppn_ref.alias 
                   FROM worksheet_ref
                   INNER JOIN kppn_ref ON kppn_ref.id = worksheet_ref.kppn_id 
-                  WHERE period = $1 AND kppn_ref.level = $2`;
+                  WHERE period = $1 AND kppn_ref.level = $2
+                  ORDER BY kppn_ref.col_order`;
       const result = await pool.query(q, [period, 0]);
       return result.rows
     }catch(err){
@@ -41,12 +42,13 @@ class Worksheet{
     }  
   }
 
-  async getWorksheetByPeriodAndKPPN(period: number, kppnId: string): Promise<WorksheetType[]>{
+  async getWorksheetByPeriodAndKPPN(period: number, kppnId: string, poolTrx?: PoolClient): Promise<WorksheetType[]>{
+    const poolInstance = poolTrx??pool;
     try{
       const q = ` SELECT *
                   FROM worksheet_ref
                   WHERE period = $1 AND kppn_id = $2`;
-      const result = await pool.query(q, [period, kppnId]);
+      const result = await poolInstance.query(q, [period, kppnId]);
       return result.rows
     }catch(err){
       throw err

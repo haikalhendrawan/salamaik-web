@@ -66,24 +66,61 @@ class Findings{
     }
   }
 
-  async updateFindingsScore(id: number, kppnScore: string, kanwilScore: string, userName: string){
+  async updateFindingsScore(id: number, scoreBefore: string, scoreAfter: string, userName: string){
     try{
       const updateTime = new Date(Date.now()).toISOString();
       const q = `UPDATE findings_data 
-                 SET kppn_score = $1, kanwil_score = $2, updated_by = $3, last_update = $4
+                 SET score_before = $1, score_after = $2, updated_by = $3, last_update = $4
                  WHERE id = $5
                  RETURNING *`;
-      const result = await pool.query(q, [kppnScore, kanwilScore, userName, updateTime, id]);
+      const result = await pool.query(q, [scoreBefore, scoreAfter, userName, updateTime, id]);
       return result.rows[0]
     }catch(err){
       throw err
     }
   }
 
-  async deleteFindings(id: number){
+  async updateFindingsStatus(id: number, status: number, userName: string){
+    try{
+      const updateTime = new Date(Date.now()).toISOString();
+      const q = `UPDATE findings_data 
+                 SET status = $1, updated_by = $2, last_update = $3
+                 WHERE id = $4
+                 RETURNING *`;
+      const result = await pool.query(q, [status, userName, updateTime, id]);
+      return result.rows[0]
+    }catch(err){
+      throw err
+    }
+  }
+
+  async deleteFindings(id: number, poolTrx?: PoolClient){
+    const poolInstance = poolTrx || pool;
     try{
       const q = `DELETE FROM findings_data WHERE id = $1`;
       const result = await pool.query(q, [id]);
+      return result
+    }catch(err){
+      throw err
+    }
+  }
+
+  async deleteFindingsByMatrixId(matrixId: number, poolTrx?: PoolClient){
+    const poolInstance = poolTrx || pool;
+    try{
+      const q = `DELETE FROM findings_data WHERE matrix_id = $1`;
+      const result = await pool.query(q, [matrixId]);
+      return result
+    }catch(err){
+      throw err
+    }
+  }
+
+  async deleteFindingsByWsJunctionId(wsJunctionId: number, poolTrx: PoolClient){
+    const poolInstance = poolTrx || pool;
+    try{
+      const q = `DELETE FROM findings_data WHERE ws_junction_id = $1`;
+      const result = await pool.query(q, [wsJunctionId]);
       return result
     }catch(err){
       throw err

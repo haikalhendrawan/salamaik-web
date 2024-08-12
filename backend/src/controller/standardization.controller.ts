@@ -9,6 +9,7 @@ import { sanitizeMimeType } from '../utils/mimeTypeSanitizer';
 import { stdScoreGenerator } from '../utils/standardizationCounter';
 import fs from 'fs';
 import path from 'path';
+import { PeriodType } from '../model/period.model';
 // -------------------------------------------------
 interface StandardizationType{
   id: number;
@@ -17,13 +18,6 @@ interface StandardizationType{
   interval: number
 };
 
-interface PeriodType{
-  id: number;
-  name: string; 
-  evenPeriod: 0;
-  semester: number;
-  tahun: string
-};
 
 // ------------------------------------------------------
 const getAllStandardization = async (req: Request, res: Response, next: NextFunction) => {
@@ -50,7 +44,7 @@ const getStdWorksheet = async (req: Request, res: Response, next: NextFunction) 
     const {period: periodID} = req.payload;
     const {kppn} = req.params
     const periodRef = await period.getAllPeriod();
-    const isEvenPeriod = periodRef?.filter((item: PeriodType) => item.id === periodID)?.[0]?.evenPeriod || 0;
+    const isEvenPeriod = periodRef?.filter((item: PeriodType) => item.id === periodID)?.[0]?.even_period || 0;
 
     const stdRef = await standardization.getStandardization();
     const stdJunction = await standardization.getStandardizationJunction(kppn, periodID);

@@ -105,7 +105,12 @@ export default function MatrixTable({matrix, matrixStatus, getMatrix}: {matrix: 
 
   return (
     <>
-      <MatrixTableToolbar matrixStatus={matrixStatus} selectedKomponen={selectedKomponen} setSelectedKomponen={setSelectedKomponen}/>
+      <MatrixTableToolbar 
+        matrixStatus={matrixStatus} 
+        selectedKomponen={selectedKomponen} 
+        setSelectedKomponen={setSelectedKomponen} 
+        getMatrix={getMatrix}
+      />
       
       <Grow in>
         <Card sx={{height:'auto', display:'flex', flexDirection:'column', gap:theme.spacing(1), mb: 1}}>

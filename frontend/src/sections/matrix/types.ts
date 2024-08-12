@@ -1,5 +1,6 @@
 import { WsJunctionType } from "../worksheet/types";
 import { ChecklistType } from "../admin/worksheetRef/ChecklistRef/useChecklist";
+import { OpsiType } from "../worksheet/types";
 
 
 
@@ -63,6 +64,7 @@ export interface MatrixWithWsJunctionType{
   ws_junction: WsJunctionType[],
   checklist: ChecklistType[],
   findings: FindingsType[],
+  opsi: OpsiType[]
 }
 
 interface ScorePerKomponenType{

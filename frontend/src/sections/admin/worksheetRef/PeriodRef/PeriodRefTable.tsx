@@ -125,7 +125,7 @@ export default function PeriodRefTable({tableData}: PeriodRefTableProps) {
                             aria-label="delete" 
                             variant='contained' 
                             size='small' 
-                            color='white'
+                            color='pink'
                             onClick= {() => handleOpenDelete(row.id)}
                           >
                             <Iconify icon="solar:trash-bin-trash-bold"/>

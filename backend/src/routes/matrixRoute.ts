@@ -8,6 +8,7 @@ router.get('/getMatrixByWorksheetId/:id', authenticate, matrixController.getMatr
 router.get('/getMatrixWithWsDetailById/:kppnId', authenticate,matrixController.getMatrixWithWsDetailById);
 router.post('/createMatrix', authenticate, matrixController.createMatrix);
 router.post('/updateMatrix', authenticate, matrixController.updateMatrix);
+router.post('/reAssignMatrix', authenticate, matrixController.reAssignMatrix);
 router.post('/deleteMatrix', authenticate, matrixController.deleteMatrix);
 
 

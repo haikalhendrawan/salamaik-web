@@ -90,7 +90,8 @@ export interface WsJunctionWithKomponenType{
 // ------------------------------------------------------
 
 class WorksheetJunction{
-  async getWsJunctionByWorksheetId(worksheetId: string): Promise<WsJunctionJoinChecklistType[]>{
+  async getWsJunctionByWorksheetId(worksheetId: string, poolTrx?: PoolClient): Promise<WsJunctionJoinChecklistType[]>{
+    const poolInstance = poolTrx ?? pool;
     try{
       const q = ` SELECT worksheet_junction.*, checklist_ref.*, json_agg(opsi_ref.* ORDER BY opsi_ref.checklist_id ASC, value DESC) AS opsi
                   FROM worksheet_junction
@@ -102,7 +103,7 @@ class WorksheetJunction{
                   GROUP BY worksheet_junction.junction_id, checklist_ref.id
                   ORDER BY worksheet_junction.checklist_id
                   `;
-      const result = await pool.query(q, [worksheetId]);
+      const result = await poolInstance.query(q, [worksheetId]);
       return result.rows
     }catch(err){
       throw err

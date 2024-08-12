@@ -1,1 +1,1 @@
-export { default } from './HorizontalLayout';
+export { default } from './RequireAuthHorizontalLayout';

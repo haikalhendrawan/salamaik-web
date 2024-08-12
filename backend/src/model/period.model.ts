@@ -4,18 +4,18 @@ import jwt, {JwtPayload, VerifyErrors} from "jsonwebtoken";
 import ErrorDetail  from "./error.model";
 import "dotenv/config"; 
 // -------------------------------------------------
-interface PeriodType{
+export interface PeriodType{
   id: number;
   name: string; 
-  evenPeriod: 0;
+  even_period: 0;
   semester: number;
   tahun: number
 };
 // ------------------------------------------------------
 class Period{
-  async getAllPeriod(){
+  async getAllPeriod(): Promise<PeriodType[]>{
     try{
-      const q = "SELECT * FROM period_ref";
+      const q = "SELECT * FROM period_ref ORDER BY id ASC";
       const result = await pool.query(q);
       return result.rows;
     }catch(err){
@@ -25,7 +25,7 @@ class Period{
 
   async getPeriodById(id: number){
     try{
-      const q = "SELECT * FROM period_ref WHERE id = $1";
+      const q = "SELECT * FROM period_ref WHERE id = $1 ORDER BY id ASC";
       const result = await pool.query(q, [id]);;
       return result.rows;
     }catch(err){

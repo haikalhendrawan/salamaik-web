@@ -1,4 +1,5 @@
 import { MatrixWithWsJunctionType } from "../matrix/types"
+import { OpsiType } from "../worksheet/types"
 
 export interface FindingsResponseType{
   id: number,
@@ -6,12 +7,12 @@ export interface FindingsResponseType{
   worksheet_id: string,
   checklist_id: number,
   matrix_id: number, 
-  kppn_reponse: string,
+  kppn_response: string,
   kanwil_response: string,
   score_before: number,
   score_after: number,
   last_update: string,
   updated_by: string,
   status: number,
-  matrixDetail: MatrixWithWsJunctionType[]
+  matrixDetail: MatrixWithWsJunctionType[],
 };

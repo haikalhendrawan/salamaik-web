@@ -1,15 +1,19 @@
 import {Request, Response, NextFunction} from 'express';
 import multer from 'multer';
 import wsJunction, {WorksheetJunctionType, WsJunctionJoinChecklistType, WsJunctionWithKomponenType} from '../model/worksheetJunction.model';
-import worksheet from '../model/worksheet.model';
-import { komponen } from '../model/komponen.model';
+import worksheet, { WorksheetType } from '../model/worksheet.model';
+import { komponen, KomponenWithSubKomponen } from '../model/komponen.model';
 import ErrorDetail from '../model/error.model';
+import unit from '../model/unit.model';
+import period from '../model/period.model';
 import { uploadWsJunctionFile } from '../config/multer';
 import fs from 'fs';
 import path from 'path';
 import { sanitizeMimeType } from '../utils/mimeTypeSanitizer';
 import { validateScore } from '../utils/worksheetJunction.utils';
 import { getScoreForMatrix } from '../utils/getScorePembinaan';
+import {UnitType} from '../model/unit.model';
+
 // ------------------------------------------------------------------
 
 interface ScorePerKomponenType{
@@ -71,7 +75,7 @@ const getWsJunctionByWorksheetForKanwil = async(req: Request, res: Response, nex
 
 const getWsJunctionByPeriod = async(req: Request, res: Response, next: NextFunction) => {
   try{
-    const period = req.body;
+    const {period} = req.body;
     const result: WorksheetJunctionType[] = await wsJunction.getWsJunctionByPeriod(period);
     return res.status(200).json({sucess: true, message: 'Get worksheet junction success', rows: result})
   }catch(err){
@@ -81,7 +85,7 @@ const getWsJunctionByPeriod = async(req: Request, res: Response, next: NextFunct
 
 const getWsJunctionByKPPN = async(req: Request, res: Response, next: NextFunction) => {
   try{
-    const kppn = req.body;
+    const {kppn} = req.body;
     const result: WorksheetJunctionType[] = await wsJunction.getWsJunctionByKPPN(kppn);
     return res.status(200).json({sucess: true, message: 'Get worksheet junction success', rows: result})
   }catch(err){
@@ -92,35 +96,75 @@ const getWsJunctionByKPPN = async(req: Request, res: Response, next: NextFunctio
 const getWsJunctionScoreAndProgress = async(req: Request, res: Response, next: NextFunction) => {
   try{
     const {kppnId, period} = req.body;
-    const mainWorksheet = await worksheet.getWorksheetByPeriodAndKPPN(period, kppnId);
-    const worksheetId = mainWorksheet.length>0? mainWorksheet[0].id : null;
 
-    if(!worksheetId) {
+    // query #1 get worksheet Id
+    const mainWorksheet = await worksheet.getWorksheetByPeriodAndKPPN(period, kppnId);
+
+    if(mainWorksheet.length === 0) {
       throw new ErrorDetail(404, 'Worksheet not found');
     };
+    
+    // query #2 #3 get komponen dan wsJunction
+    const responseBody = await getScoreProgressResponseBody(mainWorksheet);
 
-    const komponenAll = await komponen.getAllKomponenWithSubKomponen();
-    const wsJunctionDetail = await wsJunction.getWsJunctionWithKomponenDetail(worksheetId);
-
-    if(!wsJunctionDetail || wsJunctionDetail.length===0) {
-      throw new ErrorDetail(404, 'Worksheet not assigned');
-    };
-
-    const responseBody = {
-      scoreByKanwil : getScoreForMatrix(komponenAll, wsJunctionDetail, true)?.reduce((a, c) => a+c.weightedScore, 0) || 0,
-      scoreByKPPN: getScoreForMatrix(komponenAll, wsJunctionDetail, false)?.reduce((a, c) => a+c.weightedScore, 0) || 0,
-      isFinal: 0,
-      totalChecklist: wsJunctionDetail?.length,
-      totalProgressKanwil: wsJunctionDetail?.filter((item) => item?.kanwil_score !== null).length,
-      totalProgressKPPN: wsJunctionDetail?.filter((item) => item?.kppn_score !== null).length,
-      scorePerKomponen: getScoreForMatrix(komponenAll, wsJunctionDetail, true),
-      scorePerKomponenKPPN: getScoreForMatrix(komponenAll, wsJunctionDetail, false)
-    };
     return res.status(200).json({sucess: true, message: 'Get worksheet junction success', rows: responseBody})
   }catch(err){
     next(err)
   }
 }
+
+const getWsJunctionScoreAndProgressAllKPPN = async(req: Request, res: Response, next: NextFunction) => {
+  try{
+    const {period} = req.payload;
+    const allKPPN = await unit.getAllKPPN();
+
+    const result = await Promise.all(allKPPN.map(async(kppn) => {
+      // computation sama persis seperti controller sebelumnya dengan perbedaan response body
+      const mainWorksheet = await worksheet.getWorksheetByPeriodAndKPPN(period, kppn.id);
+      const worksheetId = mainWorksheet.length>0? mainWorksheet[0].id : null;
+  
+      if(!worksheetId) {
+        return {
+          ...kppn,
+          scoreProgressDetail: null
+        }
+      };
+
+      return await getScoreProgressResponseBodyAllKPPN(mainWorksheet, kppn);
+    }));
+
+    return res.status(200).json({sucess: true, message: 'Get worksheet junction success', rows: result})
+  }catch(err){
+    next(err)
+  }
+}
+
+const getWsJunctionScoreAllPeriod = async(req: Request, res: Response, next: NextFunction) => {
+  try {
+    const allPeriod = await period.getAllPeriod();
+    const allKPPN = await unit.getAllKPPN();
+
+    const result = await Promise.all(
+      allPeriod.map(async (period) => {
+        const kppnResults = await Promise.all(
+          allKPPN.map(async (kppn) => {
+            const mainWorksheet = await worksheet.getWorksheetByPeriodAndKPPN(period.id, kppn.id);
+            return getScoreProgressResponseBodyAllKPPN(mainWorksheet, kppn);
+          })
+        );
+
+        return {
+          ...period,
+          kppn: kppnResults,
+        };
+      })
+    );
+
+    return res.status(200).json({ success: true, message: 'Get Score and progress success', rows: result });
+  } catch (err) {
+    next(err);
+  }
+};
 
 const editWsJunctionKPPNScore = async(req: Request, res: Response, next: NextFunction) => {
   try{
@@ -241,6 +285,8 @@ export {
   getWsJunctionByPeriod,
   getWsJunctionByKPPN,
   getWsJunctionScoreAndProgress,
+  getWsJunctionScoreAndProgressAllKPPN,
+  getWsJunctionScoreAllPeriod,
   editWsJunctionKPPNScore,
   editWsJunctionKanwilScore,
   editWsJunctionKanwilNote,
@@ -250,3 +296,109 @@ export {
 }
 
 // ------------------------------
+
+async function utilGetWorksheetId(period: number, kppnId: string){
+  try{
+    const mainWorksheet = await worksheet.getWorksheetByPeriodAndKPPN(period, kppnId);
+    const worksheetId = mainWorksheet.length>0? mainWorksheet[0].id : null;
+
+    return worksheetId
+  }catch(err){
+    throw err
+  }
+}
+
+async function getScoreProgressResponseBody(mainWorksheet: WorksheetType[]) {
+  try{
+    const worksheetId = mainWorksheet.length>0? mainWorksheet[0].id : null;
+
+    if(!worksheetId) {
+      throw new ErrorDetail(404, 'Worksheet not found');
+    };
+
+    const komponenAll = await komponen.getAllKomponenWithSubKomponen();
+    const wsJunctionDetail = await wsJunction.getWsJunctionWithKomponenDetail(worksheetId);
+
+    if(!wsJunctionDetail || wsJunctionDetail.length===0) {
+      throw new ErrorDetail(404, 'Worksheet not assigned');
+    };
+    
+    const today = new Date().getTime();
+    const closeFollowUp = new Date(mainWorksheet?.[0]?.close_follow_up).getTime();
+    const isPastDue = today > closeFollowUp;
+
+    return {
+      scoreByKanwil : getScoreForMatrix(komponenAll, wsJunctionDetail, true)?.reduce((a, c) => a+c.weightedScore, 0) || 0,
+      scoreByKPPN: getScoreForMatrix(komponenAll, wsJunctionDetail, false)?.reduce((a, c) => a+c.weightedScore, 0) || 0,
+      isFinal: isPastDue,
+      totalChecklist: wsJunctionDetail?.length,
+      totalProgressKanwil: wsJunctionDetail?.filter((item) => item?.kanwil_score !== null).length,
+      totalProgressKPPN: wsJunctionDetail?.filter((item) => item?.kppn_score !== null).length,
+      scorePerKomponen: getScoreForMatrix(komponenAll, wsJunctionDetail, true),
+      scorePerKomponenKPPN: getScoreForMatrix(komponenAll, wsJunctionDetail, false)
+    };
+  }catch(err){
+    throw err
+  }
+}
+
+async function getScoreProgressResponseBodyAllKPPN(mainWorksheet: WorksheetType[], kppn: UnitType) {
+  try{
+    const worksheetId = mainWorksheet.length>0? mainWorksheet[0].id : null;
+
+    if(!worksheetId) {
+      return {
+        ...kppn,
+        scoreProgressDetail: {
+          scoreByKanwil : 0,
+          scoreByKPPN: 0,
+          isFinal: false,
+          totalChecklist: 0,
+          totalProgressKanwil: 0,
+          totalProgressKPPN: 0,
+          scorePerKomponen: null,
+          scorePerKomponenKPPN: null
+        }
+      }
+    };
+
+    const komponenAll = await komponen.getAllKomponenWithSubKomponen();
+    const wsJunctionDetail = await wsJunction.getWsJunctionWithKomponenDetail(worksheetId);
+
+    if(!wsJunctionDetail || wsJunctionDetail.length===0) {
+      return {
+        ...kppn,
+        scoreProgressDetail: {
+          scoreByKanwil : 0,
+          scoreByKPPN: 0,
+          isFinal: false,
+          totalChecklist: 0,
+          totalProgressKanwil: 0,
+          totalProgressKPPN: 0,
+          scorePerKomponen: null,
+          scorePerKomponenKPPN: null
+        }
+      }
+    };
+    
+    const today = new Date().getTime();
+    const closeFollowUp = new Date(mainWorksheet?.[0]?.close_follow_up).getTime();
+    const isPastDue = today > closeFollowUp;
+
+    return {
+      ...kppn,
+      scoreProgressDetail:{
+        scoreByKanwil : getScoreForMatrix(komponenAll, wsJunctionDetail, true)?.reduce((a, c) => a+c.weightedScore, 0) || 0,
+        scoreByKPPN: getScoreForMatrix(komponenAll, wsJunctionDetail, false)?.reduce((a, c) => a+c.weightedScore, 0) || 0,
+        isFinal: isPastDue,
+        totalChecklist: wsJunctionDetail?.length,
+        totalProgressKanwil: wsJunctionDetail?.filter((item) => item?.kanwil_score !== null).length,
+        totalProgressKPPN: wsJunctionDetail?.filter((item) => item?.kppn_score !== null).length,
+        scorePerKomponen: getScoreForMatrix(komponenAll, wsJunctionDetail, true),
+        scorePerKomponenKPPN: getScoreForMatrix(komponenAll, wsJunctionDetail, false)
+      }
+    };
+  }catch(err){
+    throw err
+  }
+}

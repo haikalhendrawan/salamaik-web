@@ -1,327 +1,191 @@
-import {useState, useRef} from "react";
-import axios from "axios";
-import { Container, Stack, Typography, Grid, Card, CardHeader, IconButton, Tooltip, Select, MenuItem, InputLabel,
-          FormControl, TextField, Button, Divider, Badge, Box} from '@mui/material';
-import {useTheme, styled} from '@mui/material/styles';
-import Iconify from "../../../../components/iconify";
-import Label from "../../../../components/label";
-import Scrollbar from "../../../../components/scrollbar/Scrollbar";
-import StyledButton from "../../../../components/styledButton/StyledButton";
-
+import {useState, useEffect, useCallback} from "react";
+import Typography from '@mui/material/Typography';
+import Grid from '@mui/material/Grid';
+import Card from '@mui/material/Card';
+import CardHeader from '@mui/material/CardHeader';
+import Divider from '@mui/material/Divider';
+import Skeleton from '@mui/material/Skeleton';
+import InstructionPopover from "../InstructionPopover";
+import styled from '@mui/material/styles/styled';
+import Head from "./Head";
+import Kriteria from "./Kriteria";
+import Dokumen from "./Dokumen";
+import Nilai from "./Nilai";
+import Catatan from "./Catatan";
+import Approval from "./Approval";
+import { WsJunctionType } from "../../../worksheet/types";
+import { FindingsResponseType } from "../../types";
 // ------------------------------------------------------------
-const selectKondisi = [
-  {jenis:'Sesuai', value:2, color:'success'}, 
-  {jenis:'Belum Sesuai', value:1, color:'error'},
-  {jenis:'Tidak Tahu', value:0, color:'warning'},
-  ];
-
-const VisuallyHiddenInput = styled('input')({
-  clip: 'rect(0 0 0 0)',
-  clipPath: 'inset(50%)',
-  height: 1,
-  overflow: 'hidden',
-  position: 'absolute',
-  bottom: 0,
-  left: 0,
-  whiteSpace: 'nowrap',
-  width: 1,
-});
-
 interface FollowUpCardProps{
-  id: number,
-  title: string,
-  description: string,
-  num: number | string,
-  dateUpdated: Date,
   modalOpen: () => void,
   modalClose: () => void,
-  file: string | undefined,
-  openInstruction: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
+  findingResponse: FindingsResponseType | null,
+  id?: string
 };
 
-interface HeadPropInterface{
-  num: number | string,
-  title:string,
-  dateUpdated: Date
-};
+const StyledCardHeader = styled(CardHeader)(({theme}) => ({
+  backgroundColor: theme.palette.background.default,
+  color: theme.palette.text.primary,
+  height: '67px',
+  paddingLeft: theme.spacing(1),
+  paddingTop: theme.spacing(0),
+}));
+
+const HeadGrid = styled(Grid)(({theme}) => ({
+  marginTop: theme.spacing(1),
+  marginBottom: theme.spacing(1),
+  textAlign: 'center',
+  justifyContent: 'center',
+  color: theme.palette.text.secondary,
+}));
+
+const BodyGrid = styled(Grid)(({theme}) => ({
+  marginTop: theme.spacing(0),
+  maxHeight: '160px',
+  textAlign: 'center',
+  justifyContent: 'center',
+}));
+
+const StyledDivider = styled(Divider)(({theme}) => ({
+  borderStyle: 'dashed', 
+  marginTop: theme.spacing(3)
+}));
 
 // ------------------------------------------------------------
 export default function FollowUpCard(props: FollowUpCardProps) {
-  const theme = useTheme();
+  const [mounted, setIsMounted] = useState(false);
 
-  const [value, setValue] = useState<string>('');
+  const matrixDetail = props.findingResponse?.matrixDetail[0] || null;
 
-  const [selectValue, setSelectValue] = useState<number>(0);
+  const wsJunction = matrixDetail?.ws_junction[0] || null;
 
-  const [selectValue2, setSelectValue2] = useState<number>(1);
+  const checklist = matrixDetail?.checklist[0] || null;
 
-  const addFileRef = useRef<HTMLInputElement>(null);
+  const findings = matrixDetail?.findings[0] || null;
 
-  const openUploadFile = () => {
-    addFileRef.current? addFileRef.current.click() : null
+  const [openInstruction, setOpenInstruction] = useState<boolean>(false);
+
+  const [anchorEl, setAnchorEl] = useState<EventTarget & HTMLButtonElement | null>(null);
+
+  const handleOpenInstruction = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    setOpenInstruction(true);
+    setAnchorEl(event.currentTarget);
+  }, []); 
+
+  const handleCloseInstruction = useCallback(() => {
+    setOpenInstruction(false)
+  }, []);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if(!mounted) {
+    return <FollowUpCardSkeleton />
   };
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setValue(event.target.value)
-  };
-
-  return(
+  return (
+    <>
       <Grid item xs={12} sm={12} md={12}>
-        <Card sx={{minHeight:'300px'}}>
-            <CardHeader title={<Head num={props.num} title={props.title} dateUpdated={props.dateUpdated} />} sx={{backgroundColor:theme.palette.background.default, color:theme.palette.text.primary,  height:'67px', pl:1, pt:0}}/> 
+        <Card sx={{ minHeight: '300px' }} id={props.id} key={props.findingResponse?.checklist_id}>
+          <StyledCardHeader
+            title={
+              <Head
+                num={checklist?.id || 0}
+                title={checklist?.title || ""}
+                dateUpdated={wsJunction?.last_update || null}
+                updatedBy={wsJunction?.updated_by || null}
+              />
+            }
+          />
 
-              <Grid container sx={{mt:1, mb:1, textAlign:'center', justifyContent:'center', color:theme.palette.text.secondary}} spacing={0}>  {/* Kepala Table */}
-                  <Grid item xs={5}>
-                    <Typography variant="body2" sx={{mr:1}}> Kriteria </Typography>
-                  </Grid>
+          <HeadGrid container spacing={0}>
+            {/* Table Header */}
+            <Grid item xs={4.5}>
+              <Typography variant="body2">
+                Kriteria
+              </Typography>
+            </Grid>
 
-                  <Grid item xs={1.5}>
-                    <Typography variant="body2"> Dokumen </Typography>
-                  </Grid>
+            <Grid item xs={1.5}>
+              <Typography variant="body2">Dokumen</Typography>
+            </Grid>
 
-                  <Grid item xs={1.5}>
-                    <Typography variant="body2"> Nilai</Typography>
-                  </Grid>
+            <Grid item xs={1.5}>
+              <Typography variant="body2">Nilai</Typography>
+            </Grid>
 
-                  <Grid item xs={2.5}>
-                    <Typography variant="body2">  Catatan Kanwil </Typography>
-                  </Grid>
+            <Grid item xs={1.75}>
+              <Typography variant="body2">Tanggapan KPPN</Typography>
+            </Grid>
 
-                  <Grid item xs={1.5}>
-                    <Typography variant="body2"> Status Tindak Lanjut </Typography>
-                  </Grid>
+            <Grid item xs={1.75}>
+              <Typography variant="body2">Tanggapan Kanwil</Typography>
+            </Grid>
 
+            <Grid item xs={1}>
+              <Typography variant="body2">Approval</Typography>
+            </Grid>
+          </HeadGrid>
 
-              </Grid>
+          <Divider flexItem />
 
-              <Divider  flexItem/>  
+          <BodyGrid
+            container
+            spacing={1}
+          >
+            <Grid item xs={4.5}>
+              <Kriteria
+                kriteria={checklist?.header || ""}
+                opsi={matrixDetail?.opsi || []}
+              />
+            </Grid>
 
-              <Grid container sx={{mt:0, maxHeight:'160px', textAlign:'center',  justifyContent:'center'}} spacing={1}>  {/* Table Body */}
-                <Grid item xs={5} >
-                  <Scrollbar  sx={{
-                    height: 140,
-                    '& .simplebar-content': { height: 1, display: 'flex', flexDirection: 'column' },
-                    pl:4,
-                    pr:4
-                  }}>
-                    <Box>
-                      <Typography variant="body2" sx={{mr:1, fontSize:12}} dangerouslySetInnerHTML={{__html:props.description}} textAlign={'justify'}/>
-                    </Box> 
-                  </Scrollbar>
-                </Grid>
+            <Grid item xs={1.5}>
+              <Dokumen openInstruction={handleOpenInstruction} findingResponse={props.findingResponse} />
+            </Grid>
 
-                <Grid item xs={1.5}> 
-                  <Stack direction='column' spacing={2}>
-                    <Stack direction='column' spacing={1}>
-                      <Typography variant='body3' sx={{fontSize:12}} textAlign={'left'}>Bukti Dukung :</Typography>
-                      <Stack direction='row' spacing={1}>
-                        <Tooltip title='file 1'>
-                          <span>
-                            <StyledButton 
-                              aria-label="edit" 
-                              variant='contained' 
-                              size='small' 
-                              color='secondary'
-                              onClick={props.modalOpen}
-                            >
-                              <Iconify icon="solar:file-bold-duotone"/>
-                            </StyledButton>
-                          </span>
-                        </Tooltip>
+            <Grid item xs={1.5}>
+              <Nilai findingResponse={props.findingResponse} />
+            </Grid>
 
-                        <Tooltip title='file 2'>
-                          <span>
-                            <StyledButton 
-                              aria-label="edit" 
-                              variant='contained' 
-                              size='small' 
-                              color='secondary'
-                              onClick={props.modalOpen}
-                            >
-                              <Iconify icon="solar:file-bold-duotone"/>
-                            </StyledButton>
-                          </span>
-                        </Tooltip>
+            <Grid item xs={1.75}>
+              <Catatan findingResponse={props.findingResponse}/>
+            </Grid>
 
-                        <input accept='image/*,.pdf,.zip,.rar' type='file' style={{display:'none'}} ref={addFileRef} tabIndex={-1} />
-                        <Tooltip title='Add file'>
-                          <span>
-                            <StyledButton aria-label="delete" variant='contained' size='small' color='white' onClick={openUploadFile}>
-                              <Iconify sx={{color:theme.palette.grey[500]}} icon="solar:add-circle-bold"/>
-                            </StyledButton>
-                          </span>
-                        </Tooltip>
-                      </Stack>
-                    </Stack>
-                    
-                    <Stack direction='column' spacing={1}>
-                      <Typography variant='body3' sx={{fontSize:12}} textAlign={'left'}>Petunjuk :</Typography>
-                      <Stack direction='row' spacing={1}>
-                        <Tooltip title='Instruksi'>
-                          <span>
-                            <StyledButton 
-                              aria-label="instruksi" 
-                              variant='contained' 
-                              size='small' 
-                              color='white' 
-                              onClick={(e) => props.openInstruction(e)}
-                            >
-                              <Iconify sx={{color:theme.palette.grey[500]}} icon="solar:info-circle-bold"/>
-                            </StyledButton>
-                          </span>
-                        </Tooltip>
-                        <Tooltip title='Contoh Bukti Dukung'>
-                          <span>
-                            <StyledButton 
-                              aria-label="edit" 
-                              variant='contained' 
-                              size='small' 
-                              color='warning'
-                            >
-                              <Iconify icon="solar:file-bold-duotone"/>
-                            </StyledButton>
-                          </span>
-                        </Tooltip>
-                      </Stack>
-                    </Stack>
-                    
-                  </Stack>   
-                </Grid>
+            <Grid item xs={1.75}>
+              <Catatan findingResponse={props.findingResponse}/>
+            </Grid>
 
-                <Grid item xs={1.5} > 
-                  <Stack direction='column' spacing={2} sx={{px: 2}}>
-                    <Stack direction='column' spacing={1} >
-                      <Typography variant='body3' sx={{fontSize:12}} textAlign={'left'}>Nilai KPPN :</Typography>
-                      <FormControl sx={{width:'100%', height:'100%'}}>
-                        <Select 
-                          required 
-                          name="kondisi" 
-                          disabled
-                          value={selectValue2}  
-                          size='small' 
-                          sx={{typography:'body2', fontSize:12,}}
-                        >
-                          <MenuItem key={0} sx={{fontSize:12}} value={0}>10</MenuItem>
-                          <MenuItem key={1} sx={{fontSize:12}} value={1}>5</MenuItem>
-                          <MenuItem key={2} sx={{fontSize:12}} value={2}>0</MenuItem>
-                        </Select>
-                      </FormControl>
-                    </Stack>
-                    
-                    <Stack direction='column' spacing={1}>
-                      <Typography variant='body3' sx={{fontSize:12}} textAlign={'left'}>Nilai Kanwil :</Typography>
-                      <FormControl sx={{width:'100%', height:'100%'}}>
-                        <Select 
-                          required 
-                          name="kondisi" 
-                          value={selectValue2}  
-                          size='small' 
-                          sx={{typography:'body2', fontSize:12}}
-                        >
-                          <MenuItem key={0} sx={{fontSize:12}} value={0}>10</MenuItem>
-                          <MenuItem key={1} sx={{fontSize:12}} value={1}>5</MenuItem>
-                          <MenuItem key={2} sx={{fontSize:12}} value={2}>0</MenuItem>
-                        </Select>
-                      </FormControl>
-                    </Stack>
-                    
-                  </Stack>    
-                  
-                </Grid>
+            <Grid item xs={1}>
+              <Approval />
+            </Grid>
+          </BodyGrid>
 
-                <Grid item xs={2.5}>  
-                  <FormControl sx={{width:'100%', height:'100%', pr:1, pt:0.5}}>
-                    <TextField 
-                      name="catatankppn" 
-                      size='small' 
-                      value={value} 
-                      onChange={handleChange} 
-                      multiline 
-                      minRows={6} 
-                      maxRows={6}
-                      sx={{width:'100%', height:'100%'}}  
-                      inputProps={{sx: {fontSize: 12, width:'100%', height:'100%'}, spellCheck: false,}} 
-                    />
-                  </FormControl>
-                </Grid>
-
-                <Grid item xs={1.5}>  
-                  <Stack direction='column' spacing={3}>
-                    <Stack direction='column' spacing={1}>
-                      <Typography variant='body3' sx={{fontSize:12}} textAlign={'left'}>Status :</Typography>
-                        <Stack direction='row' spacing={1}>
-                          <Label color='success'> Approved</Label>
-                        </Stack>
-                    </Stack>
-                    
-                    <Stack direction='column' spacing={1}>
-                      <Typography variant='body3' sx={{fontSize:12}} textAlign={'left'}>Action :</Typography>
-                      <Stack direction='row' spacing={1}>
-                        <Tooltip title='Approve'>
-                          <span>
-                            <StyledButton 
-                              aria-label="instruksi" 
-                              variant='contained' 
-                              size='small' 
-                              color='success' 
-                            >
-                              <Iconify icon="solar:check-circle-bold-duotone"/>
-                            </StyledButton>
-                          </span>
-                        </Tooltip>
-                        <Tooltip title='Tolak'>
-                          <span>
-                            <StyledButton 
-                              aria-label="edit" 
-                              variant='contained' 
-                              size='small' 
-                              color='error'
-                            >
-                              <Iconify icon="solar:close-circle-bold"/>
-                            </StyledButton>
-                          </span>
-                        </Tooltip>
-                      </Stack>
-                    </Stack>
-                    
-                  </Stack>   
-                </Grid>    
-              </Grid>
-
-              <Divider sx={{ borderStyle: 'dashed', mt: 3 }}/>
-
+          <StyledDivider  />
         </Card>
-      </Grid> 
-      ) 
+      </Grid>
+
+      <InstructionPopover
+        open={openInstruction}
+        anchorEl={anchorEl}
+        handleClose={handleCloseInstruction}
+        instruction={wsJunction?.instruksi || null}
+        fileExample={wsJunction?.contoh_file || null}
+      />
+    </>
+  );
 }
+
 
 // ------------------------------------------------------------------------------------------------------
 
-function Head(props: HeadPropInterface) {  // bagian atas dari card
-  const date = new Date(props.dateUpdated).toLocaleDateString('en-GB');
-  const time = new Date(props.dateUpdated).toLocaleTimeString('en-GB');
-  const tooltipText = `Last update: ${date} (${time})`;
-  const isUpdate = props.dateUpdated;
-  const theme = useTheme();
-
+function FollowUpCardSkeleton(){
   return(
-  <>
-  <Stack direction="row" spacing={2} sx={{justifyContent:'space-between', ml:1}}>
-    <Stack direction="row" spacing={1} sx={{alignItems:'center'}}>
-        <Typography variant="h6" sx={{ml:1, fontSize:14}}>{`${props.num}`}</Typography>
-        <Stack >
-            <Typography variant="body1" sx={{fontSize:15}}>{props.title}</Typography>
-        </Stack>
-    </Stack>
-    {isUpdate?
-      <Tooltip title={tooltipText} placement="left-start">
-        <IconButton disableRipple><Iconify icon={"solar:check-circle-bold"} sx={{color:'rgb(0, 167, 111)', borderRadius:'50%'}} /></IconButton>
-      </Tooltip>:
-      null
-    }
-
-  </Stack>
-  </>
+    <Grid item xs={12} sm={12} md={12}>
+      <Skeleton variant="rounded" height={'300px'} width={'100%'} />
+    </Grid>
   )
 }
+
 

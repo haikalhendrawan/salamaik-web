@@ -58,4 +58,34 @@ const addFindings = async (req: Request, res: Response, next: NextFunction) => {
   }
 }
 
-export {getFindingsByWorksheetId, addFindings}
+const updateFindingsScore = async (req: Request, res: Response, next: NextFunction) => {
+  try{
+    const {id, scoreBefore, scoreAfter, userName} = req.body;
+    const result = await findings.updateFindingsResponse(id, scoreBefore, scoreAfter, userName);
+    return res.status(200).json({sucess: true, message: 'Update findings success', rows: result})
+  }catch(err){
+    next(err)
+  }
+}
+
+const updateFindingsResponse = async (req: Request, res: Response, next: NextFunction) => {
+  try{
+    const {id, kppnResponse, kanwilResponse, userName} = req.body;
+    const result = await findings.updateFindingsResponse(id, kppnResponse, kanwilResponse, userName);
+    return res.status(200).json({sucess: true, message: 'Update findings success', rows: result})
+  }catch(err){
+    next(err)
+  }
+}
+
+const updateFindingStatus = async(req: Request, res: Response, next: NextFunction) => {
+  try{
+    const {id, status, userName} = req.body;
+    const result = await findings.updateFindingsStatus(id, status, userName);
+    return res.status(200).json({sucess: true, message: 'Update findings success', rows: result})
+  }catch(err){
+    next(err)
+  }
+}
+
+export {getFindingsByWorksheetId, updateFindingsScore, addFindings, updateFindingsResponse, updateFindingStatus}

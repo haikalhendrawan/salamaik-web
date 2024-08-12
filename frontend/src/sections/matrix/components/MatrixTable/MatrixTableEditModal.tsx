@@ -58,6 +58,7 @@ export default function MatrixTableEditModal({modalOpen, modalClose, matrix, get
     ws_junction: [],
     checklist: [],
     findings: [],
+    opsi: []
   });
 
   const {setIsLoading} = useLoading();

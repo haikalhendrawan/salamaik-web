@@ -1,11 +1,8 @@
-import {useEffect, useRef} from "react";
-import { Helmet } from 'react-helmet-async';
+import {useEffect, useRef, useState} from "react";
 // @mui
 import { useTheme } from '@mui/material/styles';
-import { Grid, Container, Typography, LinearProgress, Button, Box } from '@mui/material';
+import { avatarGroupClasses, Grid } from '@mui/material';
 // sections
-import WelcomeCard from "./components/WelcomeCard";
-import PhotoGallery from "./components/PhotoGallery";
 import ProgressPembinaan from "./components/ProgressPembinaan";
 import ScoreHistory from "./components/ScoreHistory";
 import ProgressHorizontal from "./components/ProgressHorizontal";
@@ -13,21 +10,71 @@ import FindingPerKomponen from "./components/FindingPerKomponen";
 import SortedKPPNScore from "./components/SortedKPPNScore";
 import DasarHukum from "./components/DasarHukum";
 import ScorePembinaan from "./components/ScorePembinaan";
+import useAxiosJWT from "../../hooks/useAxiosJWT";
+import useLoading from "../../hooks/display/useLoading";
+import useSnackbar from "../../hooks/display/useSnackbar";
+import { useAuth } from "../../hooks/useAuth";
+import { KPPNScoreProgressResponseType } from "./types";
+import { HistoricalScoreProgressType } from "./types";
 // -----------------------------------------------------------------------
 
 
-
+// -----------------------------------------------------------------------
 export default function KanwilView(){
   const theme = useTheme();
+
+  const axiosJWT = useAxiosJWT();
+
+  const {setIsLoading} = useLoading();
+
+  const {openSnackbar} = useSnackbar();
+
+  const {auth} = useAuth();
+
+  const [kppnScoreProgress, setKPPNScoreProgress] = useState<KPPNScoreProgressResponseType[] | []>([]);
+
+  const [historicalScore, setHistoricalScore] = useState<HistoricalScoreProgressType[] | []>([]);
+
+  const getData = async() => {
+    try{
+      setIsLoading(true);
+      const response = await axiosJWT.get('/getWsJunctionScoreAndProgressAllKPPN');
+      const response2 = await axiosJWT.get('/getWsJunctionScoreAllPeriod');
+      setKPPNScoreProgress(response.data.rows);
+      setHistoricalScore(response2.data.rows);
+      setIsLoading(false);
+    }catch(err:any){
+      setIsLoading(false);
+      openSnackbar(err.response.data.message, 'error');
+    }finally{
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  const countProgressWorksheet = kppnScoreProgress?.reduce((a, c) => (a + (c?.scoreProgressDetail?.totalProgressKanwil || 0)), 0);
+  const countTotalChecklist = kppnScoreProgress?.reduce((a, c) => (a + (c?.scoreProgressDetail?.totalChecklist || 0)), 0);
+  const percentProgress = countProgressWorksheet / countTotalChecklist * 100;
+
+  const avgScoreByKanwil = kppnScoreProgress?.reduce((a, c) => (a + getScoreKPPN(true, c.id, kppnScoreProgress)), 0) / kppnScoreProgress?.length;
+  const avgScoreByKPPN = kppnScoreProgress?.reduce((a, c) => (a + getScoreKPPN(false, c.id, kppnScoreProgress)), 0) / kppnScoreProgress?.length;
+
+  const last4Period = historicalScore?.slice(-4);
+  const last4PeriodString = last4Period.map(item => item.name.replace("Semester", "Smt") || ""); 
+  const Last4PeriodScorePerKPPN = last4Period.map(item => item.kppn.map(k => k.scoreProgressDetail.scoreByKanwil || 0)); // [[..6],[...6],...]
+  const avgScoreLast4Period = Last4PeriodScorePerKPPN.map((item) => (item.reduce((a, c) => (a + c), 0) / item.length).toFixed(2)); // [9,2] , [9.5], [9.6]
 
   return(
     <>
       <Grid item xs={12} md={4}>
         <ProgressPembinaan 
           header={`Progress Kertas Kerja`}
-          number={40.3}
-          footer={`20 Mei 2024`}
-          detail={`20/20`}
+          number={percentProgress}
+          footer={`${new Date().toLocaleString("id-ID", { year: 'numeric', month: 'long', day: 'numeric' })}`}
+          detail={`${countProgressWorksheet}/${countTotalChecklist}`}
           icon={`mdi:cash-register`}
           color={theme.palette.primary.main}
         />
@@ -36,40 +83,42 @@ export default function KanwilView(){
       <Grid item xs={12} md={4}>
         <ProgressHorizontal
           header={`Progress Per KPPN`}
-          data={[
-            {id:1, text:'KPPN Padang', value:90.5},
-            {id:2, text:'KPPN Bukittinggi', value:86.5},
-            {id:3, text:'KPPN Solok', value:88.5},
-            {id:4, text:'KPPN Lubuk Sikaping', value:91.7},
-            {id:5, text:'KPPN Sijunjung', value:92.8},
-            {id:6, text:'KPPN Painan', value:95.5},
-          ]}
+          data={
+                kppnScoreProgress.map((item) =>({
+                    id:Number(item.id), 
+                    text:item.alias, 
+                    value:(getProgressKPPN(item.id, kppnScoreProgress) || 0)
+                  }))
+                }
         />
       </Grid>
 
       <Grid item xs={12} md={4}>
         <ScorePembinaan
           header={`Nlai Kinerja KPPN (avg)`}
-          selfScore={9.77}
-          kanwilScore={9.45}
+          selfScore={avgScoreByKanwil}
+          kanwilScore={avgScoreByKPPN}
         />
       </Grid>
 
       <Grid item xs={12} md={4}>
-        <DasarHukum title={'Dasar Hukum'} subheader="Peraturan Direktur Jenderal Perbendaharaan Nomor PER-1/PB/2023"/> 
+        <DasarHukum 
+          title={'Dasar Hukum'} 
+          subheader="Peraturan Direktur Jenderal Perbendaharaan Nomor PER-1/PB/2023"
+        /> 
       </Grid>
 
       <Grid item xs={12} md={8}>
         <ScoreHistory
           title= "Rata-Rata Nilai Kinerja KPPN"
           subheader = '4 periode terakhir'
-          chartLabels={['Smt 1 2022', 'Smt 2 2022', 'Smt 1 2023', 'Smt 2 2023']}
+          chartLabels={last4PeriodString}
           chartData= {[
             {
               name: 'Rata2 Nilai KPPN',
               type: 'area',
               fill: 'gradient',
-              data: [9.44, 9.56, 9.40, 9.46]
+              data: avgScoreLast4Period
             },
           ]}
         />
@@ -109,10 +158,23 @@ export default function KanwilView(){
             {label: 'KPPN Sijunjung', value: 9.42},
             {label: 'KPPN Painan', value: 9.40},
           ]}
-
         />
       </Grid>
     
     </>
   )
 }
+
+// =========================================================================================================================================================
+
+function getProgressKPPN(kppnId: string, kppnScoreProgress: KPPNScoreProgressResponseType[]){
+  const countProgressKPPN =  kppnScoreProgress?.filter((item) => item.id === kppnId )?.[0]?.scoreProgressDetail?.totalProgressKanwil || 0;
+  const countTotalChKPPN = kppnScoreProgress?.filter((item) => item.id === kppnId )?.[0]?.scoreProgressDetail?.totalChecklist || 0;
+  return countProgressKPPN / countTotalChKPPN * 100;
+};
+
+function getScoreKPPN(isKanwil: boolean, kppnId: string, kppnScoreProgress: KPPNScoreProgressResponseType[]){
+  const scoreProgressDetail =  kppnScoreProgress?.filter((item) => item.id === kppnId )?.[0]?.scoreProgressDetail;
+  const score = (isKanwil?scoreProgressDetail?.scoreByKanwil: (isKanwil?scoreProgressDetail?.scoreByKanwil: scoreProgressDetail?.scoreByKPPN)) || 0;
+  return score
+};

@@ -1,7 +1,7 @@
 import pool from "../config/db";
 import "dotenv/config";
 import { PoolClient } from "pg";
-import { WorksheetJunctionType } from "./worksheetJunction.model";
+import { OpsiType, WorksheetJunctionType } from "./worksheetJunction.model";
 import { ChecklistType } from "./checklist.model";
 import { FindingsType } from "./findings.model";
 /**
@@ -54,7 +54,8 @@ export interface MatrixWithWsJunctionType{
   subkomponen_string: string | null,
   ws_junction: WorksheetJunctionType[],
   checklist: ChecklistType[],
-  findings: FindingsType[]
+  findings: FindingsType[],
+  opsi: OpsiType[]
 };
 
 // --------------------------------------------------
@@ -117,6 +118,7 @@ class Matrix{
                     json_agg(worksheet_junction.* ORDER BY worksheet_junction.junction_id ASC) AS ws_junction, 
                     json_agg(checklist_ref.* ORDER BY checklist_ref.id ASC) AS checklist,
                     json_agg(findings_data.* ORDER BY findings_data.id ASC) AS findings,
+                    json_agg(opsi_ref.* ORDER BY opsi_ref.id ASC) AS opsi,
                     komponen_ref.title AS komponen_string,
                     subkomponen_ref.title AS subkomponen_string
                   FROM matrix_data 
@@ -130,11 +132,24 @@ class Matrix{
                   ON subkomponen_ref.id = checklist_ref.subkomponen_id
                   LEFT JOIN findings_data
                   ON findings_data.matrix_id = matrix_data.id
+                  LEFT JOIN opsi_ref
+                  ON checklist_ref.id = opsi_ref.checklist_id
                   WHERE matrix_data.worksheet_id = $1
                   GROUP BY matrix_data.id, worksheet_junction.junction_id, komponen_ref.title, subkomponen_ref.title
                   `;
       const result = await poolInstance.query(q, [worksheetId]);
       return result.rows
+    }catch(err){
+      throw err
+    }
+  }
+
+  async getSingleMatrixByWsJunctionId(wsJunctionId: number, poolTrx?: PoolClient): Promise<MatrixType>{
+    const poolInstance = poolTrx??pool;
+    try{
+      const q = `SELECT * FROM matrix_data WHERE ws_junction_id = $1`;
+      const result = await poolInstance.query(q, [wsJunctionId]);
+      return result.rows[0]
     }catch(err){
       throw err
     }
@@ -164,6 +179,20 @@ class Matrix{
         isFinding,
         id,
       ]);
+      return result.rows[0]
+    }catch(err){
+      throw err
+    }
+  }
+
+  async updateMatrixFindings(wsJunctionId: number, hasilImplementasi: string, permasalahan: string, isFinding: number, poolTrx?: PoolClient){
+    const poolInstance = poolTrx??pool;
+    try{
+      const q = ` UPDATE matrix_data 
+                  SET hasil_implementasi = $1, permasalahan = $2, is_finding = $3 
+                  WHERE ws_junction_id = $4 
+                  RETURNING *`;
+      const result = await poolInstance.query(q, [hasilImplementasi, permasalahan, isFinding, wsJunctionId]);
       return result.rows[0]
     }catch(err){
       throw err

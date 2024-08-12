@@ -1,8 +1,14 @@
 // @mui
 import { Button, Select, FormControl, InputLabel, MenuItem} from '@mui/material';
 import {useTheme, styled} from '@mui/material/styles';
+import { useLocation } from 'react-router-dom';
 import Iconify from '../../../../components/iconify/Iconify';
+import useSnackbar from '../../../../hooks/display/useSnackbar';
+import useAxiosJWT from '../../../../hooks/useAxiosJWT';
+import { MatrixType, MatrixWithWsJunctionType } from '../../types';
+import { WorksheetType } from '../../../worksheet/types';
 import useDictionary from '../../../../hooks/useDictionary';
+import useLoading from '../../../../hooks/display/useLoading';
 
 const StyledDiv = styled('div')(({theme}) => ({
   display:'flex',
@@ -14,12 +20,40 @@ interface MatrixTableToolbarProps{
   matrixStatus: number | null,
   selectedKomponen: string  | null,
   setSelectedKomponen: React.Dispatch<React.SetStateAction<string | null>>,
+  getMatrix: () => Promise<void>
 }
 
-export default function MatrixTableToolbar({matrixStatus, selectedKomponen, setSelectedKomponen}: MatrixTableToolbarProps) {
+export default function MatrixTableToolbar({matrixStatus, selectedKomponen, setSelectedKomponen, getMatrix}: MatrixTableToolbarProps) {
   const theme = useTheme();
 
   const {komponenRef} = useDictionary();
+
+  const {setIsLoading} = useLoading();
+
+  const {openSnackbar} = useSnackbar();
+
+  const axiosJWT = useAxiosJWT();
+
+  const kppnId = new URLSearchParams(useLocation().search).get("id");
+
+  const handleReAssignMatrix = async() => {
+    try{
+      setIsLoading(true);
+      const response = await axiosJWT.post(`/reAssignMatrix`, {kppnId: kppnId});
+      await getMatrix();
+      openSnackbar(response.data.message, "success");
+      setIsLoading(false);
+    }catch(err: any){
+      setIsLoading(false);
+      if(err.response){
+        openSnackbar(err.response.data.message, "error");
+      }else{
+        openSnackbar('network error', "error");
+      }
+    }finally{
+      setIsLoading(false);
+    }
+  }
 
   return(
     <StyledDiv>
@@ -41,7 +75,11 @@ export default function MatrixTableToolbar({matrixStatus, selectedKomponen, setS
         </Select>
       </FormControl>
       {
-        matrixStatus === 1 ?<Button variant='contained' endIcon={ <Iconify icon="solar:refresh-bold-duotone"/>}>Update Matriks</Button> : null
+        matrixStatus === 1 
+        ? <Button variant='contained' endIcon={ <Iconify icon="solar:refresh-bold-duotone"/>} onClick={handleReAssignMatrix}>
+            ReAssign Matriks
+          </Button> 
+        : null
       }
       <div style={{flexGrow:1}} />
       <Button variant="text"  endIcon={ <Iconify icon="vscode-icons:file-type-pdf2"/>}>

@@ -5,7 +5,7 @@ import Iconify from '../../components/iconify/Iconify';
 import {useTheme} from '@mui/material/styles';
 import {Button, IconButton, Container, Grid, Stack, Typography} from '@mui/material';
 // sections
-import FollowUpCard from './components/FollowUpCard';
+import FollowUpCard from './components/FollowUpCard/FollowUpCard';
 import FollowUpHeader from './components/FollowUpHeader';
 import useAxiosJWT from '../../hooks/useAxiosJWT';
 import useSnackbar from '../../hooks/display/useSnackbar';
@@ -117,25 +117,7 @@ export default function FollowUpDetail() {
         </Grid>
 
         <Grid item xs={12}>
-          <FollowUpCard 
-            id={1} 
-            title={'Akurasi RPD Harian Satker secara semesteran'} 
-            description={`Berdasarkan tingkat deviasi RPD dari aplikasi MonSAKTI/OMSPAN pada Modul Renkas: <br/><br/>
-            <b>-Nilai 10</b>:
-            Nilai Deviasi antara 0 s.d. 1,99%<br/>
-            <b>-Nilai 7</b>:
-            Nilai Deviasi antara 2% s.d. 5% <br/>
-            <b>-Nilai 5</b>:
-            Nilai Deviasi antara 5% s.d. 10% <br/>
-            <b>-Nilai 0</b>:
-            Nilai deviasi lebih dari 10%`}
-            num={1}
-            dateUpdated={new Date()}
-            modalOpen={handleOpenFile}
-            modalClose={handleCloseFile}
-            file={file}
-            openInstruction={handleOpenInstruction}
-          />
+         <FollowUpCard modalOpen={handleOpenFile} modalClose={handleCloseFile} findingResponse={selectedFindings} />
         </Grid>
         
       </Grid>

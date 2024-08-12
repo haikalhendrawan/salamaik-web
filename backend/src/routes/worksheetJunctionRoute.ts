@@ -11,6 +11,8 @@ router.get("/getWsJunctionByWorksheetForKanwil", authenticate,  wsJunctionContro
 router.get("/getWsJunctionByPeriod", authenticate,  wsJunctionController.getWsJunctionByPeriod);
 router.get("/getWsJunctionByKPPN", authenticate,  wsJunctionController.getWsJunctionByKPPN);
 router.post("/getWsJunctionScoreAndProgress", authenticate,  wsJunctionController.getWsJunctionScoreAndProgress);
+router.get("/getWsJunctionScoreAndProgressAllKPPN", authenticate,  wsJunctionController.getWsJunctionScoreAndProgressAllKPPN);
+router.get("/getWsJunctionScoreAllPeriod", authenticate,  wsJunctionController.getWsJunctionScoreAllPeriod);
 router.post("/editWsJunctionKPPNScore", authenticate,  wsJunctionController.editWsJunctionKPPNScore);
 router.post("/editWsJunctionKanwilScore", authenticate,  wsJunctionController.editWsJunctionKanwilScore);
 router.post("/editWsJunctionKanwilNote", authenticate,  wsJunctionController.editWsJunctionKanwilNote);
