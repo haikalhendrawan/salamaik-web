@@ -59,8 +59,9 @@ const updateProfilePicture = async (req: Request, res: Response, next: NextFunct
       const fileExt = req.file.mimetype.split("/")[1];
       const fileName =`avatar_${nip}.${fileExt}`;
       const response = await profile.updateProfilePicture(userID, fileName);
-      return res.status(200).json({ success: true, message: 'Profile picture has been updated' });
+      return res.status(200).json({ success: true, message: 'Profile picture has been updated', rows: response });
     } catch (err) {
+      console.log(err);
       next(err);
     }
   });

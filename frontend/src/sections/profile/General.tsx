@@ -177,7 +177,7 @@ export default function General(){
     try{
       setIsLoading(true);
       const formData = new FormData();
-      formData.append("file", selectedFile);
+      formData.append("picture", selectedFile);
       const response = await axiosJWT.post(`/updateProfilePicture`, formData, {
         headers:{"Content-Type": "multipart/form-data"}
       });

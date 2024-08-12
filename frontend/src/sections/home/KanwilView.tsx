@@ -13,11 +13,31 @@ import ScorePembinaan from "./components/ScorePembinaan";
 import useAxiosJWT from "../../hooks/useAxiosJWT";
 import useLoading from "../../hooks/display/useLoading";
 import useSnackbar from "../../hooks/display/useSnackbar";
+import useDictionary from "../../hooks/useDictionary";
 import { useAuth } from "../../hooks/useAuth";
 import { KPPNScoreProgressResponseType } from "./types";
 import { HistoricalScoreProgressType } from "./types";
 // -----------------------------------------------------------------------
-
+interface FindingsWithChecklist{
+  id: number,
+  ws_junction_id: number,
+  worksheet_id: string,
+  checklist_id: number,
+  matrix_id: number, 
+  kppn_reponse: string,
+  kanwil_response: string,
+  score_before: number,
+  score_after: number,
+  last_update: string,
+  status: number,
+  updated_by: string,
+  title: string | null, 
+  komponen_id: number,
+  subkomponen_id: number,
+  komponen_title: string,
+  subkomponen_title: string,
+  period: number
+}
 
 // -----------------------------------------------------------------------
 export default function KanwilView(){
@@ -29,18 +49,34 @@ export default function KanwilView(){
 
   const {openSnackbar} = useSnackbar();
 
+  const {komponenRef, periodRef} = useDictionary();
+
   const {auth} = useAuth();
 
   const [kppnScoreProgress, setKPPNScoreProgress] = useState<KPPNScoreProgressResponseType[] | []>([]);
 
   const [historicalScore, setHistoricalScore] = useState<HistoricalScoreProgressType[] | []>([]);
 
-  const getData = async() => {
+  const [findingsData, setFindingsData] = useState<FindingsWithChecklist[]>([]);
+
+  const getScoreProgress = async() => {
     try{
       setIsLoading(true);
       const response = await axiosJWT.get('/getWsJunctionScoreAndProgressAllKPPN');
-      const response2 = await axiosJWT.get('/getWsJunctionScoreAllPeriod');
       setKPPNScoreProgress(response.data.rows);
+      setIsLoading(false);
+    }catch(err:any){
+      setIsLoading(false);
+      openSnackbar(err.response.data.message, 'error');
+    }finally{
+      setIsLoading(false);
+    }
+  };
+
+  const getHistorical = async() => {
+    try{
+      setIsLoading(true);
+      const response2 = await axiosJWT.get('/getWsJunctionScoreAllPeriod');
       setHistoricalScore(response2.data.rows);
       setIsLoading(false);
     }catch(err:any){
@@ -51,8 +87,27 @@ export default function KanwilView(){
     }
   };
 
+  const getFindings= async() => {
+    try{
+      setIsLoading(true);
+      const response3 = await axiosJWT.get('/getAllFindingsWithChecklistDetail');
+      console.log(response3.data.rows);
+      setFindingsData(response3.data.rows);
+      setIsLoading(false);
+    }catch(err:any){
+      setIsLoading(false);
+      openSnackbar(err.response.data.message, 'error');
+    }finally{
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    getData();
+    getScoreProgress();
+    getHistorical();
+    getFindings();
+
+    console.log(komponenRef)
   }, []);
 
   const countProgressWorksheet = kppnScoreProgress?.reduce((a, c) => (a + (c?.scoreProgressDetail?.totalProgressKanwil || 0)), 0);
@@ -66,6 +121,23 @@ export default function KanwilView(){
   const last4PeriodString = last4Period.map(item => item.name.replace("Semester", "Smt") || ""); 
   const Last4PeriodScorePerKPPN = last4Period.map(item => item.kppn.map(k => k.scoreProgressDetail.scoreByKanwil || 0)); // [[..6],[...6],...]
   const avgScoreLast4Period = Last4PeriodScorePerKPPN.map((item) => (item.reduce((a, c) => (a + c), 0) / item.length).toFixed(2)); // [9,2] , [9.5], [9.6]
+
+  const komponenRefStringArray = komponenRef?.map((item) => item.alias) || [];
+  const last2Period = periodRef?.list?.slice(-2);
+
+  const last2PeriodFindings = last2Period?.map((item) => {
+    const findingsPerKomponen = komponenRef?.map((k) => {
+      return findingsData?.filter((f) => (f.komponen_id === k.id) && (f.period === item.id))?.length || 0;
+    })
+
+    return {
+      name: item.name || "",
+      type: 'bar',
+      fill: 'gradient',
+      data: findingsPerKomponen || []
+    }
+  }) || [];
+
 
   return(
     <>
@@ -96,8 +168,8 @@ export default function KanwilView(){
       <Grid item xs={12} md={4}>
         <ScorePembinaan
           header={`Nlai Kinerja KPPN (avg)`}
-          selfScore={avgScoreByKanwil}
-          kanwilScore={avgScoreByKPPN}
+          selfScore={avgScoreByKPPN}
+          kanwilScore={avgScoreByKanwil}
         />
       </Grid>
 
@@ -126,23 +198,10 @@ export default function KanwilView(){
 
       <Grid item xs={12} md={8}>
         <FindingPerKomponen
-          title= "Temuan Per Komponen"
+          title= "Permasalahan Per Komponen"
           subheader = '2 periode terakhir'
-          chartLabels={['Treasurer', 'PF, RKKD, SM', 'Financial Advisor', 'Tata Kelola Internal']}
-          chartData= {[
-            {
-              name: 'Smt 1 2023',
-              type: 'bar',
-              fill: 'gradient',
-              data: [3, 1, 5, 6]
-            },
-            {
-              name: 'Smt 2 2023',
-              type: 'bar',
-              fill: 'gradient',
-              data: [5, 1, 3, 5]
-            }
-          ]}
+          chartLabels={komponenRefStringArray}
+          chartData= {last2PeriodFindings}
         />
       </Grid>
 

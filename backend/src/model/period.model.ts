@@ -15,7 +15,7 @@ export interface PeriodType{
 class Period{
   async getAllPeriod(): Promise<PeriodType[]>{
     try{
-      const q = "SELECT * FROM period_ref ORDER BY id ASC";
+      const q = "SELECT * FROM period_ref ORDER BY tahun, semester ASC";
       const result = await pool.query(q);
       return result.rows;
     }catch(err){
@@ -25,7 +25,7 @@ class Period{
 
   async getPeriodById(id: number){
     try{
-      const q = "SELECT * FROM period_ref WHERE id = $1 ORDER BY id ASC";
+      const q = "SELECT * FROM period_ref WHERE id = $1";
       const result = await pool.query(q, [id]);;
       return result.rows;
     }catch(err){

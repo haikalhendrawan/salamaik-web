@@ -48,6 +48,15 @@ const getFindingsByWorksheetId = async (req: Request, res: Response, next: NextF
   }
 }
 
+const getAllFindings = async(req: Request, res: Response, next: NextFunction) => {
+  try{
+    const allFindings = await findings.getAllFindingsWithChecklistDetail();
+    return res.status(200).json({sucess: true, message: 'Get all findings success', rows: allFindings})
+  }catch(err){
+    next(err)
+  }
+}
+
 const addFindings = async (req: Request, res: Response, next: NextFunction) => {
   try{
     const {worksheetId, wsJunctionId, checklistId, matrixId, scoreBefore} = req.body;
@@ -88,4 +97,4 @@ const updateFindingStatus = async(req: Request, res: Response, next: NextFunctio
   }
 }
 
-export {getFindingsByWorksheetId, updateFindingsScore, addFindings, updateFindingsResponse, updateFindingStatus}
+export {getFindingsByWorksheetId, getAllFindings, updateFindingsScore, addFindings, updateFindingsResponse, updateFindingStatus}

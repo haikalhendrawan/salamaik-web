@@ -21,7 +21,7 @@ export default function ScoreHistory({ title, subheader, chartLabels, chartData,
     xaxis: { type: 'category'},
     yaxis:{
       min:(min: number) => min-0.5, 
-      max:(max: number) => max+0.2>10?10:max+0.2},
+      max:(max: number) => (max+0.2>10)?10:max+0.2},
       formatter: (value: number) => value.toFixed(2), // Format y-axis labels to 2 decimal places
     tooltip: {
       shared: true,

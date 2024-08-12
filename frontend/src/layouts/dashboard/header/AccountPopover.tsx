@@ -85,7 +85,7 @@ export default function AccountPopover() {
     {
       label: periodText,
       icon: 'mdi:calendar',
-      link: '',
+      link: '/profile',
       component:NavLink
     },
   ];

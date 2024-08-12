@@ -29,6 +29,27 @@ interface FindingsBodyType{
   matrixId: number,
   scoreBefore: number | null,
 };
+
+interface FindingsWithChecklist{
+  id: number,
+  ws_junction_id: number,
+  worksheet_id: string,
+  checklist_id: number,
+  matrix_id: number, 
+  kppn_reponse: string,
+  kanwil_response: string,
+  score_before: number,
+  score_after: number,
+  last_update: string,
+  status: number,
+  updated_by: string,
+  title: string | null, 
+  komponen_id: number,
+  subkomponen_id: number,
+  komponen_title: string,
+  subkomponen_title: string,
+  period: number
+}
 // --------------------------------------------------
 class Findings{
   async createFindings({worksheetId, wsJunctionId, checklistId, matrixId, scoreBefore}: FindingsBodyType, poolTrx?: PoolClient){
@@ -46,6 +67,33 @@ class Findings{
     try{
       const q = `SELECT * FROM findings_data WHERE worksheet_id = $1`;
       const result = await pool.query(q, [worksheetId]);
+      return result.rows
+    }catch(err){
+      throw err
+    }
+  }
+
+  async getAllFindingsWithChecklistDetail(): Promise<FindingsWithChecklist[]>{
+    try{
+      const q = ` SELECT 
+                    findings_data.*, 
+                    checklist_ref.title, 
+                    checklist_ref.komponen_id, 
+                    checklist_ref.subkomponen_id, 
+                    komponen_ref.title AS komponen_title, 
+                    subkomponen_ref.title AS subkomponen_title, 
+                    worksheet_ref.period
+                  FROM findings_data
+                  LEFT JOIN worksheet_ref
+                  ON findings_data.worksheet_id = worksheet_ref.id
+                  LEFT JOIN checklist_ref 
+                  ON findings_data.checklist_id = checklist_ref.id
+                  LEFT JOIN komponen_ref
+                  ON checklist_ref.komponen_id = komponen_ref.id
+                  LEFT JOIN subkomponen_ref
+                  ON checklist_ref.subkomponen_id = subkomponen_ref.id
+                  ORDER BY findings_data.id DESC`;
+      const result = await pool.query(q);
       return result.rows
     }catch(err){
       throw err

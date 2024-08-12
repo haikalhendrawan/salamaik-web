@@ -99,7 +99,7 @@ export default function FollowUpKPPN() {
   };
 
   const totalFindingsNonFinal = findings?.length;
-  const totalFindingsFinal = findings?.filter((f) => f?.status === (2 | 3)).length;
+  const totalFindingsFinal = findings?.filter((f) => f?.status === (0 | 1 | 2)).length;
   const countFindingsOnProgress = findings?.filter((f) => f?.status === 1).length;
   const findingsPercentProgress = (countFindingsOnProgress / totalFindingsNonFinal) * 100;
 
