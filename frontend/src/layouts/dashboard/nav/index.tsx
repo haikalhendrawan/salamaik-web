@@ -59,8 +59,7 @@ export default function Nav({ openNav, onCloseNav }: NavType) {
       <NavSection data={navHome}  />
       <NavSection data={navSupervisi}  header={"SUPERVISI KPPN"} />
       <NavSection data={navMonitoring} header={"MONITORING"} />
-      {auth?.role===2?(<NavSectionNested data={navAdmin} header={"ADMIN"} />) :null}
-      <NavSectionNested data={navAdmin} header={"ADMIN"} />
+      {auth?(<NavSectionNested data={navAdmin} header={"ADMIN"} />) :null}
 
       <Box sx={{ flexGrow: 1 }} />
 

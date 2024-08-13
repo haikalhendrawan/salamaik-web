@@ -23,6 +23,7 @@ import { FindingsResponseType } from '../../types';
 // ------------------------------------------------------------
 interface NilaiPropsType{
   findingResponse: FindingsResponseType | null,
+  getData: () => void
 };
 
 const StyledFormControl = styled(FormControl)(({}) => ({
@@ -57,7 +58,7 @@ const StyledNumberTextField = styled(TextField)(({}) => ({
 }));
 
 // ------------------------------------------------------------
-export default function Nilai({findingResponse}: NilaiPropsType) {
+export default function Nilai({findingResponse, getData}: NilaiPropsType) {
   const [isMounted, setIsMounted] = useState(true);
 
   const matrixDetail = findingResponse?.matrixDetail[0] || null;
@@ -79,6 +80,8 @@ export default function Nilai({findingResponse}: NilaiPropsType) {
   const {getWsJunctionKanwil} = useWsJunction();
 
   const {openSnackbar} = useSnackbar();
+
+  const isStandardisasi = findingResponse?.matrixDetail[0]?.standardisasi || 0;
 
   const isKanwil = useMemo(() =>{
     return auth?.kppn==='03010';
@@ -106,7 +109,7 @@ export default function Nilai({findingResponse}: NilaiPropsType) {
         if(!response?.success){
           openSnackbar(response?.message, 'error');
         };
-        await getWsJunctionKanwil(wsJunction?.kppn_id || '');
+        await getData()
         setIsLoading(false);
       }catch(err: any){
         openSnackbar(err?.message, 'error');
@@ -314,7 +317,7 @@ export default function Nilai({findingResponse}: NilaiPropsType) {
         <Typography variant='body3' fontSize={12} textAlign={'left'}>Nilai KPPN :</Typography>
         <StyledFormControl>
           {
-            wsJunction?.standardisasi === 1
+            isStandardisasi === 1
             ?
               <Stack direction='row' spacing={2}>
                 <StyledNumberTextField  
@@ -360,7 +363,7 @@ export default function Nilai({findingResponse}: NilaiPropsType) {
         <Typography variant='body3' fontSize={12} textAlign={'left'}>Nilai Kanwil :</Typography>
         <StyledFormControl>
           {
-            wsJunction?.standardisasi === 1
+            isStandardisasi === 1
             ?
               <Stack direction='row' spacing={2}>
                 <StyledNumberTextField  

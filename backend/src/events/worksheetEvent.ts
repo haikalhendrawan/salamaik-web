@@ -53,6 +53,9 @@ class WorksheetEvent{
       };
 
       const result = await wsJunction.editWsJunctionKanwilScore( junctionId, worksheetId, kanwilScore, name);
+
+      socket.broadcast.emit('kanwilScoreHasUpdated', {worksheetId, junctionId, kanwilScore});
+
       return callback({success: true, rows: result, message: 'Nilai has been updated'});
 
     }catch(err: any){
@@ -76,6 +79,9 @@ class WorksheetEvent{
       };
 
       const result = await wsJunction.editWsJunctionKPPNScore( junctionId, worksheetId, kppnScore, name);
+
+      socket.broadcast.emit('KPPNScoreHasUpdated', {worksheetId, junctionId, kppnScore});
+
       return callback({success: true, rows: result, message: 'Nilai has been updated'});
 
     }catch(err: any){
@@ -89,6 +95,9 @@ class WorksheetEvent{
       const {name} = socket.data.payload;
       const {worksheetId, junctionId, kanwilNote} = data; 
       const result = await wsJunction.editWsJunctionKanwilNote( junctionId, worksheetId, kanwilNote, name);
+
+      socket.broadcast.emit('kanwilNoteHasUpdated', {worksheetId, junctionId, kanwilNote});
+
       return callback({success: true, rows: result, message: 'Note has been updated'});
     }catch(err: any){
       logger.error(err);
@@ -105,8 +114,10 @@ class WorksheetEvent{
       
       const filePath = path.join(__dirname,`../uploads/`, fileName);
       fs.unlinkSync(filePath);
-      return callback({success: true, rows: result, message: 'File deleted successfully'});
-   
+
+      socket.broadcast.emit('wsJunctionFileHasDeleted', {id, fileName, option});
+
+      return callback({success: true, rows: result, message: 'File deleted successfully'});   
     }catch(err: any){
       logger.error(err);
       return socketError(callback, err.message)

@@ -12,6 +12,7 @@ import useLoading from '../../../../hooks/display/useLoading';
 import useAxiosJWT from '../../../../hooks/useAxiosJWT';
 import useSnackbar from '../../../../hooks/display/useSnackbar';
 import useWsJunction from '../../useWsJunction';
+import useSocket from '../../../../hooks/useSocket';
 import { WsJunctionType } from '../../types';
 // ----------------------------------------------------------------------------
 const VisuallyHiddenInput = styled('input')({
@@ -46,6 +47,8 @@ export default function Dokumen({openInstruction, wsJunction}: DokumenProps){
   const {setIsLoading} = useLoading();
 
   const {openSnackbar} = useSnackbar();
+
+  const {socket} = useSocket();
 
   const handleOpenExampleFile = useCallback((option: number) => {
     const baseDir = "checklist";
@@ -94,7 +97,7 @@ export default function Dokumen({openInstruction, wsJunction}: DokumenProps){
       await axiosJWT.post(`/editWsJunctionFile`, formData, {
         headers:{"Content-Type": "multipart/form-data"}
       });
-      await getWsJunctionKanwil(wsJunction.kppn_id);
+      // await getWsJunctionKanwil(wsJunction.kppn_id);
       setIsLoading(false); 
     }catch(err: any){
       setIsLoading(false);
@@ -110,6 +113,15 @@ export default function Dokumen({openInstruction, wsJunction}: DokumenProps){
 
   useEffect(() => {
     setIsMounted(false);
+  }, []);
+
+  useEffect(() => {
+    const handleFileUpdate = () => console.log('fileUpdated'+wsJunction?.junction_id);
+    socket?.on('fileHasUpdated', handleFileUpdate);
+  
+    return () => {
+      socket?.off('fileHasUpdated', handleFileUpdate);
+    };
   }, []);
 
   if(isMounted) {

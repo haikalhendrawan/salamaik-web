@@ -1,47 +1,20 @@
-import {useEffect, useRef, useState} from "react";
 import { Helmet } from 'react-helmet-async';
 // @mui
-import { useTheme} from '@mui/material/styles';
-import { Grid, Container, Snackbar, Alert, Button } from '@mui/material';
-import useSocket from "../hooks/useSocket";
-import useLoading from "../hooks/display/useLoading";
-import useSnackbar from "../hooks/display/useSnackbar";
+import { Grid, Container} from '@mui/material';
 import { useAuth } from "../hooks/useAuth";
 // sections
 import WelcomeCard from "../sections/home/components/WelcomeCard";
 import PhotoGallery from "../sections/home/components/PhotoGallery";
 import KanwilView from "../sections/home/KanwilView";
+import KPPNView from "../sections/home/KPPNView";
 // ----------------------------------------------------------------------
 
 export default function HomePage() {
-  const theme = useTheme();
+  const {auth} = useAuth();
 
-  const {openSnackbar} = useSnackbar();
+  const isKanwil = auth?.kppn === '03010';
 
-  const {setIsLoading} = useLoading();
-
-  const {auth} = useAuth() as AuthType;
-
-  const {socket} = useSocket();
-
-  useEffect(() => {
-    socket?.emit("getData", {
-      kppn: "010",
-      period: auth?.period
-    }, (response: any) => {
-      console.log(response);
-    })
-
-    setIsLoading(true);
-    const id = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-
-    return () => {
-      clearTimeout(id);
-    };
-  }, []);
-
+  const username = auth?.name
 
   return (
     <>
@@ -52,7 +25,7 @@ export default function HomePage() {
       <Container maxWidth="xl">
         <Grid container spacing={4}>
           <Grid item xs={12} md={8}>
-           <WelcomeCard title="Welcome, Person 1" total={10} icon="eva:home-outline" />
+           <WelcomeCard title={`Welcome, ${username}`} total={10} icon="eva:home-outline" />
           </Grid>
 
           <Grid item xs={12} md={4}>
@@ -63,10 +36,7 @@ export default function HomePage() {
             /> 
           </Grid>
 
-          {/* <Button onClick={submitEvent}>Button</Button>
-          <Button onClick={() => socketRef.current.disconnect()}>disconnect</Button> */}
-
-          <KanwilView />
+          {isKanwil?<KanwilView />:<KPPNView />}
 
         </Grid>
       </Container>

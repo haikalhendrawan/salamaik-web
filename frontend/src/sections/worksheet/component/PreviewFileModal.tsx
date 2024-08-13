@@ -37,7 +37,7 @@ export default function PreviewFileModal(){
 
   const {getWsJunctionKanwil} = useWsJunction();
 
-  const currentFileURL = `${import.meta.env.VITE_API_URL}/standardization`;
+  const currentFileURL = `${import.meta.env.VITE_API_URL}/`;
 
   const fileExt = file ? file.split('.').pop()?.toLowerCase() : '' ;
 

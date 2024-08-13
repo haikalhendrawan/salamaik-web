@@ -1,4 +1,4 @@
-import {useState, useEffect, useCallback} from "react";
+import {useState, useEffect, useCallback,useMemo} from "react";
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Card from '@mui/material/Card';
@@ -17,10 +17,9 @@ import { WsJunctionType } from "../../../worksheet/types";
 import { FindingsResponseType } from "../../types";
 // ------------------------------------------------------------
 interface FollowUpCardProps{
-  modalOpen: () => void,
-  modalClose: () => void,
   findingResponse: FindingsResponseType | null,
-  id?: string
+  id?: string,
+  getData: () => void
 };
 
 const StyledCardHeader = styled(CardHeader)(({theme}) => ({
@@ -57,7 +56,7 @@ export default function FollowUpCard(props: FollowUpCardProps) {
 
   const matrixDetail = props.findingResponse?.matrixDetail[0] || null;
 
-  const wsJunction = matrixDetail?.ws_junction[0] || null;
+  const wsJunction = useMemo(() => matrixDetail?.ws_junction[0], [props.findingResponse]) || null;
 
   const checklist = matrixDetail?.checklist[0] || null;
 
@@ -108,23 +107,33 @@ export default function FollowUpCard(props: FollowUpCardProps) {
             </Grid>
 
             <Grid item xs={1.5}>
-              <Typography variant="body2">Dokumen</Typography>
+              <Typography variant="body2">
+                Dokumen
+              </Typography>
             </Grid>
 
             <Grid item xs={1.5}>
-              <Typography variant="body2">Nilai</Typography>
+              <Typography variant="body2">
+                Nilai
+              </Typography>
             </Grid>
 
             <Grid item xs={1.75}>
-              <Typography variant="body2">Tanggapan KPPN</Typography>
+              <Typography variant="body2">
+                Tanggapan KPPN
+              </Typography>
             </Grid>
 
             <Grid item xs={1.75}>
-              <Typography variant="body2">Tanggapan Kanwil</Typography>
+              <Typography variant="body2">
+                Tanggapan Kanwil
+              </Typography>
             </Grid>
 
             <Grid item xs={1}>
-              <Typography variant="body2">Approval</Typography>
+              <Typography variant="body2">
+                Approval
+              </Typography>
             </Grid>
           </HeadGrid>
 
@@ -142,23 +151,23 @@ export default function FollowUpCard(props: FollowUpCardProps) {
             </Grid>
 
             <Grid item xs={1.5}>
-              <Dokumen openInstruction={handleOpenInstruction} findingResponse={props.findingResponse} />
+              <Dokumen 
+                openInstruction={handleOpenInstruction} 
+                findingResponse={props.findingResponse} 
+                getData={props.getData}
+              />
             </Grid>
 
             <Grid item xs={1.5}>
-              <Nilai findingResponse={props.findingResponse} />
+              <Nilai findingResponse={props.findingResponse} getData={props.getData}/>
             </Grid>
 
-            <Grid item xs={1.75}>
-              <Catatan findingResponse={props.findingResponse}/>
-            </Grid>
-
-            <Grid item xs={1.75}>
-              <Catatan findingResponse={props.findingResponse}/>
+            <Grid item xs={3.5}>
+              <Catatan findingResponse={props.findingResponse} getData={props.getData}/>
             </Grid>
 
             <Grid item xs={1}>
-              <Approval />
+              <Approval findingResponse={props.findingResponse} getData={props.getData}/>
             </Grid>
           </BodyGrid>
 

@@ -5,7 +5,7 @@ import Tooltip from '@mui/material/Tooltip';
 import Skeleton  from "@mui/material/Skeleton";
 import useTheme  from '@mui/material/styles/useTheme';
 import styled  from '@mui/material/styles/styled';
-import usePreviewFileModal from '../usePreviewFileModal';
+import usePreviewFileModal from '../../usePreviewFileModal';
 import Iconify from "../../../../components/iconify";
 import StyledButton from "../../../../components/styledButton/StyledButton";
 import useLoading from '../../../../hooks/display/useLoading';
@@ -29,16 +29,17 @@ const VisuallyHiddenInput = styled('input')({
 
 interface DokumenProps{
   openInstruction: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
-  findingResponse: FindingsResponseType | null
+  findingResponse: FindingsResponseType | null,
+  getData: () => void
 }
 
 // ----------------------------------------------------------------------------
-export default function Dokumen({openInstruction, findingResponse}: DokumenProps){
+export default function Dokumen({openInstruction, findingResponse, getData}: DokumenProps){
   const [isMounted, setIsMounted] = useState(true);
 
   const theme = useTheme();
 
-  const { handleSetIsExampleFile, modalOpen, changeFile, selectId, setFileOption } = usePreviewFileModal();
+  const { handleSetIsExampleFile, modalOpen, changeFile, selectId, setFileOption, open } = usePreviewFileModal();
 
   const {getWsJunctionKanwil} = useWsJunction();
 
@@ -97,7 +98,8 @@ export default function Dokumen({openInstruction, findingResponse}: DokumenProps
       await axiosJWT.post(`/editWsJunctionFile`, formData, {
         headers:{"Content-Type": "multipart/form-data"}
       });
-      await getWsJunctionKanwil(wsJunction.kppn_id);
+      await getWsJunctionKanwil(kppnId);
+      await getData();
       setIsLoading(false); 
     }catch(err: any){
       setIsLoading(false);

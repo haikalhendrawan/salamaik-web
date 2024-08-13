@@ -100,9 +100,38 @@ class Findings{
     }
   }
 
+  async getAllFindingsWithChecklistDetailByKPPN(kppnId: string): Promise<FindingsWithChecklist[]>{
+    try{
+      const q = ` SELECT 
+                    findings_data.*, 
+                    checklist_ref.title, 
+                    checklist_ref.komponen_id, 
+                    checklist_ref.subkomponen_id, 
+                    komponen_ref.title AS komponen_title, 
+                    subkomponen_ref.title AS subkomponen_title, 
+                    worksheet_ref.period
+                  FROM findings_data
+                  LEFT JOIN worksheet_ref
+                  ON findings_data.worksheet_id = worksheet_ref.id
+                  LEFT JOIN checklist_ref 
+                  ON findings_data.checklist_id = checklist_ref.id
+                  LEFT JOIN komponen_ref
+                  ON checklist_ref.komponen_id = komponen_ref.id
+                  LEFT JOIN subkomponen_ref
+                  ON checklist_ref.subkomponen_id = subkomponen_ref.id
+                  WHERE worksheet_ref.kppn_id = $1
+                  ORDER BY findings_data.id DESC`;
+      const result = await pool.query(q, [kppnId]);
+      return result.rows
+    }catch(err){
+      throw err
+    }
+  }
+
   async updateFindingsResponse(id: number, kppnResponse: string, kanwilResponse: string, userName: string){
     try{
       const updateTime = new Date(Date.now()).toISOString();
+      console.log(id, kppnResponse, kanwilResponse, userName);
       const q = `UPDATE findings_data 
                  SET kppn_response = $1, kanwil_response = $2, updated_by = $3, last_update = $4
                  WHERE id = $5
@@ -128,7 +157,7 @@ class Findings{
     }
   }
 
-  async updateFindingsStatus(id: number, status: number, userName: string){
+  async updateFindingStatus(id: number, status: number, userName: string){
     try{
       const updateTime = new Date(Date.now()).toISOString();
       const q = `UPDATE findings_data 

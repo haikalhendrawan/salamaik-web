@@ -1,7 +1,7 @@
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useState} from "react";
 // @mui
 import { useTheme } from '@mui/material/styles';
-import { avatarGroupClasses, Grid } from '@mui/material';
+import { Grid } from '@mui/material';
 // sections
 import ProgressPembinaan from "./components/ProgressPembinaan";
 import ScoreHistory from "./components/ScoreHistory";
@@ -91,7 +91,6 @@ export default function KanwilView(){
     try{
       setIsLoading(true);
       const response3 = await axiosJWT.get('/getAllFindingsWithChecklistDetail');
-      console.log(response3.data.rows);
       setFindingsData(response3.data.rows);
       setIsLoading(false);
     }catch(err:any){
@@ -107,7 +106,6 @@ export default function KanwilView(){
     getHistorical();
     getFindings();
 
-    console.log(komponenRef)
   }, []);
 
   const countProgressWorksheet = kppnScoreProgress?.reduce((a, c) => (a + (c?.scoreProgressDetail?.totalProgressKanwil || 0)), 0);
@@ -123,7 +121,7 @@ export default function KanwilView(){
   const avgScoreLast4Period = Last4PeriodScorePerKPPN.map((item) => (item.reduce((a, c) => (a + c), 0) / item.length).toFixed(2)); // [9,2] , [9.5], [9.6]
 
   const komponenRefStringArray = komponenRef?.map((item) => item.alias) || [];
-  const last2Period = periodRef?.list?.slice(-2);
+  const last2Period = periodRef?.list?.slice(-1, -3);
 
   const last2PeriodFindings = last2Period?.map((item) => {
     const findingsPerKomponen = komponenRef?.map((k) => {
@@ -138,6 +136,9 @@ export default function KanwilView(){
     }
   }) || [];
 
+  if(findingsData.length===0 || kppnScoreProgress.length===0 || historicalScore.length===0){
+    return <></>;
+  };
 
   return(
     <>
@@ -209,14 +210,7 @@ export default function KanwilView(){
         <SortedKPPNScore
           title= "Nilai Per KPPN"
           subheader = 'Periode Smt 1 2023'
-          chartData= {[
-            {label: 'KPPN Padang', value: 9.77},
-            {label: 'KPPN Bukittinggi', value: 9.67},
-            {label: 'KPPN Solok', value: 9.55},
-            {label: ['KPPN Lubuk','Sikaping'], value: 9.44},
-            {label: 'KPPN Sijunjung', value: 9.42},
-            {label: 'KPPN Painan', value: 9.40},
-          ]}
+          chartData= {historicalScore}
         />
       </Grid>
     

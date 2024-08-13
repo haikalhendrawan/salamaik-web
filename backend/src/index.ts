@@ -4,8 +4,10 @@ import "dotenv/config";
 import cors from "cors";
 import cookieParser from 'cookie-parser';
 import logger from './config/logger';
-import { createServer } from "http";
-import { Server, Socket } from "socket.io";
+//instance
+import app from './config/app';
+import io from './config/io';
+import httpServer from './config/httpServer';
 //routes
 import notifRoute from './routes/notifRoute';
 import authRoute from './routes/authRoute';
@@ -29,13 +31,8 @@ import rateLimiter from './middleware/rateLimiter';
 import connectEvent from './events';
 import socketAuthenticate from './middleware/socketAuthenticate';
 //utils and option
-import { socketOption, corsOption } from './config/option';
-// ------------------------------------------------------------
-
-const app = express();
-const httpServer = createServer(app);
-const io = new Server(httpServer, socketOption);
-
+import { corsOption } from './config/option';
+// -----------------------------------------------------------
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'uploads')));

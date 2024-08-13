@@ -61,6 +61,8 @@ export interface MatrixWithWsJunctionType{
   is_finding: number,
   komponen_string: string | null,
   subkomponen_string: string | null,
+  standardisasi?: number,
+  standardisasi_id?: number | null,
   ws_junction: WsJunctionType[],
   checklist: ChecklistType[],
   findings: FindingsType[],

@@ -39,7 +39,7 @@ export default function ProgressPembinaan({header, number, footer, detail, icon,
                   labels:[detail],
                   colors:theme.palette.primary.main,
                   toColor:theme.palette.primary.dark,  
-                  series:[number]
+                  series:[Number(number.toFixed(2))],
                 }} 
               />
             </Stack>

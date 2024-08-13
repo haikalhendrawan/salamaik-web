@@ -3,7 +3,7 @@ import {Button, Box, Tooltip, Modal, Typography} from '@mui/material';
 import Iconify from '../../../components/iconify';
 import useLoading from '../../../hooks/display/useLoading';
 import useSnackbar from '../../../hooks/display/useSnackbar';
-import usePreviewFileModal from './usePreviewFileModal';
+import usePreviewFileModal from '../usePreviewFileModal';
 import useSocket from '../../../hooks/useSocket';
 // -------------------------------------------------------------------------------------------
 const style = {
@@ -16,7 +16,7 @@ const style = {
 };
 
 // -------------------------------------------------------------------------------------------
-export default function PreviewFileModal(){
+export default function PreviewFileModal({getData}: {getData: () => void}){
   const {
     open, 
     file, 
@@ -34,7 +34,7 @@ export default function PreviewFileModal(){
 
   const {openSnackbar} = useSnackbar();
 
-  const currentFileURL = `${import.meta.env.VITE_API_URL}/standardization`;
+  const currentFileURL = `${import.meta.env.VITE_API_URL}/`;
 
   const fileExt = file ? file.split('.').pop()?.toLowerCase() : '' ;
 
@@ -54,16 +54,16 @@ export default function PreviewFileModal(){
       }, async() => {
         try{
           setIsLoading(true);
+          getData();
           modalClose();
           setIsLoading(false);
         }catch(err: any){
           setIsLoading(false);
-          openSnackbar(err.response.data.message, "error");
+          openSnackbar(err?.message, "error");
         }finally{
           setIsLoading(false);
         }
       });
-
 
   };
 

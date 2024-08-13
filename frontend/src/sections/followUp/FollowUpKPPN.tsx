@@ -98,6 +98,21 @@ export default function FollowUpKPPN() {
     }
   };
 
+  const getData = () =>{
+    const id = params.get('id');
+
+    if(!id){
+      navigate(`?id=010`);
+    };
+
+    if (id !== tabValue) {
+      setTabValue(id || '010'); // Sync tabValue with URL on location change
+    };
+
+    getFindings();
+    getWorksheet();
+  };
+
   const totalFindingsNonFinal = findings?.length;
   const totalFindingsFinal = findings?.filter((f) => f?.status === (0 | 1 | 2)).length;
   const countFindingsOnProgress = findings?.filter((f) => f?.status === 1).length;
@@ -111,19 +126,7 @@ export default function FollowUpKPPN() {
   const isFinalText = isPastClosePeriod ? 'Final' : 'Non-Final';
 
   useEffect(() => {
-    const id = params.get('id');
-
-    if(!id){
-      navigate(`?id=010`);
-    };
-
-    if (id !== tabValue) {
-      setTabValue(id || '010'); // Sync tabValue with URL on location change
-    };
-
-    getFindings();
-    getWorksheet();
-
+    getData();
   }, [location.search, tabValue]);
 
   return (

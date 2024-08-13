@@ -10,9 +10,11 @@ import useWsJunction from "../../../worksheet/useWsJunction";
 import {useAuth} from "../../../../hooks/useAuth";
 import useSnackbar from "../../../../hooks/display/useSnackbar";
 import { FindingsResponseType } from "../../types";
+import useAxiosJWT from "../../../../hooks/useAxiosJWT";
 // ------------------------------------------------------------
 interface CatatanPropsType{
   findingResponse: FindingsResponseType | null,
+  getData: () => void
 };
 
 const StyledFormControl = styled(FormControl)(({theme}) => ({
@@ -23,7 +25,7 @@ const StyledFormControl = styled(FormControl)(({theme}) => ({
 }));
 
 // ------------------------------------------------------------
-export default function Catatan({findingResponse}: CatatanPropsType) {
+export default function Catatan({findingResponse, getData}: CatatanPropsType) {
   const [isMounted, setIsMounted] = useState(true);
 
   const wsJunction = findingResponse?.matrixDetail[0]?.ws_junction[0] || null;
@@ -42,27 +44,66 @@ export default function Catatan({findingResponse}: CatatanPropsType) {
 
   const {openSnackbar} = useSnackbar();
 
-  const {getWsJunctionKanwil} = useWsJunction();
+  const axiosJWT = useAxiosJWT();
 
   const isKanwil = useMemo(() =>{
     return auth?.kppn==='03010';
   }, [auth]);
 
-  const handleEditKanwilNote = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleEditKanwilNote = async(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const currentNote = e.target.value;
 
     if(currentNote === lastSavedNoteRefKanwil.current) {
       return
     };
+
+    try{
+      await updateFindingResponse(currentNote, findingResponse?.kppn_response || '');
+    }catch(err: any){
+      if(err.response){
+        openSnackbar(err.response.data.message, "error");
+      }else{
+        openSnackbar('network error', "error");
+      }
+    }
   };
 
-  const handleEditKPPNNote = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleEditKPPNNote = async(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const currentNote = e.target.value;
 
-    if(currentNote === lastSavedNoteRefKanwil.current) {
+    if(currentNote === lastSavedNoteRefKPPN.current) {
       return
     };
+
+    try{
+      await updateFindingResponse(findingResponse?.kanwil_response || '', currentNote);
+    }catch(err: any){
+      if(err.response){
+        openSnackbar(err.response.data.message, "error");
+      }else{
+        openSnackbar('network error', "error");
+      }
+    }
   };
+
+  const updateFindingResponse = async(kanwilNote: string, kppnNote: string) => {
+    try{
+      if(!findingResponse) {
+        return null
+      };
+
+      const response = await axiosJWT.post("/updateFindingsResponse", {
+        id: findingResponse?.id,
+        kanwilResponse: kanwilNote,
+        kppnResponse: kppnNote,
+        userName: auth?.name
+      });
+      getData();
+      openSnackbar(response.data.message, "success");
+    }catch(err: any){
+      throw err
+    }
+  }
 
   useEffect(() => {
     setIsMounted(false);
@@ -74,33 +115,36 @@ export default function Catatan({findingResponse}: CatatanPropsType) {
 
   return (
     <>
-      <StyledFormControl>
-        <TextField 
-          name="kppnResponse"
-          size='small' 
-          defaultValue={initialNoteRefKPPN.current}
-          onBlur={(e) => handleEditKPPNNote(e)} 
-          multiline 
-          minRows={6} 
-          maxRows={6}
-          fullWidth
-          inputProps={{sx: {fontSize: 12, width:'100%', height:'100%'}, spellCheck: false}} 
-          disabled={isKanwil}
-        />
-
-        <TextField
-          name="kanwilResponse" 
-          size='small' 
-          defaultValue={initialNoteRefKanwil.current}
-          onBlur={(e) => handleEditKanwilNote(e)} 
-          multiline 
-          minRows={6} 
-          maxRows={6}
-          fullWidth
-          inputProps={{sx: {fontSize: 12, width:'100%', height:'100%'}, spellCheck: false}} 
-          disabled={!isKanwil}
-        />
-      </StyledFormControl>
+      <div style={{display: 'flex', flexDirection: 'row', width: '100%', height: '100%'}}>
+        <StyledFormControl>
+          <TextField 
+            name="kppnResponse"
+            size='small' 
+            defaultValue={initialNoteRefKPPN.current}
+            onBlur={(e) => handleEditKPPNNote(e)} 
+            multiline 
+            minRows={6} 
+            maxRows={6}
+            fullWidth
+            inputProps={{sx: {fontSize: 12, width:'100%', height:'100%'}, spellCheck: false}} 
+            disabled={isKanwil}
+          />
+        </StyledFormControl>
+        <StyledFormControl>
+          <TextField
+            name="kanwilResponse" 
+            size='small' 
+            defaultValue={initialNoteRefKanwil.current}
+            onBlur={(e) => handleEditKanwilNote(e)} 
+            multiline 
+            minRows={6} 
+            maxRows={6}
+            fullWidth
+            inputProps={{sx: {fontSize: 12, width:'100%', height:'100%'}, spellCheck: false}} 
+            disabled={!isKanwil}
+          />
+        </StyledFormControl>
+      </div>
     </>
     
   )

@@ -3,7 +3,6 @@ import { Pool, PoolClient } from "pg";
 import ErrorDetail  from "./error.model";
 import { v4 as uuidv4 } from 'uuid';
 import "dotenv/config";
-import logger from "../config/logger"; 
 /**
  *
  *

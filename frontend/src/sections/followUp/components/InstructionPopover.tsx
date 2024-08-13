@@ -44,7 +44,7 @@ export default function InstructionPopover({open, anchorEl, handleClose, instruc
                   </Stack>
                   <br />
                   <Stack direction='column' spacing={1}>
-                    <Typography variant='body2' sx={{fontSize: 14}} fontWeight={'bold'}>Contoh file</Typography>
+                    <Typography variant='body2' sx={{fontSize: 14}} fontWeight={'bold'}>Dokumen</Typography>
                     <Typography variant='body2' sx={{fontSize: 12}}>{fileExample}</Typography>
                   </Stack>
                 </Box>

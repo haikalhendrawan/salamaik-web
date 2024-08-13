@@ -4,7 +4,6 @@ import matrix from '../model/matrix.model';
 import worksheet, { WorksheetType } from '../model/worksheet.model';
 import ErrorDetail from '../model/error.model';
 import { MatrixWithWsJunctionType } from '../model/matrix.model';
-import { FindingsType } from '../model/findings.model';
 // ---------------------------------------------------------------------------------------------------
 interface FindingsResponseType{
   id: number,
@@ -57,6 +56,16 @@ const getAllFindings = async(req: Request, res: Response, next: NextFunction) =>
   }
 }
 
+const getAllFindingsByKPPN = async(req: Request, res: Response, next: NextFunction) => {
+  try{
+    const {kppn} = req.payload;
+    const allFindings = await findings.getAllFindingsWithChecklistDetailByKPPN(kppn);
+    return res.status(200).json({sucess: true, message: 'Get all findings success', rows: allFindings})
+  }catch(err){
+    next(err)
+  }
+}
+
 const addFindings = async (req: Request, res: Response, next: NextFunction) => {
   try{
     const {worksheetId, wsJunctionId, checklistId, matrixId, scoreBefore} = req.body;
@@ -71,7 +80,7 @@ const updateFindingsScore = async (req: Request, res: Response, next: NextFuncti
   try{
     const {id, scoreBefore, scoreAfter, userName} = req.body;
     const result = await findings.updateFindingsResponse(id, scoreBefore, scoreAfter, userName);
-    return res.status(200).json({sucess: true, message: 'Update findings success', rows: result})
+    return res.status(200).json({sucess: true, message: 'Score has been updated', rows: result})
   }catch(err){
     next(err)
   }
@@ -81,7 +90,7 @@ const updateFindingsResponse = async (req: Request, res: Response, next: NextFun
   try{
     const {id, kppnResponse, kanwilResponse, userName} = req.body;
     const result = await findings.updateFindingsResponse(id, kppnResponse, kanwilResponse, userName);
-    return res.status(200).json({sucess: true, message: 'Update findings success', rows: result})
+    return res.status(200).json({sucess: true, message: 'Response has been updated  ', rows: result})
   }catch(err){
     next(err)
   }
@@ -90,11 +99,11 @@ const updateFindingsResponse = async (req: Request, res: Response, next: NextFun
 const updateFindingStatus = async(req: Request, res: Response, next: NextFunction) => {
   try{
     const {id, status, userName} = req.body;
-    const result = await findings.updateFindingsStatus(id, status, userName);
-    return res.status(200).json({sucess: true, message: 'Update findings success', rows: result})
+    const result = await findings.updateFindingStatus(id, status, userName);
+    return res.status(200).json({sucess: true, message: 'Status has been updated', rows: result})
   }catch(err){
     next(err)
   }
 }
 
-export {getFindingsByWorksheetId, getAllFindings, updateFindingsScore, addFindings, updateFindingsResponse, updateFindingStatus}
+export {getFindingsByWorksheetId, getAllFindings, getAllFindingsByKPPN, updateFindingsScore, addFindings, updateFindingsResponse, updateFindingStatus}

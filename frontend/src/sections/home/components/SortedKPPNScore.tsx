@@ -7,6 +7,8 @@ import {styled, useTheme} from '@mui/material/styles';
 import Iconify from '../../../components/iconify';
 // components
 import { useChart } from '../../../components/chart';
+import PeriodSelectionPopper from "./PeriodSelectionPopper";
+import useDictionary from "../../../hooks/useDictionary";
 
 // ----------------------------------------------------------------------
 const StyledButton = styled(Button)(({theme}) => ({
@@ -21,8 +23,6 @@ const StyledButton = styled(Button)(({theme}) => ({
   }
 }));
 
-const allValue = ['Smt 2 2022', 'Smt 1 2023', 'Smt 2 2023'];
-
 interface SortedKPPNScoreProps{
   title: string,
   subheader: string,
@@ -34,21 +34,41 @@ interface SortedKPPNScoreProps{
 export default function SortedKPPNScore({ title, subheader, chartData, colors, ...other }: SortedKPPNScoreProps) {
   const theme = useTheme();
   
-  const [open, setOpen] = useState(null);
+  const [open, setOpen] = useState<any>(null);
+
+  const [selectedPeriod, setSelectedPeriod] = useState<number>(0);
 
   const handleClose = () => {
     setOpen(null);
   };
 
-  const chartLabels = chartData.map((i) => i.label);
+  const handleChangePeriod = (newPeriod: number) => {
+    setSelectedPeriod(newPeriod);
+    setOpen(null);
+    console.log(chartData)
+  };
 
-  const chartSeries = chartData.map((i) => i.value);
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const target = e.currentTarget;
+    setOpen(target);
+  };
+
+  const filteredChartData = chartData?.filter((item) => item.id === 0)[selectedPeriod]?.kppn?.map((unit: any) => ({
+    label: unit.alias, 
+    value: unit.scoreProgressDetail.scoreByKanwil
+  })) || [];
+
+  const {periodRef} = useDictionary();
+
+  const chartLabels = filteredChartData.map((i: any) => i.label);
+
+  const chartSeries = filteredChartData.map((i: any) => i.value);
 
   const chartOptions = useChart({
     tooltip: {
       marker: { show: false },
       y: {
-        formatter: (seriesName: string) => seriesName,
+        formatter: (val: number) => Number(val).toFixed(2),
         title: {
           formatter: (val: any) => '',
         },
@@ -76,27 +96,29 @@ export default function SortedKPPNScore({ title, subheader, chartData, colors, .
 
   return (
     <>
-    <Card {...other}>
-      <CardHeader 
-        title={title} 
-        subheader={subheader} 
-        action={
-          <StyledButton
-            aria-label="settings" 
-            variant='outlined'
-            endIcon={<Iconify icon="mdi:arrow-down-drop" />}
-            disableFocusRipple
-            >
-              {allValue[0]}
-          </StyledButton>
-        }  
-        />
+      <Card {...other}>
+        <CardHeader 
+          title={title} 
+          subheader={subheader} 
+          action={
+            <StyledButton
+              aria-label="settings" 
+              variant='outlined'
+              endIcon={<Iconify icon="mdi:arrow-down-drop" />}
+              disableFocusRipple
+              onClick={(e) => handleClick(e)}
+              >
+                {periodRef?.list.filter((p) => p.id === selectedPeriod)[0]?.name}
+            </StyledButton>
+          }  
+          />
 
-      <Box sx={{ mx: 3 }} dir="ltr">
-        <ReactApexChart type="bar" series={[{ data: chartSeries }]} options={chartOptions} height={335} />
-      </Box>
-    </Card>
+        <Box sx={{ mx: 3 }} dir="ltr">
+          <ReactApexChart type="bar" series={[{ data: chartSeries }]} options={chartOptions} height={335} />
+        </Box>
+      </Card>
 
+      <PeriodSelectionPopper open={open} close={handleClose} value={selectedPeriod} changeValue={handleChangePeriod} />
     </>
   );
 }

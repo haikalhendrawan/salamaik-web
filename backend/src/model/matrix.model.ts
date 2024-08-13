@@ -52,6 +52,8 @@ export interface MatrixWithWsJunctionType{
   is_finding: number,
   komponen_string: string | null,
   subkomponen_string: string | null,
+  standardisasi: number, 
+  standardisasi_id: number | null,
   ws_junction: WorksheetJunctionType[],
   checklist: ChecklistType[],
   findings: FindingsType[],
@@ -120,7 +122,9 @@ class Matrix{
                     json_agg(findings_data.* ORDER BY findings_data.id ASC) AS findings,
                     json_agg(opsi_ref.* ORDER BY opsi_ref.id ASC) AS opsi,
                     komponen_ref.title AS komponen_string,
-                    subkomponen_ref.title AS subkomponen_string
+                    subkomponen_ref.title AS subkomponen_string,
+                    checklist_ref.standardisasi AS standardisasi,
+                    checklist_ref.standardisasi_id AS standardisasi_id
                   FROM matrix_data 
                   LEFT JOIN worksheet_junction
                   ON matrix_data.ws_junction_id = worksheet_junction.junction_id
@@ -135,7 +139,7 @@ class Matrix{
                   LEFT JOIN opsi_ref
                   ON checklist_ref.id = opsi_ref.checklist_id
                   WHERE matrix_data.worksheet_id = $1
-                  GROUP BY matrix_data.id, worksheet_junction.junction_id, komponen_ref.title, subkomponen_ref.title
+                  GROUP BY matrix_data.id, worksheet_junction.junction_id, komponen_ref.title, subkomponen_ref.title, checklist_ref.standardisasi, checklist_ref.standardisasi_id
                   `;
       const result = await poolInstance.query(q, [worksheetId]);
       return result.rows

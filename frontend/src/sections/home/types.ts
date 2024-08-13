@@ -6,7 +6,7 @@ interface ScorePerKomponenType{
   komponenBobot: number,
   wsJunction: WsJunctionType[],
 }
-interface WsJunctionScoreAndProgress{
+export interface WsJunctionScoreAndProgress{
   scoreByKanwil : number,
   scoreByKPPN: number,
   isFinal: boolean,
