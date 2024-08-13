@@ -126,7 +126,7 @@ export default function FollowUpCard(props: FollowUpCardProps) {
 
             <Grid item xs={1.75}>
               <Typography variant="body2">
-                Tanggapan Kanwil
+                Catatan Kanwil
               </Typography>
             </Grid>
 

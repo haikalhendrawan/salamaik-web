@@ -1,6 +1,6 @@
 import { ReactNode, useState, createContext, useContext } from 'react';
 // @mui
-import { useTheme, alpha, styled } from '@mui/material/styles';
+import { useTheme, styled } from '@mui/material/styles';
 import { Typography, Dialog, DialogTitle, DialogContent, DialogActions} from '@mui/material';
 import StyledButton from '../../components/styledButton/StyledButton';
 //------------------------------------------------------------------
@@ -26,7 +26,7 @@ const StyledDialog = styled(Dialog)(({ theme }) => ({
 type DialogContextType = {
   openDialog: (title: string, 
               content: string, 
-              color: 'success' |'pink' | 'white', 
+              color: 'success' |'pink' | 'white' | 'warning', 
               buttonTitle: string,
               action: () => void) => void,
   closeDialog: () => void
@@ -49,13 +49,13 @@ const DialogProvider = ({children}: DialogProviderProps) => {
 
   const [content, setContent] = useState<string>('');
 
-  const [color, setColor] = useState<'success' |'pink' | 'white'>('white');
+  const [color, setColor] = useState<'success' |'pink' | 'white' | 'warning'>('white');
 
   const [handleClick, setHandleClick] = useState<() => void>(() => {});
 
   const openDialog = (title: string, 
                       content: string, 
-                      color: 'success' |'pink' | 'white', 
+                      color: 'success' |'pink' | 'white' | 'warning', 
                       buttonTitle: string,
                       action: () => void) => {
     setOpen(true);

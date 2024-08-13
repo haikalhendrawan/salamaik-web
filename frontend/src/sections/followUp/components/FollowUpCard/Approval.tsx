@@ -13,6 +13,8 @@ export default function Approval({findingResponse, getData}: {findingResponse: F
 
   const isKanwilnAdmin = auth?.kppn ==='03010' && (auth?.role === 4 || auth?.role === 99);
 
+  const isKPPNAdmin = (auth?.kppn!=='03010' && (auth?.role === 2)) || (auth?.role === 99);
+
   const axiosJWT = useAxiosJWT();
 
   const {openSnackbar} = useSnackbar();
@@ -52,7 +54,7 @@ export default function Approval({findingResponse, getData}: {findingResponse: F
           </Stack>
       </Stack>
       
-      <Stack direction='column' spacing={1} visibility={isKanwilnAdmin ? 'visible' : 'hidden'}>
+      <Stack direction='column' spacing={1} display={isKanwilnAdmin ? 'flex' : 'none'}>
         <Typography variant='body3' sx={{fontSize:12}} textAlign={'left'}>Action :</Typography>
         <Stack direction='row' spacing={1}>
           {status === 0  || status === 1?
@@ -82,7 +84,7 @@ export default function Approval({findingResponse, getData}: {findingResponse: F
                     aria-label="tolak" 
                     variant='contained' 
                     size='small' 
-                    color='error'
+                    color='pink'
                     onClick={() => openDialog(
                       "Tindak Tindak Lanjut", 
                       "Tolak tindak lanjut KPPN?", 
@@ -121,7 +123,56 @@ export default function Approval({findingResponse, getData}: {findingResponse: F
           : null}
         </Stack>
       </Stack>
-      
+
+      <Stack direction='column' spacing={1} display={isKPPNAdmin ? 'flex' : 'none'} alignItems={'flex-start'}>
+        <Typography variant='body3' sx={{fontSize:12}} textAlign={'left'}>Action :</Typography>
+        {((status === 0) && (isKPPNAdmin))?
+          <>
+            <Tooltip title='Kirim'>
+              <span>
+                <StyledButton 
+                  aria-label="kirim" 
+                  variant='contained' 
+                  size='small' 
+                  color='warning'
+                  onClick={() => openDialog(
+                    "Kirim Tindak Lanjut", 
+                    "Kirim tanggapan? pastikan bukti dukung telah memadai", 
+                    'warning', 
+                    'Setuju', 
+                    () => handleUpdateStatus(1))
+                  } 
+                >
+                  <Iconify icon="solar:plain-bold"/>
+                </StyledButton>
+              </span>
+            </Tooltip>
+          </>
+        : ((status === 1) && (isKPPNAdmin))?
+          <Tooltip title='Revert status'>
+              <span>
+                <StyledButton
+                  aria-label="revert" 
+                  variant='contained' 
+                  size='small' 
+                  color='pink'
+                  onClick={() => openDialog(
+                    "Revert Status", 
+                    "Revert status tindak lanjut?", 
+                    'pink', 
+                    'Ya', 
+                    () => handleUpdateStatus(0))
+                  }
+                >
+                  <Iconify icon="solar:refresh-bold"/>
+                </StyledButton>
+              </span>
+            </Tooltip>
+            : null
+        }
+
+      </Stack>
+        
     </Stack>   
   )
 }

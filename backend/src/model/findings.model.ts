@@ -73,6 +73,16 @@ class Findings{
     }
   }
 
+  async getFindingsById(id: number): Promise<FindingsType[]>{
+    try{
+      const q = `SELECT * FROM findings_data WHERE id = $1`;
+      const result = await pool.query(q, [id]);
+      return result.rows
+    }catch(err){
+      throw err
+    }
+  }
+
   async getAllFindingsWithChecklistDetail(): Promise<FindingsWithChecklist[]>{
     try{
       const q = ` SELECT 

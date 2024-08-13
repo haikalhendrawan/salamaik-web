@@ -98,7 +98,21 @@ const updateFindingsResponse = async (req: Request, res: Response, next: NextFun
 
 const updateFindingStatus = async(req: Request, res: Response, next: NextFunction) => {
   try{
+    const {kppn, role} = req.payload;
     const {id, status, userName} = req.body;
+
+    const currentFinding = await findings.getFindingsById(id);
+    if(currentFinding.length === 0){
+      throw new ErrorDetail(404, 'Findings not found');
+    };
+
+    const currentStatus = currentFinding[0].status;
+    const isVerifiedToUpdateStatus =  verifyUpdateFindingStatus(role, currentStatus, status);
+
+    if(!isVerifiedToUpdateStatus){
+      throw new ErrorDetail(403, 'Not Authorized to update status');
+    };
+
     const result = await findings.updateFindingStatus(id, status, userName);
     return res.status(200).json({sucess: true, message: 'Status has been updated', rows: result})
   }catch(err){
@@ -107,3 +121,25 @@ const updateFindingStatus = async(req: Request, res: Response, next: NextFunctio
 }
 
 export {getFindingsByWorksheetId, getAllFindings, getAllFindingsByKPPN, updateFindingsScore, addFindings, updateFindingsResponse, updateFindingStatus}
+
+
+function verifyUpdateFindingStatus(role: number, oldStatus: number, newStatus: number){
+  const isAdminKanwil = role === 4 || role === 99;
+
+  if(newStatus === 1 && (oldStatus === 2 || oldStatus===3)){
+    if(!isAdminKanwil){
+      return false
+    }
+  };
+
+  if(newStatus ===2 || newStatus === 3){
+    if(!isAdminKanwil){
+      return false
+    }
+  };
+
+  // utk filter out user biasa di middleware
+  // passed from middleware sudah only admin kppn dan admin kanwil
+
+  return true
+}
