@@ -97,7 +97,7 @@ export default function Dokumen({openInstruction, wsJunction}: DokumenProps){
       await axiosJWT.post(`/editWsJunctionFile`, formData, {
         headers:{"Content-Type": "multipart/form-data"}
       });
-      // await getWsJunctionKanwil(wsJunction.kppn_id);
+      await getWsJunctionKanwil(wsJunction.kppn_id);
       setIsLoading(false); 
     }catch(err: any){
       setIsLoading(false);

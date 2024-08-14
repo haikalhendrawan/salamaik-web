@@ -48,7 +48,7 @@ const getWsJunctionByWorksheetForKPPN = async(req: Request, res: Response, next:
   }catch(err){
     next(err);
   }
-}
+};
 
 const getWsJunctionByWorksheetForKanwil = async(req: Request, res: Response, next: NextFunction) => {
   try{
@@ -72,7 +72,7 @@ const getWsJunctionByWorksheetForKanwil = async(req: Request, res: Response, nex
   }catch(err){
     next(err);
   }
-}
+};
 
 const getWsJunctionByPeriod = async(req: Request, res: Response, next: NextFunction) => {
   try{
@@ -82,7 +82,7 @@ const getWsJunctionByPeriod = async(req: Request, res: Response, next: NextFunct
   }catch(err){
     next(err);
   }
-}
+};
 
 const getWsJunctionByKPPN = async(req: Request, res: Response, next: NextFunction) => {
   try{
@@ -92,7 +92,7 @@ const getWsJunctionByKPPN = async(req: Request, res: Response, next: NextFunctio
   }catch(err){
     next(err);
   }
-}
+};
 
 const getWsJunctionScoreAndProgress = async(req: Request, res: Response, next: NextFunction) => {
   try{
@@ -112,7 +112,7 @@ const getWsJunctionScoreAndProgress = async(req: Request, res: Response, next: N
   }catch(err){
     next(err)
   }
-}
+};
 
 const getWsJunctionScoreAndProgressAllKPPN = async(req: Request, res: Response, next: NextFunction) => {
   try{
@@ -138,8 +138,7 @@ const getWsJunctionScoreAndProgressAllKPPN = async(req: Request, res: Response, 
   }catch(err){
     next(err)
   }
-}
-
+};
 
 const getWsJunctionScoreAllPeriod = async(req: Request, res: Response, next: NextFunction) => {
   try {
@@ -206,7 +205,7 @@ const editWsJunctionKPPNScore = async(req: Request, res: Response, next: NextFun
   }catch(err){
     next(err);
   }
-}
+};
 
 //protect endpoint di route
 const editWsJunctionKanwilScore = async(req: Request, res: Response, next: NextFunction) => {
@@ -228,7 +227,7 @@ const editWsJunctionKanwilScore = async(req: Request, res: Response, next: NextF
   }catch(err){
     next(err);
   }
-}
+};
 
 //protect endpoint di route
 const editWsJunctionKanwilNote = async(req: Request, res: Response, next: NextFunction) => {
@@ -240,7 +239,7 @@ const editWsJunctionKanwilNote = async(req: Request, res: Response, next: NextFu
   }catch(err){
     next(err);
   }
-}
+};
 
 const editWsJunctionFile = async(req: Request, res: Response, next: NextFunction) => {
   uploadWsJunctionFile(req, res, async (err: any) => {
@@ -273,7 +272,7 @@ const editWsJunctionFile = async(req: Request, res: Response, next: NextFunction
     }
 
   });
-}
+};
 
 const deleteWsJunctionFile = async(req: Request, res: Response, next: NextFunction) => {
   try{
@@ -288,7 +287,7 @@ const deleteWsJunctionFile = async(req: Request, res: Response, next: NextFuncti
   }catch(err){
     next(err);
   }
-}
+};
 
 //protect endpoint di route
 const deleteWsJunctionByWorksheetId = async(req: Request, res: Response, next: NextFunction) => {
@@ -299,7 +298,7 @@ const deleteWsJunctionByWorksheetId = async(req: Request, res: Response, next: N
   }catch(err){
     next(err);
   }
-}
+};
 
 export {
   getWsJunctionByWorksheetForKPPN, 

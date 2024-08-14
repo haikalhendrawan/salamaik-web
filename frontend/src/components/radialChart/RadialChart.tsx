@@ -25,7 +25,7 @@ export default function RadialChart(props: RadialChartProps) {
   const LABEL_VALUE = {
     show: true,
     offsetY: -8,
-    formatter: (val: number) => `${val} %`,
+    formatter: (val: number) => `${val.toFixed(2)} %`,
     color: theme.palette.text.primary,
     fontSize: theme.typography.h5.fontSize,
     fontWeight: theme.typography.h5.fontWeight,
@@ -41,7 +41,6 @@ export default function RadialChart(props: RadialChartProps) {
     fontWeight: theme.typography.h6.fontWeight,
     lineHeight: theme.typography.h5.lineHeight,
   };
-
   
   const chartOptions: any = {
     labels:' ',

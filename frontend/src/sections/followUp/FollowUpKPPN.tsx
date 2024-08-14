@@ -116,7 +116,7 @@ export default function FollowUpKPPN() {
   const totalFindingsNonFinal = findings?.length;
   const totalFindingsFinal = findings?.filter((f) => f?.status === (0 | 1 | 2)).length;
   const countFindingsOnProgress = findings?.filter((f) => f?.status === 1).length;
-  const findingsPercentProgress = (countFindingsOnProgress / totalFindingsNonFinal) * 100;
+  const findingsPercentProgress = ((countFindingsOnProgress / totalFindingsNonFinal) * 100) || 0;
 
   const semester = periodRef?.list?.filter((item) => item.id === auth?.period)[0]?.semester || '';
   const year = periodRef?.list?.filter((item) => item.id === auth?.period)[0]?.tahun || '';

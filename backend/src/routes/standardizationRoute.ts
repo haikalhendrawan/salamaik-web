@@ -8,6 +8,7 @@ const router = express.Router();
 router.get("/getAllStandardization", authenticate,  standardizationController.getAllStandardization);
 router.get("/getStandardizationJunction", authenticate, standardizationController.getStandardizationJunction);
 router.get("/getStdWorksheet/:kppn", authenticate, authorize([99, 1, 2, 3, 4]), standardizationController.getStdWorksheet);
+router.post("/getStdFilePerMonthKPPN", authenticate, authorize([99, 1, 2, 3, 4]), standardizationController.getStdFilePerMonthKPPN);
 router.post("/addStandardizationJunction", authenticate, standardizationController.addStandardizationJunction);
 router.post("/deleteStandardizationJunction", authenticate, standardizationController.deleteStandardizationJunction);
 

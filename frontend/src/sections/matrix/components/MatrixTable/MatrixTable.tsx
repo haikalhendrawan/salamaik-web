@@ -110,6 +110,7 @@ export default function MatrixTable({matrix, matrixStatus, getMatrix}: {matrix: 
         selectedKomponen={selectedKomponen} 
         setSelectedKomponen={setSelectedKomponen} 
         getMatrix={getMatrix}
+        matrix={matrix}
       />
       
       <Grow in>

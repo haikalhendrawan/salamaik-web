@@ -1,8 +1,10 @@
 import {Request, Response, NextFunction} from 'express';
+import archiver from 'archiver';
 import standardization from '../model/standardization.model';
 import { uploadStdFile } from '../config/multer';
 import period from '../model/period.model';
 import ErrorDetail from '../model/error.model';
+import unit from '../model/unit.model';
 import multer from 'multer';
 import logger from '../config/logger';
 import { sanitizeMimeType } from '../utils/mimeTypeSanitizer';
@@ -71,6 +73,46 @@ const getStdWorksheet = async (req: Request, res: Response, next: NextFunction) 
   }
 }
 
+const getStdFilePerMonthKPPN = async (req: Request, res: Response, next: NextFunction) => {
+  try{
+    const {period, kppn} = req.payload;
+    const {kppnId, month} = req.body;
+
+    const monthName = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    const monthString = monthName[month-1];
+    const unitAll = await unit.getAllKPPN();
+    const kppnString = unitAll.filter((item) => item.id === kppnId)[0]?.name || '';
+
+
+    const CLUSTER = [
+      'Manajemen Eksternal', 'Penguatan Kapasitas Perbendaharaan', 'Penguatan Manajemen Internal'
+    ];
+
+    const archive = archiver('zip', {
+      zlib: { level: 9 } // Set the compression level
+    });
+
+    res.attachment(`${kppnString} - ${monthString}.zip`);
+
+    const basePath = `${__dirname}/../uploads/standardization`;
+
+    archive.pipe(res);
+
+    const fileToAdd = await standardization.getStdFileNameCollection(kppnId, month, period);
+
+    fileToAdd.forEach(fileObj => {
+      const fileName = `${CLUSTER[fileObj.cluster-1]}/${fileObj.title}/${fileObj.file}`;
+      const filePath = path.join(basePath, fileObj.file);
+      archive.file(filePath, { name: fileName });
+    });
+    
+    archive.finalize();
+
+  }catch(err){
+    next(err)
+  }
+}
+
 const addStandardizationJunction = async (req: Request, res: Response, next: NextFunction) => {
   uploadStdFile(req, res, async (err) => {
     if(!req.file){
@@ -119,6 +161,9 @@ export {
   getAllStandardization, 
   getStandardizationJunction, 
   getStdWorksheet, 
+  getStdFilePerMonthKPPN,
   addStandardizationJunction, 
   deleteStandardizationJunction 
 }
+
+// ------------------------------------------------------------------------------------------------------------------

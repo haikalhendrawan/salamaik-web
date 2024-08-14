@@ -26,6 +26,7 @@
     "date-fns": "^3.6.0",
     "dayjs": "^1.11.11",
     "dotenv": "^16.4.5",
+    "exceljs": "^4.4.0",
     "js-cookie": "^3.0.5",
     "lodash": "^4.17.21",
     "mui-one-time-password-input": "^2.0.2",
@@ -42,6 +43,7 @@
     "simplebar-react": "^3.2.4",
     "slick-carousel": "^1.8.1",
     "socket.io-client": "^4.7.5",
+    "xlsx": "^0.18.5",
     "zod": "^3.23.4"
   },
   "devDependencies": {

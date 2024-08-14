@@ -1,7 +1,7 @@
 import {useEffect, useRef, useState} from "react";
 // @mui
 import { useTheme } from '@mui/material/styles';
-import { Grid } from '@mui/material';
+import { Grid, Box, Skeleton } from '@mui/material';
 // sections
 import ProgressPembinaan from "./components/ProgressPembinaan";
 import ScoreHistory from "./components/ScoreHistory";
@@ -146,7 +146,7 @@ export default function KPPNView(){
   const avgScoreLast4Period = last4Period?.map(item => item.scoreByKanwil.toFixed(2)); // [9,2] , [9.5], [9.6]
 
   const komponenRefStringArray = komponenRef?.map((item) => item.alias) || [];
-  const last2Period = periodRef?.list?.slice(periodRef?.list?.length-3, periodRef?.list?.length-1) || [];
+  const last2Period = periodRef?.list?.slice(-3, -1) || [];
 
   const last2PeriodFindings = last2Period?.map((item) => {
     const findingsPerKomponen = komponenRef?.map((k) => {
@@ -162,7 +162,38 @@ export default function KPPNView(){
   }) || [];
 
   if(findingsData.length===0 || kppnScoreProgress===null || historicalScore.length===0){
-    return <></>;
+    return( 
+      <>
+        <Grid item xs={12} md={4}>
+          <Box marginRight={2}> 
+            <Skeleton variant="rounded" height={'200px'} width={'100%'} /> 
+          </Box>
+        </Grid>
+  
+        <Grid item xs={12} md={4}>
+          <Box marginRight={2}> 
+            <Skeleton variant="rounded" height={'200px'} width={'100%'} /> 
+          </Box>
+        </Grid>
+  
+        <Grid item xs={12} md={4}>
+          <Box marginRight={2}> 
+            <Skeleton variant="rounded" height={'200px'} width={'100%'} /> 
+          </Box>
+        </Grid>
+  
+        <Grid item xs={12} md={4}>
+          <Box marginRight={2}> 
+            <Skeleton variant="rounded" height={'420px'} width={'100%'} /> 
+          </Box>
+        </Grid>
+  
+        <Grid item xs={12} md={8}>
+          <Box marginRight={2}> 
+            <Skeleton variant="rounded" height={'420px'} width={'100%'} /> 
+          </Box>
+        </Grid>
+      </>);
   };
 
 

@@ -51,6 +51,18 @@ class Standardization{
       throw err
     }
   }
+  async getStdFileNameCollection(kppnId: string, month: number, period: number){
+    try{
+      const q = ` SELECT standardization_junction.file, standardization_ref.title, standardization_ref.cluster
+                  FROM standardization_junction 
+                  INNER JOIN standardization_ref ON standardization_junction.standardization_id = standardization_ref.id
+                  WHERE kppn_id = $1 AND month = $2 AND period_id = $3`;
+      const result = await pool.query(q, [kppnId, month, period]);
+      return result.rows
+    }catch(err){
+      throw err
+    }
+  }
 
   async deleteStandardizationJunction(id: number){
     try{

@@ -8,6 +8,7 @@ import SelectionTab from './components/SelectionTab';
 import PageLoading from '../../components/pageLoading/PageLoading';
 import StandardizationTable from './components/StandardizationTable';
 import DocumentShort from './components/DocumentShort';
+import DocumentZip from './components/DocumentZip';
 import AmountShort from './components/AmountShort';
 import PreviewFileModal from './components/PreviewFileModal';
 import useStandardization from './useStandardization';
@@ -86,16 +87,21 @@ export default function StandardizationKanwil() {
 
           <Grid item xs={4}>
             <DocumentShort 
-              header='Monitoring Kekurangan Per KPPN' 
+              header='Monitoring Kekurangan' 
+              subheader={`${unitName}`} 
+              image='/image/Other 09.png'
+              tabValue={tabValue}
+            />
+          </Grid>
+
+          <Grid item xs={4}>
+            <DocumentZip  
+              header='Unduh File Bulanan (zip)' 
               subheader={`${unitName}`} 
               image='/image/Other 12.png'
               tabValue={tabValue}
             />
           </Grid>
-
-          {/* <Grid item xs={4}>
-            <DocumentShort header='Monitoring Kekurangan' subheader='Seluruh KPPN' image='/image/Other 09.png'/>
-          </Grid> */}
         </Grid>
 
         <Stack direction='column' spacing={4}>

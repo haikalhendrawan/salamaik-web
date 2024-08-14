@@ -1,7 +1,7 @@
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 // @mui
 import { useTheme } from '@mui/material/styles';
-import { Grid } from '@mui/material';
+import { Grid, Box, Skeleton } from '@mui/material';
 // sections
 import ProgressPembinaan from "./components/ProgressPembinaan";
 import ScoreHistory from "./components/ScoreHistory";
@@ -58,6 +58,10 @@ export default function KanwilView(){
   const [historicalScore, setHistoricalScore] = useState<HistoricalScoreProgressType[] | []>([]);
 
   const [findingsData, setFindingsData] = useState<FindingsWithChecklist[]>([]);
+
+  const isDataReady = useMemo(() => {
+    return kppnScoreProgress.length > 0 && historicalScore.length > 0 && findingsData.length > 0;
+  }, [kppnScoreProgress, historicalScore, findingsData]);
 
   const getScoreProgress = async() => {
     try{
@@ -121,7 +125,7 @@ export default function KanwilView(){
   const avgScoreLast4Period = Last4PeriodScorePerKPPN.map((item) => (item.reduce((a, c) => (a + c), 0) / item.length).toFixed(2)); // [9,2] , [9.5], [9.6]
 
   const komponenRefStringArray = komponenRef?.map((item) => item.alias) || [];
-  const last2Period = periodRef?.list?.slice(-1, -3);
+  const last2Period = periodRef?.list?.slice(-3, -1);
 
   const last2PeriodFindings = last2Period?.map((item) => {
     const findingsPerKomponen = komponenRef?.map((k) => {
@@ -136,8 +140,39 @@ export default function KanwilView(){
     }
   }) || [];
 
-  if(findingsData.length===0 || kppnScoreProgress.length===0 || historicalScore.length===0){
-    return <></>;
+  if(!isDataReady){
+    return( 
+    <>
+      <Grid item xs={12} md={4}>
+        <Box marginRight={2}> 
+          <Skeleton variant="rounded" height={'200px'} width={'100%'} /> 
+        </Box>
+      </Grid>
+
+      <Grid item xs={12} md={4}>
+        <Box marginRight={2}> 
+          <Skeleton variant="rounded" height={'200px'} width={'100%'} /> 
+        </Box>
+      </Grid>
+
+      <Grid item xs={12} md={4}>
+        <Box marginRight={2}> 
+          <Skeleton variant="rounded" height={'200px'} width={'100%'} /> 
+        </Box>
+      </Grid>
+
+      <Grid item xs={12} md={4}>
+        <Box marginRight={2}> 
+          <Skeleton variant="rounded" height={'420px'} width={'100%'} /> 
+        </Box>
+      </Grid>
+
+      <Grid item xs={12} md={8}>
+        <Box marginRight={2}> 
+          <Skeleton variant="rounded" height={'420px'} width={'100%'} /> 
+        </Box>
+      </Grid>
+    </>);
   };
 
   return(
