@@ -1,4 +1,4 @@
-import {useState, useEffect, useCallback} from "react";
+import { useState, useEffect, useCallback } from "react";
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Card from '@mui/material/Card';
@@ -13,15 +13,17 @@ import Dokumen from "./Dokumen";
 import Nilai from "./Nilai";
 import Catatan from "./Catatan";
 import { WsJunctionType } from "../../types";
+import { debounce } from 'lodash';
+
 // ------------------------------------------------------------
-interface WorksheetCardProps{
+interface WorksheetCardProps {
   modalOpen: () => void,
   modalClose: () => void,
   wsJunction: WsJunctionType | null,
   id?: string
 };
 
-const StyledCardHeader = styled(CardHeader)(({theme}) => ({
+const StyledCardHeader = styled(CardHeader)(({ theme }) => ({
   backgroundColor: theme.palette.background.default,
   color: theme.palette.text.primary,
   height: '67px',
@@ -29,7 +31,7 @@ const StyledCardHeader = styled(CardHeader)(({theme}) => ({
   paddingTop: theme.spacing(0),
 }));
 
-const HeadGrid = styled(Grid)(({theme}) => ({
+const HeadGrid = styled(Grid)(({ theme }) => ({
   marginTop: theme.spacing(1),
   marginBottom: theme.spacing(1),
   textAlign: 'center',
@@ -37,21 +39,22 @@ const HeadGrid = styled(Grid)(({theme}) => ({
   color: theme.palette.text.secondary,
 }));
 
-const BodyGrid = styled(Grid)(({theme}) => ({
+const BodyGrid = styled(Grid)(({ theme }) => ({
   marginTop: theme.spacing(0),
   maxHeight: '160px',
   textAlign: 'center',
   justifyContent: 'center',
 }));
 
-const StyledDivider = styled(Divider)(({theme}) => ({
-  borderStyle: 'dashed', 
+const StyledDivider = styled(Divider)(({ theme }) => ({
+  borderStyle: 'dashed',
   marginTop: theme.spacing(3)
 }));
 
 // ------------------------------------------------------------
 export default function WorksheetCard(props: WorksheetCardProps) {
-  const [mounted, setIsMounted] = useState(false)
+  const [mounted, setIsMounted] = useState(false);
+  const [renderNilai, setRenderNilai] = useState(false);
 
   const [openInstruction, setOpenInstruction] = useState<boolean>(false);
 
@@ -60,19 +63,25 @@ export default function WorksheetCard(props: WorksheetCardProps) {
   const handleOpenInstruction = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     setOpenInstruction(true);
     setAnchorEl(event.currentTarget);
-  }, []); 
+  }, []);
 
   const handleCloseInstruction = useCallback(() => {
-    setOpenInstruction(false)
+    setOpenInstruction(false);
   }, []);
 
   useEffect(() => {
     setIsMounted(true);
+    const debounceRenderNilai = debounce(() => setRenderNilai(true), 500);  
+    debounceRenderNilai();
+
+    return () => {
+      debounceRenderNilai.cancel();
+    };
   }, []);
 
-  if(!mounted) {
-    return <WorksheetCardSkeleton />
-  };
+  if (!mounted) {
+    return <WorksheetCardSkeleton />;
+  }
 
   return (
     <>
@@ -128,15 +137,15 @@ export default function WorksheetCard(props: WorksheetCardProps) {
             </Grid>
 
             <Grid item xs={1.5}>
-              <Nilai wsJunction={props.wsJunction} />
+              {renderNilai && <Nilai wsJunction={props.wsJunction} />}
             </Grid>
 
             <Grid item xs={3}>
-              <Catatan wsJunction={props.wsJunction}/>
+              <Catatan wsJunction={props.wsJunction} />
             </Grid>
           </BodyGrid>
 
-          <StyledDivider  />
+          <StyledDivider />
         </Card>
       </Grid>
 
@@ -151,15 +160,12 @@ export default function WorksheetCard(props: WorksheetCardProps) {
   );
 }
 
-
 // ------------------------------------------------------------------------------------------------------
 
-function WorksheetCardSkeleton(){
-  return(
+function WorksheetCardSkeleton() {
+  return (
     <Grid item xs={12} sm={12} md={12}>
       <Skeleton variant="rounded" height={'300px'} width={'100%'} />
     </Grid>
-  )
+  );
 }
-
-
