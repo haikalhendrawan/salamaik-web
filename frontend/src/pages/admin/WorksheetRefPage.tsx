@@ -65,7 +65,7 @@ export default function WorksheetRefPage() {
     'Komponen',
     'Sub Komponen',
     'Sub Sub Komponen',
-    'Batch',
+    'Kertas Kerja',
     'Periode',
   ];
 

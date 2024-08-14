@@ -385,7 +385,7 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
                 required 
                 name="kanwilScore" 
                 value={wsJunction?.kanwil_score !== null ? String(wsJunction?.kanwil_score) : ''} 
-                onChange={(e) => handleChangeKanwilScore(e.target.value as string)}
+                onChange={(e: any) => handleChangeKanwilScore(e.target.value as string)}
                 size='small' 
                 disabled={!isKanwil}
               >

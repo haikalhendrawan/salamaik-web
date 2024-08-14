@@ -43,7 +43,7 @@ export function renderConditionalRow(
 
   const {periodRef} = useDictionary();
 
-  const isEvenPeriod = periodRef?.list?.filter((item) => item.id === auth?.period)?.[0]?.evenPeriod || 0;
+  const isEvenPeriod = periodRef?.list?.filter((item) => item.id === auth?.period)?.[0]?.even_period || 0;
 
   const tableRows = useMemo(() =>
       standardization?.map((row, index) => {
@@ -276,6 +276,8 @@ export function renderConditionalRow(
 
 export function getAmountShort(standardization: StandardizationType[] | [], isEvenPeriod: number, reportingDate: number) {
   const currentMonth = new Date().getMonth();
+
+  console.log(isEvenPeriod)
 
   const currMonthSmt = isEvenPeriod===0?currentMonth:(currentMonth-6);
 

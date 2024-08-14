@@ -11,7 +11,7 @@ interface DocumentShortProps {
   header: string,
   subheader: string,
   image: string,
-  tabValue: string
+  tabValue?: string
 };
 // ----------------------------------------------
 

@@ -10,7 +10,7 @@ interface DictionaryType {
 interface PeriodType{
   id: number;
   name: string; 
-  evenPeriod: 0;
+  even_period: number | null;
   semester: number;
   tahun: number
 };

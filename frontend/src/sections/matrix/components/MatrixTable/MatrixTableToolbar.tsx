@@ -250,12 +250,12 @@ export default function MatrixTableToolbar({matrixStatus, selectedKomponen, setS
         : null
       }
       <div style={{flexGrow:1}} />
-      <Button 
+      {/* <Button 
         variant="text"  
         endIcon={ <Iconify icon="vscode-icons:file-type-pdf2"/>}
       >
         Export
-      </Button>
+      </Button> */}
       <Button variant="text"  endIcon={ <Iconify icon="vscode-icons:file-type-excel"/>} onClick={handlePrintExcel}>
         Export
       </Button>

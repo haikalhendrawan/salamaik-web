@@ -21,8 +21,6 @@ import { getAmountShort, getReportingMonth } from './utils';
 export default function StandardizationKanwil() {
   const [loading, setLoading] = useState(true);
 
-  const params = new URLSearchParams(useLocation().search);
-
   const {kppnRef, periodRef} = useDictionary();
 
   const {getStandardization, standardization} = useStandardization();
@@ -37,7 +35,7 @@ export default function StandardizationKanwil() {
     setTabValue(newValue);
   };
 
-  const isEvenPeriod = periodRef?.list?.filter((item) => item.id === auth?.period)?.[0]?.evenPeriod || 0;
+  const isEvenPeriod = periodRef?.list?.filter((item) => item.id === auth?.period)?.[0]?.even_period || 0;
 
   const reportingDate = 15;
 
@@ -87,7 +85,7 @@ export default function StandardizationKanwil() {
 
           <Grid item xs={4}>
             <DocumentShort 
-              header='Monitoring Kekurangan' 
+              header='Monitoring Kekurangan Dokumen' 
               subheader={`${unitName}`} 
               image='/image/Other 09.png'
               tabValue={tabValue}

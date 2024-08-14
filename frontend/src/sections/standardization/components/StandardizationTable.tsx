@@ -51,7 +51,7 @@ export default function StandardizationTable({header, modalOpen, kppnTab, cluste
 
   const {auth} = useAuth();
 
-  const isEvenPeriod = periodRef?.list?.filter((item) => item.id === auth?.period)?.[0]?.evenPeriod || 0;
+  const isEvenPeriod = periodRef?.list?.filter((item) => item.id === auth?.period)?.[0]?.even_period || 0;
 
   const tableHeaders = isEvenPeriod === 0 ? TABLE_HEAD.odd : TABLE_HEAD.even;
 

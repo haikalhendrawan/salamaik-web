@@ -8,6 +8,7 @@ import StandardizationTable from './components/StandardizationTable';
 import DocumentShort from './components/DocumentShort';
 import AmountShort from './components/AmountShort';
 import PreviewFileModal from './components/PreviewFileModal';
+import DocumentZip from './components/DocumentZip';
 import useStandardization from './useStandardization';
 import usePreviewFileModal from './usePreviewFileModal';
 import { useAuth } from '../../hooks/useAuth';
@@ -28,7 +29,7 @@ export default function StandardizationKPPN() {
 
   const {open, modalOpen, modalClose, file} = usePreviewFileModal();
 
-  const isEvenPeriod = periodRef?.list?.filter((item) => item.id === auth?.period)?.[0]?.evenPeriod || 0;
+  const isEvenPeriod = periodRef?.list?.filter((item) => item.id === auth?.period)?.[0]?.even_period || 0;
 
   const reportingDate = 15;
 
@@ -76,16 +77,21 @@ export default function StandardizationKPPN() {
 
           <Grid item xs={4}>
             <DocumentShort 
-              header='Monitoring Kekurangan Per KPPN' 
+              header='Monitoring Kekurangan Dokumen' 
               subheader={`${unitName}`} 
-              image='/image/Other 12.png'
+              image='/image/Other 09.png'
               tabValue={tabValue}
             />
           </Grid>
 
-          {/* <Grid item xs={4}>
-            <DocumentShort header='Monitoring Kekurangan' subheader='Seluruh KPPN' image='/image/Other 09.png'/>
-          </Grid> */}
+          <Grid item xs={4}>
+              <DocumentZip  
+                header='Unduh File Bulanan (zip)' 
+                subheader={`${unitName}`} 
+                image='/image/Other 12.png'
+                tabValue={tabValue}
+              />
+          </Grid>
         </Grid>
 
         <Stack direction='column' spacing={4}>
