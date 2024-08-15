@@ -84,6 +84,16 @@ export default function MatrixTable({matrix, matrixStatus, getMatrix}: {matrix: 
       'Ya',
       () => handleReAssignMatrix()
     )
+  };
+
+  const handleClickDelete = () => {
+    openDialog(
+      'Delete Matriks',
+      'Hapus matriks? seluruh catatan yang diisi akan terhapus',
+      'pink',
+      'Ya',
+      () => handleDeleteMatrix()
+    )
   }
 
   const handleDeleteMatrix = async() => {
@@ -237,7 +247,7 @@ export default function MatrixTable({matrix, matrixStatus, getMatrix}: {matrix: 
           ? <Button 
               variant='contained' 
               endIcon={ <Iconify icon="solar:trash-bin-trash-bold-duotone"/>} 
-              onClick={handleDeleteMatrix}
+              onClick={handleClickDelete}
             >
               Delete
             </Button> 

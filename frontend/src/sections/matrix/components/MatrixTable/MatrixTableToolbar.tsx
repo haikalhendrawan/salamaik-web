@@ -67,6 +67,84 @@ export default function MatrixTableToolbar({matrixStatus, selectedKomponen, setS
   const handlePrintPPTX = async () => {
     const ppt = new pptxgen();
     const rowsPerSlide = 2;
+
+    ppt.defineSlideMaster({
+      title: "MASTER_SLIDE",
+      background: { color: "FFFFFF" },
+      objects: [
+        { 
+          line: { 
+            x: 1.12, 
+            y: 0.91, 
+            w: 7, 
+            line: { 
+              color: "005FAC", 
+              width: 0.5 
+            },
+          } 
+        },
+        { 
+          line: { 
+            x: 8.32, 
+            y: 0.91, 
+            w: 1.65, 
+            line: { 
+              color: "FCB813", 
+              width: 0.5 
+            } 
+          } 
+        },
+        { rect: { x: 9.37, y: 5.2, w: 0.37, h: 0.43, fill: { color: "FCB813" } } },
+        {
+          rect: { 
+            x: 7.68, 
+            y: 5.2, 
+            w: 1.5, 
+            h: 0.43, 
+            fill: { color: "005FAC" } 
+          },  
+        },
+        {
+          text: { 
+            text: "Kanwil DJPb Sumatera Barat", 
+            options: { 
+              x: 7.68, 
+              y: 5.2, 
+              w: 1.5, 
+              h: 0.43, 
+              fontSize: 8, 
+              color: "FFFFFF", 
+              align: "center" 
+            } 
+          },
+        },
+        {
+          text: {
+            text: "Permasalahan",
+            options: {
+              x: 1.12,
+              y: 0.21,
+              w: 7.66,
+              h: 0.67,
+              fontFace: "Calibri",
+              fontSize: 28,
+              color: "005FAC",
+              bold: true,  // Set the title text to bold
+              align: "center",
+            },
+          },
+        },
+        { image: { x: 0.21, y: 0.21, w: 0.78, h: 0.73, path: "/logo/kemenkeu.png" } },
+        { image: { x: 9, y: 0.21, w: 0.78, h: 0.73, path: "/logo/djpb.png" } },
+      ],
+      slideNumber: {
+        x: 9.4,
+        y: 5.3,
+        color: "FFFFFF",
+        fontSize: 9,
+      },
+    });
+     
   
     const TABLE_HEAD = [
       'No', 'Komponen Supervisi', 'Hal', 'Permasalahan', 'Rekomendasi', 'Peraturan Terkait', 'UIC'
@@ -90,22 +168,22 @@ export default function MatrixTableToolbar({matrixStatus, selectedKomponen, setS
       ]
     });
   
-    // Split the rows into chunks for each slide
     const chunks = [];
     for (let i = 0; i < dataRows.length; i += rowsPerSlide) {
       chunks.push(dataRows.slice(i, i + rowsPerSlide));
     }
 
-  // Create slides and add the corresponding table data
+
   chunks.forEach((chunk, slideIndex) => {
-    const slide = ppt.addSlide();
+    const slide = ppt.addSlide({ masterName: 'MASTER_SLIDE' });
     const tableData = [headerRow, ...chunk];
 
     const tableOptions = {
-      x: 0.5,
-      y: 0.5,
-      w: 9,
-      border: { pt: 1, color: "FFFFFF" }
+      x: 0.2,
+      y: 1.1,
+      w: 9.5,
+      border: { pt: 1, color: "FFFFFF" },
+      colW: [0.5, 1.1, 2.05, 2.1, 1.9, 1, 0.9] 
     };
 
     slide.addTable(tableData, tableOptions);
@@ -191,7 +269,7 @@ export default function MatrixTableToolbar({matrixStatus, selectedKomponen, setS
   )
 }
 
-// -----------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 async function handlePrintExcel(data: SectionedMatrixType[], kppnName: string, periodName: string) {
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Sheet1');
