@@ -5,6 +5,7 @@ import { Outlet } from 'react-router-dom';
 import {useTheme, styled} from '@mui/material/styles';
 //sections
 import MatrixKPPN from '../sections/matrix/MatrixKPPN';
+import { DialogProvider } from '../hooks/display/useDialog';
 
 // -----------------------------------------------------------------------
 
@@ -16,7 +17,9 @@ export default function MatrixPage() {
 
   return (
     <>
-      <MatrixKPPN/>
+      <DialogProvider>
+        <MatrixKPPN/>
+      </DialogProvider>
     </>
   );
 };

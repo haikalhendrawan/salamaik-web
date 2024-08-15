@@ -4,7 +4,7 @@ import FormControl from '@mui/material/FormControl';
 import Skeleton  from "@mui/material/Skeleton";
 import Box from '@mui/material/Box';
 import styled from '@mui/material/styles/styled';
-import { WsJunctionType } from "../../types";
+import { WsJunctionType, WorksheetType } from "../../types";
 import useSocket from "../../../../hooks/useSocket";
 import useWsJunction from "../../useWsJunction";
 import {useAuth} from "../../../../hooks/useAuth";
@@ -12,6 +12,7 @@ import useSnackbar from "../../../../hooks/display/useSnackbar";
 // ------------------------------------------------------------
 interface CatatanPropsType{
   wsJunction: WsJunctionType | null,
+  wsDetail: WorksheetType | null,
 };
 
 const StyledFormControl = styled(FormControl)(({theme}) => ({
@@ -22,7 +23,7 @@ const StyledFormControl = styled(FormControl)(({theme}) => ({
 }));
 
 // ------------------------------------------------------------
-export default function Catatan({wsJunction}: CatatanPropsType) {
+export default function Catatan({wsJunction, wsDetail}: CatatanPropsType) {
   const [isMounted, setIsMounted] = useState(true);
 
   const initialNoteRef = useRef(wsJunction?.kanwil_note || '');
@@ -36,6 +37,8 @@ export default function Catatan({wsJunction}: CatatanPropsType) {
   const {openSnackbar} = useSnackbar();
 
   const {getWsJunctionKanwil} = useWsJunction();
+
+  const isPastDue = useMemo(() => new Date().getTime() > new Date(wsDetail?.close_period || "").getTime(), [wsDetail]);
 
   const isKanwil = useMemo(() =>{
     return auth?.kppn==='03010';
@@ -90,7 +93,7 @@ export default function Catatan({wsJunction}: CatatanPropsType) {
           maxRows={6}
           fullWidth
           inputProps={{sx: {fontSize: 12, width:'100%', height:'100%'}, spellCheck: false}} 
-          disabled={!isKanwil}
+          disabled={!isKanwil || isPastDue}
         />
       </StyledFormControl>
     </>

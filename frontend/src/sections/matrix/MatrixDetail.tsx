@@ -11,6 +11,7 @@ import useSnackbar from '../../hooks/display/useSnackbar';
 import useAxiosJWT from '../../hooks/useAxiosJWT';
 import { MatrixType, MatrixWithWsJunctionType } from './types';
 import { WorksheetType } from '../worksheet/types';
+import { DialogProvider } from '../../hooks/display/useDialog';
 // ----------------------------------------------------------------------------------
 interface MatrixResponse{
   worksheet: WorksheetType,
@@ -67,10 +68,13 @@ export default function MatrixDetail() {
       </Button>
 
       <MatrixDetailHeader />
-      
-      {!matrix? null :<MatrixTable matrix={matrix} matrixStatus={matrixStatus} getMatrix={getMatrix}/>}
-      
-
+      {!matrix
+        ? null 
+        :<DialogProvider>
+            <MatrixTable matrix={matrix} matrixStatus={matrixStatus} getMatrix={getMatrix}/>
+          </DialogProvider>
+      }
+     
     </Container>
     </>
   )

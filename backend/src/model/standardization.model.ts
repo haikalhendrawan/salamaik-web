@@ -42,6 +42,17 @@ class Standardization{
     }
   }
 
+  async getStandardizationById(junctionId: number){
+    try{
+      const q = "SELECT * FROM standardization_junction WHERE id = $1";
+      const result = await pool.query(q, [junctionId]);
+      return result.rows[0]
+    }
+    catch(err){
+      throw err
+    }
+  }
+
   async addStandardizationJunction(kppnId: number, periodId: number, standardizationId: number, month: string, fileName: string){
     try{
       const q = "INSERT INTO standardization_junction (kppn_id, period_id, standardization_id, month, file) VALUES ($1, $2, $3, $4, $5) RETURNING *";

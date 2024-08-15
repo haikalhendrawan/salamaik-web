@@ -15,6 +15,7 @@ import { WorksheetType } from '../../../worksheet/types';
 import useDictionary from '../../../../hooks/useDictionary';
 import StyledButton from '../../../../components/styledButton';
 import useLoading from '../../../../hooks/display/useLoading';
+import useDialog from '../../../../hooks/display/useDialog';
 // ----------------------------------------------------------------------------------
 interface MatrixResponse{
   worksheet: WorksheetType,
@@ -43,6 +44,8 @@ export default function MatrixTable({matrix, matrixStatus, getMatrix}: {matrix: 
 
   const {openSnackbar} = useSnackbar();
 
+  const {openDialog} = useDialog();
+
   const kppnId = new URLSearchParams(useLocation().search).get("id");
 
   const {subKomponenRef} = useDictionary();
@@ -58,7 +61,7 @@ export default function MatrixTable({matrix, matrixStatus, getMatrix}: {matrix: 
   const handleAssignMatrix = async() => {
     try{
       setIsLoading(true);
-      const response = await axiosJWT.post(`/createMatrix`, {kppnId});
+      await axiosJWT.post(`/createMatrix`, {kppnId});
       await getMatrix();
       setIsLoading(false);
     }catch(err: any){
@@ -73,12 +76,41 @@ export default function MatrixTable({matrix, matrixStatus, getMatrix}: {matrix: 
     }
   };
 
+  const handleClickReassign = () => {
+    openDialog(
+      'Reassign Matriks',
+      'Re-assign matriks?',
+      'warning',
+      'Ya',
+      () => handleReAssignMatrix()
+    )
+  }
+
   const handleDeleteMatrix = async() => {
     try{
       const response = await axiosJWT.post(`/deleteMatrix`, {worksheetId:'6d77aea7-4976-47d7-8ed7-46f25463ba5d'});
       getMatrix();
     }catch(err){
       console.log(err);
+    }
+  };
+
+  const handleReAssignMatrix = async() => {
+    try{
+      setIsLoading(true);
+      const response = await axiosJWT.post(`/reAssignMatrix`, {kppnId: kppnId});
+      await getMatrix();
+      openSnackbar(response.data.message, "success");
+      setIsLoading(false);
+    }catch(err: any){
+      setIsLoading(false);
+      if(err.response){
+        openSnackbar(err.response.data.message, "error");
+      }else{
+        openSnackbar('network error', "error");
+      }
+    }finally{
+      setIsLoading(false);
     }
   };
 
@@ -91,7 +123,6 @@ export default function MatrixTable({matrix, matrixStatus, getMatrix}: {matrix: 
     setOpen(false);
     setSelectedId(null);
   };
-
 
   const tableContentNoMatrix =  (
     <TableRow hover key={0} tabIndex={-1}>
@@ -189,10 +220,36 @@ export default function MatrixTable({matrix, matrixStatus, getMatrix}: {matrix: 
           </TableContainer>
         </Card>
       </Grow>
-      
-      <Button onClick={handleDeleteMatrix}>Delete</Button>
+      {
+          matrixStatus === 1 
+          ? <Button 
+              variant='contained' 
+              color='warning' 
+              endIcon={ <Iconify icon="solar:plain-bold-duotone"/>} 
+              onClick={handleClickReassign}
+              sx={{mr:2}}>
+              ReAssign Matrix
+            </Button> 
+          : null
+      }
+      {
+          matrixStatus === 1 
+          ? <Button 
+              variant='contained' 
+              endIcon={ <Iconify icon="solar:trash-bin-trash-bold-duotone"/>} 
+              onClick={handleDeleteMatrix}
+            >
+              Delete
+            </Button> 
+          : null
+      }
 
-      <MatrixTableEditModal modalOpen={open} modalClose={handleClose} matrix={selectedMatrix} getMatrix={getMatrix}/>
+      <MatrixTableEditModal 
+        modalOpen={open} 
+        modalClose={handleClose} 
+        matrix={selectedMatrix} 
+        getMatrix={getMatrix}
+      />
     </>
   )
 

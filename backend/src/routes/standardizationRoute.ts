@@ -5,11 +5,11 @@ import authorize from "../middleware/authorize";
 
 const router = express.Router(); 
 
-router.get("/getAllStandardization", authenticate,  standardizationController.getAllStandardization);
-router.get("/getStandardizationJunction", authenticate, standardizationController.getStandardizationJunction);
-router.get("/getStdWorksheet/:kppn", authenticate, authorize([99, 1, 2, 3, 4]), standardizationController.getStdWorksheet);
-router.post("/getStdFilePerMonthKPPN", authenticate, authorize([99, 1, 2, 3, 4]), standardizationController.getStdFilePerMonthKPPN);
-router.post("/addStandardizationJunction", authenticate, standardizationController.addStandardizationJunction);
-router.post("/deleteStandardizationJunction", authenticate, standardizationController.deleteStandardizationJunction);
+router.get("/getAllStandardization", authenticate, authorize([99, 4, 3, 2, 1]), standardizationController.getAllStandardization);
+router.get("/getStandardizationJunction", authenticate, authorize([99, 4, 3, 2, 1]), standardizationController.getStandardizationJunction);
+router.get("/getStdWorksheet/:kppn", authenticate, authorize([99, 4, 3, 2, 1]), standardizationController.getStdWorksheet);
+router.post("/getStdFilePerMonthKPPN", authenticate, authorize([99, 4, 3, 2, 1]), standardizationController.getStdFilePerMonthKPPN);
+router.post("/addStandardizationJunction", authenticate, authorize([99, 4, 3, 2, 1]), standardizationController.addStandardizationJunction);
+router.post("/deleteStandardizationJunction", authenticate, authorize([99, 4, 3, 2, 1]), standardizationController.deleteStandardizationJunction);
 
 export default router

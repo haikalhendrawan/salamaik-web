@@ -23,6 +23,7 @@ interface ScorePerKomponenType{
   komponenBobot: number,
   wsJunction: WorksheetJunctionType[],
 }
+
 interface WsJunctionScoreAndProgress{
   scoreByKanwil : number,
   scoreByKPPN: number,
@@ -96,10 +97,13 @@ const getWsJunctionByKPPN = async(req: Request, res: Response, next: NextFunctio
 
 const getWsJunctionScoreAndProgress = async(req: Request, res: Response, next: NextFunction) => {
   try{
+    const {kppn} = req.payload;
     const {kppnId, period} = req.body;
 
+    const allowedKPPN = kppn?.length===5?kppnId:kppn;
+
     // query #1 get worksheet Id
-    const mainWorksheet = await worksheet.getWorksheetByPeriodAndKPPN(period, kppnId);
+    const mainWorksheet = await worksheet.getWorksheetByPeriodAndKPPN(period, allowedKPPN);
 
     if(mainWorksheet.length === 0) {
       throw new ErrorDetail(404, 'Worksheet not found');

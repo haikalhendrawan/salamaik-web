@@ -2,13 +2,15 @@ import { ReactNode, useState, createContext, useContext } from 'react';
 import useAxiosJWT from '../../hooks/useAxiosJWT';
 // import useLoading from '../../hooks/display/useLoading';
 import useSnackbar from '../../hooks/display/useSnackbar';
-import { WsJunctionType } from './types';
+import { WorksheetType, WsJunctionType } from './types';
 //------------------------------------------------------------------
 interface WsJunctionContextType{
   wsJunction: WsJunctionType[] | [],
+  wsDetail: WorksheetType | null,
   setWsJunction: React.Dispatch<React.SetStateAction<[] | WsJunctionType[]>>, 
   getWsJunctionKanwil: (kppnId: string) => Promise<void>,
   getWsJunctionKPPN: () => Promise<void>,
+  getWorksheet : (worksheetId: string) => Promise<void>,
 };
 
 type WsJunctionProviderProps = {
@@ -18,9 +20,11 @@ type WsJunctionProviderProps = {
 //------------------------------------------------------------------
 const WsJunctionContext = createContext<WsJunctionContextType>({
   wsJunction: [],
+  wsDetail: null,
   setWsJunction: () => {}, 
   getWsJunctionKanwil: async() => {},
   getWsJunctionKPPN: async() => {},
+  getWorksheet : async() => {}
 });
 
 const WsJunctionProvider = ({children}: WsJunctionProviderProps) => {
@@ -31,6 +35,8 @@ const WsJunctionProvider = ({children}: WsJunctionProviderProps) => {
   const { openSnackbar } = useSnackbar();
 
   const [wsJunction, setWsJunction] = useState<WsJunctionType[] | []  >([]);
+
+  const [wsDetail, setWsDetail] = useState<WorksheetType | null>(null);
 
   async function getWsJunctionKanwil(kppnId: string) {
     try{
@@ -62,9 +68,23 @@ const WsJunctionProvider = ({children}: WsJunctionProviderProps) => {
     }
   };
 
+  async function getWorksheet(kppnId: string){
+    try{
+      const response = await axiosJWT.get(`/getWorksheetByPeriodAndKPPN/${kppnId}`);
+      setWsDetail(response.data.rows);
+      console.log(response.data.rows);
+    }catch(err: any){
+      setWsDetail(null);
+      if(err.response){
+        openSnackbar(err.response.data.message, "error");
+      }else{
+        openSnackbar(err.message, "error");
+      }
+    }
+  };
 
   return(
-    <WsJunctionContext.Provider value={{wsJunction, setWsJunction, getWsJunctionKanwil, getWsJunctionKPPN}}>
+    <WsJunctionContext.Provider value={{wsJunction, wsDetail, getWorksheet, setWsJunction, getWsJunctionKanwil, getWsJunctionKPPN}}>
       {children}
     </WsJunctionContext.Provider>
   )

@@ -77,12 +77,12 @@ const getStdFilePerMonthKPPN = async (req: Request, res: Response, next: NextFun
   try{
     const {period, kppn} = req.payload;
     const {kppnId, month} = req.body;
+    const allowedKPPN = kppn === '03010'? kppnId: kppn ;
 
     const monthName = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
     const monthString = monthName[month-1];
     const unitAll = await unit.getAllKPPN();
-    const kppnString = unitAll.filter((item) => item.id === kppnId)[0]?.name || '';
-
+    const kppnString = unitAll.filter((item) => item.id === allowedKPPN)[0]?.name || '';
 
     const CLUSTER = [
       'Manajemen Eksternal', 'Penguatan Kapasitas Perbendaharaan', 'Penguatan Manajemen Internal'
@@ -98,7 +98,7 @@ const getStdFilePerMonthKPPN = async (req: Request, res: Response, next: NextFun
 
     archive.pipe(res);
 
-    const fileToAdd = await standardization.getStdFileNameCollection(kppnId, month, period);
+    const fileToAdd = await standardization.getStdFileNameCollection(allowedKPPN, month, period);
 
     fileToAdd.forEach(fileObj => {
       const fileName = `${CLUSTER[fileObj.cluster-1]}/${fileObj.title}/${fileObj.file}`;
@@ -130,10 +130,12 @@ const addStandardizationJunction = async (req: Request, res: Response, next: Nex
     };
 
     try{
+      const {kppn} = req.payload;
       const {kppnId, periodId, standardizationId, month, timeStamp} = req.body;
+      const allowedKPPN = kppn === '03010'? kppnId : kppn;
       const fileExt = sanitizeMimeType(req.file.mimetype);
-      const fileName = `std_${kppnId}_${periodId}${month}${standardizationId}_${timeStamp}.${fileExt}`;
-      const result = await standardization.addStandardizationJunction(kppnId, periodId, standardizationId, month, fileName);
+      const fileName = `std_${allowedKPPN}_${periodId}${month}${standardizationId}_${timeStamp}.${fileExt}`;
+      const result = await standardization.addStandardizationJunction(allowedKPPN, periodId, standardizationId, month, fileName);
       return res.status(200).json({sucess: true, message: 'Add File success', rows: result})
     }catch(err){
       logger.error('Error adding std junction', err)
@@ -146,6 +148,16 @@ const addStandardizationJunction = async (req: Request, res: Response, next: Nex
 const deleteStandardizationJunction = async (req: Request, res: Response, next: NextFunction) => {
   try{
     const {id, fileName} = req.body;
+    const {kppn, role} = req.payload;
+
+    const standardizationJunction = await standardization.getStandardizationById(id);
+    const stdKPPN = standardizationJunction?.kppn_id;
+    const isAuthorized = (stdKPPN === kppn) || role ===(99 || 4);
+
+    if(!isAuthorized){
+      return res.status(401).json({sucess: false, message: 'Unauthorized'})
+    };
+
     const result = await standardization.deleteStandardizationJunction(id);
 
     const filePath = path.join(__dirname,`../uploads/standardization/`, fileName);

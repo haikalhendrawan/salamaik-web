@@ -61,6 +61,16 @@ class User{
     }
   }
 
+  async getUserById(id: string){
+    try{
+      const q = `SELECT * FROM user_ref WHERE id = $1`;
+      const result = await pool.query(q, [id]);
+      return result.rows[0]
+    }catch(err){
+      throw err
+    }
+  }
+
   async addUser(body: AddUserBodyType){
     try{
       const {id, username, name, email, password_hash, picture, period, role, status, kppn, gender} = body;

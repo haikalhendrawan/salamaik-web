@@ -68,7 +68,16 @@ const editUser = async (req: Request, res: Response, next: NextFunction) => {
     if(!id || !username  || !name || !kppn || !email){
       return next(new ErrorDetail(400, 'Required field contain null values'))
     };
-  
+
+    const {kppn: payloadKPPN, role} = req.payload;
+    const targetDetail = await user.getUserById(id);
+    const targetKPPN = targetDetail.kppn;
+    const isAllowed = (targetKPPN === payloadKPPN) || (role===(99 || 4));
+
+    if(!isAllowed){
+      return next(new ErrorDetail(400, 'Unauthorized unit'))
+    };
+    
     const result = await user.editUser(req.body);
     return res.status(200).json({sucess: true, message: 'User has been edited', detail: result})
   }catch(err){
@@ -79,6 +88,15 @@ const editUser = async (req: Request, res: Response, next: NextFunction) => {
 const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
   try{
     const targetID = req.body.id;
+    const {kppn, role} = req.payload;
+    const targetDetail = await user.getUserById(targetID);
+    const targetKPPN = targetDetail.kppn;
+    const isAllowed = (targetKPPN === kppn) || (role===(99 || 4));
+
+    if(!isAllowed){
+      return next(new ErrorDetail(400, 'Unauthorized unit'))
+    };
+
     const result = await user.deleteUser(targetID);
     return res.status(200).json({sucess: true, message: 'Delete user success', detail: result})
   }catch(err){
@@ -88,7 +106,16 @@ const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
 
 const updateStatus = async (req: Request, res: Response, next: NextFunction) => {
   try{
+    const {kppn, role} = req.payload;
     const targetID = req.body.id;
+    const targetDetail = await user.getUserById(targetID);
+    const targetKPPN = targetDetail.kppn;
+    const isAllowed = (targetKPPN === kppn) || (role===(99 || 4));
+
+    if(!isAllowed){
+      return next(new ErrorDetail(400, 'Unauthorized unit'))
+    };
+
     const result = await user.updateStatus(targetID);
     return res.status(200).json({sucess: true, message: 'User has been activated', detail: result})
   }catch(err){

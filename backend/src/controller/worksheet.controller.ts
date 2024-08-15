@@ -39,7 +39,7 @@ const addWorksheet = async(req: Request, res: Response, next: NextFunction) => {
     const { kppnId, startDate, closeDate, openFollowUp, closeFollowUp } = req.body;
     const isValidDate = validateDates(startDate, closeDate, openFollowUp, closeFollowUp);
 
-    if (!isValidDate.success) {
+    if(!isValidDate.success) {
       return res.status(400).json({sucess: false, message: isValidDate.message})
     };
 

@@ -12,7 +12,7 @@ import Kriteria from "./Kriteria";
 import Dokumen from "./Dokumen";
 import Nilai from "./Nilai";
 import Catatan from "./Catatan";
-import { WsJunctionType } from "../../types";
+import { WsJunctionType, WorksheetType } from "../../types";
 import { debounce } from 'lodash';
 
 // ------------------------------------------------------------
@@ -20,6 +20,7 @@ interface WorksheetCardProps {
   modalOpen: () => void,
   modalClose: () => void,
   wsJunction: WsJunctionType | null,
+  wsDetail: WorksheetType | null,
   id?: string
 };
 
@@ -133,15 +134,19 @@ export default function WorksheetCard(props: WorksheetCardProps) {
             </Grid>
 
             <Grid item xs={1.5}>
-              <Dokumen openInstruction={handleOpenInstruction} wsJunction={props.wsJunction} />
+              <Dokumen 
+                openInstruction={handleOpenInstruction} 
+                wsJunction={props.wsJunction} 
+                wsDetail={props.wsDetail}
+              />
             </Grid>
 
             <Grid item xs={1.5}>
-              {renderNilai && <Nilai wsJunction={props.wsJunction} />}
+              {renderNilai && <Nilai wsJunction={props.wsJunction} wsDetail={props.wsDetail}/>}
             </Grid>
 
             <Grid item xs={3}>
-              <Catatan wsJunction={props.wsJunction} />
+              <Catatan wsJunction={props.wsJunction} wsDetail={props.wsDetail}/>
             </Grid>
           </BodyGrid>
 

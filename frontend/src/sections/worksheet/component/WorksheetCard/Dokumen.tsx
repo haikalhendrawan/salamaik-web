@@ -13,7 +13,7 @@ import useAxiosJWT from '../../../../hooks/useAxiosJWT';
 import useSnackbar from '../../../../hooks/display/useSnackbar';
 import useWsJunction from '../../useWsJunction';
 import useSocket from '../../../../hooks/useSocket';
-import { WsJunctionType } from '../../types';
+import { WsJunctionType, WorksheetType } from '../../types';
 // ----------------------------------------------------------------------------
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -29,11 +29,12 @@ const VisuallyHiddenInput = styled('input')({
 
 interface DokumenProps{
   openInstruction: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
-  wsJunction: WsJunctionType | null
+  wsJunction: WsJunctionType | null,
+  wsDetail: WorksheetType | null,
 }
 
 // ----------------------------------------------------------------------------
-export default function Dokumen({openInstruction, wsJunction}: DokumenProps){
+export default function Dokumen({openInstruction, wsJunction, wsDetail}: DokumenProps){
   const [isMounted, setIsMounted] = useState(true);
 
   const theme = useTheme();
@@ -49,6 +50,8 @@ export default function Dokumen({openInstruction, wsJunction}: DokumenProps){
   const {openSnackbar} = useSnackbar();
 
   const {socket} = useSocket();
+
+  const isPastDue = useMemo(() => new Date().getTime() > new Date(wsDetail?.close_period || "").getTime(), [wsDetail]);
 
   const handleOpenExampleFile = useCallback((option: number) => {
     const baseDir = "checklist";
@@ -208,6 +211,7 @@ export default function Dokumen({openInstruction, wsJunction}: DokumenProps){
                       variant='contained' 
                       size='small' 
                       color='secondary'
+                      disabled={isPastDue}
                       onClick={() => handleOpenWsJunctionFile(1)}
                     >
                       <Iconify icon="solar:file-bold-duotone"/>
@@ -227,6 +231,7 @@ export default function Dokumen({openInstruction, wsJunction}: DokumenProps){
                       variant='contained' 
                       size='small' 
                       color='secondary'
+                      disabled={isPastDue}
                       onClick={() => handleOpenWsJunctionFile(2)}
                     >
                       <Iconify icon="solar:file-bold-duotone"/>
@@ -246,6 +251,7 @@ export default function Dokumen({openInstruction, wsJunction}: DokumenProps){
                       variant='contained' 
                       size='small' 
                       color='secondary'
+                      disabled={isPastDue}
                       onClick={() => handleOpenWsJunctionFile(3)}
                     >
                       <Iconify icon="solar:file-bold-duotone"/>
@@ -259,7 +265,7 @@ export default function Dokumen({openInstruction, wsJunction}: DokumenProps){
               !isMaxFile
               ?
                 <Tooltip title='Add file'>
-                  <StyledButton variant='contained' component='label' aria-label="delete" size='small' color='white'>
+                  <StyledButton variant='contained' component='label' aria-label="delete" size='small' color='white' disabled={isPastDue}>
                     <Iconify 
                       icon="solar:add-circle-bold"
                       color={theme.palette.grey[500]}

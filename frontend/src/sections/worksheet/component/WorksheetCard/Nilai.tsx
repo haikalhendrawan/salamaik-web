@@ -10,7 +10,7 @@ import StyledButton from '../../../../components/styledButton/StyledButton';
 import Iconify from '../../../../components/iconify/Iconify';
 import { TextField } from '@mui/material';
 import styled  from '@mui/material/styles/styled';
-import { WsJunctionType } from "../../types";
+import { WorksheetType, WsJunctionType } from "../../types";
 import useSocket from "../../../../hooks/useSocket";
 import useWsJunction from "../../useWsJunction";
 import {useAuth} from "../../../../hooks/useAuth";
@@ -22,6 +22,7 @@ import { StandardizationType } from '../../../standardization/types';
 // ------------------------------------------------------------
 interface NilaiPropsType{
   wsJunction: WsJunctionType | null,
+  wsDetail: WorksheetType | null,
 };
 
 const StyledFormControl = styled(FormControl)(({}) => ({
@@ -56,7 +57,7 @@ const StyledNumberTextField = styled(TextField)(({}) => ({
 }));
 
 // ------------------------------------------------------------
-export default function Nilai({wsJunction}: NilaiPropsType) {
+export default function Nilai({wsJunction, wsDetail}: NilaiPropsType) {
   const [isMounted, setIsMounted] = useState(true);
 
   const [stdScoreKanwil, setStdScoreKanwil] = useState(wsJunction?.kanwil_score || '');
@@ -73,6 +74,8 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
   const {getWsJunctionKanwil} = useWsJunction();
 
   const {openSnackbar} = useSnackbar();
+
+  const isPastDue = useMemo(() => new Date().getTime() > new Date(wsDetail?.close_period || "").getTime(), [wsDetail]);
 
   const isKanwil = useMemo(() =>{
     return auth?.kppn==='03010';
@@ -316,7 +319,7 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
                   type="text"
                   onChange={(e) => setStdScoreKPPN(e.target.value)}
                   onBlur={(e) => handleChangeKPPNScoreStd(e)}
-                  disabled={isKanwil}
+                  disabled={isKanwil || isPastDue}
                   value={stdScoreKPPN}
                 />
                 <Tooltip title='Ambil nilai standardisasi'>
@@ -341,7 +344,7 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
                 value={wsJunction?.kppn_score !== null ? String(wsJunction?.kppn_score) : ''}
                 onChange={(e) => handleChangeKPPNScore(e.target.value as string)}
                 size='small' 
-                disabled={isKanwil}
+                disabled={isKanwil || isPastDue}
               >
                 {opsiSelection}
                 <StyledMenuItem key={null} value={''}>{null}</StyledMenuItem>
@@ -362,7 +365,7 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
                   type="text"
                   onChange={(e) => setStdScoreKanwil(e.target.value)}
                   onBlur={(e) => handleChangeKanwilScoreStd(e)}
-                  disabled={!isKanwil}
+                  disabled={!isKanwil || isPastDue}
                   value={stdScoreKanwil}
                 />
                 <Tooltip title='Ambil nilai standardisasi'>
@@ -387,7 +390,7 @@ export default function Nilai({wsJunction}: NilaiPropsType) {
                 value={wsJunction?.kanwil_score !== null ? String(wsJunction?.kanwil_score) : ''} 
                 onChange={(e: any) => handleChangeKanwilScore(e.target.value as string)}
                 size='small' 
-                disabled={!isKanwil}
+                disabled={!isKanwil || isPastDue}
               >
                 {opsiSelection}
                 <StyledMenuItem key={null} value={''}>{null}</StyledMenuItem>

@@ -45,7 +45,7 @@ const SELECT_KPPN: {[key: string]: string} = {
 // ----------------------------------------------------------------------
 
 export default function WorksheetKPPN() {
-  const { wsJunction, getWsJunctionKanwil } = useWsJunction();
+  const { wsJunction, getWsJunctionKanwil, wsDetail, getWorksheet } = useWsJunction();
 
   const { subKomponenRef } = useDictionary();
 
@@ -69,6 +69,7 @@ export default function WorksheetKPPN() {
 
   useEffect(() => {
     getWsJunctionKanwil(id);
+    getWorksheet(id);
     setIsLoading(false);
   }, []);
 
@@ -108,6 +109,7 @@ export default function WorksheetKPPN() {
               <WorksheetCard 
                 key={index}
                 wsJunction={item}
+                wsDetail={wsDetail}
                 modalOpen={modalOpen}
                 modalClose={modalClose}
                 id={"card"+ item.checklist_id.toString()}
