@@ -10,3 +10,5 @@ export  const passwordSchema =  z
                                   passwordRegex,
                                   'Minimum 8 characters, at least one letter and one number'
                                 );
+
+export const emailSchema = z.string().email('Invalid email');

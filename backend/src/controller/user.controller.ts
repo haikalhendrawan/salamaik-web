@@ -4,13 +4,20 @@ import ErrorDetail from '../model/error.model';
 import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from 'uuid';
 import { passwordSchema } from '../utils/schema';
+import period from '../model/period.model';
 // ------------------------------------------------------
 const getUser = async (req: Request, res: Response, next: NextFunction) => {
   try{
     const role = req.payload.role;
     const kppn = req.payload.kppn;
+    const isAdminKanwil = role === 4 || role === 99; // filter role user biasa di middleware
+    const isSuperAdmin = role === 99;
 
-    const result = role===4 || role===99 ? await user.getAllUser(): await user.getUserKPPN(kppn);
+    const result = isAdminKanwil 
+                    ? isSuperAdmin 
+                      ?await user.getAllUser()
+                      : await user.getAllUserWtAdmin()
+                    :await user.getUserKPPN(kppn);
     return res.status(200).json({sucess: true, message: 'Get user success', rows: result})
   }catch(err){
     next(err)
@@ -39,7 +46,8 @@ const addUser = async (req: Request, res: Response, next: NextFunction) => {
     const picture = gender===0?'default-male.png':'default-female.png';
     const role = kppn.length===5? 3 : 1;
     const status = 0;
-    const period = 0;
+    const allPeriod = await period.getAllPeriod();
+    const currPeriod = allPeriod[allPeriod?.length-1]?.id;
 
     const userBody = {
       id,
@@ -48,7 +56,7 @@ const addUser = async (req: Request, res: Response, next: NextFunction) => {
       email,
       password_hash,
       picture,
-      period,
+      period: currPeriod,
       role,
       status,
       kppn,
@@ -67,6 +75,10 @@ const editUser = async (req: Request, res: Response, next: NextFunction) => {
     const { id, username, name, email, kppn, gender} = req.body;
     if(!id || !username  || !name || !kppn || !email){
       return next(new ErrorDetail(400, 'Required field contain null values'))
+    };
+
+    if(username.length !== 18){
+      throw new ErrorDetail(400, 'NIP must be 18 digits')
     };
 
     const {kppn: payloadKPPN, role} = req.payload;
@@ -125,7 +137,7 @@ const updateStatus = async (req: Request, res: Response, next: NextFunction) => 
 
 const updateRole = async (req: Request, res: Response, next: NextFunction) => {
   try{
-    const { oldRole, newRole, adminRole, targetId} = req.body;
+    const {oldRole, newRole, adminRole, targetId} = req.body;
 
     if(oldRole === newRole){
       return res.status(200).json({sucess: true, message: 'Role is not changed'})

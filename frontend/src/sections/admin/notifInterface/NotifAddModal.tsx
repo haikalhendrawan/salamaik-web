@@ -84,7 +84,7 @@ export default function NotifAddModal({modalOpen, modalClose, addNotif}: NotifAd
     await addNotif(value.title, value.message, value.categories);
 
     return setValue({ title: '', message: '', categories: 0})
-  }
+  };
 
   // ----------------------------------------------------------------------------------------
   return(

@@ -1,6 +1,5 @@
 import { Helmet } from 'react-helmet-async';
 import { Link as RouterLink } from 'react-router-dom';
-import { useState } from 'react';
 // @mui
 import { styled } from '@mui/material/styles';
 import { Container, Stack, Typography, Box, Button } from '@mui/material';
@@ -37,7 +36,7 @@ export default function Page403() {
 
           <Box
             component="img"
-            src="illustration_404.svg"
+            src="/illustration_404.svg"
             sx={{ height: 260, mx: 'auto', my: { xs: 5, sm: 10 } }}
           />
 

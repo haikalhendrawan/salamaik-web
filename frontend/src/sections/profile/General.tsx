@@ -149,7 +149,18 @@ export default function General(){
       setIsLoading(false);
     }catch(err: any){
       setIsLoading(false);
-      openSnackbar(`Update profile failed, error: ${err.response.data.message}`, "error");
+      setValue({
+        id: auth?.id || '',
+        username: auth?.username || '',
+        name: auth?.name || '',
+        email: auth?.email || '',
+        picture: auth?.picture || '',
+        kppn: auth?.kppn || '',
+        role: auth?.role || 0,
+        period: auth?.period || 0,
+        status: auth?.status || 0
+      });
+      openSnackbar(`Update profile failed, error: ${err?.response?.data?.message}`, "error");
     }finally{
       setIsLoading(false);
     }

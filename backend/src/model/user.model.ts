@@ -61,6 +61,18 @@ class User{
     }
   }
 
+  async getAllUserWtAdmin(){
+    try{
+      const q = ` SELECT id, username, name, email, picture, period, role, status, kppn, gender 
+                  FROM user_ref
+                  WHERE role != 99`;
+      const result = await pool.query(q);
+      return result.rows;
+    }catch(err){
+      throw err;
+    }
+  }
+
   async getUserById(id: string){
     try{
       const q = `SELECT * FROM user_ref WHERE id = $1`;

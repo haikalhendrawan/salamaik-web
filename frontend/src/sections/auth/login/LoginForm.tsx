@@ -73,7 +73,7 @@ export default function LoginForm() {
     <div>
       <form onSubmit={handleSubmit}>
         <Stack spacing={3}>
-          <TextField name="username" label="Username" onChange={handleChange} value={value.username}/>
+          <TextField name="username" label="Username (NIP)" onChange={handleChange} value={value.username}/>
 
           <TextField
             name="password"

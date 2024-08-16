@@ -41,7 +41,7 @@ export default function PembinaanPeriod({header, open, close}: PembinaanPeriodPr
 
               <Grid item xs={8} key={1}>
                 <Box sx={{justifyContent:'center'}} dir="ltr" >
-                  <img src='/image/Other 15.png' style={{height:'200px', margin: 'auto', marginTop: -50, marginLeft: 30}} />
+                  <img src='/image/calendar_front.png' style={{height:'200px', margin: 'auto', marginTop: -50, marginLeft: 30}} />
                 </Box>
               </Grid>
             </Grid>

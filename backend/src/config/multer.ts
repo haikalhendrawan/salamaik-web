@@ -24,7 +24,7 @@ const fileFilter = (req: any, file: any, callback: any) => {
 }; 
 
 const limit = {
-  fileSize: 12582912 //12 mb
+  fileSize: 2097152 //2 mb
 };
 
 const uploadPP = multer({storage:storage, limits:limit, fileFilter:fileFilter}).single('picture');
@@ -60,7 +60,7 @@ const checklistFileFilter = (req: any, file: any, callback: any) => {
 };
 
 const checklistFileLimit = {
-  fileSize: 12582912 //12 mb
+  fileSize: 5242880 //5 mb
 };
 
 const uploadChecklistFile = multer({
@@ -101,7 +101,7 @@ const stdFileFilter = (req: any, file: any, callback: any) => {
 };
 
 const stdFileLimit = {
-  fileSize: 12582912
+  fileSize: 5242880 //5 mb
 };
 
 const uploadStdFile = multer({
@@ -142,7 +142,7 @@ const wsJunctionFileFilter = (req: any, file: any, callback: any) => {
 };
 
 const wsJunctionFileLimit = {
-  fileSize: 31457280
+  fileSize: 5242880 //5 mb
 };
 
 const uploadWsJunctionFile = multer({

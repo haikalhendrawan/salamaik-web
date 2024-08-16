@@ -75,7 +75,7 @@ export default function RegisterSuccess({}: RegisterSuccessPropsType) {
           Your account have been registered
         </Typography>
         <Typography gutterBottom>
-          Please contact admin kppn to activate the account.
+          Please contact unit admin to activate the account.
         </Typography>
 
 

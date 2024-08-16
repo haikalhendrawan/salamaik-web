@@ -16,7 +16,7 @@ import { useTheme } from '@mui/material/styles';
 import ProfileTab from '../sections/profile/ProfileTab';
 import General from '../sections/profile/General';
 import Security from '../sections/profile/Security';
-import Stats from '../sections/profile/Stats';
+// import Stats from '../sections/profile/Stats';
 // ----------------------------------------------------
 export default function ProfilePage(){
   const theme = useTheme();
@@ -32,7 +32,7 @@ export default function ProfilePage(){
   const SELECT_SECTION: JSX.Element[] = [
     <General />,
     <Security />,
-    <Stats />
+    // <Stats />
   ];
 
   return (

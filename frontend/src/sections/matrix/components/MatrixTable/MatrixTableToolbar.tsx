@@ -74,23 +74,25 @@ export default function MatrixTableToolbar({matrixStatus, selectedKomponen, setS
       objects: [
         { 
           line: { 
-            x: 1.12, 
-            y: 0.91, 
-            w: 7, 
+            x: 1, 
+            y: 1, 
+            w: 6.9,
+            h:0, 
             line: { 
               color: "005FAC", 
-              width: 0.5 
+              width: 6 
             },
           } 
         },
         { 
           line: { 
-            x: 8.32, 
-            y: 0.91, 
-            w: 1.65, 
+            x: 8, 
+            y: 1, 
+            w: 0.7,
+            h:0,
             line: { 
               color: "FCB813", 
-              width: 0.5 
+              width: 6 
             } 
           } 
         },

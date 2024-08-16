@@ -180,7 +180,11 @@ const getWsJunctionScoreAllPeriodSingleKPPN = async(req: Request, res: Response,
     const result = await Promise.all(
           allPeriod.map(async (period) => {
             const mainWorksheet = await worksheet.getWorksheetByPeriodAndKPPN(period.id, kppn);
-            return getScoreProgressResponseBody(mainWorksheet);
+            const scoreProgress = await getScoreProgressResponseBody(mainWorksheet);
+            return {
+              ...period,
+              ...scoreProgress
+            }
           })
         );
     

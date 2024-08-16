@@ -12,6 +12,7 @@ import useAxiosJWT from '../../../hooks/useAxiosJWT';
 import useLoading from '../../../hooks/display/useLoading';
 import useSnackbar from '../../../hooks/display/useSnackbar';
 import useUser from './useUser';
+import {useAuth} from '../../../hooks/useAuth';
 import { z } from 'zod';
 // --------------------------------------------------------------------------------------------
 const style = {
@@ -94,6 +95,10 @@ export default function UserRefAddModal({modalOpen, modalClose}: UserRefAddModal
 
     const [showPassword, setShowPassword] = useState<boolean>(false); 
 
+    const {auth} = useAuth();
+
+    const isAdminKanwil = auth?.role === (4 || 99);
+
     const [value, setValue] = useState<ValueType>({
       username: "", 
       name: "", 
@@ -102,6 +107,8 @@ export default function UserRefAddModal({modalOpen, modalClose}: UserRefAddModal
       kppn: "", 
       gender: 0
     });
+
+    const isSameKPPN = auth?.kppn === value?.kppn;
 
     const [error, setError] = useState<ErrorType>({
       username: false, 
@@ -150,6 +157,10 @@ export default function UserRefAddModal({modalOpen, modalClose}: UserRefAddModal
           return
         };
 
+        if(!isAdminKanwil && !isSameKPPN){
+          return openSnackbar('Pilihan KPPN Invalid', 'error');
+        };
+
         const response = await axiosJWT.post("/addUser", value);
         openSnackbar(response.data.message, "success");
         getUser();
@@ -167,7 +178,7 @@ export default function UserRefAddModal({modalOpen, modalClose}: UserRefAddModal
       }finally{
         setIsLoading(false);
       }
-    }
+    };
  
     // ----------------------------------------------------------------------------------------
     return(

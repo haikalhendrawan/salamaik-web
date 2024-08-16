@@ -16,7 +16,7 @@ import useLoading from "../../hooks/display/useLoading";
 import useSnackbar from "../../hooks/display/useSnackbar";
 import useDictionary from "../../hooks/useDictionary";
 import { useAuth } from "../../hooks/useAuth";
-import { KPPNScoreProgressResponseType, WsJunctionScoreAndProgress, HistoricalScoreProgressType } from "./types";
+import { KPPNScoreProgressResponseType, WsJunctionScoreAndProgress, HistoricalScoreProgressKPPNType } from "./types";
 import { WorksheetType } from "../worksheet/types";
 // -----------------------------------------------------------------------
 interface FindingsWithChecklist{
@@ -44,6 +44,8 @@ interface FindingsWithChecklist{
 export default function KPPNView(){
   const theme = useTheme();
 
+  const [isMounted, setIsMounted] = useState(false);
+
   const axiosJWT = useAxiosJWT();
 
   const {setIsLoading} = useLoading();
@@ -60,7 +62,7 @@ export default function KPPNView(){
 
   const [kppnScoreProgress, setKPPNScoreProgress] = useState<WsJunctionScoreAndProgress | null>(null);
 
-  const [historicalScore, setHistoricalScore] = useState<WsJunctionScoreAndProgress[] | []>([]);
+  const [historicalScore, setHistoricalScore] = useState<HistoricalScoreProgressKPPNType[] | []>([]);
 
   const [findingsData, setFindingsData] = useState<FindingsWithChecklist[]>([]);
 
@@ -99,7 +101,6 @@ export default function KPPNView(){
       setIsLoading(true);
       const response3 = await axiosJWT.get('/getAllFindingsByKPPN');
       setFindingsData(response3.data.rows);
-      console.log(response3.data.rows);
       setIsLoading(false);
     }catch(err:any){
       setIsLoading(false);
@@ -128,6 +129,7 @@ export default function KPPNView(){
     getHistorical();
     getFindings();
     getWorksheet();
+    setIsMounted(true);
 
   }, []);
 
@@ -141,12 +143,16 @@ export default function KPPNView(){
   const openPeriod = worksheet?.open_period || 0;
   const closePeriod = worksheet?.close_period || 0;
 
-  const last4Period = historicalScore?.slice(-4);
-  const last4PeriodString = last4Period?.map(item =>  ""); 
+  const currentPeriodIndex = periodRef?.list?.findIndex((item) => item.id === auth?.period) || 0;
+  const startIndex4 = Math.max(0, currentPeriodIndex - 3); 
+  const last4Period = historicalScore?.slice(startIndex4, currentPeriodIndex+1);
+  const last4PeriodString = last4Period?.map(item => item?.name?.replace("Semester", "Smt") || ""); 
   const avgScoreLast4Period = last4Period?.map(item => item.scoreByKanwil.toFixed(2)); // [9,2] , [9.5], [9.6]
 
   const komponenRefStringArray = komponenRef?.map((item) => item.alias) || [];
-  const last2Period = periodRef?.list?.slice(-3, -1) || [];
+
+  const startIndex2 = Math.max(0, currentPeriodIndex - 2); 
+  const last2Period = periodRef?.list?.slice(startIndex2, currentPeriodIndex);
 
   const last2PeriodFindings = last2Period?.map((item) => {
     const findingsPerKomponen = komponenRef?.map((k) => {
@@ -161,7 +167,7 @@ export default function KPPNView(){
     }
   }) || [];
 
-  if(findingsData.length===0 || kppnScoreProgress===null || historicalScore.length===0){
+  if(!isMounted){
     return( 
       <>
         <Grid item xs={12} md={4}>

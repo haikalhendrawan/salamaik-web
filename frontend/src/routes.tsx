@@ -102,6 +102,11 @@ export default function Router() {
       <Route path="/reference" element={<RequireAuthLayout allowedRoles={[2, 4, 99]}/> }>
         <Route index element={<Navigate to="user"/>} />
         <Route path="user" element={<UserRefPage />} />
+      </Route>
+    </Route>
+
+    <Route element={<PersistLogin/>}>
+      <Route path="/reference" element={<RequireAuthLayout allowedRoles={[4, 99]}/> }>
         <Route path='worksheet' element={<WorksheetRefPage />} />
       </Route>
     </Route>

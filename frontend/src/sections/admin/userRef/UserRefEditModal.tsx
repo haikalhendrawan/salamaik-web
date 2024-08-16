@@ -118,7 +118,7 @@ export default function UserRefEditModal({editId, users, modalOpen, modalClose}:
       };
 
       if(auth.role===4){
-        return roleRef.list.filter((row) => row.id<4 )
+        return roleRef.list.filter((row) => row.id!==99 )
       };
 
       return roleRef.list

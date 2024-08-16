@@ -57,7 +57,7 @@ function LinearProgressWithLabel(props : LinearProgressWithLabelProps) {
         <Typography variant="body3" sx={{mb:-1, fontSize:12}}>{props.text}</Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', m:0 }}>
           <Box sx={{ width: '100%', mr: 1 }}>
-            <LinearProgress variant="determinate" {...props} sx={{borderRadius:'12px'}} />
+            <LinearProgress variant="buffer" {...props} sx={{borderRadius:'12px'}} valueBuffer={props.value}/>
           </Box>
           <Box sx={{ minWidth: 40 }}>
             <Typography variant="body2" color="text.secondary" noWrap>

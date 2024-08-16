@@ -42,17 +42,17 @@ export default function ProfileTab({tabValue, setTabValue}: ProfileTabProps){
         <Tab 
           icon={<Iconify icon="solar:key-bold-duotone" />} 
           iconPosition="start" 
-          label="Security" 
+          label="Security"  
           value={1} 
           disableRipple
         />
-        <Tab 
+        {/* <Tab 
           icon={<Iconify icon="solar:dumbbell-large-minimalistic-bold-duotone" />} 
           iconPosition="start" 
           label="Stats" 
           value={2} 
           disableRipple
-          />
+          /> */}
       </Tabs>
     </Box>
   )

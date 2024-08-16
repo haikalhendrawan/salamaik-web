@@ -119,13 +119,17 @@ export default function KanwilView(){
   const avgScoreByKanwil = kppnScoreProgress?.reduce((a, c) => (a + getScoreKPPN(true, c.id, kppnScoreProgress)), 0) / kppnScoreProgress?.length;
   const avgScoreByKPPN = kppnScoreProgress?.reduce((a, c) => (a + getScoreKPPN(false, c.id, kppnScoreProgress)), 0) / kppnScoreProgress?.length;
 
-  const last4Period = historicalScore?.slice(-4);
+  const currentPeriodIndex = periodRef?.list?.findIndex((item) => item.id === auth?.period) || 0;
+  const startIndex4 = Math.max(0, currentPeriodIndex - 3); 
+  const last4Period = historicalScore?.slice(startIndex4, currentPeriodIndex+1);
   const last4PeriodString = last4Period.map(item => item.name.replace("Semester", "Smt") || ""); 
   const Last4PeriodScorePerKPPN = last4Period.map(item => item.kppn.map(k => k.scoreProgressDetail.scoreByKanwil || 0)); // [[..6],[...6],...]
   const avgScoreLast4Period = Last4PeriodScorePerKPPN.map((item) => (item.reduce((a, c) => (a + c), 0) / item.length).toFixed(2)); // [9,2] , [9.5], [9.6]
 
   const komponenRefStringArray = komponenRef?.map((item) => item.alias) || [];
-  const last2Period = periodRef?.list?.slice(-3, -1);
+
+  const startIndex2 = Math.max(0, currentPeriodIndex - 2); 
+  const last2Period = periodRef?.list?.slice(startIndex2, currentPeriodIndex);
 
   const last2PeriodFindings = last2Period?.map((item) => {
     const findingsPerKomponen = komponenRef?.map((k) => {

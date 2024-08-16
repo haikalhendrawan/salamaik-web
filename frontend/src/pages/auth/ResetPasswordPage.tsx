@@ -21,7 +21,8 @@ const StyledSection = styled('div')(({ theme }) => ({
   flexDirection: 'column',
   justifyContent: 'center',
   boxShadow: theme.customShadows.card,
-  backgroundColor: theme.palette.primary.main
+  backgroundImage: `url('/image/line-scenery.png')`,
+  backgroundSize: 'cover',
 }));
 
 const StyledContent = styled('div')(({ theme }) => ({
@@ -118,9 +119,9 @@ export default function ResetPasswordPage() {
 
             {SECTION[view]}
 
-            <Stack direction="column" justifyContent="center" alignItems="center" spacing={0} sx={{bottom:10, position:'fixed', width:'38%'}}>
-              <Typography variant='body2'>Copyright © 2024 Kanwil DJPb Prov Sumbar</Typography>
-            </Stack>
+            <div style={{width: 480, textAlign:'center', position:'fixed', bottom: 0, margin: 'auto', marginBottom: 10}}>
+              <Typography variant='body2' color="text.secondary">Copyright © 2024 Kanwil DJPb Prov Sumbar</Typography>
+            </div>
           </StyledContent>
         </Container>
       </StyledRoot>

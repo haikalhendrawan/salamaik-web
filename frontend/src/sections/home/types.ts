@@ -35,3 +35,18 @@ export interface HistoricalScoreProgressType{
   tahun: number;
   kppn: KPPNScoreProgressResponseType[]
 };
+
+export interface HistoricalScoreProgressKPPNType{
+  id: number;
+  name: string; 
+  even_period: 0;
+  semester: number;
+  tahun: number;
+  scoreByKanwil : number,
+  scoreByKPPN: number,
+  isFinal: boolean,
+  totalChecklist: number,
+  totalProgressKanwil: number,
+  totalProgressKPPN: number,
+  scorePerKomponen: ScorePerKomponenType[],
+};
