@@ -8,6 +8,7 @@ import useSnackbar from '../../../../hooks/display/useSnackbar';
 import useLoading from '../../../../hooks/display/useLoading';
 import useDictionary from '../../../../hooks/useDictionary';
 import useAxiosJWT from '../../../../hooks/useAxiosJWT';
+import { PeriodType } from '../../../../hooks/useDictionary';
 // -------------------------------------------------------------------------------------------
 const style = {
   position: 'absolute',
@@ -32,14 +33,6 @@ const FormDataContainer = styled(Box)(({theme}) => ({
   gap:theme.spacing(3)
 }));
 
-interface PeriodType{
-  id: number;
-  name: string; 
-  evenPeriod: 0;
-  semester: number;
-  tahun: number
-};
-
 interface PeriodRefModalProps {
   modalOpen: boolean,
   modalClose: () => void,
@@ -62,7 +55,7 @@ export default function PeriodRefModal({modalOpen, modalClose, addState, editID,
   const [addValue, setAddValue] = useState<PeriodType>({
     id: 0,
     name: '',
-    evenPeriod: 0,
+    even_period: 0,
     semester: 1,
     tahun: new Date().getFullYear(),
   });
@@ -102,7 +95,7 @@ export default function PeriodRefModal({modalOpen, modalClose, addState, editID,
     setAddValue({
       id: 0,
       name: '',
-      evenPeriod: 0,
+      even_period: 0,
       semester: 1,
       tahun: new Date().getFullYear(),
     })
@@ -111,7 +104,7 @@ export default function PeriodRefModal({modalOpen, modalClose, addState, editID,
   const [editValue, setEditValue] = useState<PeriodType>({
     id: 0,
     name: '',
-    evenPeriod: 0,
+    even_period: 0,
     semester: 1,
     tahun: new Date().getFullYear(),
   });
@@ -131,7 +124,7 @@ export default function PeriodRefModal({modalOpen, modalClose, addState, editID,
     setEditValue({
       id: data?.filter((row) => row.id===editID)[0].id || 0,
       name: data?.filter((row) => row.id===editID)[0].name || '',
-      evenPeriod: data?.filter((row) => row.id===editID)[0].evenPeriod || 0,
+      even_period: data?.filter((row) => row.id===editID)[0].even_period || 0,
       semester: data?.filter((row) => row.id===editID)[0].semester || 1,
       tahun: data?.filter((row) => row.id===editID)[0].tahun || new Date().getFullYear(),
     })
@@ -142,7 +135,7 @@ export default function PeriodRefModal({modalOpen, modalClose, addState, editID,
       setEditValue({
         id: data?.filter((row) => row.id===editID)[0].id || 0,
         name: data?.filter((row) => row.id===editID)[0].name || '',
-        evenPeriod: data?.filter((row) => row.id===editID)[0].evenPeriod || 0,
+        even_period: data?.filter((row) => row.id===editID)[0].even_period || 0,
         semester: data?.filter((row) => row.id===editID)[0].semester || 1,
         tahun: data?.filter((row) => row.id===editID)[0].tahun || new Date().getFullYear(),
       })

@@ -15,7 +15,7 @@ import RegisterPage from "./pages/auth/RegisterPage";
 import WorksheetPage from "./pages/WorksheetPage";
 import ProfilePage from "./pages/ProfilePage";
 import WorksheetLanding from "./sections/worksheet/WorksheetLanding";
-import WorksheetKPPN from "./sections/worksheet/WorksheetKPPN";
+import WorksheetKanwil from "./sections/worksheet/WorksheetKanwil";
 import Page403 from "./pages/guard/Page403";
 import Page404 from "./pages/guard/Page404";
 import MatrixPage from "./pages/MatrixPage";
@@ -59,7 +59,7 @@ export default function Router() {
         <Route path='standard' element={<StandardizationPage />} />
         <Route path="worksheet" element={<WorksheetPage />}>
           <Route index element={<WorksheetLanding />} />
-          <Route path="kppn" element={<WorksheetKPPN />} />
+          <Route path="kppn" element={<WorksheetKanwil />} />
         </Route>
       </Route>
     </Route>

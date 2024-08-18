@@ -11,7 +11,6 @@ import useLoading from '../../../../hooks/display/useLoading';
 import { useAuth } from '../../../../hooks/useAuth';
 import ExcelJS from 'exceljs';
 import pptxgen from 'pptxgenjs';
-import HTMLTable from '../HTMLTable';
 
 // ---------------------------------------------------------------------------------------------------------
 const StyledDiv = styled('div')(({theme}) => ({
@@ -226,7 +225,6 @@ export default function MatrixTableToolbar({matrixStatus, selectedKomponen, setS
   
   return(
     <>
-      <HTMLTable matrix={matrix}/>
       <StyledDiv>
         <FormControl sx={{height:'45px', width:'30%'}}>
           <InputLabel id="komponen-select-label" sx={{typography:'body2'}}>Komponen</InputLabel>

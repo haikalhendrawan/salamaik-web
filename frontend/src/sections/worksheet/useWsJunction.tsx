@@ -3,6 +3,7 @@ import useAxiosJWT from '../../hooks/useAxiosJWT';
 // import useLoading from '../../hooks/display/useLoading';
 import useSnackbar from '../../hooks/display/useSnackbar';
 import { WorksheetType, WsJunctionType } from './types';
+import { useAuth } from '../../hooks/useAuth';
 //------------------------------------------------------------------
 interface WsJunctionContextType{
   wsJunction: WsJunctionType[] | [],
@@ -38,7 +39,13 @@ const WsJunctionProvider = ({children}: WsJunctionProviderProps) => {
 
   const [wsDetail, setWsDetail] = useState<WorksheetType | null>(null);
 
+  const {auth} = useAuth();
+
   async function getWsJunctionKanwil(kppnId: string) {
+    return auth?.kppn==="03010"?  getWsJunctionForKanwil(kppnId): getWsJunctionKPPN() ;
+  };
+
+  async function getWsJunctionForKanwil(kppnId: string) {
     try{
       // setIsLoading(true);
       const response = await axiosJWT.get(`/getWsJunctionByWorksheetForKanwil?kppn=${kppnId}&time=${new Date().getTime()}`);
@@ -72,7 +79,6 @@ const WsJunctionProvider = ({children}: WsJunctionProviderProps) => {
     try{
       const response = await axiosJWT.get(`/getWorksheetByPeriodAndKPPN/${kppnId}`);
       setWsDetail(response.data.rows);
-      console.log(response.data.rows);
     }catch(err: any){
       setWsDetail(null);
       if(err.response){

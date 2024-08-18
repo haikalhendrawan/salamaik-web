@@ -27,7 +27,11 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 // ----------------------------------------------------------------------------------
-export default function MatrixTable({matrix, matrixStatus, getMatrix}: {matrix: MatrixWithWsJunctionType[] | [], matrixStatus: number | null, getMatrix: () => Promise<void>}) {
+export default function MatrixTable({matrix, matrixStatus, getMatrix, worksheetId}: {
+  matrix: MatrixWithWsJunctionType[] | [], 
+  matrixStatus: number | null, 
+  getMatrix: () => Promise<void>,
+  worksheetId: string | null}) {
   const theme = useTheme();
 
   const [selectedKomponen, setSelectedKomponen] = useState<string | null>('1');
@@ -98,10 +102,10 @@ export default function MatrixTable({matrix, matrixStatus, getMatrix}: {matrix: 
 
   const handleDeleteMatrix = async() => {
     try{
-      const response = await axiosJWT.post(`/deleteMatrix`, {worksheetId:'6d77aea7-4976-47d7-8ed7-46f25463ba5d'});
+      await axiosJWT.post(`/deleteMatrix`, {worksheetId:worksheetId});
       getMatrix();
-    }catch(err){
-      console.log(err);
+    }catch(err: any){
+      openSnackbar(err?.response?.data?.message, "error");
     }
   };
 

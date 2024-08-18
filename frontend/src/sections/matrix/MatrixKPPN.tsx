@@ -103,7 +103,7 @@ export default function MatrixKPPN() {
           </Typography>
         </Stack>
 
-        <SelectionTab tab={tabValue} changeTab={handleTabChange} />
+        <SelectionTab tab={tabValue} changeTab={handleTabChange}/>
         
         <Stack direction='row'>
           <Grid container spacing={4}>

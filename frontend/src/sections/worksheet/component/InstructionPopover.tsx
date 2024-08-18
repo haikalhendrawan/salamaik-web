@@ -39,8 +39,8 @@ export default function InstructionPopover({open, anchorEl, handleClose, instruc
 							<ClickAwayListener onClickAway={handleClose}>
                 <Box>
                   <Stack direction='column' spacing={1}>
-                    <Typography variant='body2' sx={{fontSize: 14}} fontWeight={'bold'}>Instruksi</Typography>
-                    <Typography variant='body2' sx={{fontSize: 12}}>{instruction}</Typography>
+                    <Typography variant='body2' sx={{fontSize: 14}} fontWeight={'bold'}>Instruksi Khusus</Typography>
+                    <Typography variant='body2' sx={{fontSize: 12}}>{(instruction?.length===0 || !instruction)?"-":instruction}</Typography>
                   </Stack>
                   <br />
                   <Stack direction='column' spacing={1}>

@@ -4,6 +4,7 @@ import Iconify from '../../../components/iconify';
 import { Container, Stack, Typography, Tabs, Tab, Grid, Paper, 
         IconButton, Breadcrumbs, Link} from '@mui/material';
 import {useTheme, styled} from '@mui/material/styles';
+import { useAuth } from '../../../hooks/useAuth';
 // --------------------------------------------------------------
 const StyledLabel = styled(Typography)(({theme}) => ({
   cursor: 'pointer',
@@ -25,8 +26,10 @@ interface SelectionTabProps{
 
 export default function SelectionTab({tab, changeTab}: SelectionTabProps){
 
+  const {auth} = useAuth();
+
   return(
-    <Stack direction="row" alignItems="center" justifyContent="center " mb={5} >
+    <Stack direction="row" alignItems="center" justifyContent="center " mb={5} sx={{display: auth?.kppn?.length===5?'flex':'none'}} >
       <Tabs value={tab} onChange={changeTab}> 
         <Tab 
           icon={<Iconify icon="solar:city-bold-duotone" />} 

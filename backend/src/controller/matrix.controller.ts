@@ -141,6 +141,7 @@ const reAssignMatrix = async(req: Request, res: Response, next: NextFunction) =>
     const worksheetProfile: WorksheetType[] = await worksheet.getWorksheetByPeriodAndKPPN(period, kppnId, connection); 
     const worksheetId = worksheetProfile[0]?.id || null;
 
+
     if(!worksheetId) {
       throw new ErrorDetail(404, 'Worksheet not found');
     };

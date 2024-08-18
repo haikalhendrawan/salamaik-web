@@ -6,7 +6,7 @@
 
 import { forwardRef, ReactNode } from 'react';
 // @mui
-import { ThemeOptions, SxProps, useTheme } from '@mui/material/styles';
+import { SxProps, useTheme } from '@mui/material/styles';
 import { Box } from '@mui/material';
 //
 import { StyledLabel } from './styles';

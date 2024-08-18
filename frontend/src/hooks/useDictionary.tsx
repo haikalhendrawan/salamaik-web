@@ -7,7 +7,7 @@ interface DictionaryType {
   list: any[];
 };
 
-interface PeriodType{
+export interface PeriodType{
   id: number;
   name: string; 
   even_period: number | null;

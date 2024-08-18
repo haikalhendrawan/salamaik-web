@@ -33,6 +33,8 @@ export default function MatrixDetail() {
 
   const [matrixStatus, setMatrixStatus] = useState<number | null>(null);
 
+  const [worksheetId, setWorksheetId] = useState<string | null>(null);
+
   const [matrix, setMatrix] = useState<MatrixWithWsJunctionType[] | []>([]);
 
   const getMatrix = async() => {
@@ -41,6 +43,7 @@ export default function MatrixDetail() {
       const response = await axiosJWT.get(`/getMatrixWithWsDetailById/${kppnId}`);
       const matrixResponse: MatrixResponse = response.data.rows;
       setMatrixStatus(matrixResponse.worksheet.matrix_status);
+      setWorksheetId(matrixResponse.worksheet.id);
       setMatrix(matrixResponse.matrix);
       setIsLoading(false);
     }catch(err: any){
@@ -71,7 +74,7 @@ export default function MatrixDetail() {
       {!matrix
         ? null 
         :<DialogProvider>
-            <MatrixTable matrix={matrix} matrixStatus={matrixStatus} getMatrix={getMatrix}/>
+            <MatrixTable matrix={matrix} matrixStatus={matrixStatus} getMatrix={getMatrix} worksheetId={worksheetId}/>
           </DialogProvider>
       }
      

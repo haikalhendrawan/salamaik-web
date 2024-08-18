@@ -30,12 +30,12 @@ export default function PageLoading({ duration }:PageLoadingProps){
     let progressTimer: number;
 
     const startLoading = () => {
-      timer = setTimeout(() => {
+      timer = window.setTimeout(() => {
         clearInterval(progressTimer);
         setProgress(95);
       }, duration * 1000);
 
-      progressTimer = setInterval(() => {
+      progressTimer = window.setInterval(() => {
         setProgress((oldProgress) => {
           if (oldProgress === 100) {
             return 100;

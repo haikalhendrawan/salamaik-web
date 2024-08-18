@@ -45,7 +45,7 @@ const SELECT_KPPN: {[key: string]: string} = {
 // ----------------------------------------------------------------------
 
 export default function WorksheetKPPN() {
-  const { wsJunction, getWsJunctionKanwil, wsDetail, getWorksheet } = useWsJunction();
+  const { wsJunction, wsDetail, getWorksheet, getWsJunctionKPPN } = useWsJunction();
 
   const { subKomponenRef } = useDictionary();
 
@@ -68,7 +68,7 @@ export default function WorksheetKPPN() {
   // const { isLoading, setIsLoading } = useLoading();
 
   useEffect(() => {
-    getWsJunctionKanwil(id);
+    getWsJunctionKPPN();
     getWorksheet(id);
     setIsLoading(false);
   }, []);

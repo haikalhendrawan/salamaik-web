@@ -7,6 +7,7 @@ import useSnackbar from '../../../../hooks/display/useSnackbar';
 import useAxiosJWT from '../../../../hooks/useAxiosJWT';
 import useDictionary from '../../../../hooks/useDictionary';
 import useDialog from '../../../../hooks/display/useDialog';
+import { PeriodType } from '../../../../hooks/useDictionary';
 //----------------------------------------------------
 const TABLE_HEAD = [
   { id: 'id', label: 'Id', alignRight: false },
@@ -15,14 +16,6 @@ const TABLE_HEAD = [
   { id: 'endDate', label: 'End Date', alignRight: false },
   { id: 'action', label: 'Action', alignRight: false },
 ];
-
-interface PeriodType{
-  id: number;
-  name: string; 
-  evenPeriod: 0;
-  semester: number;
-  tahun: number
-};
 
 interface PeriodRefTableProps {
   tableData: PeriodType[] | null,
@@ -99,10 +92,10 @@ export default function PeriodRefTable({tableData}: PeriodRefTableProps) {
                   <TableCell align="left">{row.name}</TableCell>
 
                   <TableCell align="left">
-                    {row.evenPeriod===0?`01 Jan ${row.tahun}`:`01 Jul ${row.tahun}`}
+                    {row.even_period===0?`01 Jan ${row.tahun}`:`01 Jul ${row.tahun}`}
                   </TableCell>
 
-                  <TableCell align="left">{row.evenPeriod===0?`30 Jun ${row.tahun}`: `31 Dec ${row.tahun}`}</TableCell>
+                  <TableCell align="left">{row.even_period===0?`30 Jun ${row.tahun}`: `31 Dec ${row.tahun}`}</TableCell>
 
                   <TableCell align="justify">
                     <Stack direction='row' spacing={1}>
