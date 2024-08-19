@@ -13,6 +13,11 @@ const useAxiosJWT = () => {
         if(!config.headers.Authorization){
             config.headers.Authorization = `Bearer ${auth?.accessToken}` // setiap request kita auth di header yg valuenya mrpk accessToken
         }
+
+        if (config.method === 'get') {
+            const timeStamp = new Date().getTime(); // Current timestamp
+            config.params = {...config.params, _: timeStamp}; // Add time to the params
+        }
         return config;
     }, (error) => {
         return Promise.reject(error)

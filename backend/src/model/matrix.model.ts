@@ -189,6 +189,20 @@ class Matrix{
     }
   }
 
+  async updateMatrixTindakLanjut(id: number, kanwilResponse: string, poolTrx?: PoolClient){
+    const poolInstance = poolTrx??pool;
+    try{
+      const q = `UPDATE matrix_data SET
+                  tindak_lanjut = $1 
+                  WHERE id = $2
+                  RETURNING *`;
+      const result = await poolInstance.query(q, [kanwilResponse, id]);
+      return result.rows[0]
+    }catch(err){
+      throw err
+    }
+  }
+
   async updateMatrixFindings(wsJunctionId: number, hasilImplementasi: string, permasalahan: string, isFinding: number, poolTrx?: PoolClient){
     const poolInstance = poolTrx??pool;
     try{

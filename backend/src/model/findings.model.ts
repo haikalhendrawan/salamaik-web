@@ -65,7 +65,7 @@ class Findings{
 
   async getFindingsByWorksheetId(worksheetId: string): Promise<FindingsType[]>{
     try{
-      const q = `SELECT * FROM findings_data WHERE worksheet_id = $1`;
+      const q = `SELECT * FROM findings_data WHERE worksheet_id = $1 ORDER BY id ASC`;
       const result = await pool.query(q, [worksheetId]);
       return result.rows
     }catch(err){
@@ -138,15 +138,15 @@ class Findings{
     }
   }
 
-  async updateFindingsResponse(id: number, kppnResponse: string, kanwilResponse: string, userName: string){
+  async updateFindingsResponse(id: number, kppnResponse: string, kanwilResponse: string, userName: string, poolTrx?: PoolClient){
+    const poolInstance = poolTrx??pool;
     try{
       const updateTime = new Date(Date.now()).toISOString();
-      console.log(id, kppnResponse, kanwilResponse, userName);
       const q = `UPDATE findings_data 
                  SET kppn_response = $1, kanwil_response = $2, updated_by = $3, last_update = $4
                  WHERE id = $5
                  RETURNING *`;
-      const result = await pool.query(q, [kppnResponse, kanwilResponse, userName, updateTime, id]);
+      const result = await poolInstance.query(q, [kppnResponse, kanwilResponse, userName, updateTime, id]);
       return result.rows[0]
     }catch(err){
       throw err

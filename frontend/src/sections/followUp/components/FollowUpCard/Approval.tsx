@@ -8,12 +8,12 @@ import useSnackbar from '../../../../hooks/display/useSnackbar';
 import useDialog from '../../../../hooks/display/useDialog';
 import { FindingsResponseType } from '../../types';
 // --------------------------------------------------------------------------------
-export default function Approval({findingResponse, getData}: {findingResponse: FindingsResponseType | null, getData: () => void}) {
+export default function Approval({findingResponse, getData, isDisabled}: {findingResponse: FindingsResponseType | null, getData: () => Promise<void>, isDisabled: boolean}) {
   const {auth} = useAuth();
 
   const isKanwilnAdmin = auth?.kppn ==='03010' && (auth?.role === 4 || auth?.role === 99);
 
-  const isKPPNAdmin = (auth?.kppn!=='03010' && (auth?.role === 2)) || (auth?.role === 99);
+  const isKPPNAdmin = (auth?.kppn!=='03010' && (auth?.role === 2));
 
   const axiosJWT = useAxiosJWT();
 
@@ -62,8 +62,8 @@ export default function Approval({findingResponse, getData}: {findingResponse: F
               <Tooltip title='Approve'>
                 <span>
                   <StyledButton 
-                    aria-label="approve" 
-                    variant='contained' 
+                    variant='contained'
+                    disabled={isDisabled} 
                     size='small' 
                     color='success'
                     onClick={() => openDialog(
@@ -81,8 +81,8 @@ export default function Approval({findingResponse, getData}: {findingResponse: F
               <Tooltip title='Tolak'>
                 <span>
                   <StyledButton 
-                    aria-label="tolak" 
-                    variant='contained' 
+                    variant='contained'
+                    disabled={isDisabled}  
                     size='small' 
                     color='pink'
                     onClick={() => openDialog(
@@ -104,8 +104,8 @@ export default function Approval({findingResponse, getData}: {findingResponse: F
             <Tooltip title='Revert status'>
               <span>
                 <StyledButton
-                  aria-label="revert" 
-                  variant='contained' 
+                  variant='contained'
+                  disabled={isDisabled}  
                   size='small' 
                   color='pink'
                   onClick={() => openDialog(
@@ -125,14 +125,13 @@ export default function Approval({findingResponse, getData}: {findingResponse: F
       </Stack>
 
       <Stack direction='column' spacing={1} display={isKPPNAdmin ? 'flex' : 'none'} alignItems={'flex-start'}>
-        <Typography variant='body3' sx={{fontSize:12}} textAlign={'left'}>Action :</Typography>
         {((status === 0) && (isKPPNAdmin))?
           <>
             <Tooltip title='Kirim'>
               <span>
                 <StyledButton 
-                  aria-label="kirim" 
-                  variant='contained' 
+                  variant='contained'
+                  disabled={isDisabled}  
                   size='small' 
                   color='warning'
                   onClick={() => openDialog(
@@ -152,8 +151,8 @@ export default function Approval({findingResponse, getData}: {findingResponse: F
           <Tooltip title='Revert status'>
               <span>
                 <StyledButton
-                  aria-label="revert" 
-                  variant='contained' 
+                  variant='contained'
+                  disabled={isDisabled} 
                   size='small' 
                   color='pink'
                   onClick={() => openDialog(

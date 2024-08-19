@@ -97,7 +97,7 @@ export default function UserRefAddModal({modalOpen, modalClose}: UserRefAddModal
 
     const {auth} = useAuth();
 
-    const isAdminKanwil = auth?.role === (4 || 99);
+    const isAdminKanwil = auth?.role === 4 || auth?.role === 99;
 
     const [value, setValue] = useState<ValueType>({
       username: "", 

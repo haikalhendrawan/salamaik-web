@@ -19,7 +19,8 @@ import { FindingsResponseType } from "../../types";
 interface FollowUpCardProps{
   findingResponse: FindingsResponseType | null,
   id?: string,
-  getData: () => void
+  getData: () => Promise<void>,
+  isDisabled: boolean
 };
 
 const StyledCardHeader = styled(CardHeader)(({theme}) => ({
@@ -139,10 +140,7 @@ export default function FollowUpCard(props: FollowUpCardProps) {
 
           <Divider flexItem />
 
-          <BodyGrid
-            container
-            spacing={1}
-          >
+          <BodyGrid container spacing={1}>
             <Grid item xs={4.5}>
               <Kriteria
                 kriteria={checklist?.header || ""}
@@ -155,19 +153,32 @@ export default function FollowUpCard(props: FollowUpCardProps) {
                 openInstruction={handleOpenInstruction} 
                 findingResponse={props.findingResponse} 
                 getData={props.getData}
+                isDisabled={props.isDisabled}
               />
             </Grid>
 
             <Grid item xs={1.5}>
-              <Nilai findingResponse={props.findingResponse} getData={props.getData}/>
+              <Nilai 
+                findingResponse={props.findingResponse} 
+                getData={props.getData} 
+                isDisabled={props.isDisabled}
+              />
             </Grid>
 
             <Grid item xs={3.5}>
-              <Catatan findingResponse={props.findingResponse} getData={props.getData}/>
+              <Catatan 
+                findingResponse={props.findingResponse} 
+                getData={props.getData} 
+                isDisabled={props.isDisabled}
+              />
             </Grid>
 
             <Grid item xs={1}>
-              <Approval findingResponse={props.findingResponse} getData={props.getData}/>
+              <Approval 
+                findingResponse={props.findingResponse} 
+                getData={props.getData} 
+                isDisabled={props.isDisabled}
+              />
             </Grid>
           </BodyGrid>
 

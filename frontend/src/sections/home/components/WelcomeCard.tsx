@@ -13,6 +13,17 @@ interface WelcomeCardProps {
   color?: string;
   sx?: object;
 };
+
+const PANDUAN_FILE = [  
+  {role: 0, file: 'panduan_user_kppn.pdf'},
+  {role: 1, file: 'panduan_user_kppn.pdf'},
+  {role: 2, file: 'panduan_admin_kppn.pdf'},
+  {role: 3, file: 'panduan_user_kanwil.pdf'},
+  {role: 4, file: 'panduan_admin_kanwil.pdf'},
+  {role: 99, file: 'panduan_admin_kanwil.pdf'}, 
+];
+
+const baseUrl = import.meta.env.VITE_API_URL;
 // ----------------------------------------------------------------------
 
 export default function WelcomeCard({ title, total, icon, color = 'primary', sx, ...other }: WelcomeCardProps) {
@@ -20,7 +31,7 @@ export default function WelcomeCard({ title, total, icon, color = 'primary', sx,
 
   const {auth} = useAuth();
 
-  const [file, setFile] = useState<string | undefined>('https://jdih.kemenkeu.go.id/download/a321969c-4ce0-4073-81ce-df35023750b1/PER_1_PB_2023-Perubahan%20Atas%20PERDIRJEN%20No.PER-24_PB_2019%20tentang%20Pedoman%20Pembinaan%20&%20Supervisi%20Pelaksanaan%20Tugas%20KPPN.pdf'); // for preview file modal
+  const file = (baseUrl+"/panduan/"+PANDUAN_FILE.filter((item) => item.role === auth?.role)[0]?.file) || 'panduan_user_kppn.pdf';
   
   const [open, setOpen] = useState<boolean>(false); // for preview file modal
 

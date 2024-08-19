@@ -1,23 +1,57 @@
-import {useEffect} from "react";
+import {useState, useEffect} from "react";
 import { Helmet } from 'react-helmet-async';
 import useWsJunction from "./useWsJunction";
 import {useAuth} from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import useAxiosJWT from "../../hooks/useAxiosJWT";
 // @mui
 import { Grid, Container, Typography } from '@mui/material';
 // sections
 import KPPNSelectionCard from "./component/KPPNSelectionCard";
+import { KPPNScoreProgressResponseType } from "../home/types";
+import useSnackbar from "../../hooks/display/useSnackbar";
+import useLoading from "../../hooks/display/useLoading";
 // ----------------------------------------------------------------------
+const KPPN_PICTURE = ['kppn-padang.png', 'kppn-bukittinggi.jpg', 'kppn-solok.jpg', 'kppn-lubuk-sikaping.jpg', 'kppn-sijunjung.jpg', 'kppn-painan.jpg' ];
 
+
+
+// ----------------------------------------------------------------------
 export default function WorksheetLanding() {
   const { setWsJunction} = useWsJunction();
 
   const {auth} = useAuth();
 
+  const [wsDetail, setWsDetail] = useState<KPPNScoreProgressResponseType[] | null>(null);
+
+  const axiosJWT = useAxiosJWT();
+
   const navigate = useNavigate();
+
+  const {openSnackbar} = useSnackbar();
+
+  const {setIsLoading} = useLoading();
+
+  const getScoreProgress = async() => {
+    try{
+      setIsLoading(true);
+      if(auth?.kppn?.length!==5){
+        return setIsLoading(false);
+      }
+      const response = await axiosJWT.get('/getWsJunctionScoreAndProgressAllKPPN');
+      setWsDetail(response.data.rows);
+      setIsLoading(false);
+    }catch(err:any){
+      setIsLoading(false);
+      openSnackbar(err?.response?.data?.message, 'error');
+    }finally{
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     setWsJunction([]);
+    getScoreProgress();
   }, []);
 
   if(auth?.kppn !== '03010' ){
@@ -35,65 +69,24 @@ export default function WorksheetLanding() {
           Kertas Kerja
         </Typography>
         <Grid container spacing={4}>
-          <Grid item xs={12} md={6}>
-            <KPPNSelectionCard
-              header='KPPN Padang'
-              subheader='67% complete'
-              lastUpdate="Last Update: Apr 12, 2022"
-              image='kppn-padang.png'
-              link={`/worksheet/kppn?id=010`}
-            />
-          </Grid>
-
-          <Grid item xs={12} md={6}>
-            <KPPNSelectionCard
-              header='KPPN Bukittinggi'
-              subheader='24% complete'
-              lastUpdate="Last Update: Mei 19, 2022"
-              image='kppn-bukittinggi.jpg'
-              link={`/worksheet/kppn?id=011`}
-            />
-          </Grid>
-
-          <Grid item xs={12} md={6}>
-            <KPPNSelectionCard
-              header='KPPN Solok'
-              subheader='100% complete'
-              lastUpdate="Last Update: Apr 16, 2022"
-              image='kppn-solok.jpg'
-              link={`/worksheet/kppn?id=090`}
-            />
-          </Grid>
-
-          <Grid item xs={12} md={6}>
-            <KPPNSelectionCard
-              header='KPPN Lubuk Sikaping'
-              subheader='5% complete'
-              lastUpdate="Last Update: Mei 12, 2022"
-              image='kppn-lubuk-sikaping.jpg'
-              link={`/worksheet/kppn?id=091`}
-            />
-          </Grid>
-
-          <Grid item xs={12} md={6}>
-            <KPPNSelectionCard
-              header='KPPN Sijunjung'
-              subheader='88% complete'
-              lastUpdate="Apr 12, 2022"
-              image='kppn-sijunjung.jpg'
-              link={`/worksheet/kppn?id=077`}
-            />
-          </Grid>
-
-          <Grid item xs={12} md={6}>
-            <KPPNSelectionCard
-              header='KPPN Painan'
-              subheader='12% complete'
-              lastUpdate="Apr 12, 2022"
-              image='kppn-painan.jpg'
-              link={`/worksheet/kppn?id=142`}
-            />
-          </Grid>
+          {
+            wsDetail?.map((item, index) => {
+              const progressKanwil = item?.scoreProgressDetail?.totalProgressKanwil || 0;
+              const totalChecklist = item?.scoreProgressDetail?.totalChecklist || 0;
+              const percentProgress = (progressKanwil / totalChecklist * 100) || 0;
+              return (
+                <Grid item xs={12} md={6} key={index}>
+                  <KPPNSelectionCard
+                    header={item?.alias}
+                    subheader={percentProgress?.toFixed(0)?.toString() + '% complete'}
+                    lastUpdate="Last Update: Apr 12, 2022"
+                    image={KPPN_PICTURE[index]}
+                    link={`/worksheet/kppn?id=${item?.id}`}
+                  />
+                </Grid>
+              )
+            })
+          }
         </Grid>
       </Container>
     </>

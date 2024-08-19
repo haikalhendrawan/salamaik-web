@@ -65,6 +65,9 @@ export default function WorksheetKPPN() {
 
   const [isLoading, setIsLoading] = useState(true);
 
+  const isPastDue = useMemo(() => new Date().getTime() > new Date(wsDetail?.close_period || "").getTime(), [wsDetail]);
+
+
   // const { isLoading, setIsLoading } = useLoading();
 
   useEffect(() => {
@@ -168,7 +171,7 @@ export default function WorksheetKPPN() {
 
           </Container>
 
-          <PreviewFileModal />
+          <PreviewFileModal isDisabled={isPastDue}/>
 
           <NavigationDrawer tabValue={tabValue} scrollToElement={scrollToElement}/> 
           

@@ -154,6 +154,7 @@ export default function UserRefTableToolbar({
               onClick={(event)=>{event.stopPropagation()}}
               onChange={handleFilterUnit}
               MenuProps={MenuProps}
+              defaultValue={''}
               >
                 <MenuItem 
                   sx={{typography:'body2', color:theme.palette.primary.main}} 

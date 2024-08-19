@@ -51,11 +51,7 @@ const updatePassword = async (req: Request, res: Response, next: NextFunction) =
 const updateProfilePicture = async (req: Request, res: Response, next: NextFunction) => {
   uploadPP(req, res, async (err: any) => {
     if(err instanceof multer.MulterError) {
-      if(err.message==='LIMIT FILE SIZE'){
-        return next(new ErrorDetail(400, 'File size is too large max 12mb'));
-      }else{
-        return next(err);
-      }
+      return next(new ErrorDetail(400, 'File too large (Max 2mb)', err));
     } else if(err) {
       return next(err);
     };

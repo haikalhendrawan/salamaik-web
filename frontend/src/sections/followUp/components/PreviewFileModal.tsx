@@ -16,7 +16,7 @@ const style = {
 };
 
 // -------------------------------------------------------------------------------------------
-export default function PreviewFileModal({getData}: {getData: () => void}){
+export default function PreviewFileModal({getData, isDisabled}: {getData: () => void, isDisabled: boolean}) {
   const {
     open, 
     file, 
@@ -102,6 +102,7 @@ export default function PreviewFileModal({getData}: {getData: () => void}){
               variant='contained'
               color='pink'
               onClick={deleteFile}
+              disabled={isDisabled}
             >
               Delete 
               <Iconify icon="solar:trash-bin-trash-bold"/>

@@ -3,6 +3,7 @@ import findings from '../model/findings.model';
 import matrix from '../model/matrix.model';
 import worksheet, { WorksheetType } from '../model/worksheet.model';
 import ErrorDetail from '../model/error.model';
+import pool from '../config/db';
 import { MatrixWithWsJunctionType } from '../model/matrix.model';
 // ---------------------------------------------------------------------------------------------------
 interface FindingsResponseType{
@@ -87,12 +88,19 @@ const updateFindingsScore = async (req: Request, res: Response, next: NextFuncti
 }
 
 const updateFindingsResponse = async (req: Request, res: Response, next: NextFunction) => {
+  const connection = await pool.connect();
   try{
-    const {id, kppnResponse, kanwilResponse, userName} = req.body;
+    await connection.query('BEGIN');
+    const {id, kppnResponse, kanwilResponse, userName, matrixId} = req.body;
     const result = await findings.updateFindingsResponse(id, kppnResponse, kanwilResponse, userName);
-    return res.status(200).json({sucess: true, message: 'Response has been updated  ', rows: result})
+    const matrixResult = await matrix.updateMatrixTindakLanjut(matrixId, kanwilResponse, connection);
+    await connection.query('COMMIT');
+    return res.status(200).json({sucess: true, message: 'Response has been updated  ', rows: {result, matrixResult}})
   }catch(err){
+    await connection.query('ROLLBACK');
     next(err)
+  }{
+    connection.release();
   }
 }
 

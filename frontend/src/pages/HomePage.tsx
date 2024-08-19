@@ -31,7 +31,7 @@ export default function HomePage() {
           <Grid item xs={12} md={4}>
             <PhotoGallery 
               title='Galeri Salamaik' 
-              images={['01.jpg', '02.jpg', '03.jpg', '04.jpeg', '05.jpeg']}
+              images={['01.jpg', '02.jpg', '03.jpg', '04.jpeg', '05.jpeg', '06.png']}
               height={'300px'} 
             /> 
           </Grid>

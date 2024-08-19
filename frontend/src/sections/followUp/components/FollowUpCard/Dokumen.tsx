@@ -30,11 +30,12 @@ const VisuallyHiddenInput = styled('input')({
 interface DokumenProps{
   openInstruction: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
   findingResponse: FindingsResponseType | null,
-  getData: () => void
+  getData: () => Promise<void>,
+  isDisabled: boolean
 }
 
 // ----------------------------------------------------------------------------
-export default function Dokumen({openInstruction, findingResponse, getData}: DokumenProps){
+export default function Dokumen({openInstruction, findingResponse, getData, isDisabled}: DokumenProps){
   const [isMounted, setIsMounted] = useState(true);
 
   const theme = useTheme();
@@ -252,7 +253,7 @@ export default function Dokumen({openInstruction, findingResponse, getData}: Dok
               !isMaxFile
               ?
                 <Tooltip title='Add file'>
-                  <StyledButton variant='contained' component='label' aria-label="delete" size='small' color='white'>
+                  <StyledButton variant='contained' component='label' aria-label="delete" size='small' color='white' disabled={isDisabled}>
                     <Iconify 
                       icon="solar:add-circle-bold"
                       color={theme.palette.grey[500]}
@@ -261,6 +262,7 @@ export default function Dokumen({openInstruction, findingResponse, getData}: Dok
                       type='file'
                       accept='image/*,.pdf,.zip' 
                       onChange={(e) => handleChangeFile(e, wsJunction)} 
+                      disabled={isDisabled}
                     />
                   </StyledButton>
                 </Tooltip>

@@ -33,6 +33,10 @@ export default function FollowUpKPPN() {
 
   const isKanwil = auth?.kppn === '03010';
 
+  const payloadKPPN = auth?.kppn || '';
+
+  const defaultTab = isKanwil? '010': payloadKPPN;
+
   const {openSnackbar} = useSnackbar();
 
   const {setIsLoading} = useLoading();
@@ -47,7 +51,7 @@ export default function FollowUpKPPN() {
 
   const [worksheet, setWorksheet] = useState<WorksheetType | null>(null);
 
-  const [tabValue, setTabValue] = useState('010'); // ganti menu komponen supervisi
+  const [tabValue, setTabValue] = useState(defaultTab); // ganti menu komponen supervisi
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: string) => { // setiap tab komponen berubah
     setTabValue(newValue);
@@ -63,10 +67,9 @@ export default function FollowUpKPPN() {
       const response = await axiosJWT.get(`/getFindingsByWorksheetId/${kppnId}`);
       setFindings(response.data.rows);
 
-      console.log(response.data.rows);
-
     }catch(err: any){
       setIsLoading(false);
+      setFindings([]);
       if(err.response){
         openSnackbar(err.response.data.message, "error");
       }else{
@@ -85,9 +88,8 @@ export default function FollowUpKPPN() {
 
       const response = await axiosJWT.get(`/getWorksheetByPeriodAndKPPN/${kppnId}`);
       setWorksheet(response.data.rows);
-      console.log(response.data.rows);
-
     }catch(err: any){
+      setWorksheet(null);
       if(err.response){
         openSnackbar(err.response.data.message, "error");
       }else{
@@ -98,36 +100,38 @@ export default function FollowUpKPPN() {
     }
   };
 
-  const getData = () =>{
-    const id = params.get('id');
-
-    if(!id){
-      navigate(`?id=010`);
+  const getData = async() =>{
+    if(!kppnId){
+      navigate(`?id=${defaultTab}`);
     };
 
-    if (id !== tabValue) {
-      setTabValue(id || '010'); // Sync tabValue with URL on location change
+    if(!isKanwil){
+      navigate(`?id=${defaultTab}`);
+    }
+
+    if (kppnId !== tabValue) {
+      setTabValue(kppnId || '010'); // Sync tabValue with URL on location change
     };
 
     getFindings();
     getWorksheet();
   };
 
+  useEffect(() => {
+    getData();
+  }, [location.search, tabValue]);
+  
   const totalFindingsNonFinal = findings?.length;
-  const totalFindingsFinal = findings?.filter((f) => f?.status === (0 | 1 | 2)).length;
-  const countFindingsOnProgress = findings?.filter((f) => f?.status === 1).length;
+  const totalFindingsFinal = findings?.filter((f) => (f?.status === 0 || f?.status ===1 || f?.status ===2)).length;
+  const countFindingsOnProgress = findings?.filter((f) => f?.status === 1)?.length;
   const findingsPercentProgress = ((countFindingsOnProgress / totalFindingsNonFinal) * 100) || 0;
 
   const semester = periodRef?.list?.filter((item) => item.id === auth?.period)[0]?.semester || '';
   const year = periodRef?.list?.filter((item) => item.id === auth?.period)[0]?.tahun || '';
 
   const today = new Date();
-  const isPastClosePeriod = new Date(worksheet?.close_follow_up || '').getTime() < today.getTime();
+  const isPastClosePeriod = new Date(worksheet?.close_follow_up || '').getTime() < today?.getTime();
   const isFinalText = isPastClosePeriod ? 'Final' : 'Non-Final';
-
-  useEffect(() => {
-    getData();
-  }, [location.search, tabValue]);
 
   return (
     <>

@@ -10,7 +10,7 @@ export default function ReverseAuthLayout() {
 
   const location = useLocation();
 
-  if (auth && auth.accessToken){
+  if (auth && auth?.accessToken){
     return <Navigate to="/home" state={{from:location}} replace />
   };
   

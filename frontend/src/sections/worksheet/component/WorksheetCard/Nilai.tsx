@@ -61,6 +61,7 @@ export default function Nilai({wsJunction, wsDetail}: NilaiPropsType) {
   const [isMounted, setIsMounted] = useState(true);
 
   const [stdScoreKanwil, setStdScoreKanwil] = useState(wsJunction?.kanwil_score || '');
+  
   const [stdScoreKPPN, setStdScoreKPPN] = useState(wsJunction?.kppn_score || '');
 
   const {socket} = useSocket();
@@ -329,7 +330,7 @@ export default function Nilai({wsJunction, wsDetail}: NilaiPropsType) {
                       variant='contained' 
                       size='small' 
                       color='warning'
-                      disabled={isKanwil}
+                      disabled={isKanwil || isPastDue}
                       onClick={() => handleFetchStdScoreKPPN()}
                     >
                       <Iconify icon="solar:refresh-bold-duotone"/>
@@ -375,7 +376,7 @@ export default function Nilai({wsJunction, wsDetail}: NilaiPropsType) {
                       variant='contained' 
                       size='small' 
                       color='warning'
-                      disabled={!isKanwil}
+                      disabled={!isKanwil || isPastDue}
                       onClick={() => handleFetchStdScoreKanwil()}
                     >
                       <Iconify icon="solar:refresh-bold-duotone"/>

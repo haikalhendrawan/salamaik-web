@@ -37,11 +37,11 @@ export default function KPPNSelectionCard({header, subheader, lastUpdate, image,
                 >
                   Open
                 </Button> 
-                <Tooltip title={lastUpdate}>
+                {/* <Tooltip title={lastUpdate}>
                   {lastUpdate?
                   <IconButton disableRipple><Iconify icon={"solar:check-circle-bold"}  sx={{borderRadius:'50%', color: 'rgb(0, 167, 111)' }} /></IconButton>
                   :<IconButton disableRipple sx={{display:'none'}}><Iconify icon={"solar:check-circle-bold"} sx={{borderRadius:'50%'}} /></IconButton>}
-                </Tooltip> 
+                </Tooltip>  */}
               </Grid>                      
             </Box>
           </Grid>

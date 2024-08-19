@@ -82,9 +82,8 @@ const editUser = async (req: Request, res: Response, next: NextFunction) => {
     };
 
     const {kppn: payloadKPPN, role} = req.payload;
-    const targetDetail = await user.getUserById(id);
-    const targetKPPN = targetDetail.kppn;
-    const isAllowed = (targetKPPN === payloadKPPN) || (role===(99 || 4));
+
+    const isAllowed = (kppn === payloadKPPN) || (role===99 || role===4);
 
     if(!isAllowed){
       return next(new ErrorDetail(400, 'Unauthorized unit'))
@@ -103,7 +102,7 @@ const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
     const {kppn, role} = req.payload;
     const targetDetail = await user.getUserById(targetID);
     const targetKPPN = targetDetail.kppn;
-    const isAllowed = (targetKPPN === kppn) || (role===(99 || 4));
+    const isAllowed = (targetKPPN === kppn) || (role===99 || role===4);
 
     if(!isAllowed){
       return next(new ErrorDetail(400, 'Unauthorized unit'))
@@ -122,7 +121,7 @@ const updateStatus = async (req: Request, res: Response, next: NextFunction) => 
     const targetID = req.body.id;
     const targetDetail = await user.getUserById(targetID);
     const targetKPPN = targetDetail.kppn;
-    const isAllowed = (targetKPPN === kppn) || (role===(99 || 4));
+    const isAllowed = (targetKPPN === kppn) || (role===99 || role===4);
 
     if(!isAllowed){
       return next(new ErrorDetail(400, 'Unauthorized unit'))
@@ -147,8 +146,8 @@ const updateRole = async (req: Request, res: Response, next: NextFunction) => {
       return next(new ErrorDetail(400, 'Unauthorized, you cannot set kanwil role'))
     };
 
-    if(adminRole===4 && newRole ===4){ // utk role yang masuk udh di filter di middleware antara 2, 4, dan 99
-      return next(new ErrorDetail(400, 'Unauthorized, untuk menambahkan role admin kanwil dilakukam oleh super admin'))
+    if(adminRole===4 && newRole ===99){ // utk role yang masuk udh di filter di middleware antara 2, 4, dan 99
+      return next(new ErrorDetail(400, 'Unauthorized'))
     };
 
     const result = await user.updateRole(targetId, newRole);

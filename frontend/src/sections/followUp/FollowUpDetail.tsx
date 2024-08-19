@@ -16,6 +16,7 @@ import { FindingsResponseType } from './types';
 import PreviewFileModal from './components/PreviewFileModal';
 import { PreviewFileModalProvider } from './usePreviewFileModal';
 import { DialogProvider } from '../../hooks/display/useDialog';
+import { WorksheetType } from '../worksheet/types';
 // --------------------------------------------------------------
 
 
@@ -44,12 +45,14 @@ export default function FollowUpDetail() {
 
   const [findings, setFindings] = useState<FindingsResponseType[] | []>([]);
 
+  const [worksheet, setWorksheet] = useState<WorksheetType | null>(null);
+
   const selectedFindings = findings?.find((item) =>item?.id === Number(params.get('findingsId'))) || null;
 
   const getFindings = async() => {
     try{
       if(!kppnId){
-        return null
+        return 
       };
 
       const response = await axiosJWT.get(`/getFindingsByWorksheetId/${kppnId}`);
@@ -67,9 +70,32 @@ export default function FollowUpDetail() {
     }
   };
 
+  const getWorksheet = async() => {
+    try{
+      if(!kppnId){
+        return null
+      };
+
+      const response = await axiosJWT.get(`/getWorksheetByPeriodAndKPPN/${kppnId}`);
+      setWorksheet(response.data.rows);
+    }catch(err: any){
+      if(err.response){
+        openSnackbar(err.response.data.message, "error");
+      }else{
+        openSnackbar('network error', "error");
+      }
+    }finally{
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     getFindings();
+    getWorksheet();
   }, []);
+
+  const today = new Date();
+  const isPastClosePeriod = new Date(worksheet?.close_follow_up || '').getTime() < today?.getTime();
 
   return (
     <>
@@ -94,11 +120,13 @@ export default function FollowUpDetail() {
               </Grid>
 
               <Grid item xs={12}>
-              <FollowUpCard findingResponse={selectedFindings} getData={getFindings}/>
+                <FollowUpCard findingResponse={selectedFindings} getData={getFindings} isDisabled={isPastClosePeriod}/>
               </Grid>
               
             </Grid>
-            <PreviewFileModal getData={getFindings}/>
+
+            <PreviewFileModal getData={getFindings} isDisabled={isPastClosePeriod}/>
+
           </Container>
         </DialogProvider>
       </PreviewFileModalProvider>

@@ -83,6 +83,12 @@ const assignWorksheet = async(req: Request, res: Response, next: NextFunction) =
 const editWorksheetPeriod = async(req: Request, res: Response, next: NextFunction) => {
   try{
     const { worksheetId, startDate, closeDate, openFollowUp, closeFollowUp } = req.body;
+    const isValidDate = validateDates(startDate, closeDate, openFollowUp, closeFollowUp);
+
+    if(!isValidDate.success) {
+      return res.status(400).json({sucess: false, message: isValidDate.message})
+    };
+    
     const result = await worksheet.editWorksheetPeriod(worksheetId, startDate, closeDate, openFollowUp, closeFollowUp);
     return res.status(200).json({sucess: true, message: 'Edit worksheet period success', rows: result})
   }catch(err){

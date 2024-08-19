@@ -115,18 +115,14 @@ const getStdFilePerMonthKPPN = async (req: Request, res: Response, next: NextFun
 
 const addStandardizationJunction = async (req: Request, res: Response, next: NextFunction) => {
   uploadStdFile(req, res, async (err) => {
-    if(!req.file){
-      return next(new ErrorDetail(400,  'Incorrect file type or Directory doesn\'t exist', err.message));
-    };
-
     if(err instanceof multer.MulterError) {
-      if(err.message==='LIMIT FILE SIZE'){
-        return next(new ErrorDetail(400, 'File size is too large'));
-      }else{
-        return next(err);
-      }
+      return next(new ErrorDetail(400, 'File too large (Max 5mb)', err));
     } else if(err) {
       return next(err);
+    };
+
+    if(!req.file){
+      return next(new ErrorDetail(400, 'File not allowed', err));
     };
 
     try{

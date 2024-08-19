@@ -12,7 +12,6 @@ import useLoading from '../../../../hooks/display/useLoading';
 import useAxiosJWT from '../../../../hooks/useAxiosJWT';
 import useSnackbar from '../../../../hooks/display/useSnackbar';
 import useWsJunction from '../../useWsJunction';
-import useSocket from '../../../../hooks/useSocket';
 import { WsJunctionType, WorksheetType } from '../../types';
 // ----------------------------------------------------------------------------
 const VisuallyHiddenInput = styled('input')({
@@ -48,8 +47,6 @@ export default function Dokumen({openInstruction, wsJunction, wsDetail}: Dokumen
   const {setIsLoading} = useLoading();
 
   const {openSnackbar} = useSnackbar();
-
-  const {socket} = useSocket();
 
   const isPastDue = useMemo(() => new Date().getTime() > new Date(wsDetail?.close_period || "").getTime(), [wsDetail]);
 
@@ -101,6 +98,7 @@ export default function Dokumen({openInstruction, wsJunction, wsDetail}: Dokumen
         headers:{"Content-Type": "multipart/form-data"}
       });
       await getWsJunctionKanwil(wsJunction.kppn_id);
+      e.target.value = '';
       setIsLoading(false); 
     }catch(err: any){
       setIsLoading(false);
@@ -116,15 +114,6 @@ export default function Dokumen({openInstruction, wsJunction, wsDetail}: Dokumen
 
   useEffect(() => {
     setIsMounted(false);
-  }, []);
-
-  useEffect(() => {
-    const handleFileUpdate = () => console.log('fileUpdated'+wsJunction?.junction_id);
-    socket?.on('fileHasUpdated', handleFileUpdate);
-  
-    return () => {
-      socket?.off('fileHasUpdated', handleFileUpdate);
-    };
   }, []);
 
   if(isMounted) {
@@ -211,7 +200,6 @@ export default function Dokumen({openInstruction, wsJunction, wsDetail}: Dokumen
                       variant='contained' 
                       size='small' 
                       color='secondary'
-                      disabled={isPastDue}
                       onClick={() => handleOpenWsJunctionFile(1)}
                     >
                       <Iconify icon="solar:file-bold-duotone"/>
@@ -231,7 +219,6 @@ export default function Dokumen({openInstruction, wsJunction, wsDetail}: Dokumen
                       variant='contained' 
                       size='small' 
                       color='secondary'
-                      disabled={isPastDue}
                       onClick={() => handleOpenWsJunctionFile(2)}
                     >
                       <Iconify icon="solar:file-bold-duotone"/>
@@ -251,7 +238,6 @@ export default function Dokumen({openInstruction, wsJunction, wsDetail}: Dokumen
                       variant='contained' 
                       size='small' 
                       color='secondary'
-                      disabled={isPastDue}
                       onClick={() => handleOpenWsJunctionFile(3)}
                     >
                       <Iconify icon="solar:file-bold-duotone"/>
@@ -265,7 +251,14 @@ export default function Dokumen({openInstruction, wsJunction, wsDetail}: Dokumen
               !isMaxFile
               ?
                 <Tooltip title='Add file'>
-                  <StyledButton variant='contained' component='label' aria-label="delete" size='small' color='white' disabled={isPastDue}>
+                  <StyledButton 
+                    variant='contained' 
+                    component='label' 
+                    aria-label="delete" 
+                    size='small' 
+                    color='white' 
+                    disabled={isPastDue}
+                  >
                     <Iconify 
                       icon="solar:add-circle-bold"
                       color={theme.palette.grey[500]}

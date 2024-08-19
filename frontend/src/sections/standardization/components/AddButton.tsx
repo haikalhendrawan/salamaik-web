@@ -56,6 +56,7 @@ export default function AddButton({kppn, standardizationId, month}: AddButtonPro
         headers:{"Content-Type": "multipart/form-data"}
       });
       await getStandardization(kppn);
+      e.target.value = '';
       setIsLoading(false);
       openSnackbar(response.data.message, 'success');
     }catch(err: any){

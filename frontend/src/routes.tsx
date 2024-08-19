@@ -89,10 +89,10 @@ export default function Router() {
 
     <Route element={<PersistLogin/>}>
       <Route path="/followUp" >
-        <Route element={<RequireAuthLayout allowedRoles={[0, 1, 2, 3, 4, 99]} />}>
+        <Route element={<RequireAuthLayout allowedRoles={[2, 4, 99]} />}>
           <Route index element={<FollowUpPage />} />
         </Route>
-        <Route element={<RequireAuthHorizontalLayout allowedRoles={[0, 1, 2, 3, 4, 99]}/>}>
+        <Route element={<RequireAuthHorizontalLayout allowedRoles={[2, 4, 99]}/>}>
           <Route path="detail" element={<FollowUpDetail />} />
         </Route>
       </Route>

@@ -27,6 +27,8 @@ export default function ImageSlider({images, title, height}: ImageSliderProps) {
 
   const slider = useRef<any>(null);
 
+  const baseUrl = `${import.meta.env.VITE_API_URL}/image`;
+
   const settings = {
     dots: false,
     infinite: true,
@@ -77,7 +79,7 @@ export default function ImageSlider({images, title, height}: ImageSliderProps) {
           }
           {images?.map((item, index) => (
             <Box key={index+1} sx={{width:'100%', height:'100%', color:theme.palette.common.black}}>
-              <img onLoad={handleImageLoad} src={`/image/${item}`} style={{width:'100%', height:height, objectFit: 'cover'}} alt={item} loading="lazy"/>
+              <img onLoad={handleImageLoad} src={`${baseUrl}/${item}`} style={{width:'100%', height:height, objectFit: 'cover'}} alt={item} loading="lazy"/>
             </Box> 
             ))
           }

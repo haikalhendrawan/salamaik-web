@@ -59,15 +59,22 @@ const createMatrix = async(req: Request, res: Response, next: NextFunction) => {
     const worksheetData = await wsJunction.getWsJunctionByWorksheetId(worksheetId);
 
     const matrixBody = worksheetData.map((item) => {
+      const minimalScoreItem = item.opsi?.reduce((min, op) => {
+        return op?.value < min?.value ? op : min;
+      }, item.opsi[0]);
+      const equalScoreItem = item?.opsi?.filter((op) => op?.value === item?.kanwil_score)?.[0] || null;
+      
+      const positiveFallback = equalScoreItem?.positive_fallback || item?.title || '';
+      const negativeFallback = equalScoreItem?.negative_fallback || minimalScoreItem?.negative_fallback || '';
       const isStandardisasi = item.standardisasi === 1;
       const isFinding = item.standardisasi === 1 
                         ? item.kanwil_score === 12 ? 0 : 1 
                         : item.kanwil_score === 10 ? 0 : 1;
       const wsJunctionId = item.junction_id;
       const checklistId = item.checklist_id;
-      const hasilImplementasi = (isStandardisasi ? item.title : item.opsi?.filter((op) => op?.value === item.kanwil_score)[0]?.positive_fallback || '');
-      const rekomendasi = isFinding ? (item.opsi?.filter((op) => op?.value === item.kanwil_score)[0]?.rekomendasi|| '') : '';
-      const permasalahan = isFinding ? (item.opsi?.filter((op) => op?.value === item.kanwil_score)[0]?.negative_fallback || '') : '';
+      const hasilImplementasi = (isStandardisasi ? item.title : positiveFallback);
+      const rekomendasi = isFinding ? (equalScoreItem?.rekomendasi??null) : '';
+      const permasalahan = isFinding ? negativeFallback : '';
       const peraturan = item.peraturan;
       const uic = item.uic;
       const tindakLanjut = "";

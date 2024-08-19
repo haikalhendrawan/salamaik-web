@@ -23,7 +23,8 @@ import { FindingsResponseType } from '../../types';
 // ------------------------------------------------------------
 interface NilaiPropsType{
   findingResponse: FindingsResponseType | null,
-  getData: () => void
+  getData: () => Promise<void>,
+  isDisabled: boolean
 };
 
 const StyledFormControl = styled(FormControl)(({}) => ({
@@ -58,7 +59,7 @@ const StyledNumberTextField = styled(TextField)(({}) => ({
 }));
 
 // ------------------------------------------------------------
-export default function Nilai({findingResponse, getData}: NilaiPropsType) {
+export default function Nilai({findingResponse, getData, isDisabled}: NilaiPropsType) {
   const [isMounted, setIsMounted] = useState(true);
 
   const matrixDetail = findingResponse?.matrixDetail[0] || null;
@@ -138,6 +139,7 @@ export default function Nilai({findingResponse, getData}: NilaiPropsType) {
           openSnackbar(response?.message, 'error');
         };
         await getWsJunctionKanwil(wsJunction?.kppn_id || '');
+        await getData()
         setIsLoading(false);
       }catch(err: any){
         openSnackbar(err?.message, 'error');
@@ -222,6 +224,7 @@ export default function Nilai({findingResponse, getData}: NilaiPropsType) {
     }, async () => {
       try{
         await getWsJunctionKanwil(wsJunction?.kppn_id || '');
+        await getData()
         setIsLoading(false);
       }catch(err: any){
         openSnackbar(err?.message, 'error');
@@ -245,6 +248,7 @@ export default function Nilai({findingResponse, getData}: NilaiPropsType) {
         try{
           setStdScoreKanwil(score.toString());
           await getWsJunctionKanwil(wsJunction?.kppn_id || '');
+          await getData()
           setIsLoading(false);
         }catch(err: any){
           openSnackbar(err?.message, 'error');
@@ -277,6 +281,7 @@ export default function Nilai({findingResponse, getData}: NilaiPropsType) {
       }, async() => {
         try{
           await getWsJunctionKanwil(wsJunction?.kppn_id || '');
+          await getData()
           setStdScoreKPPN(score.toString());
           setIsLoading(false);
         }catch(err: any){
@@ -325,7 +330,7 @@ export default function Nilai({findingResponse, getData}: NilaiPropsType) {
                   type="text"
                   onChange={(e) => setStdScoreKPPN(e.target.value)}
                   onBlur={(e) => handleChangeKPPNScoreStd(e)}
-                  disabled={isKanwil}
+                  disabled={isKanwil || isDisabled}
                   value={stdScoreKPPN}
                 />
                 <Tooltip title='Ambil nilai standardisasi'>
@@ -350,7 +355,7 @@ export default function Nilai({findingResponse, getData}: NilaiPropsType) {
                 value={wsJunction?.kppn_score !== null ? String(wsJunction?.kppn_score) : ''}
                 onChange={(e) => handleChangeKPPNScore(e.target.value as string)}
                 size='small' 
-                disabled={isKanwil}
+                disabled={isKanwil || isDisabled}
               >
                 {opsiSelection}
                 <StyledMenuItem key={null} value={''}>{null}</StyledMenuItem>
@@ -371,7 +376,7 @@ export default function Nilai({findingResponse, getData}: NilaiPropsType) {
                   type="text"
                   onChange={(e) => setStdScoreKanwil(e.target.value)}
                   onBlur={(e) => handleChangeKanwilScoreStd(e)}
-                  disabled={!isKanwil}
+                  disabled={!isKanwil || isDisabled}
                   value={stdScoreKanwil}
                 />
                 <Tooltip title='Ambil nilai standardisasi'>
@@ -381,7 +386,7 @@ export default function Nilai({findingResponse, getData}: NilaiPropsType) {
                       variant='contained' 
                       size='small' 
                       color='warning'
-                      disabled={!isKanwil}
+                      disabled={!isKanwil || isDisabled}
                       onClick={() => handleFetchStdScoreKanwil()}
                     >
                       <Iconify icon="solar:refresh-bold-duotone"/>
@@ -396,7 +401,7 @@ export default function Nilai({findingResponse, getData}: NilaiPropsType) {
                 value={wsJunction?.kanwil_score !== null ? String(wsJunction?.kanwil_score) : ''} 
                 onChange={(e) => handleChangeKanwilScore(e.target.value as string)}
                 size='small' 
-                disabled={!isKanwil}
+                disabled={!isKanwil || isDisabled}
               >
                 {opsiSelection}
                 <StyledMenuItem key={null} value={''}>{null}</StyledMenuItem>

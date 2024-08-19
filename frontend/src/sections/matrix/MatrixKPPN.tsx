@@ -33,6 +33,12 @@ export default function MatrixKPPN() {
   
   const {auth} = useAuth();
 
+  const isKanwil = auth?.kppn === '03010';
+
+  const payloadKPPN = auth?.kppn || '';
+
+  const defaultTab = isKanwil? '010': payloadKPPN;
+
   const {setIsLoading} = useLoading();
 
   const { openSnackbar} = useSnackbar();
@@ -41,7 +47,7 @@ export default function MatrixKPPN() {
 
   const [matrixScore, setMatrixScore] = useState<MatrixScoreAndProgressType | null>(null);
 
-  const [tabValue, setTabValue] = useState('010'); // ganti menu komponen supervisi
+  const [tabValue, setTabValue] = useState(defaultTab); // ganti menu komponen supervisi
 
   const kppnName = kppnRef?.list.filter((item) => item.id === kppnId)[0]?.alias || ''
 
@@ -72,19 +78,22 @@ export default function MatrixKPPN() {
   };
 
   useEffect(() => {
-    const id = params.get('id');
-
-    if(!id){
-      navigate(`?id=010`);
+    if(!kppnId){
+      navigate(`?id=${defaultTab}`);
     };
-    if (id !== tabValue) {
-      setTabValue(id || '010'); // Sync tabValue with URL on location change
+
+    if(!isKanwil){
+      navigate(`?id=${defaultTab}`);
+    }
+
+    if (kppnId !== tabValue) {
+      setTabValue(kppnId || '010'); // Sync tabValue with URL on location change
     };
 
     getMatrixScoreAndProgress();
   }, [location.search, tabValue]);
 
-  const isKanwil = auth?.kppn === '03010';
+
   const totalChecklist = matrixScore?.totalChecklist || 0;
   const countProgress = isKanwil ? ((matrixScore?.totalProgressKanwil) || 0 ): ((matrixScore?.totalProgressKPPN) || 0 );
   const progressPercentPembinaan = ((countProgress/totalChecklist) * 100) || 0; 

@@ -79,6 +79,7 @@ const WsJunctionProvider = ({children}: WsJunctionProviderProps) => {
     try{
       const response = await axiosJWT.get(`/getWorksheetByPeriodAndKPPN/${kppnId}`);
       setWsDetail(response.data.rows);
+      console.log(response.data.rows)
     }catch(err: any){
       setWsDetail(null);
       if(err.response){

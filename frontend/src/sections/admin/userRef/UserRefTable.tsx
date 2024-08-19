@@ -65,7 +65,8 @@ export default function UserRefTable({users, setEditModalOpen, tab, setTab}: Use
   const handleDelete = async(id: number) => {
     try{
       setIsLoading(true);
-      const response = await axiosJWT.post("/deleteUser", {id: id});
+      const time = new Date().getTime();
+      const response = await axiosJWT.post(`/deleteUser?time=${time}`, {id: id});
       openSnackbar(response.data.message, 'success');
       getUser();
       setIsLoading(false);
@@ -89,8 +90,9 @@ export default function UserRefTable({users, setEditModalOpen, tab, setTab}: Use
 
   const handleApprove = async(id: number) => {
     try{
+      const time = new Date().getTime();
       setIsLoading(true);
-      const response = await axiosJWT.post("/updateStatus", {id: id});
+      const response = await axiosJWT.post(`/updateStatus?time=${time}`, {id: id});
       openSnackbar(response.data.message, 'success');
       getUser();
       setIsLoading(false);
@@ -129,7 +131,6 @@ export default function UserRefTable({users, setEditModalOpen, tab, setTab}: Use
   const handleFilterUnit = (event: SelectChangeEvent<unknown>) => {
     setPage(0);
     setFilterUnit(event.target.value as string);
-    console.log(event.target.value);
   };
 
   const emptyRows = useMemo(() => page > 0 ? Math.max(0, (1 + page) * rowsPerPage - users.length) : 0, [page, rowsPerPage, users.length]);

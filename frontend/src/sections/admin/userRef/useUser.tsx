@@ -38,8 +38,9 @@ const UserProvider = ({children}: UserProviderProps) => {
 
   const getUser = async() => {
     try{
+      const time = new Date().getTime();
       setIsLoading(true);
-      const response = await axiosJWT.get("/getUser");
+      const response = await axiosJWT.get(`/getUser?time=${time}`);
       setUser(response.data.rows);
       setIsLoading(false);
     }catch(err: any){

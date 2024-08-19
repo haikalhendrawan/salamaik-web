@@ -14,9 +14,7 @@ import { sanitizeMimeType } from '../utils/mimeTypeSanitizer';
 import { validateScore } from '../utils/worksheetJunction.utils';
 import { getScoreForMatrix } from '../utils/getScorePembinaan';
 import {UnitType} from '../model/unit.model';
-
 // ------------------------------------------------------------------
-
 interface ScorePerKomponenType{
   komponenId: number,
   komponenTitle: string,
@@ -252,11 +250,7 @@ const editWsJunctionKanwilNote = async(req: Request, res: Response, next: NextFu
 const editWsJunctionFile = async(req: Request, res: Response, next: NextFunction) => {
   uploadWsJunctionFile(req, res, async (err: any) => {
     if(err instanceof multer.MulterError) {
-      if(err.message==='LIMIT FILE SIZE'){
-        return next(new ErrorDetail(400, 'File size is too large (max 30mb)'));
-      }else{
-        return next(err);
-      }
+      return next(new ErrorDetail(400, 'File too large (Max 5mb)', err));
     } else if(err) {
       return next(err);
     };

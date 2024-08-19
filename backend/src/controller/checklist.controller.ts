@@ -76,11 +76,7 @@ const editChecklist = async (req: Request, res: Response, next: NextFunction) =>
 const editChecklistFile = async (req: Request, res: Response, next: NextFunction) => {
   uploadChecklistFile(req, res, async (err: any) => {
     if(err instanceof multer.MulterError) {
-      if(err.message==='LIMIT FILE SIZE'){
-        return next(new ErrorDetail(400, 'File size is too large (max 12 mb)'));
-      }else{
-        return next(err);
-      }
+      return next(new ErrorDetail(400, 'File too large (Max 5mb)', err));
     } else if(err) {
       return next(err);
     };
@@ -109,10 +105,11 @@ const editChecklistFile = async (req: Request, res: Response, next: NextFunction
 
 const deleteChecklistFile = async (req: Request, res: Response, next: NextFunction) => {
   try{
-    const {id, fileName, option} = req.body;
+    const {id, filename, option} = req.body;
     const result = await checklist.deleteChecklistFile(id, option);
 
-    const filePath = path.join(__dirname,`../uploads/checklist/`, fileName);
+
+    const filePath = path.join(__dirname,`../uploads/checklist/`, filename);
     fs.unlinkSync(filePath);
 
     return res.status(200).json({sucess: true, message: 'file deleted successfully', rows: result});

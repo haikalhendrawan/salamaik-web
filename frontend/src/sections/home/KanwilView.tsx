@@ -43,6 +43,8 @@ interface FindingsWithChecklist{
 export default function KanwilView(){
   const theme = useTheme();
 
+  const [isMounted, setIsMounted] = useState(false);
+
   const axiosJWT = useAxiosJWT();
 
   const {setIsLoading} = useLoading();
@@ -59,9 +61,9 @@ export default function KanwilView(){
 
   const [findingsData, setFindingsData] = useState<FindingsWithChecklist[]>([]);
 
-  const isDataReady = useMemo(() => {
-    return kppnScoreProgress.length > 0 && historicalScore.length > 0 && findingsData.length > 0;
-  }, [kppnScoreProgress, historicalScore, findingsData]);
+  // const isDataReady = useMemo(() => {
+  //   return kppnScoreProgress.length > 0 && historicalScore.length > 0 && findingsData.length > 0;
+  // }, [kppnScoreProgress, historicalScore, findingsData]);
 
   const getScoreProgress = async() => {
     try{
@@ -109,6 +111,7 @@ export default function KanwilView(){
     getScoreProgress();
     getHistorical();
     getFindings();
+    setIsMounted(true);
 
   }, []);
 
@@ -144,7 +147,7 @@ export default function KanwilView(){
     }
   }) || [];
 
-  if(!isDataReady){
+  if(!isMounted){
     return( 
     <>
       <Grid item xs={12} md={4}>

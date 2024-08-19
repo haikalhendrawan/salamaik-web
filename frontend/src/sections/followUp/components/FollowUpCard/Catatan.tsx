@@ -14,7 +14,8 @@ import useAxiosJWT from "../../../../hooks/useAxiosJWT";
 // ------------------------------------------------------------
 interface CatatanPropsType{
   findingResponse: FindingsResponseType | null,
-  getData: () => void
+  getData: () => Promise<void>,
+  isDisabled: boolean
 };
 
 const StyledFormControl = styled(FormControl)(({theme}) => ({
@@ -25,7 +26,7 @@ const StyledFormControl = styled(FormControl)(({theme}) => ({
 }));
 
 // ------------------------------------------------------------
-export default function Catatan({findingResponse, getData}: CatatanPropsType) {
+export default function Catatan({findingResponse, getData, isDisabled}: CatatanPropsType) {
   const [isMounted, setIsMounted] = useState(true);
 
   const wsJunction = findingResponse?.matrixDetail[0]?.ws_junction[0] || null;
@@ -96,7 +97,8 @@ export default function Catatan({findingResponse, getData}: CatatanPropsType) {
         id: findingResponse?.id,
         kanwilResponse: kanwilNote,
         kppnResponse: kppnNote,
-        userName: auth?.name
+        userName: auth?.name,
+        matrixId: findingResponse?.matrix_id
       });
       getData();
       openSnackbar(response.data.message, "success");
@@ -127,7 +129,7 @@ export default function Catatan({findingResponse, getData}: CatatanPropsType) {
             maxRows={6}
             fullWidth
             inputProps={{sx: {fontSize: 12, width:'100%', height:'100%'}, spellCheck: false}} 
-            disabled={isKanwil}
+            disabled={isKanwil || isDisabled}
           />
         </StyledFormControl>
         <StyledFormControl>
@@ -141,7 +143,7 @@ export default function Catatan({findingResponse, getData}: CatatanPropsType) {
             maxRows={6}
             fullWidth
             inputProps={{sx: {fontSize: 12, width:'100%', height:'100%'}, spellCheck: false}} 
-            disabled={!isKanwil}
+            disabled={!isKanwil || isDisabled}
           />
         </StyledFormControl>
       </div>

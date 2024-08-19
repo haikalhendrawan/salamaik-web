@@ -54,6 +54,10 @@ export default function MatrixTable({matrix, matrixStatus, getMatrix, worksheetI
 
   const {subKomponenRef} = useDictionary();
 
+  const isAdminKanwil = auth?.role === 4 || auth?.role === 99;
+
+  const isUserKanwil = auth?.role === 3;
+
   const selectedMatrix = useMemo(() => {
     if(selectedId){
       return matrix?.find((matrix) => matrix?.id === selectedId) || null
@@ -78,6 +82,16 @@ export default function MatrixTable({matrix, matrixStatus, getMatrix, worksheetI
     }finally{
       setIsLoading(false);
     }
+  };
+
+  const handleClickAassign = () => {
+    openDialog(
+      'Assign Matriks',
+      'Assign matriks? pastikan seluruh checklist kertas kerja telah diisi',
+      'pink',
+      'Ya',
+      () => handleAssignMatrix()
+    )
   };
 
   const handleClickReassign = () => {
@@ -141,7 +155,7 @@ export default function MatrixTable({matrix, matrixStatus, getMatrix, worksheetI
   const tableContentNoMatrix =  (
     <TableRow hover key={0} tabIndex={-1}>
       <TableCell colSpan={10} height={'480px'} align='center'>
-        <Button variant='contained' endIcon={ <Iconify icon="solar:plain-bold-duotone"/>} onClick={handleAssignMatrix}>
+        <Button variant='contained' endIcon={ <Iconify icon="solar:plain-bold-duotone"/>} onClick={handleClickAassign}>
           Assign Matrix
         </Button>
       </TableCell>
@@ -165,7 +179,7 @@ export default function MatrixTable({matrix, matrixStatus, getMatrix, worksheetI
             <MatrixTableHead />
             <TableBody>
               {
-                matrixStatus === 0 ? tableContentNoMatrix : null
+                (matrixStatus === 0 && isAdminKanwil)? tableContentNoMatrix : null
               }
               {
                 matrix.length === 0 
@@ -187,6 +201,15 @@ export default function MatrixTable({matrix, matrixStatus, getMatrix, worksheetI
                     const findingStatus = item?.findings?.[0]?.status;
                     const isFinding = item?.is_finding===1;
 
+                    const statusLabels: Record<number, { color: string; text: string }> = {
+                      3: { color: 'success', text: 'Disetujui' },
+                      2: { color: 'error', text: 'Ditolak' },
+                      1: { color: 'warning', text: 'Proses' },
+                      0: { color: 'error', text: 'Perlu tindak lanjut' }
+                    };
+                    
+                    const currentStatus = statusLabels[findingStatus];
+
                     return (
                       <>
                         <TableRow hover key={i+1} tabIndex={-1} >
@@ -206,17 +229,16 @@ export default function MatrixTable({matrix, matrixStatus, getMatrix, worksheetI
                           <StyledTableCell align="left">{item?.tindak_lanjut}</StyledTableCell>
   
                           <StyledTableCell align="left">
-                            {findingStatus === 1
-                              ?(<Label color={'success'}> selesai</Label>)
-                              :findingStatus === 0
-                                ?(<Label color={'error'}> Perlu tindak lanjut </Label>)
-                                : null
-                            }
+                            {currentStatus && (
+                              <Label color={currentStatus.color}>
+                                {currentStatus.text}
+                              </Label>
+                            )}
                           </StyledTableCell>
 
                           <StyledTableCell align="left">
                             <Tooltip title="Edit matriks">
-                              <StyledButton variant='contained' color='warning' onClick={() => handleOpen(item?.id)}>
+                              <StyledButton variant='contained' color='warning' onClick={() => handleOpen(item?.id)} disabled={!isUserKanwil && !isAdminKanwil}>
                                   <Iconify icon="mdi:edit" />
                                 </StyledButton>
                             </Tooltip>
@@ -235,7 +257,7 @@ export default function MatrixTable({matrix, matrixStatus, getMatrix, worksheetI
         </Card>
       </Grow>
       {
-          matrixStatus === 1 
+          matrixStatus === 1 && (isAdminKanwil || isUserKanwil)
           ? <Button 
               variant='contained' 
               color='warning' 
@@ -247,7 +269,7 @@ export default function MatrixTable({matrix, matrixStatus, getMatrix, worksheetI
           : null
       }
       {
-          matrixStatus === 1 
+          matrixStatus === 1 && (isAdminKanwil)
           ? <Button 
               variant='contained' 
               endIcon={ <Iconify icon="solar:trash-bin-trash-bold-duotone"/>} 
