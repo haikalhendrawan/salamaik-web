@@ -9,6 +9,8 @@ import Iconify from '../../../components/iconify';
 import { useChart } from '../../../components/chart';
 import PeriodSelectionPopper from "./PeriodSelectionPopper";
 import useDictionary from "../../../hooks/useDictionary";
+import { useAuth } from "../../../hooks/useAuth";
+import { KPPNScoreProgressResponseType } from "../types"; 
 
 // ----------------------------------------------------------------------
 const StyledButton = styled(Button)(({theme}) => ({
@@ -26,9 +28,17 @@ const StyledButton = styled(Button)(({theme}) => ({
 interface SortedKPPNScoreProps{
   title: string,
   subheader: string,
-  chartData: any[],
+  chartData: ChartDataType[],
   colors?: string,
 };
+
+interface ChartDataType{
+  even_period: number,
+  id: number, 
+  kppn: KPPNScoreProgressResponseType[],
+  semester: number,
+  tahun: number
+}
 
 // --------------------------------------------------------------------
 export default function SortedKPPNScore({ title, subheader, chartData, colors, ...other }: SortedKPPNScoreProps) {
@@ -36,7 +46,9 @@ export default function SortedKPPNScore({ title, subheader, chartData, colors, .
   
   const [open, setOpen] = useState<any>(null);
 
-  const [selectedPeriod, setSelectedPeriod] = useState<number>(0);
+  const {auth} = useAuth();
+
+  const [selectedPeriod, setSelectedPeriod] = useState<number>(auth?.period || 0);
 
   const handleClose = () => {
     setOpen(null);
@@ -45,7 +57,6 @@ export default function SortedKPPNScore({ title, subheader, chartData, colors, .
   const handleChangePeriod = (newPeriod: number) => {
     setSelectedPeriod(newPeriod);
     setOpen(null);
-    console.log(chartData)
   };
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -53,7 +64,7 @@ export default function SortedKPPNScore({ title, subheader, chartData, colors, .
     setOpen(target);
   };
 
-  const filteredChartData = chartData?.filter((item) => item.id === 0)[selectedPeriod]?.kppn?.map((unit: any) => ({
+  const filteredChartData = chartData?.filter((item) => item.id === selectedPeriod)[0]?.kppn?.map((unit: any) => ({
     label: unit.alias, 
     value: unit.scoreProgressDetail.scoreByKanwil
   })) || [];

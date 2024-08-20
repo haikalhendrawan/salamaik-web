@@ -59,9 +59,8 @@ const addWorksheet = async(req: Request, res: Response, next: NextFunction) => {
 
 const assignWorksheet = async(req: Request, res: Response, next: NextFunction) => {
   const client = await pool.connect();
-  await client.query('BEGIN');
-
   try {
+    await client.query('BEGIN');
     const { worksheetId, kppnId, period } = req.body;
     const allChecklist: ChecklistType[]  = await checklist.getAllChecklist(client);
 

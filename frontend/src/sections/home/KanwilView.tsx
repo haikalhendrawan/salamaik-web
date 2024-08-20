@@ -115,6 +115,8 @@ export default function KanwilView(){
 
   }, []);
 
+  const currentPeriodString = periodRef?.list?.find((item) => item.id === auth?.period)?.name || '';
+
   const countProgressWorksheet = kppnScoreProgress?.reduce((a, c) => (a + (c?.scoreProgressDetail?.totalProgressKanwil || 0)), 0);
   const countTotalChecklist = kppnScoreProgress?.reduce((a, c) => (a + (c?.scoreProgressDetail?.totalChecklist || 0)), 0);
   const percentProgress = countProgressWorksheet / countTotalChecklist * 100;
@@ -251,7 +253,7 @@ export default function KanwilView(){
       <Grid item xs={12} md={4}>
         <SortedKPPNScore
           title= "Nilai Per KPPN"
-          subheader = 'Periode Smt 1 2023'
+          subheader = {`Periode ${currentPeriodString}`}
           chartData= {historicalScore}
         />
       </Grid>
