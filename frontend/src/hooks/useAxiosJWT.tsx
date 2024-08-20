@@ -15,8 +15,8 @@ const useAxiosJWT = () => {
         }
 
         if (config.method === 'get') {
-            const timeStamp = new Date().getTime(); // Current timestamp
-            config.params = {...config.params, _: timeStamp}; // Add time to the params
+            const timeStamp = new Date().getTime(); 
+            config.params = {...config.params, _: timeStamp}; // Add time to the params, utk cache busting
         }
         return config;
     }, (error) => {

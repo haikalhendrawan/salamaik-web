@@ -66,7 +66,8 @@ const assignWorksheet = async(req: Request, res: Response, next: NextFunction) =
     const allChecklist: ChecklistType[]  = await checklist.getAllChecklist(client);
 
     const mapChecklist = Promise.all (allChecklist.map(async(item) => {
-        await wsJunction.addWsJunction(worksheetId, item.id, kppnId, period, client);
+        const isExcluded = item.standardisasi;
+        await wsJunction.addWsJunction(worksheetId, item.id, kppnId, period, isExcluded, client);
     }));
     
     const result = await worksheet.editWorksheetStatus(worksheetId, client);

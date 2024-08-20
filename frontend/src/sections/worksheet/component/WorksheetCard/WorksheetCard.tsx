@@ -14,6 +14,7 @@ import Nilai from "./Nilai";
 import Catatan from "./Catatan";
 import { WsJunctionType, WorksheetType } from "../../types";
 import { debounce } from 'lodash';
+import  useTheme  from "@mui/material/styles/useTheme";
 
 // ------------------------------------------------------------
 interface WorksheetCardProps {
@@ -55,9 +56,12 @@ const StyledDivider = styled(Divider)(({ theme }) => ({
 // ------------------------------------------------------------
 export default function WorksheetCard(props: WorksheetCardProps) {
   const [mounted, setIsMounted] = useState(false);
+
   const [renderNilai, setRenderNilai] = useState(false);
 
   const [openInstruction, setOpenInstruction] = useState<boolean>(false);
+
+  const theme = useTheme();
 
   const [anchorEl, setAnchorEl] = useState<EventTarget & HTMLButtonElement | null>(null);
 
@@ -80,6 +84,9 @@ export default function WorksheetCard(props: WorksheetCardProps) {
     };
   }, []);
 
+  const isExcluded = props?.wsJunction?.excluded ===1;
+  const disableStyle = {opacity: 0.6, pointerEvents: 'none'};
+
   if (!mounted) {
     return <WorksheetCardSkeleton />;
   }
@@ -87,14 +94,15 @@ export default function WorksheetCard(props: WorksheetCardProps) {
   return (
     <>
       <Grid item xs={12} sm={12} md={12}>
-        <Card sx={{ minHeight: '300px' }} id={props.id} key={props.wsJunction?.checklist_id}>
+        <Card sx={{minHeigth:'300px'}} id={props.id} key={props.wsJunction?.checklist_id}>
           <StyledCardHeader
             title={
               <Head
-                num={props.wsJunction?.checklist_id}
-                title={props.wsJunction?.title || ""}
-                dateUpdated={props.wsJunction?.last_update || null}
-                updatedBy={props.wsJunction?.updated_by || null}
+                num={props?.wsJunction?.checklist_id}
+                title={props?.wsJunction?.title || ""}
+                dateUpdated={props?.wsJunction?.last_update || null}
+                updatedBy={props?.wsJunction?.updated_by || null}
+                wsJunction={props?.wsJunction}
               />
             }
           />
@@ -125,6 +133,7 @@ export default function WorksheetCard(props: WorksheetCardProps) {
           <BodyGrid
             container
             spacing={1}
+            sx={isExcluded ? disableStyle : null}
           >
             <Grid item xs={6}>
               <Kriteria
@@ -142,7 +151,7 @@ export default function WorksheetCard(props: WorksheetCardProps) {
             </Grid>
 
             <Grid item xs={1.5}>
-              {renderNilai && <Nilai wsJunction={props.wsJunction} wsDetail={props.wsDetail}/>}
+              {renderNilai && <Nilai wsJunction={props.wsJunction} wsDetail={props.wsDetail} isExcluded={isExcluded}/>}
             </Grid>
 
             <Grid item xs={3}>

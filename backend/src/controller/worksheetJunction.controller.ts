@@ -276,6 +276,16 @@ const editWsJunctionFile = async(req: Request, res: Response, next: NextFunction
   });
 };
 
+const editWsJunctionExclude = async(req: Request, res: Response, next: NextFunction) => {
+  try{
+    const {junctionId, exclude} = req.body;
+    const result = await wsJunction.editWsJunctionExclude(junctionId, exclude);
+    return res.status(200).json({sucess: true, message: 'Edit worksheet junction success', rows: result})
+  }catch(err){
+    next(err);
+  }
+}
+
 const deleteWsJunctionFile = async(req: Request, res: Response, next: NextFunction) => {
   try{
     const {username} = req.payload;
@@ -315,6 +325,7 @@ export {
   editWsJunctionKanwilScore,
   editWsJunctionKanwilNote,
   editWsJunctionFile,
+  editWsJunctionExclude,
   deleteWsJunctionByWorksheetId,
   deleteWsJunctionFile
 }
@@ -373,9 +384,9 @@ async function getScoreProgressResponseBody(mainWorksheet: WorksheetType[]) {
       scoreByKanwil : getScoreForMatrix(komponenAll, wsJunctionDetail, true)?.reduce((a, c) => a+c.weightedScore, 0) || 0,
       scoreByKPPN: getScoreForMatrix(komponenAll, wsJunctionDetail, false)?.reduce((a, c) => a+c.weightedScore, 0) || 0,
       isFinal: isPastDue,
-      totalChecklist: wsJunctionDetail?.length,
-      totalProgressKanwil: wsJunctionDetail?.filter((item) => item?.kanwil_score !== null).length,
-      totalProgressKPPN: wsJunctionDetail?.filter((item) => item?.kppn_score !== null).length,
+      totalChecklist: wsJunctionDetail?.filter((item) => item?.excluded !== 1).length,
+      totalProgressKanwil: wsJunctionDetail?.filter((item) => (item?.kanwil_score !== null) && (item?.excluded !== 1)).length,
+      totalProgressKPPN: wsJunctionDetail?.filter((item) => (item?.kppn_score !== null) && (item?.excluded !== 1)).length,
       scorePerKomponen: getScoreForMatrix(komponenAll, wsJunctionDetail, true),
       scorePerKomponenKPPN: getScoreForMatrix(komponenAll, wsJunctionDetail, false)
     };
@@ -433,9 +444,9 @@ async function getScoreProgressResponseBodyAllKPPN(mainWorksheet: WorksheetType[
         scoreByKanwil : getScoreForMatrix(komponenAll, wsJunctionDetail, true)?.reduce((a, c) => a+c.weightedScore, 0) || 0,
         scoreByKPPN: getScoreForMatrix(komponenAll, wsJunctionDetail, false)?.reduce((a, c) => a+c.weightedScore, 0) || 0,
         isFinal: isPastDue,
-        totalChecklist: wsJunctionDetail?.length,
-        totalProgressKanwil: wsJunctionDetail?.filter((item) => item?.kanwil_score !== null).length,
-        totalProgressKPPN: wsJunctionDetail?.filter((item) => item?.kppn_score !== null).length,
+        totalChecklist: wsJunctionDetail?.filter((item) => item?.excluded !== 1).length,
+        totalProgressKanwil: wsJunctionDetail?.filter((item) => (item?.kanwil_score !== null) && (item?.excluded !== 1)).length,
+        totalProgressKPPN: wsJunctionDetail?.filter((item) => (item?.kppn_score !== null) && (item?.excluded !== 1)).length,
         scorePerKomponen: getScoreForMatrix(komponenAll, wsJunctionDetail, true),
         scorePerKomponenKPPN: getScoreForMatrix(komponenAll, wsJunctionDetail, false)
       }

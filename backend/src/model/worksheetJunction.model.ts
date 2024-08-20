@@ -22,7 +22,8 @@ export interface WorksheetJunctionType{
   kppn_id: string,
   period: string,
   last_update: string | null,
-  updated_by: string | null
+  updated_by: string | null,
+  excluded: number
 };
 
 export interface OpsiType{
@@ -49,6 +50,7 @@ export interface WsJunctionJoinChecklistType{
   period: string,
   last_update: string | null,
   updated_by: string | null,
+  excluded: number,
   id: number,
   title: string | null, 
   header: string | null,
@@ -81,6 +83,7 @@ export interface WsJunctionWithKomponenType{
   period: string,
   last_update: string | null,
   updated_by: string | null,
+  excluded: number,
   checklist: ChecklistType[],
   komponen: KomponenType[],
   subkomponen: SubKomponenType[],
@@ -171,12 +174,12 @@ class WorksheetJunction{
     }
   }
 
-  async addWsJunction(worksheetId: string, checklistId: number, kppnId: string, period: number, poolTrx?: PoolClient){
+  async addWsJunction(worksheetId: string, checklistId: number, kppnId: string, period: number, isExcluded: number, poolTrx?: PoolClient){
     const poolInstance = poolTrx ?? pool;
 
     try{
-      const q = "INSERT INTO worksheet_junction (worksheet_id, checklist_id, kppn_id, period) VALUES ($1, $2, $3, $4) RETURNING *";
-      const result = await poolInstance.query(q, [worksheetId, checklistId, kppnId, period]);
+      const q = "INSERT INTO worksheet_junction (worksheet_id, checklist_id, kppn_id, period, excluded) VALUES ($1, $2, $3, $4, $5) RETURNING *";
+      const result = await poolInstance.query(q, [worksheetId, checklistId, kppnId, period, isExcluded]);
       return result.rows
     }catch(err){
       throw err
@@ -227,6 +230,17 @@ class WorksheetJunction{
       const q = queryOption[option-1];
       const result = await pool.query(q, [fileName, updateTime, userName, junctionId, worksheetId]);
       return result.rows
+    }catch(err){
+      throw err
+    }
+  }
+
+  async editWsJunctionExclude(junctionId: number, exclude: number){
+    try{
+      const q = "UPDATE worksheet_junction SET excluded = $1, kanwil_note = $2 WHERE junction_id = $3 RETURNING *";
+      const kanwilNote = exclude===1?'Dikecualikan':null;
+      const result = await pool.query(q, [exclude, kanwilNote, junctionId]);
+      return result.rows[0]
     }catch(err){
       throw err
     }

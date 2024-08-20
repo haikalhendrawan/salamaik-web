@@ -210,7 +210,12 @@ export default function NavigationDrawer({tabValue, scrollToElement}: {tabValue:
 // --------------------------------------------------------------------------------------------------------------------
 function getLabelColor(item: WsJunctionType, auth: AuthType | null){
   const isKanwil = [3, 4, 99].includes(auth?.role || 0);
+  const isExcluded = item?.excluded === 1;
   const score = isKanwil?item.kanwil_score: item.kppn_score;
+
+  if(isExcluded){
+    return "success"
+  }
 
   if(score===null){
     return "pink"

@@ -22,6 +22,7 @@ export interface WsJunctionType{
     period: string,
     last_update: string | null,
     updated_by: string | null,
+    excluded: number,
     id: number,
     title: string | null, 
     header: string | null,

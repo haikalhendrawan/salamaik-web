@@ -64,7 +64,7 @@ export function renderConditionalRow(
                   <TableCell key={id} align="center" sx={{ fontSize: '13px' }}>
                     <Stack direction="row" spacing={0} alignContent="center" textAlign={'center'} justifyContent={'center'}>
                       {item.length === 0 ? (
-                        <AddButton kppn={kppnTab} standardizationId={row.id} month={id + 1} />
+                        <AddButton kppn={kppnTab} standardizationId={row.id} month={isEvenPeriod? id + 7 : id + 1} />
                       ) : (
                         <CheckButton file={item[0].file} id={item[0].id} />
                       )}
@@ -92,15 +92,15 @@ export function renderConditionalRow(
                       {item.length === 0 
                         ? (
                             <>
-                              <AddButton kppn={kppnTab} standardizationId={row.id} month={id + 1} />
-                              <AddButton kppn={kppnTab} standardizationId={row.id} month={id + 1} />
+                              <AddButton kppn={kppnTab} standardizationId={row.id} month={isEvenPeriod? id + 7 : id + 1} />
+                              <AddButton kppn={kppnTab} standardizationId={row.id} month={isEvenPeriod? id + 7 : id + 1} />
                             </>
                           )
                         : item.length===1 
                           ? (
                             <>
                               <CheckButton file={item[0].file} id={item[0].id} />
-                              <AddButton kppn={kppnTab} standardizationId={row.id} month={id + 1} />
+                              <AddButton kppn={kppnTab} standardizationId={row.id} month={isEvenPeriod? id + 7 : id + 1} />
                             </>
                             )
                           :(
@@ -141,7 +141,7 @@ export function renderConditionalRow(
                             ))}
                             {Array.from({ length: short }).map((_, index) => (
                               <Grid item xs={6}>
-                                <AddButton key={index} kppn={kppnTab} standardizationId={row.id} month={id + 1} />
+                                <AddButton key={index} kppn={kppnTab} standardizationId={row.id} month={isEvenPeriod? id + 7 : id + 1} />
                               </Grid>
                             ))}
                           </Grid>
@@ -169,7 +169,7 @@ export function renderConditionalRow(
                   <TableCell key={id} align="center" sx={{ fontSize: '13px' }}>
                     <Stack direction="row" spacing={0} alignContent="center" textAlign={'center'} justifyContent={'center'}>
                       {item.length === 0 ? (
-                        <AddButton kppn={kppnTab} standardizationId={row.id} month={id + 1} />
+                        <AddButton kppn={kppnTab} standardizationId={row.id} month={isEvenPeriod? id + 7 : id + 1} />
                       ) : (
                         <CheckButton file={item[0].file} id={item[0].id} />
                       )}

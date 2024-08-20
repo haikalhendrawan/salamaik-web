@@ -18,6 +18,7 @@ router.post("/editWsJunctionKPPNScore", authenticate, authorize([99, 4, 2, 1]), 
 router.post("/editWsJunctionKanwilScore", authenticate, authorize([99, 4, 3]), wsJunctionController.editWsJunctionKanwilScore);
 router.post("/editWsJunctionKanwilNote", authenticate, authorize([99, 4, 3]), wsJunctionController.editWsJunctionKanwilNote);
 router.post("/editWsJunctionFile", authenticate, authorize([99, 4, 3, 2, 1]), wsJunctionController.editWsJunctionFile);
+router.post("/editWsJunctionExclude", authenticate, authorize([99, 4, 3]), wsJunctionController.editWsJunctionExclude);
 router.post("/deleteWsJunctionByWorksheetId", authenticate,  authorize([99, 4]), wsJunctionController.deleteWsJunctionByWorksheetId);
 
 export default router

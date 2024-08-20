@@ -23,6 +23,7 @@ import { StandardizationType } from '../../../standardization/types';
 interface NilaiPropsType{
   wsJunction: WsJunctionType | null,
   wsDetail: WorksheetType | null,
+  isExcluded: boolean
 };
 
 const StyledFormControl = styled(FormControl)(({}) => ({
@@ -57,7 +58,7 @@ const StyledNumberTextField = styled(TextField)(({}) => ({
 }));
 
 // ------------------------------------------------------------
-export default function Nilai({wsJunction, wsDetail}: NilaiPropsType) {
+export default function Nilai({wsJunction, wsDetail, isExcluded}: NilaiPropsType) {
   const [isMounted, setIsMounted] = useState(true);
 
   const [stdScoreKanwil, setStdScoreKanwil] = useState(wsJunction?.kanwil_score || '');
@@ -304,11 +305,11 @@ export default function Nilai({wsJunction, wsDetail}: NilaiPropsType) {
         <Skeleton variant="rounded" height={'1.4375em'} width={'100%'} />
       </>
     );
-  }
+  };
 
   return (
     <Stack direction='column' spacing={2}>
-      <Stack direction='column' spacing={1}>
+      <Stack direction='column' spacing={1} display={isExcluded ? 'none' : 'flex'}>
         <Typography variant='body3' fontSize={12} textAlign={'left'}>Nilai KPPN :</Typography>
         <StyledFormControl>
           {
@@ -354,7 +355,7 @@ export default function Nilai({wsJunction, wsDetail}: NilaiPropsType) {
         </StyledFormControl>
       </Stack>
       
-      <Stack direction='column' spacing={1}>
+      <Stack direction='column' spacing={1} display={isExcluded ? 'none' : 'flex'}>
         <Typography variant='body3' fontSize={12} textAlign={'left'}>Nilai Kanwil :</Typography>
         <StyledFormControl>
           {

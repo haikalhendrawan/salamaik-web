@@ -69,7 +69,7 @@ const getAllFindingsByKPPN = async(req: Request, res: Response, next: NextFuncti
 
 const addFindings = async (req: Request, res: Response, next: NextFunction) => {
   try{
-    const {worksheetId, wsJunctionId, checklistId, matrixId, scoreBefore} = req.body;
+    // const {worksheetId, wsJunctionId, checklistId, matrixId, scoreBefore} = req.body;
     const result = await findings.createFindings(req.body);
     return res.status(200).json({sucess: true, message: 'Add findings success', rows: result})
   }catch(err){

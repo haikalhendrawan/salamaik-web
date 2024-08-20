@@ -67,9 +67,12 @@ const createMatrix = async(req: Request, res: Response, next: NextFunction) => {
       const positiveFallback = equalScoreItem?.positive_fallback || item?.title || '';
       const negativeFallback = equalScoreItem?.negative_fallback || minimalScoreItem?.negative_fallback || '';
       const isStandardisasi = item.standardisasi === 1;
-      const isFinding = item.standardisasi === 1 
-                        ? item.kanwil_score === 12 ? 0 : 1 
-                        : item.kanwil_score === 10 ? 0 : 1;
+      const isExcluded = item.excluded === 1;
+      const isFinding = isExcluded 
+                        ? 0 
+                        :isStandardisasi 
+                          ? item.kanwil_score === 12 ? 0 : 1 
+                          : item.kanwil_score === 10 ? 0 : 1;
       const wsJunctionId = item.junction_id;
       const checklistId = item.checklist_id;
       const hasilImplementasi = (isStandardisasi ? item.title : positiveFallback);
@@ -165,14 +168,20 @@ const reAssignMatrix = async(req: Request, res: Response, next: NextFunction) =>
       throw new ErrorDetail(404, 'Worksheet not assigned');
     };
 
-    //query #3 for each wsJunction, compare to current matrix and Add or remove matrix dan finding korespondensi
+    //query #3 for each wsJunction, compare to current matrix kemudian Add or remove matrix dan finding korespondensi
     const result = await Promise.all(wsJunctions.map(async(item) => {
       const connectedMatrix = await matrix.getSingleMatrixByWsJunctionId(item?.junction_id, connection);
       const isFindingMatrix = connectedMatrix?.is_finding === 1;
       const isStandardisasi = item?.standardisasi === 1;
-      const isFindingCurrent = isStandardisasi 
-                        ? item?.kanwil_score === 12 ? false : true 
-                        : item?.kanwil_score === 10 ? false : true;
+      const isExcluded = item?.excluded === 1;
+      const isFindingCurrent =  isExcluded 
+                                  ? false
+                                  : isStandardisasi 
+                                    ? item.kanwil_score === 12 ? false : true 
+                                    : item.kanwil_score === 10 ? false : true;
+                                // isStandardisasi 
+                                //   ? item?.kanwil_score === 12 ? false : true 
+                                //   : item?.kanwil_score === 10 ? false : true;
       const isAddFinding = ((isFindingCurrent === true) && (isFindingMatrix === false));
       const isRemoveFinding = ((isFindingCurrent === false) && (isFindingMatrix === true));
 
