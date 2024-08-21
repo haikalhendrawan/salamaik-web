@@ -1,8 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 // @mui
-import { styled, alpha } from '@mui/material/styles';
-import { Box, Link, Button, Drawer, Typography, Avatar, Stack, LinearProgress } from '@mui/material';
+import { Box, Drawer } from '@mui/material';
 // hooks
 import useResponsive from '../../../hooks/display/useResponsive';
 import {useAuth} from "../../../hooks/useAuth";
@@ -18,14 +17,6 @@ import {navSupervisi, navHome, navMonitoring, navAdmin} from './config';
 
 const NAV_WIDTH = 280;
 
-const StyledAccount = styled('div')(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  padding: theme.spacing(2, 2.5),
-  borderRadius: Number(theme.shape.borderRadius) * 1.5,
-  backgroundColor: alpha(theme.palette.grey[500], 0.12),
-}));
-
 // ----------------------------------------------------------------------
 
 interface NavType{
@@ -35,7 +26,7 @@ interface NavType{
 
 export default function Nav({ openNav, onCloseNav }: NavType) {
   const { pathname } = useLocation();
-  const {auth, setAuth} = useAuth() as AuthType;  
+  const {auth} = useAuth() as AuthType;  
 
   const isDesktop = useResponsive('up', 'lg', 'md');
 

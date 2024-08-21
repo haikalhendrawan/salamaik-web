@@ -1,7 +1,7 @@
-import {useState, useEffect} from'react';
+import {useState} from'react';
 import {Stack, Table, Card, TablePagination, TableSortLabel,
-          Tooltip, TableHead, Grow, TableBody, TableRow, TableCell} from '@mui/material';
-import { useTheme, styled } from '@mui/material/styles';
+          Tooltip, TableHead, TableBody, TableRow, TableCell} from '@mui/material';
+import { useTheme,} from '@mui/material/styles';
 import Label from '../../../components/label/Label';
 import StyledButton from '../../../components/styledButton/StyledButton';
 import Iconify from '../../../components/iconify/Iconify';
@@ -40,7 +40,7 @@ export default function NotifTable({notifications, assignNotif, deleteNotif}:Not
 
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
 
-  const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
+  const handleChangePage = (_: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPage(newPage);
   };
 

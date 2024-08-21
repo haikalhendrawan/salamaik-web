@@ -2,14 +2,14 @@ import { Helmet } from 'react-helmet-async';
 import { Link as RouterLink } from 'react-router-dom';
 // @mui
 import { styled } from '@mui/material/styles';
-import { Container, Stack, Typography, Box, Button } from '@mui/material';
+import { Container, Typography, Box, Button } from '@mui/material';
 
 
 // ----------------------------------------------------------------------
 
 export default function Page403() {
 
-  const StyledContent = styled('div')(({ theme }) => ({
+  const StyledContent = styled('div')(({  }) => ({
     maxWidth: 480,
     margin: 'auto',
     minHeight: '100vh',

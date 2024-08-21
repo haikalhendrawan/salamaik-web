@@ -9,10 +9,8 @@
  * 6: periode
  */
 
-import {useState, useEffect} from'react';
-import {Container, Stack, Button, Box, Typography, Grid, Slide, Card, 
-          FormControl, Tooltip, IconButton, Breadcrumbs, Link} from '@mui/material';
-import { useTheme, styled } from '@mui/material/styles';
+import {useState} from'react';
+import {Container, Stack, Button, Typography, Grid, IconButton, Breadcrumbs, Link} from '@mui/material';
 import Iconify from '../../components/iconify';
 import WorksheetRefLanding from "../../sections/admin/worksheetRef/WorksheetRefLanding";
 import ChecklistRef from '../../sections/admin/worksheetRef/ChecklistRef';
@@ -27,8 +25,6 @@ import { DialogProvider } from '../../hooks/display/useDialog';
 //----------------------------------------------------
 
 export default function WorksheetRefPage() {
-  const theme = useTheme();
-
   const [section, setSection] = useState<number>(0);
 
   const [addState, setAddState] = useState<boolean>(false); 

@@ -8,7 +8,7 @@ import AddButton from './components/AddButton';
 import CheckButton from './components/CheckButton';
 import { useAuth } from '../../hooks/useAuth';
 import useDictionary from '../../hooks/useDictionary';
-import { StandardizationJunctionType, StandardizationType } from './types';
+import { StandardizationType } from './types';
 // --------------------------------------------------------------
 const INTERVAL_DESC = [
   "Minimal 1x tiap Bulan",
@@ -134,7 +134,7 @@ export function renderConditionalRow(
                       <TableCell key={id} align="center" sx={{ fontSize: '13px' }}>
                         <Stack direction="row" spacing={0} alignContent="center">
                           <Grid container>
-                            {item.map((std, index) => (
+                            {item.map((_, index) => (
                               <Grid item xs={6}>
                                 <CheckButton file={item[index].file} id={item[index].id} />
                               </Grid>
@@ -237,7 +237,7 @@ export function renderConditionalRow(
                       ))
                     }
                     {
-                      Array.from({ length: q1Short }).map((_, index) =>  (
+                      Array.from({ length: q1Short }).map((_) =>  (
                         <AddButton kppn={kppnTab} standardizationId={row.id} month={isEvenPeriod===0? 3 : 9} />
                       ))
                     }
@@ -251,7 +251,7 @@ export function renderConditionalRow(
                       ))
                     }
                     {
-                      Array.from({ length: q2Short }).map((_, index) =>  (
+                      Array.from({ length: q2Short }).map((_) =>  (
                         <AddButton kppn={kppnTab} standardizationId={row.id} month={isEvenPeriod===0? 6 : 12} />
                       ))
                     }

@@ -1,16 +1,16 @@
 import React, {useState} from "react";
 import {useTheme} from "@mui/material/styles";
 import {IconButton, Stack, Popper, Paper, Fade, ClickAwayListener} from "@mui/material";
-import useMode, {ModeContext} from "../../../hooks/display/useMode";
+import useMode from "../../../hooks/display/useMode";
 import Iconify from '../../../components/iconify';
-import {GREY, PRIMARY, SECONDARY, INFO, SUCCESS, WARNING, ERROR, GREEN, PURPLE, PINK} from '../../../theme/palette';
+import { PRIMARY, WARNING, GREEN, PURPLE, PINK} from '../../../theme/palette';
 
 interface Color{
 	[key: string]:string
 };
 
 const ColorSwitcher = () => {
-	const {mode, setMode, primaryColor, setPrimaryColor} = useMode() as ModeType;
+	const {setPrimaryColor} = useMode() as ModeType;
 	const theme = useTheme();
 	const [open, setOpen] = useState(false);
 	const [anchorEl, setAnchorEl] = useState<EventTarget & HTMLButtonElement | null>(null);

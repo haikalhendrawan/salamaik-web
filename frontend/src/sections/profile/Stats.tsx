@@ -1,11 +1,6 @@
-import { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Iconify from '../../components/iconify/Iconify';
-import Label from '../../components/label/Label';
-import StyledTextField from '../../components/styledTextField';
 // @mui
-import { Stack, Box, FormControl,  Grid, IconButton, Card, Typography, Slide} from '@mui/material';
-import { useTheme, styled } from '@mui/material/styles';
+import {  Box, Grid, Card, Typography, Slide} from '@mui/material';
+import { styled } from '@mui/material/styles';
 // ---------------------------------------------------------
 const StatsContainer = styled(Box)(({theme}) => ({
   backgroundColor:theme.palette.background.neutral,
@@ -23,7 +18,6 @@ const StatsContainer = styled(Box)(({theme}) => ({
 // ---------------------------------------------------------
 
 export default function Stats(){
-  const theme = useTheme();
 
   return(
     <>

@@ -5,7 +5,6 @@ import UserRefTable from './UserRefTable';
 import UserRefAddModal from './UserRefAddModal';
 import UserRefEditModal from './UserRefEditModal';
 import useUser from './useUser';
-import PageLoading from '../../../components/pageLoading/PageLoading';
 // -----------------------------------------------------------------------
 export default function UserRefSection(){
   const [addModalOpen, setAddModalOpen] = useState<boolean>(false);

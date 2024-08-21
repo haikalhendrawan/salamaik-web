@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import { Link } from "react-router-dom";
 // @mui
-import {Card, Box, CardHeader, Grow, Button,  Grid,  IconButton, Tooltip, Skeleton} from '@mui/material';
+import {Card, Box, CardHeader, Grow, Button,  Grid,  Skeleton} from '@mui/material';
 import Iconify from '../../../components/iconify';
 // -----------------------------------------------------------------------
 interface KPPNSelectionCardProps{
@@ -12,7 +12,7 @@ interface KPPNSelectionCardProps{
   link: string;
 };
 // -----------------------------------------------------------------------
-export default function KPPNSelectionCard({header, subheader, lastUpdate, image, link}: KPPNSelectionCardProps){
+export default function KPPNSelectionCard({header, subheader, image, link}: KPPNSelectionCardProps){
   const [imageLoaded, setImageLoaded] = useState(false);
 
   const handleImageLoad = () => {

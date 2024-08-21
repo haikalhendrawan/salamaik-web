@@ -1,12 +1,10 @@
 import { useState} from 'react';
 import Iconify from '../../components/iconify/Iconify';
-import Label from '../../components/label/Label';
 import StyledTextField from '../../components/styledTextField';
 // @mui
 import { Stack,Box, FormControl,  Grid, IconButton, Card, InputAdornment, Button, Slide} from '@mui/material';
-import { useTheme, styled } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import useSnackbar from '../../hooks/display/useSnackbar';
-import useLoading from '../../hooks/display/useLoading';
 import useAxiosJWT from '../../hooks/useAxiosJWT';
 import z from 'zod';
 // ---------------------------------------------------------
@@ -36,11 +34,7 @@ const passwordSchema =  z
 // ---------------------------------------------------------
 
 export default function Security(){
-  const theme = useTheme();
-
   const { openSnackbar } = useSnackbar();
-
-  const { setIsLoading } = useLoading();
 
   const axiosJWT = useAxiosJWT();
 

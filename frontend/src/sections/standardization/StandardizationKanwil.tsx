@@ -1,6 +1,5 @@
 import { Helmet } from 'react-helmet-async';
 import { useState, useEffect, useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
 import { Container, Stack, Typography, Grid} from '@mui/material';
 import useDictionary from '../../hooks/useDictionary';
 // sections
@@ -31,7 +30,7 @@ export default function StandardizationKanwil() {
 
   const [tabValue, setTabValue] = useState('010'); // ganti menu komponen supervisi
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: string) => { // setiap tab komponen berubah
+  const handleTabChange = (_: React.SyntheticEvent, newValue: string) => { // setiap tab komponen berubah
     setTabValue(newValue);
   };
 

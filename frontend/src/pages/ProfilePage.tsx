@@ -11,7 +11,6 @@ import { useNavigate } from 'react-router-dom';
 import Iconify from '../components/iconify/Iconify';
 // @mui
 import { Container, Stack, Typography, Grid, IconButton} from '@mui/material';
-import { useTheme } from '@mui/material/styles';
 //sections
 import ProfileTab from '../sections/profile/ProfileTab';
 import General from '../sections/profile/General';
@@ -19,8 +18,6 @@ import Security from '../sections/profile/Security';
 // import Stats from '../sections/profile/Stats';
 // ----------------------------------------------------
 export default function ProfilePage(){
-  const theme = useTheme();
-
   const navigate = useNavigate();
 
   const [tabValue, setTabValue] = useState< 0 | 1| 2 >(0);

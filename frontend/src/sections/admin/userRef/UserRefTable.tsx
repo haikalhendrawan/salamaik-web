@@ -104,6 +104,22 @@ export default function UserRefTable({users, setEditModalOpen, tab, setTab}: Use
     }
   };
 
+  const handleDemote = async(id: number) => {
+    try{
+      const time = new Date().getTime();
+      setIsLoading(true);
+      const response = await axiosJWT.post(`/demoteStatus?time=${time}`, {id: id});
+      openSnackbar(response.data.message, 'success');
+      getUser();
+      setIsLoading(false);
+    }catch(err: any){
+      openSnackbar(err.response.data.message, 'success');
+      setIsLoading(false);
+    }finally{
+      setIsLoading(false);
+    }
+  };
+
   const handleOpenEdit = (id: string) => {
     setEditModalOpen(id)
   };
@@ -219,6 +235,20 @@ export default function UserRefTable({users, setEditModalOpen, tab, setTab}: Use
                                 <Iconify icon="solar:pen-bold-duotone"/>
                               </StyledButton>
                             </Tooltip>
+                            {row.status===1
+                              ? <Tooltip title='Demote'>
+                                  <StyledButton 
+                                    aria-label="demote" 
+                                    variant='contained' 
+                                    size='small' 
+                                    color='pink'
+                                    onClick={() => handleDemote(row.id)}
+                                  >
+                                    <Iconify icon="solar:round-arrow-down-bold-duotone"/>
+                                  </StyledButton>
+                                </Tooltip>
+                              : null
+                            }
                             <Tooltip title='delete'>
                               <StyledButton 
                                 aria-label="delete" 

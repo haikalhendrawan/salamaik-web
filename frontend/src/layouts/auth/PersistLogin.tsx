@@ -36,7 +36,7 @@ export default function PersistLogin() {
     {isLoading
     ? 
       <div style ={{position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}>
-          <PuffLoader color={theme.palette.primary.main}  style={{ justifyContent: 'center', alignItems: 'center' }}/>
+        <PuffLoader color={theme.palette.primary.main}  style={{ justifyContent: 'center', alignItems: 'center' }}/>
       </div>
     :
       <> 

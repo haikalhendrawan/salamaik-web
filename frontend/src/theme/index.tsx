@@ -1,11 +1,10 @@
-import PropTypes from 'prop-types';
-import { useMemo, useState, createContext, useEffect } from 'react';
+import { useMemo} from 'react';
 // @mui
 import { CssBaseline} from '@mui/material';
-import { ThemeProvider as MUIThemeProvider, createTheme, StyledEngineProvider, Theme, ThemeOptions} from '@mui/material/styles';
+import { ThemeProvider as MUIThemeProvider, createTheme, StyledEngineProvider} from '@mui/material/styles';
 import { CustomThemeOptions } from '../types/theme';
 //
-import palette, {paletteDark, GREY, PRIMARY, SECONDARY, INFO, SUCCESS, WARNING, ERROR, PINK} from './palette';
+import palette, {paletteDark, PRIMARY, PINK} from './palette';
 import shadows from './shadows';
 import typography from './typography';
 import GlobalStyles from './globalStyles';

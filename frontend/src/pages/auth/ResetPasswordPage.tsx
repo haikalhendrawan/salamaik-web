@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 import {useState} from 'react';
 // @mui
 import { styled } from '@mui/material/styles';
-import {  Container, Typography,  Stack,  Box} from '@mui/material';
+import {  Container, Typography, Box} from '@mui/material';
 // sections
 import ForgotPassIdentifier from '../../sections/auth/resetPassword/ForgotPassIdentifier';
 import ForgotPassOtp from '../../sections/auth/resetPassword/ForgotPassOtp';

@@ -10,26 +10,25 @@ interface BlurProps{
   
 }
 
-interface BlurTypes{
-  position?: string, 
-  backgroundImage?: string,
-  '&:before'?: {
-    position: string,
-    top: number,
-    left: number,
-    zIndex: number,
-    content: string,
-    width: string,
-    height: string,
-    backdropFilter: string,
-    WebkitBackdropFilter: string,
-    backgroundColor: string | any,
-  },    
-  backdropFilter?: string,
-  WebkitBackdropFilter?: string,
-  backgroundColor?: string | any,
-
-}
+// interface BlurTypes{
+//   position?: string, 
+//   backgroundImage?: string,
+//   '&:before'?: {
+//     position: string,
+//     top: number,
+//     left: number,
+//     zIndex: number,
+//     content: string,
+//     width: string,
+//     height: string,
+//     backdropFilter: string,
+//     WebkitBackdropFilter: string,
+//     backgroundColor: string | any,
+//   },    
+//   backdropFilter?: string,
+//   WebkitBackdropFilter?: string,
+//   backgroundColor?: string | any,
+// }
 
 
 export function bgBlur(props:BlurProps): any {

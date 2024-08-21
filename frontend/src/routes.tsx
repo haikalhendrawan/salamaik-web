@@ -1,7 +1,6 @@
 import {Routes, Route, Navigate} from "react-router-dom"
 
 // layouts
-import DashboardLayout from './layouts/dashboard';
 import SimpleLayout from './layouts/simple';
 import RequireAuthLayout from "./layouts/auth/RequireAuthLayout";
 import ReverseAuthLayout from "./layouts/auth/ReverseAuthLayout";
@@ -16,19 +15,15 @@ import WorksheetPage from "./pages/WorksheetPage";
 import ProfilePage from "./pages/ProfilePage";
 import WorksheetLanding from "./sections/worksheet/WorksheetLanding";
 import WorksheetKanwil from "./sections/worksheet/WorksheetKanwil";
-import Page403 from "./pages/guard/Page403";
 import Page404 from "./pages/guard/Page404";
 import MatrixPage from "./pages/MatrixPage";
-import MatrixKPPN from "./sections/matrix/MatrixKPPN";
 import FollowUpPage from "./pages/FollowUpPage";
-import { LoadingProvider } from "./hooks/display/useLoading";
 
 // admin
 import UserRefPage from "./pages/admin/UserRefPage";
 import WorksheetRefPage from "./pages/admin/WorksheetRefPage";
 import RequireAuthHorizontalLayout from "./layouts/horizontal/RequireAuthHorizontalLayout";
 import MatrixDetail from "./sections/matrix/MatrixDetail";
-import FollowUpKPPN from "./sections/followUp/FollowUpKPPN";
 import FollowUpDetail from "./sections/followUp/FollowUpDetail";
 import StandardizationPage from "./pages/StandardizationPage";
 import NotifInterfacePage from "./pages/admin/NotifInterfacePage";

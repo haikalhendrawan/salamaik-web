@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Paper, Modal, Box, MenuItem, FormControl, Stack, FormHelperText, 
           Button, Grid, Typography, IconButton, InputAdornment, SelectChangeEvent} from '@mui/material';
-import {useTheme, styled} from "@mui/material/styles";
+import {styled} from "@mui/material/styles";
 import StyledTextField from '../../../components/styledTextField';
 import { StyledSelect, StyledSelectLabel } from '../../../components/styledSelect';
 import Scrollbar from '../../../components/scrollbar';
@@ -81,8 +81,6 @@ const AddUserSchema = z.object({
 
 // --------------------------------------------------------------------------------------------
 export default function UserRefAddModal({modalOpen, modalClose}: UserRefAddModalProps) {
-    const theme = useTheme();
-
     const { kppnRef } = useDictionary();
 
     const { getUser } = useUser();

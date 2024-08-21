@@ -1,9 +1,8 @@
 import { noCase } from 'change-case';
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 // @mui
-import {Box, List, Badge, Button, Avatar, Tooltip, Divider, Popover, 
-          Typography, IconButton, ListItemText, ListItemAvatar, ListItemButton, Paper} from '@mui/material';
+import {Box, List, Badge, Avatar, Tooltip, Divider, Popover, 
+          Typography, IconButton, ListItemText, ListItemAvatar, ListItemButton} from '@mui/material';
 // utils
 import { fToNow } from '../../../utils/formatTime';
 // components
@@ -47,7 +46,7 @@ export default function NotificationsPopover() {
   const handleMarkAllAsRead = async() => {
     notifications?.map(async(item) => {
       try{
-        const response = await axiosJWT.post('/updateNotif', {junctionID:item.junction_id});
+        await axiosJWT.post('/updateNotif', {junctionID:item.junction_id});
         getNotif();
       }catch(err){
         console.log(err)
@@ -66,7 +65,7 @@ export default function NotificationsPopover() {
 
   const handleHover = async(notifId: string | number) => {
     try{
-      const response = await axiosJWT.post('/updateNotif', {junctionID:notifId})
+      await axiosJWT.post('/updateNotif', {junctionID:notifId})
       getNotif();
     }catch(err){
       console.log(err)

@@ -134,6 +134,25 @@ const updateStatus = async (req: Request, res: Response, next: NextFunction) => 
   }
 }
 
+const demoteStatus = async (req: Request, res: Response, next: NextFunction) => {
+  try{
+    const {kppn, role} = req.payload;
+    const targetID = req.body.id;
+    const targetDetail = await user.getUserById(targetID);
+    const targetKPPN = targetDetail.kppn;
+    const isAllowed = (targetKPPN === kppn) || (role===99 || role===4);
+
+    if(!isAllowed){
+      return next(new ErrorDetail(400, 'Unauthorized unit'))
+    };
+
+    const result = await user.demoteStatus(targetID);
+    return res.status(200).json({sucess: true, message: 'User has been deactivated', detail: result})
+  }catch(err){
+    next(err)
+  }
+}
+
 const updateRole = async (req: Request, res: Response, next: NextFunction) => {
   try{
     const {oldRole, newRole, adminRole, targetId} = req.body;
@@ -157,4 +176,4 @@ const updateRole = async (req: Request, res: Response, next: NextFunction) => {
   }
 }
 
-export { getUser, addUser, editUser, deleteUser, updateStatus, updateRole }
+export { getUser, addUser, editUser, deleteUser, updateStatus, demoteStatus, updateRole }

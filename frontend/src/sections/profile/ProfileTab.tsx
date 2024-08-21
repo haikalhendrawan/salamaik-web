@@ -1,9 +1,7 @@
-import { useState } from 'react';
 import Iconify from '../../components/iconify/Iconify';
 // @mui
 import { Box,Tabs, Tab} from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import useLoading from '../../hooks/display/useLoading';
 // ------------------------------------------------
 interface ProfileTabProps{
   tabValue:number,
@@ -13,10 +11,8 @@ interface ProfileTabProps{
 // --------------------------------------------------
 export default function ProfileTab({tabValue, setTabValue}: ProfileTabProps){
   const theme = useTheme();
-
-  const {setIsLoading} = useLoading();
   
-  const handleTabChange = (event: React.SyntheticEvent, newValue: 0 | 1) => { // setiap tab komponen berubah
+  const handleTabChange = (_: React.SyntheticEvent, newValue: 0 | 1) => { // setiap tab komponen berubah
     setTabValue(newValue);
   };
   

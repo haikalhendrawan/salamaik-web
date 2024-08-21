@@ -1,7 +1,6 @@
 import {useState, useEffect} from'react';
-import {Container, Stack, IconButton, Typography, Button} from '@mui/material';
+import {Container, Stack, Typography, Button} from '@mui/material';
 import axiosJWT from '../../config/axios';
-import { z } from 'zod';
 import Iconify from '../../components/iconify';
 import NotifAddModal from '../../sections/admin/notifInterface/NotifAddModal';
 import NotifTable from '../../sections/admin/notifInterface/NotifTable';
@@ -34,7 +33,7 @@ export default function NotifInterfacePage () {
 
   const addNotif = async(title: string, message: string, categories: number) => {
     try{
-      const response = await axiosJWT.post(`/addNotif`, {title, message, categories});
+      await axiosJWT.post(`/addNotif`, {title, message, categories});
       setModalOpen(false);
       getNotif();
       openSnackbar("Notification has been added", "success");
@@ -58,7 +57,7 @@ export default function NotifInterfacePage () {
 
   const assignNotif = async(notifID: number) => {
     try{
-      const response = await axiosJWT.post("/assignNotif", {notifID: notifID});
+      await axiosJWT.post("/assignNotif", {notifID: notifID});
       await getNotif();
       window.location.reload(); 
       openSnackbar("Notification has been assigned", "success");
@@ -69,7 +68,7 @@ export default function NotifInterfacePage () {
 
   const deleteNotif = async(notifID: number) => {
     try{
-      const response = await axiosJWT.post("/deleteNotif", {notifID: notifID});
+      await axiosJWT.post("/deleteNotif", {notifID: notifID});
       getNotif();
       openSnackbar("Notification has been deleted", "success");
     }catch(err: any){

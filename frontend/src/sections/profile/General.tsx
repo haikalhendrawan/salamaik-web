@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import Iconify from '../../components/iconify/Iconify';
 import Label from '../../components/label/Label';
 import ProfilePicUpload from '../../components/profilePicUpload';
 import StyledTextField from '../../components/styledTextField';
@@ -21,21 +20,6 @@ const UserDataContainer = styled(Box)(({theme}) => ({
   marginTop:theme.spacing(5),
   gap:theme.spacing(3)
 }));
-
-interface RoleType{
-  id: number;
-  title: string;
-  description: string | null
-};
-
-interface UnitType{
-  id: string;
-  name: string;
-  alias: string | null;
-  kk_name: string | null;
-  kk_nip: string | null;
-  info: string | null
-};
 
 interface PeriodType{
   id: number;

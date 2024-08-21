@@ -180,6 +180,16 @@ class User{
     }
   }
 
+  async demoteStatus(targetID: string){
+    try{
+      const q = `UPDATE user_ref SET status = 0 WHERE id = $1 RETURNING *`;
+      const result = await pool.query(q, [targetID]);
+      return result.rows[0]
+    }catch(err){
+      throw err
+    }
+  }
+
   async updateRole(id: string, newRole: number){
     try{
       const q = `UPDATE user_ref SET role = $1 WHERE id = $2 RETURNING *`;

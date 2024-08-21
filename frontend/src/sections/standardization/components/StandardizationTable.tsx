@@ -6,8 +6,6 @@ import useDictionary from '../../../hooks/useDictionary';
 import { useAuth } from '../../../hooks/useAuth';
 import useStandardization from '../useStandardization';
 import { renderConditionalRow } from '../utils';
-
-
 // ---------------------------------------------------
 const TABLE_HEAD = {
   odd: [

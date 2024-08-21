@@ -10,6 +10,7 @@ router.post("/addUser", userController.addUser);
 router.post("/editUser", authenticate, authorize([99, 4, 2]), userController.editUser);
 router.post("/deleteUser",  authenticate, authorize([99, 4, 2]), userController.deleteUser);
 router.post("/updateStatus",  authenticate, authorize([99, 4, 2]), userController.updateStatus);
+router.post("/demoteStatus",  authenticate, authorize([99, 4, 2]), userController.demoteStatus);
 router.post("/updateRole",  authenticate, authorize([99, 4, 2]), userController.updateRole);
 
 export default router

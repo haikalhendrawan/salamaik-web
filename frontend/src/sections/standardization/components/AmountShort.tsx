@@ -1,7 +1,5 @@
-import {useState} from "react";
-import {Card, Typography, Grid, Box, Tabs, Tab, CardContent, Stack, IconButton, Slide} from '@mui/material';
-import {styled, useTheme, alpha} from '@mui/material/styles';
-import Iconify from "../../../components/iconify";
+import {Card, Typography, Grid, CardContent, Stack, Slide} from '@mui/material';
+import {useTheme} from '@mui/material/styles';
 // ----------------------------------------------
 interface AmountShortProps {
   header: string,
@@ -13,10 +11,6 @@ interface AmountShortProps {
 
 export default function AmountShort({header, subheader, short}: AmountShortProps){
   const theme = useTheme();
-
-  const primaryLight = theme.palette.primary.lighter;
-
-  const primaryDark = theme.palette.primary.light;
 
   return(
     <Card sx={{height:'200px', borderRadius:'16px'}}>

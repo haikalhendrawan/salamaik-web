@@ -1,5 +1,5 @@
 import {IconButton} from '@mui/material';
-import { useTheme, styled } from '@mui/material/styles';
+import { useTheme} from '@mui/material/styles';
 import Iconify from '../../../components/iconify/Iconify';
 import usePreviewFileModal from '../usePreviewFileModal';
 

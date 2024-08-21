@@ -1,7 +1,4 @@
-import { ReactNode, useState, createContext, useContext, useEffect } from 'react';
-import useAxiosJWT from '../../hooks/useAxiosJWT';
-import useLoading from '../../hooks/display/useLoading';
-import useSnackbar from '../../hooks/display/useSnackbar';
+import { ReactNode, useState, createContext, useContext} from 'react';
 //------------------------------------------------------------------
 interface PreviewFileModalContextType{
   open: boolean,

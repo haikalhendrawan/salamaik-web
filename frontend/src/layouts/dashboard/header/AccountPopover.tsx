@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import {NavLink, NavLinkProps} from "react-router-dom"
 // @mui
 import { alpha } from '@mui/material/styles';
@@ -26,10 +26,6 @@ export default function AccountPopover() {
   const [periodText, setPeriodText] = useState<string>("");
 
   const {auth, setAuth} = useAuth() as AuthType;
-
-  const [anchorEl, setAnchorEl] = useState(null); 
-
-  const openPeriod = Boolean(anchorEl); 
 
   const {openSnackbar} = useSnackbar();
 

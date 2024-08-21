@@ -1,5 +1,4 @@
-import {useState, useEffect} from "react";
-import { Document, Page, Text, View, Image, Font} from '@react-pdf/renderer';
+import { Text, View, Font} from '@react-pdf/renderer';
 import styles from "../styles";
 import { StandardizationType } from "../../standardization/types";
 // ----------------------------------------------------------------
