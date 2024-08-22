@@ -1,6 +1,6 @@
 export const socketOption = { 
   cors: {
-    origin: process.env.CLIENT_URL,
+    origin: [process.env.CLIENT_URL1, process.env.CLIENT_URL2]
   },
   connectionStateRecovery: {
     maxDisconnectionDuration: 3 * 60 * 1000,
