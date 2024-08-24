@@ -60,6 +60,11 @@ const navAdmin = [
         path: '/interface/notification',
         icon: icon('dot-mark'),
       },
+      {
+        title: 'Gallery',
+        path: '/interface/gallery',
+        icon: icon('dot-mark'),
+      },
     ]
   },
 ];

@@ -2,7 +2,8 @@ declare namespace NodeJS {
   export interface ProcessEnv {
     readonly DEV_PORT: string;
     readonly PRODUCTION_PORT: string;
-    readonly CLIENT_URL: string;
+    readonly CLIENT_URL1: string;
+    readonly CLIENT_URL2: string;
     
     readonly PGUSER: string;
     readonly PGPASSWORD: string;

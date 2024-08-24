@@ -76,7 +76,11 @@ pink: Color,
 white: Color,
 divider: string,
 text: Color,
-background: Color,
+background: {
+  paper: string,
+  default: string,
+  neutral: string,
+},
 action: {
   active: string;
   hover: string;

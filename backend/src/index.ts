@@ -24,6 +24,7 @@ import WsJunctionRoute from './routes/worksheetJunctionRoute';
 import notFoundRoute from './routes/notFoundRoute';
 import findingsRoute from './routes/findingsRoute';
 import matrixRoute from './routes/matrixRoute';
+import miscRoute from './routes/miscRoute';
 //middleware
 import errorHandler from './middleware/errorHandler';
 import rateLimiter from './middleware/rateLimiter';
@@ -53,6 +54,7 @@ app.use(WorksheetRoute);
 app.use(WsJunctionRoute);
 app.use(matrixRoute);
 app.use(findingsRoute);
+app.use(miscRoute);
 app.use(notFoundRoute);
 app.use(errorHandler);
 

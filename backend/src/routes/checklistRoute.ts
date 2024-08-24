@@ -6,7 +6,6 @@ import authorize from "../middleware/authorize";
 
 const router = express.Router(); 
 
-
 router.get("/getAllChecklist", authenticate, authorize([99, 4]), checklistController.getAllChecklist);
 router.get("/getChecklistWithOpsi", authenticate, authorize([99, 4]), checklistController.getChecklistWithOpsi);
 router.post("/editChecklist", authenticate, authorize([99, 4]), checklistController.editChecklist);

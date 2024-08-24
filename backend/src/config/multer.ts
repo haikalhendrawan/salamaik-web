@@ -3,6 +3,7 @@ import ErrorDetail from "../model/error.model";
 import { sanitizeMimeType } from "../utils/mimeTypeSanitizer";
 
 // ----------------------------------------------------------------------------------------------------------
+// Avatar Upload
 const storage= multer.diskStorage(
   { 
     destination:(req, file, callback) => {
@@ -32,6 +33,7 @@ const uploadPP = multer({storage:storage, limits:limit, fileFilter:fileFilter}).
 export {uploadPP}
 
 // ----------------------------------------------------------------------------------------------------------
+// Checklist File Upload
 const checklistFileStorage= multer.diskStorage(
   { 
     destination:(req, file, callback) => {
@@ -72,6 +74,7 @@ const uploadChecklistFile = multer({
 export {uploadChecklistFile}
 
 // ----------------------------------------------------------------------------------------------------------
+// Standardization File Upload
 const stdFileStorage= multer.diskStorage(
   { 
     destination:(req, file, callback) => {
@@ -113,6 +116,7 @@ const uploadStdFile = multer({
 export {uploadStdFile}
 
 // ----------------------------------------------------------------------------------------------------------
+// Worksheet File Upload
 const wsJunctionFileStorage= multer.diskStorage(
   { 
     destination:(req, file, callback) => {
@@ -152,3 +156,34 @@ const uploadWsJunctionFile = multer({
 }).single('wsJunctionFile');
 
 export {uploadWsJunctionFile}
+
+// ----------------------------------------------------------------------------------------------------------
+// Gallery File Upload
+const galleryStorage= multer.diskStorage(
+  { 
+    destination:(req, file, callback) => {
+      callback(null, `${__dirname}/../uploads/image`)
+    },
+    filename:(req, file, callback) => {
+      const {miscId, value, detail1, detail2, detail3} = req.body;
+      console.log(value);
+      callback(null, value)
+    }
+  }
+);
+
+const galleryFileFilter = (req: any, file: any, callback: any) => {
+  if(file.mimetype === 'image/jpeg' || file.mimetype === 'image/png'){
+    callback(null, true)
+  }else{
+    callback(null, false)
+  }
+}; 
+
+const galleryLimit = {
+  fileSize: 2097152 //2 mb
+};
+
+const uploadGallery = multer({storage:galleryStorage, limits:galleryLimit, fileFilter:galleryFileFilter}).single('gallery');
+
+export {uploadGallery}

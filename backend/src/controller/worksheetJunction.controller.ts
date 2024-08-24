@@ -331,18 +331,6 @@ export {
 }
 
 // ------------------------------
-
-async function utilGetWorksheetId(period: number, kppnId: string){
-  try{
-    const mainWorksheet = await worksheet.getWorksheetByPeriodAndKPPN(period, kppnId);
-    const worksheetId = mainWorksheet.length>0? mainWorksheet[0].id : null;
-
-    return worksheetId
-  }catch(err){
-    throw err
-  }
-}
-
 async function getScoreProgressResponseBody(mainWorksheet: WorksheetType[]) {
   try{
     const worksheetId = mainWorksheet.length>0? mainWorksheet[0].id : null;

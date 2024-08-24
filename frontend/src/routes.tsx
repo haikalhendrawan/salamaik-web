@@ -27,6 +27,7 @@ import MatrixDetail from "./sections/matrix/MatrixDetail";
 import FollowUpDetail from "./sections/followUp/FollowUpDetail";
 import StandardizationPage from "./pages/StandardizationPage";
 import NotifInterfacePage from "./pages/admin/NotifInterfacePage";
+import GalleryInterfacePage from "./pages/admin/GalleryInterfacePage";
 // ----------------------------------------------------
 
 export default function Router() {
@@ -110,6 +111,7 @@ export default function Router() {
       <Route path="/interface" element={<RequireAuthLayout allowedRoles={[4, 99]}/> }>
         <Route index element={<Navigate to="notification"/>} />
         <Route path="notification" element={<NotifInterfacePage />} />
+        <Route path="gallery" element={<GalleryInterfacePage />} />
       </Route>
     </Route>
 
