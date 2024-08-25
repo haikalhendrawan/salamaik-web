@@ -1,3 +1,5 @@
+import "dotenv/config";
+
 export const socketOption = { 
   cors: {
     origin: [process.env.CLIENT_URL1, process.env.CLIENT_URL2]
