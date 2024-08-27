@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
@@ -10,7 +11,7 @@ import { useAuth } from '../../../../hooks/useAuth';
 import useAxiosJWT from '../../../../hooks/useAxiosJWT';
 import useSnackbar from '../../../../hooks/display/useSnackbar';
 import useLoading from '../../../../hooks/display/useLoading';
-import { WsJunctionType } from '../../types';
+import { WsJunctionType, WorksheetType } from '../../types';
 import useWsJunction from '../../useWsJunction';
 // ------------------------------------------------------------
 interface HeadPropInterface{
@@ -18,7 +19,8 @@ interface HeadPropInterface{
   title:string,
   dateUpdated: string | null,
   updatedBy: string | null,
-  wsJunction: WsJunctionType | null
+  wsJunction: WsJunctionType | null,
+  wsDetail: WorksheetType | null,
 };
 
 const StyledIconButton = styled(IconButton)(({}) => ({
@@ -59,6 +61,8 @@ export default function Head(props: HeadPropInterface) {  // bagian atas dari ca
 
   const excludeReverse = isExcluded? 0 : 1;
 
+  const isPastDue = useMemo(() => new Date().getTime() > new Date(props.wsDetail?.close_period || "").getTime(), [props.wsDetail]);
+
   const handleChangeExclude = async(exclude:number) => {
     try{
       setIsLoading(true);
@@ -95,8 +99,9 @@ export default function Head(props: HeadPropInterface) {  // bagian atas dari ca
                   aria-label="edit" 
                   variant='contained' 
                   size='small' 
-                  color={isExcluded?'success':'white'}
+                  color={isExcluded?'warning':'white'}
                   onClick={() => handleChangeExclude(excludeReverse)}
+                  disabled={isPastDue}
                 >
                   <Iconify icon="solar:flag-2-bold-duotone" />
                 </StyledButton>

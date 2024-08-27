@@ -251,24 +251,26 @@ export default function Dokumen({openInstruction, wsJunction, wsDetail}: Dokumen
               !isMaxFile
               ?
                 <Tooltip title='Add file'>
-                  <StyledButton 
-                    variant='contained' 
-                    component='label' 
-                    aria-label="delete" 
-                    size='small' 
-                    color='white' 
-                    disabled={isPastDue}
-                  >
-                    <Iconify 
-                      icon="solar:add-circle-bold"
-                      color={theme.palette.grey[500]}
-                    />
-                    <VisuallyHiddenInput 
-                      type='file'
-                      accept='image/*,.pdf,.zip' 
-                      onChange={(e) => handleChangeFile(e, wsJunction)} 
-                    />
-                  </StyledButton>
+                  <span>
+                    <StyledButton 
+                      variant='contained' 
+                      component='label' 
+                      aria-label="delete" 
+                      size='small' 
+                      color='white' 
+                      disabled={isPastDue}
+                    >
+                      <Iconify 
+                        icon="solar:add-circle-bold"
+                        color={theme.palette.grey[500]}
+                      />
+                      <VisuallyHiddenInput 
+                        type='file'
+                        accept='image/*,.pdf,.zip' 
+                        onChange={(e) => handleChangeFile(e, wsJunction)} 
+                      />
+                    </StyledButton>
+                  </span>
                 </Tooltip>
               :
                 null

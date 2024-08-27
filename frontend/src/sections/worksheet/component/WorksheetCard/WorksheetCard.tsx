@@ -103,6 +103,7 @@ export default function WorksheetCard(props: WorksheetCardProps) {
                 dateUpdated={props?.wsJunction?.last_update || null}
                 updatedBy={props?.wsJunction?.updated_by || null}
                 wsJunction={props?.wsJunction}
+                wsDetail={props?.wsDetail} 
               />
             }
           />
@@ -137,7 +138,7 @@ export default function WorksheetCard(props: WorksheetCardProps) {
           >
             <Grid item xs={6}>
               <Kriteria
-                kriteria={props.wsJunction?.header || ""}
+                kriteria={props?.wsJunction?.header || ""}
                 opsi={props?.wsJunction?.opsi || []}
               />
             </Grid>
@@ -145,17 +146,22 @@ export default function WorksheetCard(props: WorksheetCardProps) {
             <Grid item xs={1.5}>
               <Dokumen 
                 openInstruction={handleOpenInstruction} 
-                wsJunction={props.wsJunction} 
-                wsDetail={props.wsDetail}
+                wsJunction={props?.wsJunction} 
+                wsDetail={props?.wsDetail}
               />
             </Grid>
 
             <Grid item xs={1.5}>
-              {renderNilai && <Nilai wsJunction={props.wsJunction} wsDetail={props.wsDetail} isExcluded={isExcluded}/>}
+              {renderNilai && 
+              <Nilai 
+                wsJunction={props?.wsJunction} 
+                wsDetail={props?.wsDetail} 
+                isExcluded={isExcluded}
+              />}
             </Grid>
 
             <Grid item xs={3}>
-              <Catatan wsJunction={props.wsJunction} wsDetail={props.wsDetail}/>
+              <Catatan wsJunction={props?.wsJunction} wsDetail={props?.wsDetail}/>
             </Grid>
           </BodyGrid>
 
