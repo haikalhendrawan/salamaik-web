@@ -25,6 +25,7 @@ import notFoundRoute from './routes/notFoundRoute';
 import findingsRoute from './routes/findingsRoute';
 import matrixRoute from './routes/matrixRoute';
 import miscRoute from './routes/miscRoute';
+import activityRoute from './routes/activityRoute';
 //middleware
 import errorHandler from './middleware/errorHandler';
 import rateLimiter from './middleware/rateLimiter';
@@ -55,6 +56,7 @@ app.use(WsJunctionRoute);
 app.use(matrixRoute);
 app.use(findingsRoute);
 app.use(miscRoute);
+app.use(activityRoute);
 app.use(notFoundRoute);
 app.use(errorHandler);
 
