@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Iconify from '../../components/iconify/Iconify';
 // @mui
-import {useTheme} from '@mui/material/styles';
 import {IconButton, Container, Grid, Stack, Typography} from '@mui/material';
 // sections
 import FollowUpCard from './components/FollowUpCard/FollowUpCard';
@@ -10,8 +9,6 @@ import FollowUpHeader from './components/FollowUpHeader';
 import useAxiosJWT from '../../hooks/useAxiosJWT';
 import useSnackbar from '../../hooks/display/useSnackbar';
 import useLoading from '../../hooks/display/useLoading';
-import {useAuth} from '../../hooks/useAuth';
-import useDictionary from '../../hooks/useDictionary';
 import { FindingsResponseType } from './types';
 import PreviewFileModal from './components/PreviewFileModal';
 import { PreviewFileModalProvider } from './usePreviewFileModal';
@@ -23,17 +20,9 @@ import { WorksheetType } from '../worksheet/types';
 // --------------------------------------------------------------
 
 export default function FollowUpDetail() {
-  const theme = useTheme();
-
   const navigate = useNavigate();
 
   const params = new URLSearchParams(useLocation().search);
-
-  const {auth} = useAuth();
-
-  const {kppnRef} = useDictionary();
-
-  const isKanwil = auth?.kppn === '03010';
 
   const {openSnackbar} = useSnackbar();
 

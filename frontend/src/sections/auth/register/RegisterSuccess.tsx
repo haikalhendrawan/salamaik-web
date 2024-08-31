@@ -1,22 +1,9 @@
-import { MuiOtpInput } from 'mui-one-time-password-input'
 import {useState, useEffect} from 'react';
 import {Link as RouterLink, useNavigate} from 'react-router-dom';
 // @mui
-import { styled, useTheme } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import { Typography, Skeleton, Button} from '@mui/material';
 //-------------------------------------------------------------------------------------
-const MuiOtpInputStyled = styled(MuiOtpInput)(({ theme }) => ({
-  display: 'flex',
-  gap: '30px',
-  maxWidth: '650px',
-  marginInline: 'auto',
-}));
-
-interface ValueType{
-  username: string;
-  email: string;
-};
-
 interface RegisterSuccessPropsType{
 };
 
@@ -36,12 +23,6 @@ export default function RegisterSuccess({}: RegisterSuccessPropsType) {
   const navigate = useNavigate();
 
   const [countdown, setCountdown] = useState<number>(10);
-
-  const [value, setValue] = useState<string>(''); 
-
-  const handleChange = (newValue: string) => {
-    setValue(newValue)
-  };
 
   const [imageLoaded, setImageLoaded] = useState(false);
 

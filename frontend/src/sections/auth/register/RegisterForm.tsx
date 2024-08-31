@@ -1,8 +1,7 @@
-import { Helmet } from 'react-helmet-async';
-import {useState, useEffect} from 'react';
-import { styled, useTheme } from '@mui/material/styles';
+import {useState} from 'react';
+import { styled } from '@mui/material/styles';
 import { Link, Box, MenuItem, FormControl, Stack, FormHelperText, 
-  Button, Grid, Typography, IconButton, InputAdornment, SelectChangeEvent} from '@mui/material';
+  Button, Typography, IconButton, InputAdornment, SelectChangeEvent} from '@mui/material';
 import StyledTextField from '../../../components/styledTextField/StyledTextField';
 import { StyledSelect, StyledSelectLabel } from '../../../components/styledSelect';
 import Iconify from '../../../components/iconify';
@@ -92,8 +91,6 @@ export default function RegisterForm({
   setOtp, 
   setToken
 }: RegisterFormPropTypes) {
-  const theme = useTheme();
-
   const { openSnackbar } = useSnackbar();
 
   const { setIsLoading } = useLoading();

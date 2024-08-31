@@ -6,7 +6,7 @@
 import { forwardRef } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 // @mui
-import { SxProps, useTheme } from '@mui/material/styles';
+import { SxProps} from '@mui/material/styles';
 import { Box, Link } from '@mui/material';
 
 // ----------------------------------------------------------------------
@@ -16,14 +16,14 @@ interface Logo{
 }
 
 
-const Logo = forwardRef(({ disabledLink = false, sx, ...other }:Logo, ref) => {
-  const theme = useTheme();
+const Logo = forwardRef(({ disabledLink = false, sx}:Logo) => {
+  // const theme = useTheme();
 
-  const PRIMARY_LIGHT = theme.palette.primary.light;
+  // const PRIMARY_LIGHT = theme.palette.primary.light;
 
-  const PRIMARY_MAIN = theme.palette.primary.main;
+  // const PRIMARY_MAIN = theme.palette.primary.main;
 
-  const PRIMARY_DARK = theme.palette.primary.dark;
+  // const PRIMARY_DARK = theme.palette.primary.dark;
 
   // OR using local (public folder)
   // -------------------------------------------------------

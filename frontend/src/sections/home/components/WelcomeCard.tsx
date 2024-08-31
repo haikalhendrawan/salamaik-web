@@ -26,7 +26,7 @@ const PANDUAN_FILE = [
 const baseUrl = import.meta.env.VITE_API_URL;
 // ----------------------------------------------------------------------
 
-export default function WelcomeCard({ title, total, icon, color = 'primary', sx, ...other }: WelcomeCardProps) {
+export default function WelcomeCard({  }: WelcomeCardProps) {
   const theme = useTheme();
 
   const {auth} = useAuth();

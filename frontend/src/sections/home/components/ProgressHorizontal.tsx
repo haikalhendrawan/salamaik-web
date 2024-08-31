@@ -1,6 +1,4 @@
-import {useState} from "react";
-import {Card, Typography, Grid, FormControl, CardContent, Stack, LinearProgress, Box, Tooltip} from '@mui/material';
-import {styled, useTheme} from '@mui/material/styles';
+import {Card, Typography, CardContent, Stack, LinearProgress, Box,} from '@mui/material';
 import Scrollbar from "../../../components/scrollbar/Scrollbar";
 // import LinearProgressWithLabel from "../../components/linear-progress-with-label/LinearProgressWithLabel";
 // ----------------------------------------------
@@ -18,7 +16,6 @@ interface ProgressHorizontalProps {
 // ----------------------------------------------
 
 export default function ProgressHorizontal({header, data}:ProgressHorizontalProps){
-  const theme = useTheme();
 
   return(
     <Card sx={{height:'200px', borderRadius:'16px'}}>

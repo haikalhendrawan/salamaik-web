@@ -4,11 +4,10 @@
  */
 
 import {useEffect, useState} from "react"
-import PropTypes from 'prop-types';
 import { NavLink as RouterLink, useLocation } from 'react-router-dom';
 // @mui
-import { Box, List, ListItemText, ListSubheader, Button} from '@mui/material';
-import { useTheme, alpha } from '@mui/material/styles';
+import { ListItemText} from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 //
 import { StyledNavItem, StyledSubNavItemIcon  } from './styles';
 
@@ -22,7 +21,7 @@ interface NavSubItem{
   open?: boolean
 }
 
-export default function NavSubItem({ item, open }:NavSubItem) {
+export default function NavSubItem({ item }:NavSubItem) {
   const { title, path, icon, info } = item;
   const theme = useTheme() as any;
   const location = useLocation();

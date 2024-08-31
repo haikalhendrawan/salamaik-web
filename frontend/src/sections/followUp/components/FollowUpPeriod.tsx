@@ -1,7 +1,4 @@
-import {useState} from "react";
-import {Card, Typography, Grid, FormControl, CardContent, Stack, LinearProgress, Box, Tooltip} from '@mui/material';
-import {styled, useTheme, alpha} from '@mui/material/styles';
-import Scrollbar from "../../../components/scrollbar/Scrollbar";
+import {Card, Typography, Grid, CardContent, Stack, Box} from '@mui/material';
 import Label from "../../../components/label/Label";
 // ----------------------------------------------
 interface FollowUpPeriodProps {
@@ -13,11 +10,6 @@ interface FollowUpPeriodProps {
 // ----------------------------------------------
 
 export default function FollowUpPeriod({header, open, close}:FollowUpPeriodProps){
-  const theme = useTheme();
-
-  const primaryLight = theme.palette.primary.lighter;
-
-  const primaryDark = theme.palette.primary.light;
 
   return(
     <Card sx={{height:'200px', borderRadius:'16px'}}>

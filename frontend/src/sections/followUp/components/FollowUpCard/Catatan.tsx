@@ -4,9 +4,6 @@ import FormControl from '@mui/material/FormControl';
 import Skeleton  from "@mui/material/Skeleton";
 import Box from '@mui/material/Box';
 import styled from '@mui/material/styles/styled';
-import useSocket from "../../../../hooks/useSocket";
-import { WsJunctionType } from "../../../worksheet/types";
-import useWsJunction from "../../../worksheet/useWsJunction";
 import {useAuth} from "../../../../hooks/useAuth";
 import useSnackbar from "../../../../hooks/display/useSnackbar";
 import { FindingsResponseType } from "../../types";
@@ -29,8 +26,6 @@ const StyledFormControl = styled(FormControl)(({theme}) => ({
 export default function Catatan({findingResponse, getData, isDisabled}: CatatanPropsType) {
   const [isMounted, setIsMounted] = useState(true);
 
-  const wsJunction = findingResponse?.matrixDetail[0]?.ws_junction[0] || null;
-
   const initialNoteRefKanwil = useRef(findingResponse?.kanwil_response || '');
 
   const lastSavedNoteRefKanwil = useRef(findingResponse?.kanwil_response || "");
@@ -40,8 +35,6 @@ export default function Catatan({findingResponse, getData, isDisabled}: CatatanP
   const lastSavedNoteRefKPPN = useRef(findingResponse?.kppn_response || "");
 
   const {auth} = useAuth();
-
-  const {socket} = useSocket();
 
   const {openSnackbar} = useSnackbar();
 

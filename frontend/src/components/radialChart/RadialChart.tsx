@@ -1,11 +1,8 @@
 import {useState} from "react";
-import ReactApexChart from 'react-apexcharts';
-import { Card, CardHeader, Box, Button} from '@mui/material';
-import {styled, useTheme, alpha} from '@mui/material/styles';
+import {Box} from '@mui/material';
+import {useTheme, alpha} from '@mui/material/styles';
 import debounce from "lodash.debounce"
 import Chart from '../chart';
-import { useChart } from '../chart';
-import Iconify from '../iconify';
 // ----------------------------------------------------------------------
 interface RadialChartProps {
   chart: {
@@ -35,7 +32,7 @@ export default function RadialChart(props: RadialChartProps) {
   const LABEL_VALUE2 = {
     show: true,
     offsetY: -8,
-    formatter: (val: number) => labels,
+    formatter: (_: number) => labels,
     color: theme.palette.text.primary,
     fontSize: theme.typography.h6.fontSize,
     fontWeight: theme.typography.h6.fontWeight,

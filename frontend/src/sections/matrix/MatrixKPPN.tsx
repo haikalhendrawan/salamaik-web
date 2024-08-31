@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 // @mui
 import { Container, Stack, Typography, Grid } from '@mui/material';
-import {useTheme, styled} from '@mui/material/styles';
+import {useTheme} from '@mui/material/styles';
 import useDictionary from '../../hooks/useDictionary';
 import { useAuth } from '../../hooks/useAuth';
 import useAxiosJWT from '../../hooks/useAxiosJWT';
@@ -51,7 +51,7 @@ export default function MatrixKPPN() {
 
   const kppnName = kppnRef?.list.filter((item) => item.id === kppnId)[0]?.alias || ''
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: string) => { // setiap tab komponen berubah
+  const handleTabChange = (_: React.SyntheticEvent, newValue: string) => { // setiap tab komponen berubah
     setTabValue(newValue);
     navigate(`?id=${newValue}`);
     setMatrixScore(null);

@@ -1,7 +1,5 @@
-import {useState} from "react";
-import {Card, Typography, Grid, IconButton, CardContent, Stack} from '@mui/material';
-import {styled, useTheme} from '@mui/material/styles';
-import Iconify from "../../../components/iconify";
+import {Card, Typography, Grid, CardContent, Stack} from '@mui/material';
+import {useTheme} from '@mui/material/styles';
 import RadialChart from "../../../components/radialChart/RadialChart";
 // ----------------------------------------------
 interface ProgressPembinaanProps {
@@ -15,10 +13,8 @@ interface ProgressPembinaanProps {
 
 // ----------------------------------------------
 
-export default function ProgressPembinaan({header, number, footer, detail, icon, color}: ProgressPembinaanProps){
+export default function ProgressPembinaan({header, number, footer, detail}: ProgressPembinaanProps){
   const theme = useTheme();
-
-  const [value, setValue] = useState<number>(0);
 
   return(
     <Card sx={{height:'200px', borderRadius:'16px'}}>

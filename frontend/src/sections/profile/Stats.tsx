@@ -13,8 +13,6 @@ const StatsContainer = styled(Box)(({theme}) => ({
   alignItems:'start', 
   justifyContent:'start', 
 }));
-
-
 // ---------------------------------------------------------
 
 export default function Stats(){

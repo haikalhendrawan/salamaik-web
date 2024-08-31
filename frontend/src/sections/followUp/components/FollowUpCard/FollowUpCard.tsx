@@ -13,7 +13,6 @@ import Dokumen from "./Dokumen";
 import Nilai from "./Nilai";
 import Catatan from "./Catatan";
 import Approval from "./Approval";
-import { WsJunctionType } from "../../../worksheet/types";
 import { FindingsResponseType } from "../../types";
 // ------------------------------------------------------------
 interface FollowUpCardProps{
@@ -60,8 +59,6 @@ export default function FollowUpCard(props: FollowUpCardProps) {
   const wsJunction = useMemo(() => matrixDetail?.ws_junction[0], [props.findingResponse]) || null;
 
   const checklist = matrixDetail?.checklist[0] || null;
-
-  const findings = matrixDetail?.findings[0] || null;
 
   const [openInstruction, setOpenInstruction] = useState<boolean>(false);
 

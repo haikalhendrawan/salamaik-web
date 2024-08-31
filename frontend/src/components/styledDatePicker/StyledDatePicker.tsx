@@ -1,9 +1,9 @@
-import { useTheme, styled } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
-const StyledDate = styled(DatePicker)(({theme}) => ({
+const StyledDate = styled(DatePicker)(({}) => ({
   "& .MuiOutlinedInput-input": {
     fontSize: 14,
     height:'100%'

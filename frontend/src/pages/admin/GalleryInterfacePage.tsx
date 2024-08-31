@@ -1,5 +1,5 @@
 import {useState, useEffect} from'react';
-import {Container, Stack, Typography, Button, Card, Box, Grid, IconButton, Input} from '@mui/material';
+import {Container, Stack, Typography, Button, Card, Box, Grid, IconButton} from '@mui/material';
 import {styled, useTheme} from '@mui/material/styles';
 import useAxiosJWT from '../../hooks/useAxiosJWT';
 import Iconify from '../../components/iconify';
@@ -31,7 +31,7 @@ const PictureBox = styled(Box)(({ theme }) => ({
 
 const StyledIconButton = styled(IconButton, {
   shouldForwardProp: () => true
-})<{component?: string;}>(({theme}) => ({
+})<{component?: string;}>(({}) => ({
   width:'30%', 
   height:'40%', 
   mx:'auto',

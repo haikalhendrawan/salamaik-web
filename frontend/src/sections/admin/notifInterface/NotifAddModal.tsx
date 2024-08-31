@@ -1,13 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 // @mui
 import { Paper, Modal, Box, Select, MenuItem, InputLabel, FormControl, Stack, Button, Grid, Typography} from '@mui/material';
-import {useTheme, styled} from "@mui/material/styles";
+import {styled} from "@mui/material/styles";
 import { z } from 'zod';
 import StyledTextField from '../../../components/styledTextField';
-import ProfilePicUpload from '../../../components/profilePicUpload';
 // components
-import Label from '../../../components/label';
-import Iconify from '../../../components/iconify';
 import Scrollbar from '../../../components/scrollbar';
 // -------------------------------------------------------------
 const style = {
@@ -51,8 +48,6 @@ interface NotifAddModalProps {
 
 //----------------------
 export default function NotifAddModal({modalOpen, modalClose, addNotif}: NotifAddModalProps) {
-  const theme = useTheme();
-
   const [value, setValue] = useState<Value>({
     title: '',
     message: '',

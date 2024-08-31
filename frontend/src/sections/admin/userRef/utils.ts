@@ -14,7 +14,7 @@ export const visuallyHidden = {
 };
 
 
-export const StyledButton = styled(Button)(({ theme }) => ({
+export const StyledButton = styled(Button)(({  }) => ({
   display: 'inline-flex',   
   alignItems: 'center', 
   justifyContent: 'center', 

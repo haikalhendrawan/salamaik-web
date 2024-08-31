@@ -2,13 +2,12 @@ import React, { useState, useEffect,} from 'react';
 import { useNavigate,} from 'react-router-dom';
 import { axiosPublic } from '../../../config/axios';
 // @mui
-import { Link, Stack, IconButton, InputAdornment, TextField, Checkbox, FormControlLabel} from '@mui/material';
+import { Link, Stack, IconButton, InputAdornment, TextField} from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 // components
 import Iconify from '../../../components/iconify';
 import {useAuth} from "../../../hooks/useAuth";
 import useSnackbar from '../../../hooks/display/useSnackbar';
-import useLoading from '../../../hooks/display/useLoading';
 // ----------------------------------------------------------------------
 
 export default function LoginForm() {

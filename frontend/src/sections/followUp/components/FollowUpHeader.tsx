@@ -1,8 +1,5 @@
-import {useState, useEffect} from'react';
-import {Stack, Toolbar, Typography, Table, Card, TableContainer, TableSortLabel,
-          Tooltip, TableHead, Grow, TableBody, TableRow, TableCell} from '@mui/material';
-import { useTheme, styled } from '@mui/material/styles';
-import Label from '../../../components/label';
+import {Typography, Table, Card, TableSortLabel, TableHead, TableBody, TableRow, TableCell} from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { FindingsResponseType } from '../types';
 // ---------------------------------------------------
 const TABLE_HEAD = [

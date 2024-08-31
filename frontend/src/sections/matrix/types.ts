@@ -2,8 +2,6 @@ import { WsJunctionType } from "../worksheet/types";
 import { ChecklistType } from "../admin/worksheetRef/ChecklistRef/useChecklist";
 import { OpsiType } from "../worksheet/types";
 
-
-
 export interface MatrixType{
   id: number,
   ws_junction_id: number,

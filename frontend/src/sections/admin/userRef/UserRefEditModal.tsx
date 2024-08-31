@@ -1,14 +1,12 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 // @mui
 import { Paper, Modal, Box, MenuItem, FormControl, Stack, FormHelperText, 
-  Button, Grid, Typography, IconButton, InputAdornment, SelectChangeEvent} from '@mui/material';
-import {useTheme, styled} from "@mui/material/styles";
+  Button, Grid, Typography, SelectChangeEvent} from '@mui/material';
+import {styled} from "@mui/material/styles";
 import StyledTextField from '../../../components/styledTextField';
 import { StyledSelect, StyledSelectLabel } from '../../../components/styledSelect';
 import ProfilePicUpload from '../../../components/profilePicUpload';
 import { z } from 'zod';
-import Label from '../../../components/label';
-import Iconify from '../../../components/iconify';
 import Scrollbar from '../../../components/scrollbar';
 import useDictionary from '../../../hooks/useDictionary';
 import useAxiosJWT from '../../../hooks/useAxiosJWT';
@@ -101,11 +99,9 @@ interface UserRefEditModalProps {
 
 //----------------------
 export default function UserRefEditModal({editId, users, modalOpen, modalClose}: UserRefEditModalProps) {
-  const theme = useTheme();
-
   const { auth } = useAuth() as AuthType;
 
-  const { statusRef, roleRef, kppnRef, periodRef } = useDictionary();
+  const { roleRef, kppnRef} = useDictionary();
 
   const roleSelection = () => {
     if(auth && roleRef){
@@ -221,7 +217,7 @@ export default function UserRefEditModal({editId, users, modalOpen, modalClose}:
       };
    
       const response = await axiosJWT.post("/editUser", value);
-      const response2 = await axiosJWT.post("/updateRole", {
+      await axiosJWT.post("/updateRole", {
         oldRole: users?.find((user) => user.id === editId)?.role,
         newRole: value.role,
         adminRole: auth?.role,

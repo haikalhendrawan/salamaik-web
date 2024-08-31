@@ -1,9 +1,8 @@
-import {useState, useEffect, useRef} from'react';
+import {useState, useEffect} from'react';
 import {Stack, Button, Box, Typography, Table, Card, Modal, FormControl, Paper, InputLabel, TableSortLabel,
   Tooltip, TableHead, Grow, TableBody, TableRow, TableCell, Select, MenuItem} from '@mui/material';
 import { useTheme, styled } from '@mui/material/styles';
 import Iconify from '../../../../components/iconify';
-import Label from '../../../../components/label';
 import Scrollbar from '../../../../components/scrollbar';
 import StyledTextField from '../../../../components/styledTextField/StyledTextField';
 import StyledButton from '../../../../components/styledButton/StyledButton';
@@ -32,129 +31,6 @@ const TABLE_DATA: SubSubKomponenData[] = [
   {id:3, subsubkomponen:'Pengelolaan Data Kontrak dan Data Supplier', subkomponen:2, komponen:2, numChecklist:5,},
   {id:4, subsubkomponen:'Support data dan hubungan kelembagaan Satker dalam rangka analisis RPA, SR, KFR', subkomponen:3, komponen:3, numChecklist:17},
 ];
-
-const TABLE_DATA2 = [
-  {
-      "subsubcomponent_ID": "1",
-      "subsubcomponent_title": "RPD Satuan Kerja",
-      "component_ID": "1",
-      "subcomponent_ID": "1"
-  },
-  {
-      "subsubcomponent_ID": "2",
-      "subsubcomponent_title": "Penyelesaian Tagihan",
-      "component_ID": "1",
-      "subcomponent_ID": "2"
-  },
-  {
-      "subsubcomponent_ID": "3",
-      "subsubcomponent_title": "Pengelolaan Data Kontrak dan Data Supplier",
-      "component_ID": "1",
-      "subcomponent_ID": "2"
-  },
-  {
-      "subsubcomponent_ID": "4",
-      "subsubcomponent_title": "Support data dan hubungan kelembagaan Satker dalam rangka analisis RPA, SR, KFR",
-      "component_ID": "1",
-      "subcomponent_ID": "3"
-  },
-  {
-      "subsubcomponent_ID": "5",
-      "subsubcomponent_title": "Simplifikasi Pelaksanaan Anggaran melalui Digitalisai Pembayaran",
-      "component_ID": "1",
-      "subcomponent_ID": "3"
-  },
-  {
-      "subsubcomponent_ID": "6",
-      "subsubcomponent_title": "Evaluasi Pelaksanaan Anggaran Satker K/L, BLU, BLUD",
-      "component_ID": "1",
-      "subcomponent_ID": "3"
-  },
-  {
-      "subsubcomponent_ID": "7",
-      "subsubcomponent_title": "Tata Kelola Konfirmasi Penerimaan Negara",
-      "component_ID": "1",
-      "subcomponent_ID": "4"
-  },
-  {
-      "subsubcomponent_ID": "8",
-      "subsubcomponent_title": "Tata Kelola Rekening  Satuan Kerja",
-      "component_ID": "1",
-      "subcomponent_ID": "4"
-  },
-  {
-      "subsubcomponent_ID": "9",
-      "subsubcomponent_title": "Verifikasi LPJ Bendahara Satker",
-      "component_ID": "1",
-      "subcomponent_ID": "5"
-  },
-  {
-      "subsubcomponent_ID": "10",
-      "subsubcomponent_title": "Penyusunan Laporan UAKBUN Daerah",
-      "component_ID": "1",
-      "subcomponent_ID": "5"
-  },
-  {
-      "subsubcomponent_ID": "11",
-      "subsubcomponent_title": "Pembinaan Kompetensi Teknis Pejabat Perbendaharaan Satker",
-      "component_ID": "1",
-      "subcomponent_ID": "6"
-  },
-  {
-      "subsubcomponent_ID": "12",
-      "subsubcomponent_title": "Customer Service Officer",
-      "component_ID": "3",
-      "subcomponent_ID": "12"
-  },
-  {
-      "subsubcomponent_ID": "13",
-      "subsubcomponent_title": "Asistensi Digitalisasi Pembayaran (KKP,Digipay, VA)",
-      "component_ID": "3",
-      "subcomponent_ID": "12"
-  },
-  {
-      "subsubcomponent_ID": "14",
-      "subsubcomponent_title": "Asistensi dan Evaluasi Aplikasi SAKTI",
-      "component_ID": "3",
-      "subcomponent_ID": "12"
-  },
-  {
-      "subsubcomponent_ID": "15",
-      "subsubcomponent_title": "Asistensi Penyusunan Laporan Keuangan",
-      "component_ID": "3",
-      "subcomponent_ID": "12"
-  },
-  {
-      "subsubcomponent_ID": "16",
-      "subsubcomponent_title": "Pedampingan dan Layanan Konsultasi Keuangan Daerah",
-      "component_ID": "3",
-      "subcomponent_ID": "12"
-  },
-  {
-      "subsubcomponent_ID": "17",
-      "subsubcomponent_title": "Pelaksanaan Penyaluran Transfer Ke Daerag dan Dana Desa",
-      "component_ID": "3",
-      "subcomponent_ID": "13"
-  },
-  {
-      "subsubcomponent_ID": "18",
-      "subsubcomponent_title": "Evaluasi DAK Fisik dan Dana Desa",
-      "component_ID": "3",
-      "subcomponent_ID": "13"
-  },
-  {
-      "subsubcomponent_ID": "19",
-      "subsubcomponent_title": "Akurasi Data Kredit Program",
-      "component_ID": "3",
-      "subcomponent_ID": "14"
-  },
-  {
-      "subsubcomponent_ID": "20",
-      "subsubcomponent_title": "Survei Lapangan Debitur",
-      "component_ID": "3",
-      "subcomponent_ID": "14"
-  }
-]
 
 interface SubSubKomponenRefProps {
   section: number,

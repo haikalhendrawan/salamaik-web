@@ -1,13 +1,10 @@
 // @mui
 import { Button, Select, FormControl, InputLabel, MenuItem} from '@mui/material';
-import {useTheme, styled} from '@mui/material/styles';
+import { styled} from '@mui/material/styles';
 import { useLocation } from 'react-router-dom';
 import Iconify from '../../../../components/iconify/Iconify';
-import useSnackbar from '../../../../hooks/display/useSnackbar';
-import useAxiosJWT from '../../../../hooks/useAxiosJWT';
 import { MatrixWithWsJunctionType } from '../../types';
 import useDictionary from '../../../../hooks/useDictionary';
-import useLoading from '../../../../hooks/display/useLoading';
 import { useAuth } from '../../../../hooks/useAuth';
 import ExcelJS from 'exceljs';
 import pptxgen from 'pptxgenjs';
@@ -44,18 +41,10 @@ interface SectionedMatrixType{
 const STATUS_STRING = ['Belum', 'Proses', 'Ditolak', 'Disetujui'];
 
 // -----------------------------------------------------------------------------------------------------------
-export default function MatrixTableToolbar({matrixStatus, selectedKomponen, setSelectedKomponen, getMatrix, matrix}: MatrixTableToolbarProps) {
-  const theme = useTheme();
-
+export default function MatrixTableToolbar({ selectedKomponen, setSelectedKomponen, matrix}: MatrixTableToolbarProps) {
   const {komponenRef, periodRef, kppnRef} = useDictionary();
 
-  const {setIsLoading} = useLoading();
-
-  const {openSnackbar} = useSnackbar();
-
   const {auth} = useAuth();
-
-  const axiosJWT = useAxiosJWT();
 
   const kppnId = new URLSearchParams(useLocation().search).get("id");
 
@@ -175,7 +164,7 @@ export default function MatrixTableToolbar({matrixStatus, selectedKomponen, setS
     }
 
 
-  chunks.forEach((chunk, slideIndex) => {
+  chunks.forEach((chunk) => {
     const slide = ppt.addSlide({ masterName: 'MASTER_SLIDE' });
     const tableData = [headerRow, ...chunk];
 
@@ -193,7 +182,7 @@ export default function MatrixTableToolbar({matrixStatus, selectedKomponen, setS
   ppt.writeFile();
   };
   
-  const sectionedMatrix: SectionedMatrixType[] = matrix?.map((item: MatrixWithWsJunctionType, i: number) => {
+  const sectionedMatrix: SectionedMatrixType[] = matrix?.map((item: MatrixWithWsJunctionType) => {
     const komponenSupervisi = `${item.komponen_string}\n${item.subkomponen_string}`;
     const hasilImplementasi = item.hasil_implementasi;
     const permasalahan = item.permasalahan;

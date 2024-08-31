@@ -1,7 +1,7 @@
 import Iconify from '../../../components/iconify';
 // @mui
 import { Stack, Typography, Tabs, Tab} from '@mui/material';
-import {useTheme, styled} from '@mui/material/styles';
+import {styled} from '@mui/material/styles';
 import { useAuth } from '../../../hooks/useAuth';
 // --------------------------------------------------------------
 const StyledLabel = styled(Typography)(({theme}) => ({

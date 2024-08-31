@@ -2,7 +2,6 @@ import {useEffect, useState} from "react";
 import {Card, Grid, CardHeader,  Button, Box, FormControl, MenuItem} from '@mui/material';
 import styled from '@mui/material/styles/styled';
 import Iconify from "../../../components/iconify/Iconify";
-import useStandardization from "../useStandardization";
 import useDictionary from "../../../hooks/useDictionary";
 import useAxiosJWT from "../../../hooks/useAxiosJWT";
 import { StyledSelect} from "../../../components/styledSelect";
@@ -33,8 +32,6 @@ const semester2Object = [{month: 'Juli', value: 7}, {month: 'Agustus', value: 8}
 
 export default function DocumentZip({header, subheader, image, tabValue }:DocumentShortProps){
   const [loading, setLoading] = useState<boolean>(false);
-  
-  const {standardization} = useStandardization();
 
   const {auth} = useAuth();
 

@@ -20,7 +20,8 @@ export default function PersistLogin() {
       try {
         await refresh();
       }catch(err){
-        console.log(err);
+        setIsLoading(false);
+        console.log(err,isMounted);
       }finally {
         setIsLoading(false);
       }

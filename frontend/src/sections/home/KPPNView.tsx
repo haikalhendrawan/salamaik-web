@@ -1,13 +1,11 @@
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useState} from "react";
 // @mui
 import { useTheme } from '@mui/material/styles';
 import { Grid, Box, Skeleton } from '@mui/material';
 // sections
 import ProgressPembinaan from "./components/ProgressPembinaan";
 import ScoreHistory from "./components/ScoreHistory";
-import ProgressHorizontal from "./components/ProgressHorizontal";
 import FindingPerKomponen from "./components/FindingPerKomponen";
-import SortedKPPNScore from "./components/SortedKPPNScore";
 import PembinaanPeriod from "./components/PembinaanPeriod";
 import DasarHukum from "./components/DasarHukum";
 import ScorePembinaan from "./components/ScorePembinaan";
@@ -16,7 +14,7 @@ import useLoading from "../../hooks/display/useLoading";
 import useSnackbar from "../../hooks/display/useSnackbar";
 import useDictionary from "../../hooks/useDictionary";
 import { useAuth } from "../../hooks/useAuth";
-import { KPPNScoreProgressResponseType, WsJunctionScoreAndProgress, HistoricalScoreProgressKPPNType } from "./types";
+import { WsJunctionScoreAndProgress, HistoricalScoreProgressKPPNType } from "./types";
 import { WorksheetType } from "../worksheet/types";
 // -----------------------------------------------------------------------
 interface FindingsWithChecklist{
@@ -288,14 +286,14 @@ export default function KPPNView(){
 
 // =========================================================================================================================================================
 
-function getProgressKPPN(kppnId: string, kppnScoreProgress: KPPNScoreProgressResponseType[]){
-  const countProgressKPPN =  kppnScoreProgress?.filter((item) => item.id === kppnId )?.[0]?.scoreProgressDetail?.totalProgressKanwil || 0;
-  const countTotalChKPPN = kppnScoreProgress?.filter((item) => item.id === kppnId )?.[0]?.scoreProgressDetail?.totalChecklist || 0;
-  return countProgressKPPN / countTotalChKPPN * 100;
-};
+// function getProgressKPPN(kppnId: string, kppnScoreProgress: KPPNScoreProgressResponseType[]){
+//   const countProgressKPPN =  kppnScoreProgress?.filter((item) => item.id === kppnId )?.[0]?.scoreProgressDetail?.totalProgressKanwil || 0;
+//   const countTotalChKPPN = kppnScoreProgress?.filter((item) => item.id === kppnId )?.[0]?.scoreProgressDetail?.totalChecklist || 0;
+//   return countProgressKPPN / countTotalChKPPN * 100;
+// };
 
-function getScoreKPPN(isKanwil: boolean, kppnId: string, kppnScoreProgress: KPPNScoreProgressResponseType[]){
-  const scoreProgressDetail =  kppnScoreProgress?.filter((item) => item.id === kppnId )?.[0]?.scoreProgressDetail;
-  const score = (isKanwil?scoreProgressDetail?.scoreByKanwil: (isKanwil?scoreProgressDetail?.scoreByKanwil: scoreProgressDetail?.scoreByKPPN)) || 0;
-  return score
-};
+// function getScoreKPPN(isKanwil: boolean, kppnId: string, kppnScoreProgress: KPPNScoreProgressResponseType[]){
+//   const scoreProgressDetail =  kppnScoreProgress?.filter((item) => item.id === kppnId )?.[0]?.scoreProgressDetail;
+//   const score = (isKanwil?scoreProgressDetail?.scoreByKanwil: (isKanwil?scoreProgressDetail?.scoreByKanwil: scoreProgressDetail?.scoreByKPPN)) || 0;
+//   return score
+// };

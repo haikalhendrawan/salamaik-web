@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 // @mui
 import {Card, Table, Stack, Paper, Avatar, ListItemText, TableRow, Tooltip, TableBody, TableCell,
     Typography, TableContainer, TablePagination, Grow, List} from '@mui/material';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import { SelectChangeEvent } from '@mui/material/Select';
 // hooks
 import useAxiosJWT from "../../../hooks/useAxiosJWT";
 import useUser from './useUser';
@@ -18,7 +18,7 @@ import Scrollbar from '../../../components/scrollbar';
 import UserRefTableHead from './UserRefTableHead';
 import UserRefTableToolbar from './UserRefTableToolbar';
 //utils
-import {descendingComparator, getComparator, applySortFilter, StyledButton} from './utils';
+import {getComparator, applySortFilter, StyledButton} from './utils';
 
 // ----------------------------------------------------------------------
 
@@ -52,7 +52,7 @@ export default function UserRefTable({users, setEditModalOpen, tab, setTab}: Use
 
   const {getUser} = useUser();
 
-  const { statusRef, roleRef, kppnRef, periodRef } = useDictionary();
+  const { statusRef, roleRef, kppnRef } = useDictionary();
 
   const {setIsLoading} = useLoading();
 
@@ -124,13 +124,13 @@ export default function UserRefTable({users, setEditModalOpen, tab, setTab}: Use
     setEditModalOpen(id)
   };
 
-  const handleRequestSort = (event: SelectChangeEvent<number>, property: string) => {
+  const handleRequestSort = (_: SelectChangeEvent<number>, property: string) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
 
-  const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
+  const handleChangePage = (_: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPage(newPage);
   };
 

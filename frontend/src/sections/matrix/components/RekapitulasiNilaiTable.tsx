@@ -1,17 +1,10 @@
-import {useState, useEffect} from'react';
-import {Stack, Toolbar, Typography, Table, Card, CardHeader, TableSortLabel, IconButton, TableHead, Grow, TableBody, TableRow, TableCell} from '@mui/material';
-import { useTheme, styled } from '@mui/material/styles';
+import {useState} from'react';
+import {Stack, Typography, Table, Card, CardHeader, TableSortLabel, IconButton, TableHead, Grow, TableBody, TableRow, TableCell} from '@mui/material';
+import { useTheme,} from '@mui/material/styles';
 import Label from '../../../components/label';
 import { MatrixScoreAndProgressType } from '../types';
 import Iconify from '../../../components/iconify/Iconify';
 // ---------------------------------------------------
-const StyledRoot = styled(Toolbar)(({ theme }) => ({
-  height: 72,
-  display: 'flex',
-  justifyContent: 'space-between',
-  padding: theme.spacing(0, 1, 0, 3),
-}));
-
 const TABLE_HEAD = [
   { id: 'no', label: 'No', alignRight: false },
   { id: 'komponen', label: 'Nama Komponen', alignRight: false },
@@ -28,7 +21,7 @@ interface RekapitulasiNilaiTableProps{
 }
 
 // ----------------------------------------------------------------------------------
-export default function RekapitulasiNilaiTable({matrixScore, kppnName}: RekapitulasiNilaiTableProps) {
+export default function RekapitulasiNilaiTable({matrixScore}: RekapitulasiNilaiTableProps) {
   const theme = useTheme();
 
   const [value, setValue] = useState<number>(0);

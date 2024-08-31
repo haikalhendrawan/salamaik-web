@@ -1,8 +1,6 @@
-import { Helmet } from 'react-helmet-async';
-import {useState, useEffect} from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import {useState} from 'react';
+import { useNavigate } from 'react-router-dom';
 // @mui
-import { styled, useTheme } from '@mui/material/styles';
 import { Typography, Stack, InputAdornment, IconButton, Link} from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Iconify from '../../../components/iconify/Iconify';
@@ -35,7 +33,7 @@ export default function ForgotPassSubmit({identityValue, otp, token}: ForgotPass
 
   const {openSnackbar} = useSnackbar();
 
-  const {isLoading, setIsLoading} = useLoading();
+  const {isLoading} = useLoading();
 
   const [value, setValue] = useState({
     password: "",

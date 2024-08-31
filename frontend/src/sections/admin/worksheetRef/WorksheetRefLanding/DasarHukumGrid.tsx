@@ -1,6 +1,5 @@
 import {useState, useRef} from'react';
-import {Container, Stack, Button, Box, Typography, Grid, Slide, Card, 
-          FormControl, Tooltip, IconButton} from '@mui/material';
+import {Stack, Button, Box, Typography, Grid, FormControl, Tooltip, IconButton} from '@mui/material';
 import { useTheme, styled } from '@mui/material/styles';
 import Iconify from '../../../../components/iconify';
 import StyledTextField from '../../../../components/styledTextField/StyledTextField';
@@ -17,7 +16,7 @@ const StatsContainer = styled(Box)(({theme}) => ({
   justifyContent:'start', 
 }));
 
-const StyledButton = styled(Button)(({ theme }) => ({
+const StyledButton = styled(Button)(({  }) => ({
   display: 'inline-flex',   
   alignItems: 'center', 
   justifyContent: 'center', 

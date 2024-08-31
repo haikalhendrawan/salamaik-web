@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Document, Page, pdfjs} from 'react-pdf';
-import {IconButton, Button, Typography} from '@mui/material';
+import {IconButton, Typography} from '@mui/material';
 import {useTheme} from '@mui/material/styles';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';

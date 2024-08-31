@@ -1,9 +1,8 @@
 import {useState} from "react";
-import PropTypes from 'prop-types';
 import ReactApexChart from 'react-apexcharts';
 // @mui
 import { Box, Card, CardHeader, Button,  } from '@mui/material';
-import {styled, useTheme} from '@mui/material/styles';
+import {styled} from '@mui/material/styles';
 import Iconify from '../../../components/iconify';
 // components
 import { useChart } from '../../../components/chart';
@@ -42,8 +41,6 @@ interface ChartDataType{
 
 // --------------------------------------------------------------------
 export default function SortedKPPNScore({ title, subheader, chartData, colors, ...other }: SortedKPPNScoreProps) {
-  const theme = useTheme();
-  
   const [open, setOpen] = useState<any>(null);
 
   const {auth} = useAuth();
@@ -81,7 +78,7 @@ export default function SortedKPPNScore({ title, subheader, chartData, colors, .
       y: {
         formatter: (val: number) => Number(val).toFixed(2),
         title: {
-          formatter: (val: any) => '',
+          formatter: (_: any) => '',
         },
       },
     },

@@ -1,8 +1,6 @@
-import {styled, alpha, useTheme} from "@mui/material/styles";
-import {Popover, Button, Box, Popper, Paper, Fade, ClickAwayListener, Typography} from "@mui/material";
+import {styled, useTheme} from "@mui/material/styles";
+import { Button, Box, Popper, Paper, Fade, ClickAwayListener } from "@mui/material";
 import useDictionary from "../../../hooks/useDictionary";
-
-
 // -----------------------------------------------------
 
 const style = {

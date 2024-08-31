@@ -1,4 +1,4 @@
-import React, {useMemo, useEffect, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import { Typography, Table, Card, TableContainer, Grow, TableBody, TableRow, TableCell, Button, Tooltip} from '@mui/material';
 import {useAuth} from '../../../../hooks/useAuth';
 import { useTheme, styled} from '@mui/material/styles';
@@ -10,19 +10,13 @@ import MatrixTableEditModal from './MatrixTableEditModal';
 import Iconify from '../../../../components/iconify/Iconify';
 import useSnackbar from '../../../../hooks/display/useSnackbar';
 import useAxiosJWT from '../../../../hooks/useAxiosJWT';
-import { MatrixType, MatrixWithWsJunctionType } from '../../types';
-import { WorksheetType } from '../../../worksheet/types';
+import { MatrixWithWsJunctionType } from '../../types';
 import useDictionary from '../../../../hooks/useDictionary';
 import StyledButton from '../../../../components/styledButton';
 import useLoading from '../../../../hooks/display/useLoading';
 import useDialog from '../../../../hooks/display/useDialog';
 // ----------------------------------------------------------------------------------
-interface MatrixResponse{
-  worksheet: WorksheetType,
-  matrix: MatrixWithWsJunctionType[]
-};
-
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
+const StyledTableCell = styled(TableCell)(({  }) => ({
   fontSize: '12px'
 }));
 

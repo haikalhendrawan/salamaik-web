@@ -1,9 +1,4 @@
-import {useState, useEffect, useRef} from'react';
-import {Stack, Button, Box, Paper, Modal} from '@mui/material';
-import { useTheme, styled } from '@mui/material/styles';
-import Iconify from '../iconify';
-import Label from '../label';
-import Scrollbar from '../scrollbar';
+import { Box,  Modal} from '@mui/material';
 // -------------------------------------------------------------------------------------------
 const style = {
   position: 'absolute',
@@ -23,11 +18,11 @@ interface PreviewFileModalProps {
 
 // -------------------------------------------------------------------------------------------
 export default function PreviewFileModal({open, modalClose, file}: PreviewFileModalProps){
-  const theme = useTheme();
+  // const theme = useTheme();
 
-  const [render, setRender] = useState<string | JSX.Element>('No files');
+  // const [render, setRender] = useState<string | JSX.Element>('No files');
 
-  const fileExt = file ? file.split('.').pop()?.toLowerCase() : '' ;
+  // const fileExt = file ? file.split('.').pop()?.toLowerCase() : '' ;
 
   // useEffect(() => {
   //   if(fileExt==='jpg' || fileExt==='jpeg' || fileExt==='png'){

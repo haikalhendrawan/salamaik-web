@@ -1,9 +1,8 @@
-import { ReactNode, useState, useEffect, createContext, useContext } from 'react';
+import { ReactNode, useState, createContext, useContext } from 'react';
 // @mui
 import { useTheme, alpha, styled } from '@mui/material/styles';
-import { Grid, Container, Typography, Backdrop } from '@mui/material';
+import Backdrop from '@mui/material/Backdrop';
 import PuffLoader from 'react-spinners/PuffLoader';
-import useThemeMode from './useThemeMode';
 //------------------------------------------------------------------
 const StyledBackdrop = styled(Backdrop)(({theme}) => ({
   color: '#F9FAFB', 

@@ -40,7 +40,7 @@ interface StandardizationTableProps{
 }
 
 // ----------------------------------------------------------------------------------
-export default function StandardizationTable({header, modalOpen, kppnTab, cluster}: StandardizationTableProps) {
+export default function StandardizationTable({header, kppnTab, cluster}: StandardizationTableProps) {
   const theme = useTheme();
 
   const {periodRef} = useDictionary();

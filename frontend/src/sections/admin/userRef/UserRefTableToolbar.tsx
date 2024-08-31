@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 // @mui
 import { styled, alpha, useTheme } from '@mui/material/styles';
 import { Toolbar, Tabs, Tab, OutlinedInput, InputAdornment, FormControl, InputLabel, MenuItem, Stack,} from '@mui/material';
@@ -93,16 +93,15 @@ const selectItem: SelectItemType[] = [
 export default function UserRefTableToolbar({
   filterName, 
   handleFilterName,
-  filterUnit, 
   handleFilterUnit, 
   tab, 
   setTab,
   users}: UserRefTableToolbarProps) {
-  const [open, setOpen] = useState(false); // open dan close filter icon
+  const [_, setOpen] = useState(false); // open dan close filter icon
 
   const theme = useTheme();
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: 0 | 1) => { // setiap tab komponen berubah
+  const handleTabChange = (_: React.SyntheticEvent, newValue: 0 | 1) => { // setiap tab komponen berubah
     setTab(newValue);
   };
 

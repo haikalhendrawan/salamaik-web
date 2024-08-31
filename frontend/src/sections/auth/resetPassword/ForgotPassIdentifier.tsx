@@ -1,13 +1,9 @@
-import { Helmet } from 'react-helmet-async';
-import {useState, useEffect} from 'react';
 // @mui
-import { styled, useTheme } from '@mui/material/styles';
 import { Typography, Stack, Link} from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 import StyledTextField from '../../../components/styledTextField/StyledTextField';
 import Iconify from '../../../components/iconify';
 import useSnackbar from '../../../hooks/display/useSnackbar';
-import useLoading from '../../../hooks/display/useLoading';
 import axiosPublic from "../../../config/axios";
 //-------------------------------------------------------------------------------------
 interface ValueType{
@@ -33,8 +29,6 @@ export default function ForgotPassIdentifier({
   handleChangeToken}:ForgotPassIdentifierPropsType) {
   const {openSnackbar} = useSnackbar();
 
-  const { setIsLoading } = useLoading();
-  
   const handleSubmit = async() => {
     try{
       handleChangeView(1);

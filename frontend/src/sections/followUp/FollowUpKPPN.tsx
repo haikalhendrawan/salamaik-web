@@ -53,7 +53,7 @@ export default function FollowUpKPPN() {
 
   const [tabValue, setTabValue] = useState(defaultTab); // ganti menu komponen supervisi
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: string) => { // setiap tab komponen berubah
+  const handleTabChange = (_: React.SyntheticEvent, newValue: string) => { // setiap tab komponen berubah
     setTabValue(newValue);
     navigate(`?id=${newValue}`);
   };

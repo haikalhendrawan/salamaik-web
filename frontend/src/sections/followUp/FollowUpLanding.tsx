@@ -1,14 +1,11 @@
-import {useEffect, useRef} from "react";
 import { Helmet } from 'react-helmet-async';
 // @mui
-import { useTheme } from '@mui/material/styles';
-import { Grid, Container, Typography, LinearProgress, Button, Box } from '@mui/material';
+import { Grid, Container, Typography } from '@mui/material';
 // sections
 import KPPNSelectionCard from "./components/KPPNSelectionCard";
 // ----------------------------------------------------------------------
 
 export default function FollowUpLanding() {
-  const theme = useTheme();
 
   return (
     <>

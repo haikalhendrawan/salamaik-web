@@ -1,5 +1,4 @@
 import {createContext, useState, ReactNode} from "react";
-import {AuthProviderType} from "../types/hooks/authTypes";
 // --------------------------------------------------------------------
 interface Auth{
     id: string;

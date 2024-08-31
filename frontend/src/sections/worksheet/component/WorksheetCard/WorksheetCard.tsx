@@ -14,8 +14,6 @@ import Nilai from "./Nilai";
 import Catatan from "./Catatan";
 import { WsJunctionType, WorksheetType } from "../../types";
 import { debounce } from 'lodash';
-import  useTheme  from "@mui/material/styles/useTheme";
-
 // ------------------------------------------------------------
 interface WorksheetCardProps {
   modalOpen: () => void,
@@ -60,8 +58,6 @@ export default function WorksheetCard(props: WorksheetCardProps) {
   const [renderNilai, setRenderNilai] = useState(false);
 
   const [openInstruction, setOpenInstruction] = useState<boolean>(false);
-
-  const theme = useTheme();
 
   const [anchorEl, setAnchorEl] = useState<EventTarget & HTMLButtonElement | null>(null);
 

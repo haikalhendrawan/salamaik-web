@@ -3,11 +3,10 @@
  * ganti ukuran label, dan input
  * ganti border size
  */
-import { ReactNode } from 'react';
-import {InputLabel, Select} from '@mui/material';
+import { Select} from '@mui/material';
 import { styled } from '@mui/material/styles';
 
-const StyledSelect = styled(Select)(({theme}) => ({
+const StyledSelect = styled(Select)(({}) => ({
   typography:'body2',
   '& .MuiInputBase-input': {
     fontSize: 14,

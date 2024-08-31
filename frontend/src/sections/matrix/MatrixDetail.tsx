@@ -1,7 +1,6 @@
-import {useMemo, useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Iconify from '../../components/iconify/Iconify';
-import {useTheme} from '@mui/material/styles';
 import {Button, Container} from '@mui/material';
 // sections
 import MatrixTable from './components/MatrixTable/MatrixTable';
@@ -9,7 +8,7 @@ import MatrixDetailHeader from './components/MatrixDetailHeader';
 import useLoading from '../../hooks/display/useLoading';
 import useSnackbar from '../../hooks/display/useSnackbar';
 import useAxiosJWT from '../../hooks/useAxiosJWT';
-import { MatrixType, MatrixWithWsJunctionType } from './types';
+import { MatrixWithWsJunctionType } from './types';
 import { WorksheetType } from '../worksheet/types';
 import { DialogProvider } from '../../hooks/display/useDialog';
 // ----------------------------------------------------------------------------------
@@ -19,8 +18,6 @@ interface MatrixResponse{
 };
 // ----------------------------------------------------------------------------------
 export default function MatrixDetail() {
-  const theme = useTheme();
-
   const navigate = useNavigate();
   
   const axiosJWT = useAxiosJWT();

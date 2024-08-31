@@ -1,7 +1,7 @@
 import { ReactNode, useState, createContext, useContext } from 'react';
 // @mui
-import { useTheme, alpha, styled } from '@mui/material/styles';
-import { Snackbar, Alert, Paper } from '@mui/material';
+import { useTheme} from '@mui/material/styles';
+import { Snackbar, Alert } from '@mui/material';
 //------------------------------------------------------------------
 type SnackbarContextType = {
   openSnackbar: (message: string, sever: 'success' | 'error' | 'white') => void,

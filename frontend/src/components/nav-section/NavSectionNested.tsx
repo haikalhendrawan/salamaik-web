@@ -4,15 +4,10 @@
  */
 
 import {useState} from "react";
-import { NavLink as RouterLink } from 'react-router-dom';
 // @mui
-import { Box, List, ListItemText, ListSubheader, Button, Collapse, ListItemButton} from '@mui/material';
-import { useTheme, alpha } from '@mui/material/styles';
+import { Box, List, ListSubheader} from '@mui/material';
 //
-import { StyledNavItem, StyledNavItemIcon, StyledNavItemNested} from './styles';
 import NavItemNested from "./NavItemNested";
-import Iconify from "../iconify/Iconify";
-import SvgColor from "../svg-color/SvgColor";
 
 // ----------------------------------------------------------------------
 
@@ -37,12 +32,12 @@ export default function NavSectionNested({ data = [], ...other}: NavSectionNeste
     event.preventDefault();
   };
 
-  const handleClose = (event: React.MouseEvent<HTMLButtonElement>, index: number) => {
-    setOpen({
-      ...open,
-      [index]:false,
-    });
-  }
+  // const handleClose = (event: React.MouseEvent<HTMLButtonElement>, index: number) => {
+  //   setOpen({
+  //     ...open,
+  //     [index]:false,
+  //   });
+  // }
 
   return (
     <Box {...other}>

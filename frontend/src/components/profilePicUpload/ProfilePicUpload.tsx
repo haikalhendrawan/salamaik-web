@@ -3,11 +3,11 @@
  * bentuk box yang clickable. Utk hidden input perlu dibuat manual diluar komponen
  */
 
-import { Stack, Typography, Box, IconButton} from '@mui/material';
-import { useTheme, styled } from '@mui/material/styles';
+import { Typography, Box, IconButton} from '@mui/material';
+import { styled } from '@mui/material/styles';
 import Iconify from '../iconify/Iconify';
 // ----------------------------------------------------------------
-const ImageBox = styled(Box)(({ theme }) => ({
+const ImageBox = styled(Box)(({ }) => ({
   borderRadius:'50%', 
   height:'144px', 
   width:'144px', 
@@ -25,7 +25,7 @@ const ImageBox = styled(Box)(({ theme }) => ({
   }
 }));
 
-const ImageButton = styled(IconButton)(({theme}) => ({
+const ImageButton = styled(IconButton)(({}) => ({
   width:'100%', 
   height:'100%', 
   mx:'auto',
@@ -34,7 +34,7 @@ const ImageButton = styled(IconButton)(({theme}) => ({
   backgroundSize: 'cover', 
 }));
 
-const ImageBackdrop = styled(Box)(({theme}) => ({
+const ImageBackdrop = styled(Box)(({}) => ({
   position: 'absolute',
   top: 0,
   left: 0,
@@ -47,7 +47,7 @@ const ImageBackdrop = styled(Box)(({theme}) => ({
   transition: 'opacity 0.3s ease'
 }));
 
-const BackdropTypography = styled(Typography)(({theme}) => ({
+const BackdropTypography = styled(Typography)(({}) => ({
   color: 'transparent', 
   position: 'absolute', 
   top: '60%', 
@@ -58,7 +58,7 @@ const BackdropTypography = styled(Typography)(({theme}) => ({
   zIndex: 1
 }));
 
-const BackdropIcon = styled(Iconify)(({theme}) => ({
+const BackdropIcon = styled(Iconify)(({}) => ({
   color: 'transparent', 
   position: 'absolute', 
   top: '45%', 

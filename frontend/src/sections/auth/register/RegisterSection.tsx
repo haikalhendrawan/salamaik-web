@@ -1,9 +1,8 @@
 import { Helmet } from 'react-helmet-async';
-import {useState, useEffect} from 'react';
+import {useState} from 'react';
 // @mui
-import { styled, useTheme } from '@mui/material/styles';
-import { Link, Container, Typography, Divider, Stack, Box, SelectChangeEvent} from '@mui/material';
-import LoadingButton from '@mui/lab/LoadingButton';
+import { styled } from '@mui/material/styles';
+import {  Container, Typography, Stack, Box, SelectChangeEvent} from '@mui/material';
 // sections
 import RegisterForm from './RegisterForm';
 import RegisterOtp from './RegisterOtp';

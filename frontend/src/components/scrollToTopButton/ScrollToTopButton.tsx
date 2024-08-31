@@ -1,8 +1,6 @@
 /**
  * Komponen utk scroll to top
  */
-
-import {useCallback} from "react";
 import {Box, Fab, useScrollTrigger, Zoom, Tooltip} from "@mui/material";
 import Iconify from "../iconify";
 // --------------------------------------------------------------------
@@ -22,7 +20,7 @@ export default function ScrollToTopButton(){
       <Tooltip title="Scroll to top" placement="left">
         <Box
           role="presentation"
-          // Place the button in the bottom right corner.
+          // Place button di bottom right corner.
           sx={{
             position: "fixed",
             bottom: 32,

@@ -10,7 +10,7 @@ import {styled} from '@mui/material/styles';
  * fungsi utamanya utk fix performance issue saat render komponen berat
  * @param duration pass dalam satuan second, atur lama progress bar
  * */
-const ProgressContainer = styled(Box)(({ theme }) => ({
+const ProgressContainer = styled(Box)(({ }) => ({
   height: '70vh', 
   display:'flex', 
   flexDirection:'column', 

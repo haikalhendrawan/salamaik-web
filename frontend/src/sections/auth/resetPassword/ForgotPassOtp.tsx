@@ -1,16 +1,14 @@
 import { MuiOtpInput } from 'mui-one-time-password-input'
-import { Helmet } from 'react-helmet-async';
 import {useState, useEffect} from 'react';
 // @mui
-import { styled, useTheme } from '@mui/material/styles';
-import { Typography, Stack, InputAdornment, IconButton, Link} from '@mui/material';
+import { styled } from '@mui/material/styles';
+import { Typography, Stack, Link} from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Iconify from '../../../components/iconify/Iconify';
 import useSnackbar from '../../../hooks/display/useSnackbar';
-import useLoading from '../../../hooks/display/useLoading';
 import axiosPublic from "../../../config/axios";
 //-------------------------------------------------------------------------------------
-const MuiOtpInputStyled = styled(MuiOtpInput)(({ theme }) => ({
+const MuiOtpInputStyled = styled(MuiOtpInput)(({ }) => ({
   display: 'flex',
   gap: '30px',
   maxWidth: '650px',

@@ -2,14 +2,9 @@
  * gabungan menu dan header
  * ex: header Supervisi KPPN with multiple menu
  */
-
-import PropTypes from 'prop-types';
-import { NavLink as RouterLink } from 'react-router-dom';
 // @mui
-import { Box, List, ListItemText, ListSubheader, Button} from '@mui/material';
-import { useTheme, alpha } from '@mui/material/styles';
+import { Box, List, ListSubheader} from '@mui/material';
 //
-import { StyledNavItem, StyledNavItemIcon } from './styles';
 import NavItem from "./NavItem";
 
 // ----------------------------------------------------------------------
@@ -22,7 +17,8 @@ export default function NavSection({ data = [], ...other}:NavSectionProp) {
   return (
     <Box {...other}>
       <List 
-        disablePadding sx={{ p: 1 }}
+        disablePadding 
+        sx={{ p: 1, px: 1.5}}
         subheader={other.header?
         <ListSubheader component='a' sx={{fontSize: '12px', color:'rgb(99, 115, 129)', backgroundColor:'transparent'}}>
           {other.header}

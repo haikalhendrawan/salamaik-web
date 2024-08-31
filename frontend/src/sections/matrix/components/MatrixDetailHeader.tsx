@@ -3,7 +3,6 @@ import {Stack,Typography} from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import useDictionary from '../../../hooks/useDictionary';
 import {useAuth} from '../../../hooks/useAuth';
-import { useTheme} from '@mui/material/styles';
 
 export default function MatrixDetailHeader() {
   const {auth} = useAuth();

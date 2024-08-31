@@ -40,7 +40,7 @@ export default function Dokumen({openInstruction, findingResponse, getData, isDi
 
   const theme = useTheme();
 
-  const { handleSetIsExampleFile, modalOpen, changeFile, selectId, setFileOption, open } = usePreviewFileModal();
+  const { handleSetIsExampleFile, modalOpen, changeFile, selectId, setFileOption } = usePreviewFileModal();
 
   const {getWsJunctionKanwil} = useWsJunction();
 

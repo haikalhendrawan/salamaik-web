@@ -1,5 +1,4 @@
 import { MatrixWithWsJunctionType } from "../matrix/types"
-import { OpsiType } from "../worksheet/types"
 
 export interface FindingsResponseType{
   id: number,

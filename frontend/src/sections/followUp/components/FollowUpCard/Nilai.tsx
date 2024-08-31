@@ -10,7 +10,6 @@ import StyledButton from '../../../../components/styledButton/StyledButton';
 import Iconify from '../../../../components/iconify/Iconify';
 import { TextField } from '@mui/material';
 import styled  from '@mui/material/styles/styled';
-import { WsJunctionType } from "../../../worksheet/types";
 import useWsJunction from "../../../worksheet/useWsJunction";
 import useSocket from "../../../../hooks/useSocket";
 import {useAuth} from "../../../../hooks/useAuth";

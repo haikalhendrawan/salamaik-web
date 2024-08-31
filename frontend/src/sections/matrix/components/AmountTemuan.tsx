@@ -1,7 +1,5 @@
-import {useState} from "react";
-import {Card, Typography, Grid, Box, Tabs, Tab, CardContent, Stack, IconButton, Slide} from '@mui/material';
-import {styled, useTheme} from '@mui/material/styles';
-import Iconify from "../../../components/iconify";
+import {Card, Typography, Grid, CardContent, Stack, Slide} from '@mui/material';
+import {useTheme} from '@mui/material/styles';
 // ----------------------------------------------
 interface AmountTemuanProps {
   header: string,
@@ -11,7 +9,7 @@ interface AmountTemuanProps {
 
 // ----------------------------------------------
 
-export default function AmountTemuan({header, subheader, temuan}: AmountTemuanProps){
+export default function AmountTemuan({header, temuan}: AmountTemuanProps){
   const theme = useTheme();
 
   return(

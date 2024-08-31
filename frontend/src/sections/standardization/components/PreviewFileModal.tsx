@@ -16,7 +16,6 @@ const style = {
   justifyContent: 'center', alignItems: 'center', height: '100vh'
 };
 
-
 interface PreviewFileModalProps {
   open: boolean,
   modalClose: () => void,

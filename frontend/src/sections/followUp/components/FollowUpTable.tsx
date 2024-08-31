@@ -1,20 +1,12 @@
-import {useState, useEffect} from'react';
 import { Link } from 'react-router-dom';
-import {Stack, Toolbar, Typography, Table, Card, CardHeader, TableSortLabel,
+import {Stack, Typography, Table, Card, CardHeader, TableSortLabel,
         TableHead, Grow, TableBody, TableRow, TableCell, Button} from '@mui/material';
 import { useTheme, styled } from '@mui/material/styles';
 import Label from '../../../components/label';
 import Iconify from '../../../components/iconify/Iconify';
 import { FindingsResponseType } from '../types';
 // ---------------------------------------------------
-const StyledRoot = styled(Toolbar)(({ theme }) => ({
-  height: 72,
-  display: 'flex',
-  justifyContent: 'space-between',
-  padding: theme.spacing(0, 1, 0, 3),
-}));
-
-const StyledButton = styled(Button)(({ theme }) => ({
+const StyledButton = styled(Button)(({  }) => ({
   height: '30px', 
   width: '90px', 
   fontSize:'12px', 

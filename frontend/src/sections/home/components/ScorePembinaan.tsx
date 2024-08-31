@@ -1,6 +1,6 @@
 import {useState} from "react";
-import {Card, Typography, Grid, Box, Tabs, Tab, CardContent, Stack, IconButton, Slide} from '@mui/material';
-import {styled, useTheme} from '@mui/material/styles';
+import {Card, Typography, Grid, CardContent, Stack, IconButton, Slide} from '@mui/material';
+import {useTheme} from '@mui/material/styles';
 import Iconify from "../../../components/iconify";
 // ----------------------------------------------
 interface ScorePembinaanProps {

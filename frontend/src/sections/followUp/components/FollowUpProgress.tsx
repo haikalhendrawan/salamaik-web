@@ -1,7 +1,5 @@
-import {useState} from "react";
-import {Card, Typography, Grid, Box, Tabs, Tab, CardContent, Stack} from '@mui/material';
-import {styled, useTheme} from '@mui/material/styles';
-import Iconify from "../../../components/iconify";
+import {Card, Typography, Grid, CardContent, Stack} from '@mui/material';
+import {useTheme} from '@mui/material/styles';
 import RadialChart from "../../../components/radialChart/RadialChart";
 // ----------------------------------------------
 interface FollowUpProgressProps {
@@ -15,7 +13,7 @@ interface FollowUpProgressProps {
 
 // ----------------------------------------------
 
-export default function FollowUpProgress({header, number, footer, detail, icon, color}: FollowUpProgressProps){
+export default function FollowUpProgress({header, number, footer, detail}: FollowUpProgressProps){
   const theme = useTheme();
 
   return(

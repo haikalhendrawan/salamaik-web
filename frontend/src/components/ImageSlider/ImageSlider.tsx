@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import Slider from "react-slick";
-import { Card, Grid, IconButton, Button, Stack, Box, Typography, Skeleton } from "@mui/material";
+import { Card, IconButton, Stack, Box, Typography, Skeleton } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import Iconify from "../iconify/Iconify";
 import "slick-carousel/slick/slick.css";
@@ -17,13 +17,13 @@ interface ImageSliderProps{
 export default function ImageSlider({images, title, height}: ImageSliderProps) {
   const theme = useTheme();
 
-  const [current, setCurrent] = useState<number>(0); // current index dari image di carousel
+  const [_, setCurrent] = useState<number>(0); // current index dari image di carousel
 
   const [slideCounter, setSlideCounter] = useState<number>(0); // total counter image ber ganti
 
-  const [circleIndex, setCircleIndex] = useState<number>(0);
+  // const [circleIndex, setCircleIndex] = useState<number>(0);
 
-  const length = images? images.length : 0
+  // const length = images? images.length : 0
 
   const slider = useRef<any>(null);
 
@@ -59,10 +59,10 @@ export default function ImageSlider({images, title, height}: ImageSliderProps) {
     setImageLoaded(true);
   };
 
-  const toIndex = (slideCounter: number, length: number, currCircle: number, circleIndex: number) => {
-    const difference = circleIndex - currCircle;
-    return (slideCounter + difference) % length
-  };
+  // const toIndex = (slideCounter: number, length: number, currCircle: number, circleIndex: number) => {
+  //   const difference = circleIndex - currCircle;
+  //   return (slideCounter + difference) % length
+  // };
 
 
   return (

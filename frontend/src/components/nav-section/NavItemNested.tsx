@@ -6,14 +6,12 @@
 import {useState, useEffect, ReactNode} from "react";
 import { NavLink as RouterLink, useLocation } from 'react-router-dom';
 // @mui
-import { Box, List, ListItemText, ListSubheader, Button, Collapse, ListItemButton} from '@mui/material';
+import {List, ListItemText,  Collapse} from '@mui/material';
 import { useTheme, alpha } from '@mui/material/styles';
 //
-import { StyledNavItem, StyledNavItemIcon, StyledNavItemNested } from './styles';
-import NavItem from "./NavItem";
+import { StyledNavItemIcon, StyledNavItemNested } from './styles';
 import NavSubItem from "./NavSubItem";
 import Iconify from "../iconify/Iconify";
-import SvgColor from "../svg-color/SvgColor";
 
 interface NavItemNested{
   item: {
@@ -37,7 +35,7 @@ export default function NavItemNested({ item, onClick, open}: NavItemNested) {
   const { title, path, icon, info, menu } = item;
   const theme = useTheme() as any;
   const location = useLocation();
-  const [isActive, setIsActive] = useState(false);
+  const [_, setIsActive] = useState(false);
 
   useEffect(() => {
     setIsActive(location.pathname.includes(path));

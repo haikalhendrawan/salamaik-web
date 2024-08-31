@@ -9,7 +9,7 @@ import {TextField} from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 
-const StyledText = styled(TextField)(({theme}) => ({
+const StyledText = styled(TextField)(({}) => ({
   typography:'body2',
   '& .MuiInputBase-input': {
     fontSize: 14,
