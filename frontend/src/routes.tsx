@@ -28,6 +28,7 @@ import FollowUpDetail from "./sections/followUp/FollowUpDetail";
 import StandardizationPage from "./pages/StandardizationPage";
 import NotifInterfacePage from "./pages/admin/NotifInterfacePage";
 import GalleryInterfacePage from "./pages/admin/GalleryInterfacePage";
+import ActivityLogPage from "./pages/admin/ActivityLogPage";
 // ----------------------------------------------------
 
 export default function Router() {
@@ -112,6 +113,7 @@ export default function Router() {
         <Route index element={<Navigate to="notification"/>} />
         <Route path="notification" element={<NotifInterfacePage />} />
         <Route path="gallery" element={<GalleryInterfacePage />} />
+        <Route path="activity-log" element={<ActivityLogPage />} />
       </Route>
     </Route>
 

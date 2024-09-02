@@ -15,17 +15,19 @@ import useDictionary from '../../../../hooks/useDictionary';
 import StyledButton from '../../../../components/styledButton';
 import useLoading from '../../../../hooks/display/useLoading';
 import useDialog from '../../../../hooks/display/useDialog';
+import { WorksheetType } from '../../../worksheet/types';
 // ----------------------------------------------------------------------------------
 const StyledTableCell = styled(TableCell)(({  }) => ({
   fontSize: '12px'
 }));
 
 // ----------------------------------------------------------------------------------
-export default function MatrixTable({matrix, matrixStatus, getMatrix, worksheetId}: {
+export default function MatrixTable({matrix, matrixStatus, getMatrix, worksheetId, worksheetDetail}: {
   matrix: MatrixWithWsJunctionType[] | [], 
   matrixStatus: number | null, 
   getMatrix: () => Promise<void>,
-  worksheetId: string | null}) {
+  worksheetId: string | null,
+  worksheetDetail: WorksheetType | null}) {
   const theme = useTheme();
 
   const [selectedKomponen, setSelectedKomponen] = useState<string | null>('1');
@@ -51,6 +53,8 @@ export default function MatrixTable({matrix, matrixStatus, getMatrix, worksheetI
   const isAdminKanwil = auth?.role === 4 || auth?.role === 99;
 
   const isUserKanwil = auth?.role === 3;
+
+  const isPastDue = useMemo(() => new Date().getTime() > new Date(worksheetDetail?.close_follow_up || "").getTime(), [worksheetDetail]);
 
   const selectedMatrix = useMemo(() => {
     if(selectedId){
@@ -232,7 +236,11 @@ export default function MatrixTable({matrix, matrixStatus, getMatrix, worksheetI
 
                           <StyledTableCell align="left">
                             <Tooltip title="Edit matriks">
-                              <StyledButton variant='contained' color='warning' onClick={() => handleOpen(item?.id)} disabled={!isUserKanwil && !isAdminKanwil}>
+                              <StyledButton 
+                                variant='contained' 
+                                color='warning' 
+                                onClick={() => handleOpen(item?.id)} 
+                                disabled={(!isUserKanwil && !isAdminKanwil) || isPastDue}>
                                   <Iconify icon="mdi:edit" />
                                 </StyledButton>
                             </Tooltip>
@@ -257,7 +265,9 @@ export default function MatrixTable({matrix, matrixStatus, getMatrix, worksheetI
               color='warning' 
               endIcon={ <Iconify icon="solar:plain-bold-duotone"/>} 
               onClick={handleClickReassign}
-              sx={{mr:2}}>
+              sx={{mr:2}}
+              disabled={isPastDue}
+            >
               ReAssign Matrix
             </Button> 
           : null
@@ -268,6 +278,7 @@ export default function MatrixTable({matrix, matrixStatus, getMatrix, worksheetI
               variant='contained' 
               endIcon={ <Iconify icon="solar:trash-bin-trash-bold-duotone"/>} 
               onClick={handleClickDelete}
+              disabled={isPastDue}
             >
               Delete
             </Button> 

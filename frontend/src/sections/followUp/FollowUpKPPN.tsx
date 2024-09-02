@@ -120,9 +120,9 @@ export default function FollowUpKPPN() {
   useEffect(() => {
     getData();
   }, [location.search, tabValue]);
-  
-  const totalFindingsNonFinal = findings?.length;
-  const totalFindingsFinal = findings?.filter((f) => (f?.status === 0 || f?.status ===1 || f?.status ===2)).length;
+
+  const totalFindingsNonFinal = findings?.filter(isNotMaxScoreAndTouched).length;
+  const totalFindingsFinal = findings?.filter(isNotMaxScoreAndTouched).length;
   const countFindingsOnProgress = findings?.filter((f) => f?.status > 0)?.length;
   const findingsPercentProgress = ((countFindingsOnProgress / totalFindingsNonFinal) * 100) || 0;
 
@@ -182,3 +182,10 @@ export default function FollowUpKPPN() {
   )
 
 }
+
+// -------------------------------------------------------------------------------------------------
+function isNotMaxScoreAndTouched(finding: FindingsResponseType) {
+  // const isNotTouched = finding?.status === 0 || finding?.status ===1 || finding?.status ===2;
+  const maxScore = finding?.matrixDetail[0]?.standardisasi === 1 ? 12 : 10;
+  return finding?.score_after !== maxScore 
+};

@@ -14,12 +14,14 @@ import useBatch from './useBatch';
 import useDialog from '../../../../hooks/display/useDialog';
 //----------------------------------------------------
 const TABLE_HEAD = [
-  { id: 'id', label: 'Id', alignRight: false },
-  { id: 'kppn', label: 'KPPN', alignRight: false },
-  { id: 'status', label: 'Status', alignRight: false },
-  { id: 'Open Period', label: 'Open Period', alignRight: false },
-  { id: 'Close Period', label: 'Close Period', alignRight: false },
-  { id: 'action', label: 'Action', alignRight: false },
+  { id: 'id', label: 'Id', alignRight: false, width: '5%' },
+  { id: 'kppn', label: 'KPPN', alignRight: false, width: '15%' },
+  { id: 'status', label: 'Status', alignRight: false, width: '5%' },
+  { id: 'Open Period', label: 'Open Period', alignRight: false, width: '15%' },
+  { id: 'Close Period', label: 'Close Period', alignRight: false, width: '15%' },
+  { id: 'Open Period Follow Up', label: <div>Open Period<br/>(Tindak Lanjut)</div>, alignRight: false, width: '15%' },
+  { id: 'Close Period Follow Up', label: <div>Close Period<br/>(Tindak Lanjut)</div>, alignRight: false, width: '15%' },
+  { id: 'action', label: 'Action', alignRight: false, width: '15%' },
 ];
 
 interface BatchRefTableProps {
@@ -107,6 +109,7 @@ export default function BatchRefTable({tableData, handleOpen}: BatchRefTableProp
                   <TableCell
                     key={headCell.id}
                     align={headCell.alignRight ? 'right' : 'left'}
+                    width={headCell.width}
                   >
                     <TableSortLabel
                       hideSortIcon
@@ -136,6 +139,14 @@ export default function BatchRefTable({tableData, handleOpen}: BatchRefTableProp
 
                   <TableCell align="left">
                     {format(new Date(row.close_period), 'd MMMM yyy', {locale: id})}
+                  </TableCell>
+
+                  <TableCell align="left">
+                    {format(new Date(row.open_follow_up), 'd MMMM yyy', {locale: id})}
+                  </TableCell>
+
+                  <TableCell align="left">
+                    {format(new Date(row.close_follow_up), 'd MMMM yyy', {locale: id})}
                   </TableCell>
 
                   <TableCell align="justify">

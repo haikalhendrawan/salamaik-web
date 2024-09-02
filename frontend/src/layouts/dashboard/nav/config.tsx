@@ -65,6 +65,11 @@ const navAdmin = [
         path: '/interface/gallery',
         icon: icon('dot-mark'),
       },
+      {
+        title: 'Activity Log',
+        path: '/interface/activity-log',
+        icon: icon('dot-mark'),
+      },
     ]
   },
 ];

@@ -100,24 +100,28 @@ export default function DocumentZip({header, subheader, image, tabValue }:Docume
         <Grid item xs={6}>
           <CardHeader title={header}  subheader={subheader} titleTypographyProps={{variant:'subtitle2'}} /> 
           <Box sx={{ p: 3, pb: 2 }} dir="ltr">
-            <Grid container direction="column">
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'start', alignItems: 'start', width: '100%' }}>
               <StyledFormControl>
-                <StyledSelect sx={{height:'35px'}} defaultValue={selectedMonth} onChange={(e: any) => setSelectedMonth(e.target.value)}>
+                <StyledSelect 
+                  sx={{ height: '35px', width: '100%' }} 
+                  defaultValue={selectedMonth} 
+                  onChange={(e: any) => setSelectedMonth(e.target.value)}
+                >
                   {monthSelection}
                 </StyledSelect>
               </StyledFormControl>
-                
-                <Button 
-                  variant='contained' 
-                  size='small'
-                  endIcon={<Iconify icon="solar:download-bold" />} 
-                  disabled={loading}
-                  sx={{mt: 2, width: 'fit-content'}}
-                  onClick={handleDownloadFile}
-                >
-                  Zip
-                </Button>
-            </Grid>                      
+              <Button 
+                variant="contained" 
+                size="small"
+                endIcon={<Iconify icon="solar:download-bold" />} 
+                disabled={loading}
+                sx={{ mt: 1, width: 'fit-content' }}
+                onClick={handleDownloadFile}
+              >
+                Zip
+              </Button>
+
+            </div>
           </Box>
         </Grid>
 

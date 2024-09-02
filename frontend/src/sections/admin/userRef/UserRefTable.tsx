@@ -19,9 +19,9 @@ import UserRefTableHead from './UserRefTableHead';
 import UserRefTableToolbar from './UserRefTableToolbar';
 //utils
 import {getComparator, applySortFilter, StyledButton} from './utils';
+import { UserType } from './types';
 
 // ----------------------------------------------------------------------
-
 const TABLE_HEAD = [
   { id: 'name', label: 'Nama', alignRight: false },
   { id: 'kppn', label: 'Unit', alignRight: false },
@@ -31,7 +31,7 @@ const TABLE_HEAD = [
 ];
 // ----------------------------------------------------------------------
 interface UserRefTableProps{
-  users: any[],
+  users: UserType[],
   setEditModalOpen: (id: string) => void,
   tab: 0 | 1 | 2,
   setTab: React.Dispatch<React.SetStateAction<0 | 1 | 2>>

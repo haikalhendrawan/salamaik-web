@@ -32,6 +32,8 @@ export default function MatrixDetail() {
 
   const [worksheetId, setWorksheetId] = useState<string | null>(null);
 
+  const [worksheetDetail, setWorksheetDetail] = useState<WorksheetType | null>(null);
+
   const [matrix, setMatrix] = useState<MatrixWithWsJunctionType[] | []>([]);
 
   const getMatrix = async() => {
@@ -41,6 +43,7 @@ export default function MatrixDetail() {
       const matrixResponse: MatrixResponse = response.data.rows;
       setMatrixStatus(matrixResponse.worksheet.matrix_status);
       setWorksheetId(matrixResponse.worksheet.id);
+      setWorksheetDetail(matrixResponse.worksheet);
       setMatrix(matrixResponse.matrix);
       setIsLoading(false);
     }catch(err: any){
@@ -71,7 +74,7 @@ export default function MatrixDetail() {
       {!matrix
         ? null 
         :<DialogProvider>
-            <MatrixTable matrix={matrix} matrixStatus={matrixStatus} getMatrix={getMatrix} worksheetId={worksheetId}/>
+            <MatrixTable matrix={matrix} matrixStatus={matrixStatus} getMatrix={getMatrix} worksheetId={worksheetId} worksheetDetail={worksheetDetail}/>
           </DialogProvider>
       }
      

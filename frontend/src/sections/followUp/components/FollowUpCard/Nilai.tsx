@@ -91,7 +91,7 @@ export default function Nilai({findingResponse, getData, isDisabled}: NilaiProps
     <StyledMenuItem key={index+1} value={item?.value?.toString() || ''}>{item?.value}</StyledMenuItem>
   ) || null), [wsJunction]);
 
-  const handleChangeKanwilScore = (newScore: string) => {
+  const handleChangeKanwilScore = async(newScore: string) => {
     setIsLoading(true);
     const score = parseInt(newScore);
 
@@ -117,6 +117,13 @@ export default function Nilai({findingResponse, getData, isDisabled}: NilaiProps
         setIsLoading(false);
       }
     });
+
+     await axiosJWT.post('/updateFindingsScore', {
+      id: findingResponse?.id, 
+      scoreBefore: wsJunction?.kanwil_score, 
+      scoreAfter: score, 
+      userName: auth?.name
+    }).catch(err => openSnackbar(err?.response?.data?.message, 'error'));
   };
 
   const handleChangeKPPNScore = (newScore: string) => {
