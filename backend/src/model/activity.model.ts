@@ -1,5 +1,6 @@
 import pool from '../config/db';
 import ErrorDetail from './error.model';
+import "dotenv/config"; 
 
 interface ActivityRefType{
   id: number,
@@ -12,7 +13,9 @@ interface ActivityJunctionType{
   id: number,
   activity_id: number,
   user_id: string,
-  timestamp: string
+  timestamp: string,
+  ip: string,
+  detail: string | null
 }
 
 interface ActivityJoinType{
@@ -21,10 +24,30 @@ interface ActivityJoinType{
   name: string,
   description: string | null,
   user_id: string,
-  timestamp: string
+  timestamp: string,
+  ip: string,
+  detail: string | null
 }
 
 class Activity{
+  async getAllActivityLimited(){
+    try{
+      const q = ` SELECT activity_junction.*, activity_ref.name AS activity_name, activity_ref.description, activity_ref.cluster, user_ref.name AS user_name
+                  FROM activity_junction
+                  INNER JOIN activity_ref
+                  ON activity_junction.activity_id = activity_ref.id
+                  INNER JOIN user_ref
+                  ON activity_junction.user_id = user_ref.username
+                  WHERE user_id  ${process.env.ADMIN_NIP ? '<> $1' : 'IS NOT NULL'}
+                  ORDER BY id DESC
+                  LIMIT 7000`;
+      const result = await pool.query(q, [process.env.ADMIN_NIP]);
+      return result.rows
+    }catch(err){
+      throw err
+    }
+  }
+
   async getActivityByType(type: number){
     try{
       const q = ` SELECT activity_junction.*, activity_ref.name, activity_ref.description
@@ -70,10 +93,10 @@ class Activity{
     }
   }
 
-  async createActivity(userId: string, type: number){
+  async createActivity(userId: string, type: number, ip: string, detail: string|number|null = null){
     try{
-      const q = `INSERT INTO activity_junction (activity_id, user_id) VALUES ($1, $2) RETURNING *`;
-      const result = await pool.query(q, [type, userId]);
+      const q = `INSERT INTO activity_junction (activity_id, user_id, ip, detail) VALUES ($1, $2, $3, $4) RETURNING *`;
+      const result = await pool.query(q, [type, userId, ip, detail]);
       return result.rows
     }catch(err){
       throw err

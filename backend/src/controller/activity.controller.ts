@@ -1,7 +1,14 @@
 import {Request, Response, NextFunction} from 'express';
 import activity from "../model/activity.model";
-import ErrorDetail from '../model/error.model';
 
+const getAllActivityLimited = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const result = await activity.getAllActivityLimited();
+    return res.status(200).json({sucess: true, message: 'Get activity success', rows: result});
+  } catch (err) {
+    next(err)
+  }
+}
 
 const getActivityById = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -37,7 +44,8 @@ const createActivity = async (req: Request, res: Response, next: NextFunction) =
   try {
     const {username} = req.payload;
     const {activityType} = req.body;
-    const result = await activity.createActivity(username, Number(activityType));
+    const ip = req.ip || '';
+    const result = await activity.createActivity(username, Number(activityType), ip);
     return res.status(200).json({sucess: true, message: 'Create activity success', rows: result});
   } catch (err) {
     next(err)
@@ -55,6 +63,7 @@ const deleteActivity = async (req: Request, res: Response, next: NextFunction) =
 }
 
 export {
+  getAllActivityLimited,
   getActivityById,
   getActivityByUser,
   getActivityByCluster,

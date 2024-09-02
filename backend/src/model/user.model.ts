@@ -142,7 +142,7 @@ class User{
 
   async checkUsername(username: string){
     try{
-      const q = "SELECT * FROM user_ref WHERE username = $1";
+      const q = "SELECT * FROM user_ref WHERE username = $1 AND status = 1";
       const result = await pool.query(q, [username]);
 
       if(result.rows.length > 0){

@@ -6,12 +6,17 @@ import fs from 'fs';
 import path from 'path';
 import logger from '../config/logger';
 import { validateScore } from '../utils/worksheetJunction.utils';
+import nonBlockingCall from '../utils/nonBlockingCall';
+import activity from '../model/activity.model';
 // ---------------------------------------------------------------------------------------------------
 
 class WorksheetEvent{
 
   async getWorksheetJunction(socket: Socket, data: any, callback: any) {
      try{
+        const {username} = socket.data.payload;
+        const ip = socket.handshake.address;
+
         const {kppn, period} = data;
 
         const worksheetData = await worksheet.getWorksheetByPeriodAndKPPN(period, kppn);
@@ -26,6 +31,8 @@ class WorksheetEvent{
         if(!result || result.length===0) {
           return socketError(callback, 'Worksheet is not assigned')
         };
+
+        nonBlockingCall(activity.createActivity(username, 80, ip));
   
         return callback({
           success: true,
@@ -40,7 +47,9 @@ class WorksheetEvent{
 
   async updateKanwilScore(socket: Socket, data: any, callback: any) {
     try{
-      const {name} = socket.data.payload;
+      const ip = socket.handshake.address;
+
+      const {name, username} = socket.data.payload;
       const {worksheetId, junctionId, kanwilScore} = data;
 
       const wsJunctionDetail = await wsJunction.getWsJunctionByJunctionId(junctionId);
@@ -56,8 +65,9 @@ class WorksheetEvent{
 
       socket.broadcast.emit('kanwilScoreHasUpdated', {worksheetId, junctionId, kanwilScore});
 
-      return callback({success: true, rows: result, message: 'Nilai has been updated'});
+      nonBlockingCall(activity.createActivity(username, 85, ip));
 
+      return callback({success: true, rows: result, message: 'Nilai has been updated'});
     }catch(err: any){
       logger.error(err);
       return socketError(callback, err.message)
@@ -66,7 +76,9 @@ class WorksheetEvent{
 
   async updateKPPNScore(socket: Socket, data: any, callback: any) {
     try{
-      const {name} = socket.data.payload;
+      const ip = socket.handshake.address;
+
+      const {name, username} = socket.data.payload;
       const {worksheetId, junctionId, kppnScore} = data;
 
       const wsJunctionDetail = await wsJunction.getWsJunctionByJunctionId(junctionId);
@@ -82,8 +94,9 @@ class WorksheetEvent{
 
       socket.broadcast.emit('KPPNScoreHasUpdated', {worksheetId, junctionId, kppnScore});
 
-      return callback({success: true, rows: result, message: 'Nilai has been updated'});
+      nonBlockingCall(activity.createActivity(username, 91, ip));
 
+      return callback({success: true, rows: result, message: 'Nilai has been updated'});
     }catch(err: any){
       logger.error(err);
       return socketError(callback, err.message)
@@ -92,11 +105,15 @@ class WorksheetEvent{
 
   async updateKanwilNote(socket: Socket, data: any, callback: any) {
     try{
-      const {name} = socket.data.payload;
+      const ip = socket.handshake.address;
+
+      const {name, username} = socket.data.payload;
       const {worksheetId, junctionId, kanwilNote} = data; 
       const result = await wsJunction.editWsJunctionKanwilNote( junctionId, worksheetId, kanwilNote, name);
 
       socket.broadcast.emit('kanwilNoteHasUpdated', {worksheetId, junctionId, kanwilNote});
+
+      nonBlockingCall(activity.createActivity(username, 86, ip));
 
       return callback({success: true, rows: result, message: 'Note has been updated'});
     }catch(err: any){
@@ -107,7 +124,9 @@ class WorksheetEvent{
 
   async deleteWsJunctionFile(socket: Socket, data: any, callback: any){
     try{
-      const {name} = socket.data.payload;
+      const ip = socket.handshake.address;
+
+      const {name, username} = socket.data.payload;
       const {id, fileName, option} = data;
 
       const result = await wsJunction.deleteWsJunctionFile(id, option, name);
@@ -116,6 +135,8 @@ class WorksheetEvent{
       fs.unlinkSync(filePath);
 
       socket.broadcast.emit('wsJunctionFileHasDeleted', {id, fileName, option});
+
+      nonBlockingCall(activity.createActivity(username, 89, ip));
 
       return callback({success: true, rows: result, message: 'File deleted successfully'});   
     }catch(err: any){

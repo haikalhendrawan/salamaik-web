@@ -6,6 +6,7 @@ import authorize from "../middleware/authorize";
 
 const router = express.Router(); 
 
+router.get("/getAllActivityWithLimit", authenticate, authorize([99, 4]), activityController.getAllActivityLimited);
 router.get("/getActivityById/:activityType", authenticate, authorize([99, 4]), activityController.getActivityById);
 router.get("/getActivityByUser/:userId", authenticate, authorize([99, 4]), activityController.getActivityByUser);
 router.get("/getActivityByCluster/:cluster", authenticate, authorize([99, 4]), activityController.getActivityByCluster);

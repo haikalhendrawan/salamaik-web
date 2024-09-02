@@ -3,13 +3,18 @@ import profile from '../model/profile.model';
 import multer from 'multer';
 import {uploadPP} from '../config/multer';
 import ErrorDetail from '../model/error.model';
+import nonBlockingCall from '../utils/nonBlockingCall';
+import activity from '../model/activity.model';
 import { passwordSchema, emailSchema } from '../utils/schema';
 // -------------------------------------------------
 
 // ------------------------------------------------------
 const updateCommonProfile = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const userID = req.payload.id;
+    const nip = req.payload.username;
+    const ip = req.ip || '';
+
+    const userId = req.payload.id;
     const { name, username, email, period } = req.body;
 
     if(name.length === 0 || !name){
@@ -24,7 +29,10 @@ const updateCommonProfile = async (req: Request, res: Response, next: NextFuncti
       throw new ErrorDetail(400, 'Invalid email')
     };
 
-    const response = await profile.updateCommonProfile(userID, name, username, email, period );
+    const response = await profile.updateCommonProfile(userId, name, username, email, period );
+
+    nonBlockingCall(activity.createActivity(nip, 51, ip, username));
+
     return res.status(200).json({sucess: true, message: 'Profile has been updated', detail: response});
   } catch (err) {
     next(err);
@@ -33,7 +41,10 @@ const updateCommonProfile = async (req: Request, res: Response, next: NextFuncti
 
 const updatePassword = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const userID = req.payload.id;
+    const nip = req.payload.username;
+    const ip = req.ip || '';
+
+    const userId = req.payload.id;
     const { oldPassword, newPassword } = req.body;
     const validPassword = passwordSchema.safeParse(newPassword);
 
@@ -41,7 +52,10 @@ const updatePassword = async (req: Request, res: Response, next: NextFunction) =
       return next(new ErrorDetail(400,'Password criteria is not fulfilled'))
     };
 
-    const response = await profile.updatePassword(userID, oldPassword, newPassword );
+    const response = await profile.updatePassword(userId, oldPassword, newPassword );
+
+    nonBlockingCall(activity.createActivity(nip, 52, ip, userId));
+
     return res.status(200).json({sucess: true, message: 'Password has been updated', detail: response});
   } catch (err) {
     next(err);
@@ -60,14 +74,17 @@ const updateProfilePicture = async (req: Request, res: Response, next: NextFunct
       return next(new ErrorDetail(400, 'Incorrect file type', err));
     };
 
-
-
     try {
+      const ip = req.ip || '';
+
       const userID = req.payload.id;
       const nip = req.payload.username;
       const fileExt = req.file.mimetype.split("/")[1];
       const fileName =`avatar_${nip}.${fileExt}`;
       const response = await profile.updateProfilePicture(userID, fileName);
+
+      nonBlockingCall(activity.createActivity(nip, 53, ip, fileName));
+
       return res.status(200).json({ success: true, message: 'Profile picture has been updated', rows: response });
     } catch (err) {
       console.log(err);

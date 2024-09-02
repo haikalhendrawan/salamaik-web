@@ -5,11 +5,18 @@ import wsJunction from '../model/worksheetJunction.model';
 import pool from '../config/db';
 import dayjs from 'dayjs';
 import ErrorDetail from '../model/error.model';
+import nonBlockingCall from '../utils/nonBlockingCall';
+import activity from '../model/activity.model';
 // ------------------------------------------------------
 const getAllWorksheet = async(req: Request, res: Response, next: NextFunction) => {
   try {
+    const username = req.payload.username;
+    const ip = req.ip || '';
+
     const period = req.payload.period;
     const worksheets: WorksheetType[] = await worksheet.getWorksheetByPeriod(period);
+
+    nonBlockingCall(activity.createActivity(username, 71, ip));
 
     return res.status(200).json({sucess: true, message: 'Get worksheet success', rows: worksheets})
   } catch (err){
@@ -19,7 +26,9 @@ const getAllWorksheet = async(req: Request, res: Response, next: NextFunction) =
 
 const getWorksheetByPeriodAndKPPN = async(req: Request, res: Response, next: NextFunction) => {
   try {
-    const {period} = req.payload;
+    const ip = req.ip || '';
+
+    const {username, period } = req.payload;
     const {kppnId} = req.params;
     const worksheets: WorksheetType[] = await worksheet.getWorksheetByPeriodAndKPPN(period, kppnId);
     const mainWorksheet = worksheets[0];
@@ -27,6 +36,8 @@ const getWorksheetByPeriodAndKPPN = async(req: Request, res: Response, next: Nex
     if(worksheets.length === 0) {
       throw new ErrorDetail(400, 'Worksheet not found')
     };
+
+    nonBlockingCall(activity.createActivity(username, 72, ip));
 
     return res.status(200).json({sucess: true, message: 'Get worksheet success', rows: mainWorksheet})
   }catch(err){
@@ -36,6 +47,9 @@ const getWorksheetByPeriodAndKPPN = async(req: Request, res: Response, next: Nex
 
 const addWorksheet = async(req: Request, res: Response, next: NextFunction) => {
   try {
+    const username = req.payload.username;
+    const ip = req.ip || '';
+
     const { kppnId, startDate, closeDate, openFollowUp, closeFollowUp } = req.body;
     const isValidDate = validateDates(startDate, closeDate, openFollowUp, closeFollowUp);
 
@@ -50,6 +64,8 @@ const addWorksheet = async(req: Request, res: Response, next: NextFunction) => {
       return res.status(400).json({sucess: false, message: 'Worksheet already exist'})
     };
 
+    nonBlockingCall(activity.createActivity(username, 73, ip, `kppnId: ${kppnId}, period: ${period}`));
+
     const result = await worksheet.addWorksheet(kppnId, period, startDate, closeDate, openFollowUp, closeFollowUp);
     return res.status(200).json({sucess: true, message: 'Add worksheet success', rows: result})
   } catch (err){
@@ -60,6 +76,9 @@ const addWorksheet = async(req: Request, res: Response, next: NextFunction) => {
 const assignWorksheet = async(req: Request, res: Response, next: NextFunction) => {
   const client = await pool.connect();
   try {
+    const username = req.payload.username;
+    const ip = req.ip || '';
+
     await client.query('BEGIN');
     const { worksheetId, kppnId, period } = req.body;
     const allChecklist: ChecklistType[]  = await checklist.getAllChecklist(client);
@@ -71,6 +90,9 @@ const assignWorksheet = async(req: Request, res: Response, next: NextFunction) =
     
     const result = await worksheet.editWorksheetStatus(worksheetId, client);
     await client.query('COMMIT');
+
+    nonBlockingCall(activity.createActivity(username, 74, ip, worksheetId));
+
     return res.status(200).json({sucess: true, message: 'Assign worksheet success', rows: result, detail: mapChecklist})
   } catch (err){
     await client.query('ROLLBACK');
@@ -82,6 +104,9 @@ const assignWorksheet = async(req: Request, res: Response, next: NextFunction) =
 
 const editWorksheetPeriod = async(req: Request, res: Response, next: NextFunction) => {
   try{
+    const username = req.payload.username;
+    const ip = req.ip || '';
+
     const { worksheetId, startDate, closeDate, openFollowUp, closeFollowUp } = req.body;
     const isValidDate = validateDates(startDate, closeDate, openFollowUp, closeFollowUp);
 
@@ -89,6 +114,8 @@ const editWorksheetPeriod = async(req: Request, res: Response, next: NextFunctio
       return res.status(400).json({sucess: false, message: isValidDate.message})
     };
     
+    nonBlockingCall(activity.createActivity(username, 75, ip, worksheetId));
+
     const result = await worksheet.editWorksheetPeriod(worksheetId, startDate, closeDate, openFollowUp, closeFollowUp);
     return res.status(200).json({sucess: true, message: 'Edit worksheet period success', rows: result})
   }catch(err){
@@ -98,8 +125,14 @@ const editWorksheetPeriod = async(req: Request, res: Response, next: NextFunctio
 
 const deleteWorksheet = async(req: Request, res: Response, next: NextFunction) => {
   try{
+    const username = req.payload.username;
+    const ip = req.ip || '';
+
     const { worksheetId } = req.body;
     const result = await worksheet.deleteWorksheet(worksheetId);
+
+    nonBlockingCall(activity.createActivity(username, 76, ip, worksheetId));
+
     return res.status(200).json({sucess: true, message: 'Delete worksheet success', rows: result})
   }catch(err){
     next(err)
