@@ -1,4 +1,9 @@
 /**
+ *Salamaik API 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
+/**
  *
  *
  * upload file zip di windows extensionnya bisa jadi beda2

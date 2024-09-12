@@ -1,3 +1,8 @@
+/**
+ *Salamaik API 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import { createLogger, format, transports } from 'winston';
 import path from 'path';
 

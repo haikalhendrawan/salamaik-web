@@ -1,3 +1,8 @@
+/**
+ *Salamaik API 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import * as worksheetController from '../controller/worksheet.controller';
 import express from "express";
 import authenticate from "../middleware/authenticate";

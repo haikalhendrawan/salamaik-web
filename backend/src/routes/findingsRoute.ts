@@ -1,3 +1,8 @@
+/**
+ *Salamaik API 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import * as findingsController from '../controller/findings.controller';
 import { Router } from 'express';
 import authenticate from '../middleware/authenticate';

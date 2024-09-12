@@ -1,3 +1,8 @@
+/**
+ *Salamaik API 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import express from "express";
 import * as roleController from "../controller/role.controller";
 import authenticate from "../middleware/authenticate";

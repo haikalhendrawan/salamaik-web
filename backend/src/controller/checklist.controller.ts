@@ -1,3 +1,8 @@
+/**
+ *Salamaik API 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import {Request, Response, NextFunction} from 'express';
 import checklist from "../model/checklist.model";
 import { uploadChecklistFile } from '../config/multer';

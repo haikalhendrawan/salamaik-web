@@ -1,3 +1,8 @@
+/**
+ *Salamaik API 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import { OpsiType } from "model/worksheetJunction.model"
 
 export function validateScore(score: number, opsi: OpsiType[] | null, isStandardisasi: boolean){

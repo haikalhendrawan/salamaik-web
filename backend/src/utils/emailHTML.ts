@@ -1,3 +1,10 @@
+/**
+ *Salamaik API 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
+// used on kirim email login dan register
+
 export function otpEmailHTML(email: string, otp: string){
   return (
     `<div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">

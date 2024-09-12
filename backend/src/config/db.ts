@@ -1,3 +1,8 @@
+/**
+ *Salamaik API 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import pg from 'pg';
 const { Pool, types } = pg;
 import "dotenv/config"; 

@@ -1,3 +1,8 @@
+/**
+ *Salamaik API 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import nodemailer from "nodemailer";
 import "dotenv/config"
 

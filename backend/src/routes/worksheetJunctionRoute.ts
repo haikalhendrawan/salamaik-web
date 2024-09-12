@@ -1,3 +1,8 @@
+/**
+ *Salamaik API 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import express from "express";
 import * as wsJunctionController from "../controller/worksheetJunction.controller";
 import authenticate from "../middleware/authenticate";

@@ -1,3 +1,8 @@
+/**
+ *Salamaik API 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import * as matrixController from '../controller/matrix.controller';
 import { Router } from 'express';
 import authenticate from '../middleware/authenticate';

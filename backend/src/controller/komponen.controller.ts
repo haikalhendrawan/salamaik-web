@@ -1,3 +1,8 @@
+/**
+ *Salamaik API 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import {Request, Response, NextFunction} from 'express';
 import {komponen, subKomponen, subSubKomponen} from '../model/komponen.model';
 import nonBlockingCall from '../utils/nonBlockingCall';

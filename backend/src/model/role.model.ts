@@ -1,3 +1,8 @@
+/**
+ *Salamaik API 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import pool from "../config/db";
 import bcrypt from "bcrypt";
 import jwt, {JwtPayload, VerifyErrors} from "jsonwebtoken";

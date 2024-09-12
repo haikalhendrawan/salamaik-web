@@ -1,3 +1,8 @@
+/**
+ *Salamaik API 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import {Request, Response, NextFunction} from 'express';
 import worksheet, { WorksheetType } from '../model/worksheet.model';
 import checklist, { ChecklistType } from '../model/checklist.model';

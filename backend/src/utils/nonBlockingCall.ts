@@ -1,3 +1,8 @@
+/**
+ *Salamaik API 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import logger from "../config/logger";
 
 export default function nonBlockingCall(promise: Promise<any>, errorLog: string = '') {

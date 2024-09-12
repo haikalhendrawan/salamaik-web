@@ -1,3 +1,8 @@
+/**
+ *Salamaik API 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import { Request, Response, NextFunction } from "express";
 import matrix from "../model/matrix.model";
 import worksheet, {WorksheetType} from "../model/worksheet.model";

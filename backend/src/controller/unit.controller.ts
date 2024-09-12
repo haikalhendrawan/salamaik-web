@@ -1,3 +1,8 @@
+/**
+ *Salamaik API 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import {Request, Response, NextFunction} from 'express';
 import unit from '../model/unit.model';
 import nonBlockingCall from '../utils/nonBlockingCall';

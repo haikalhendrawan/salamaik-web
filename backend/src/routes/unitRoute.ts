@@ -1,3 +1,8 @@
+/**
+ *Salamaik API 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import express from "express";
 import * as unitController from "../controller/unit.controller";
 import authenticate from "../middleware/authenticate";

@@ -1,3 +1,8 @@
+/**
+ *Salamaik API 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 export default class ErrorDetail extends Error{
     status: number;
     message: string;

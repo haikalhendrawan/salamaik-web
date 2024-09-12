@@ -1,3 +1,8 @@
+/**
+ *Salamaik API 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 declare namespace NodeJS {
   export interface ProcessEnv {
     readonly DEV_PORT: string;

@@ -1,4 +1,9 @@
 /**
+ *Salamaik API 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
+/**
  *
  *
  * Refer to dasar hukum PER-1/PB/2023

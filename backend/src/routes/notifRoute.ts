@@ -1,3 +1,8 @@
+/**
+ *Salamaik API 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import express from "express";
 import * as notifController from "../controller/notif.controller";
 import authenticate from "../middleware/authenticate";

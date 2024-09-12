@@ -1,3 +1,8 @@
+/**
+ *Salamaik API 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import jwt from"jsonwebtoken";
 import "dotenv/config";
 import ErrorDetail from "../model/error.model";

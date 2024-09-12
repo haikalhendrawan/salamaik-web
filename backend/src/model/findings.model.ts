@@ -1,3 +1,8 @@
+/**
+ *Salamaik API 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import pool from "../config/db";
 import "dotenv/config";
 import { PoolClient } from "pg";

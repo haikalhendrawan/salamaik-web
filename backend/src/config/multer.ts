@@ -1,3 +1,8 @@
+/**
+ *Salamaik API 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import multer from "multer";
 import ErrorDetail from "../model/error.model";
 import { sanitizeMimeType } from "../utils/mimeTypeSanitizer";

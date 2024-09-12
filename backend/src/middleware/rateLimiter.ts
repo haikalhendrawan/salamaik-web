@@ -1,3 +1,8 @@
+/**
+ *Salamaik API 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import { rateLimit } from 'express-rate-limit';
 
 const rateLimiter = rateLimit({
