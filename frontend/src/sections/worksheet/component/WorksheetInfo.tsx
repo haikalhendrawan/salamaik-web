@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import { Grid, Card, CardHeader, CardContent} from '@mui/material';
 import Label from "../../../components/label";
 import LinearProgressWithLabel from "../../../components/linear-progress-with-label/LinearProgressWithLabel";

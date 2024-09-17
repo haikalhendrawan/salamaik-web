@@ -1,4 +1,9 @@
 /**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
+/**
  *
  * utk ngambil campuran state dari useThemeColor dan useThemeMode
  * value dari useMode hook ada di ../theme/index

@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 // @mui
 import { alpha, styled } from '@mui/material/styles';
 import { Box } from '@mui/material';

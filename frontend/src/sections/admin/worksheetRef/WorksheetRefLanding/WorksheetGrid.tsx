@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import { Button, Box, Typography, Grid} from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Iconify from '../../../../components/iconify';

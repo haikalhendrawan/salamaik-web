@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';

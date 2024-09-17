@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import {styled, useTheme} from "@mui/material/styles";
 import { Button, Box, Popper, Paper, Fade, ClickAwayListener } from "@mui/material";
 import useDictionary from "../../../hooks/useDictionary";

@@ -1,4 +1,9 @@
 /**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
+/**
  *component label atau chip. Usually digunakan utk show status active or not
  *
  */

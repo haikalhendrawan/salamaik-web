@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import React, {useEffect, useState} from "react";
 import Scrollbar from "../../../../components/scrollbar/Scrollbar";
 import Skeleton  from "@mui/material/Skeleton";

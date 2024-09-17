@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import {useMemo} from "react";
 import { Document, Page, Text, View, Image, Font} from '@react-pdf/renderer';
 import styles from "../styles";

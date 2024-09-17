@@ -1,4 +1,9 @@
 /**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
+/**
  * simple scrollbar utk div yang terlalu panjang
  */
 

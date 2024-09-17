@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import { Container, Typography } from '@mui/material';
 
 export default function SupervisionHistoryPage () {

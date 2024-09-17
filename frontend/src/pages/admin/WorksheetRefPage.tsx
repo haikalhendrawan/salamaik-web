@@ -1,4 +1,9 @@
 /**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
+/**
  * @Section param
  * 0: landing
  * 1: checklist

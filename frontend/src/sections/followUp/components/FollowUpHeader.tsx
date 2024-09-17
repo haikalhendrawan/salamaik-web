@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import {Typography, Table, Card, TableSortLabel, TableHead, TableBody, TableRow, TableCell} from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { FindingsResponseType } from '../types';

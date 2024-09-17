@@ -1,3 +1,9 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
+
 import { useState, useRef } from "react";
 import Slider from "react-slick";
 import { Card, IconButton, Stack, Box, Typography, Skeleton } from "@mui/material";

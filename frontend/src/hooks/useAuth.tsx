@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import {useContext} from "react";
 import AuthContext from "../context/AuthProvider";
 

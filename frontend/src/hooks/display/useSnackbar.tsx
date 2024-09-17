@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import { ReactNode, useState, createContext, useContext } from 'react';
 // @mui
 import { useTheme} from '@mui/material/styles';

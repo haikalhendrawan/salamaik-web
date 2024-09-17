@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import React, {useMemo, useState} from 'react';
 import { Typography, Table, Card, TableContainer, Grow, TableBody, TableRow, TableCell, Button, Tooltip} from '@mui/material';
 import {useAuth} from '../../../../hooks/useAuth';

@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import { Helmet } from 'react-helmet-async';
 import { useState, useEffect, useMemo } from 'react';
 import { Container, Stack, Typography, Grid} from '@mui/material';

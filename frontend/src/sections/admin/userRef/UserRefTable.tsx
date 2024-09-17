@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import { useState, useMemo } from 'react';
 // @mui
 import {Card, Table, Stack, Paper, Avatar, ListItemText, TableRow, Tooltip, TableBody, TableCell,

@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import Iconify from '../../../components/iconify';
 // @mui
 import { Stack, Typography, Tabs, Tab} from '@mui/material';

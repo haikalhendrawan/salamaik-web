@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import {Card, Typography, CardContent, Stack, LinearProgress, Box,} from '@mui/material';
 import Scrollbar from "../../../components/scrollbar/Scrollbar";
 // import LinearProgressWithLabel from "../../components/linear-progress-with-label/LinearProgressWithLabel";

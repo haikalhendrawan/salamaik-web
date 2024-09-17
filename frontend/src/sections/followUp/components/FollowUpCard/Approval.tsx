@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import { Stack, Typography, Tooltip} from '@mui/material';
 import Label from '../../../../components/label/Label';
 import StyledButton from '../../../../components/styledButton/StyledButton';

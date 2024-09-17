@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import { WsJunctionType } from "../worksheet/types";
 import { ChecklistType } from "../admin/worksheetRef/ChecklistRef/useChecklist";
 import { OpsiType } from "../worksheet/types";

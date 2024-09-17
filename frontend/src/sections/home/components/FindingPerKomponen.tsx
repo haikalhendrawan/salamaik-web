@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import ReactApexChart from 'react-apexcharts';
 // @mui
 import { Card, CardHeader, Box } from '@mui/material';

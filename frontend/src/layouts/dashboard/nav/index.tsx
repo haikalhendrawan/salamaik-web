@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 // @mui

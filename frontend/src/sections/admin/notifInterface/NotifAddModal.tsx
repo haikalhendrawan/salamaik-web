@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import { useState } from 'react';
 // @mui
 import { Paper, Modal, Box, Select, MenuItem, InputLabel, FormControl, Stack, Button, Grid, Typography} from '@mui/material';

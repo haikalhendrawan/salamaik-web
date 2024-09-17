@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import {useState, useEffect} from'react';
 import dayjs, { Dayjs } from 'dayjs';
 import {Stack, Button, Box, Typography, SelectChangeEvent, Modal, FormControl, Paper,MenuItem} from '@mui/material';

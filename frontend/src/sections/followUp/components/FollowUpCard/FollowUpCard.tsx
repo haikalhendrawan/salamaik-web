@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import {useState, useEffect, useCallback,useMemo} from "react";
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';

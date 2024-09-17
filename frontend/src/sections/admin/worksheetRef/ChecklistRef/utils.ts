@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import { styled } from '@mui/material/styles';
 
 interface ChecklistType{

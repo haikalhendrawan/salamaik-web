@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import {useState, useEffect} from'react';
 import {Button, Box, Tooltip, Modal, Typography} from '@mui/material';
 import Iconify from '../../../components/iconify';

@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import {Card, Typography, Grid, CardContent, Stack} from '@mui/material';
 import {useTheme} from '@mui/material/styles';
 import RadialChart from "../../../components/radialChart/RadialChart";

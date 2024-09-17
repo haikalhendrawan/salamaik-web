@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import WorksheetKPPN from './WorksheetKPPN';
 import WorksheetKanwil from './WorksheetKanwil';
 import { useAuth } from '../../hooks/useAuth';

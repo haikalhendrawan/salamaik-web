@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import {useState, useEffect} from 'react';
 import {Link as RouterLink, useNavigate} from 'react-router-dom';
 // @mui

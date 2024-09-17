@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import { useAuth } from '../hooks/useAuth';
 //sections
 import StandardizationKanwil from '../sections/standardization/StandardizationKanwil';

@@ -1,4 +1,10 @@
 /**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
+
+/**
  * component progress bar dengan label % 
  * utk nunjukin progress pengisian kertas kerja
  */

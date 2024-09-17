@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 // ----------------------------------------------------------------------
 
 export default function Table(theme:any) {

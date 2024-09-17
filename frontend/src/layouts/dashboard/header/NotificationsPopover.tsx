@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import { noCase } from 'change-case';
 import React, { useState, useEffect } from 'react';
 // @mui

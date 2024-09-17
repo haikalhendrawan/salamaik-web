@@ -1,4 +1,10 @@
 /**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
+
+/**
  * component untuk logo kiri atas
  * 
  */

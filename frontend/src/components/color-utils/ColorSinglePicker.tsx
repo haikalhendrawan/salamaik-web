@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import { forwardRef } from 'react';
 // @mui
 import { Radio, RadioGroup } from '@mui/material';

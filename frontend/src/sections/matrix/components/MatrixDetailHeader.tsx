@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import {useMemo} from 'react';
 import {Stack,Typography} from '@mui/material';
 import { useLocation } from 'react-router-dom';

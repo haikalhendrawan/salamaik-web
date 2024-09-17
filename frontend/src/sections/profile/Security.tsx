@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import { useState} from 'react';
 import Iconify from '../../components/iconify/Iconify';
 import StyledTextField from '../../components/styledTextField';

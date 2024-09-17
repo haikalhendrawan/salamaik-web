@@ -1,4 +1,10 @@
 /**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
+
+/**
  * backdrop utk disable activity saat loading
  * 
  */

@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import { MatrixWithWsJunctionType } from "../matrix/types"
 
 export interface FindingsResponseType{

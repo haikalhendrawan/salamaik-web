@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import {useState, useEffect} from'react';
 import {Stack, Button, Box, Typography, Table, Card, Modal, FormControl, Paper, TableSortLabel,
           Tooltip, TableHead, Grow, TableBody, TableRow, TableCell} from '@mui/material';

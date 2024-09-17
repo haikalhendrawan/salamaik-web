@@ -1,4 +1,9 @@
 /**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
+/**
  * Komponen buat upload profile picture
  * bentuk box yang clickable. Utk hidden input perlu dibuat manual diluar komponen
  */

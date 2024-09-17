@@ -1,4 +1,9 @@
 /**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
+/**
  *
  * hook untuk ngambil dan nge set primary color di local storage
  */

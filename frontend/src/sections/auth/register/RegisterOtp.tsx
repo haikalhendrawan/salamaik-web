@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import { MuiOtpInput } from 'mui-one-time-password-input'
 import {useState, useEffect} from 'react';
 // @mui

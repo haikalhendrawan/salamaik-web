@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import {useEffect, useState} from "react";
 import {Card, Grid, CardHeader, Button, Box} from '@mui/material';
 import Iconify from "../../../components/iconify/Iconify";

@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import { WsJunctionType  } from "./types";
 
 export function filterKomponen(wsJunction: WsJunctionType, komponenId: number){

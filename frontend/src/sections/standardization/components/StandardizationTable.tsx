@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import {useMemo} from'react';
 import {Typography, Table, Card, CardHeader, TableSortLabel, 
         TableHead, Grow, TableBody, TableRow, TableCell, } from '@mui/material';

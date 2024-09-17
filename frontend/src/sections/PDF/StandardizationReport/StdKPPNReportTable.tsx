@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import { Text, View, Font} from '@react-pdf/renderer';
 import styles from "../styles";
 import { StandardizationType } from "../../standardization/types";

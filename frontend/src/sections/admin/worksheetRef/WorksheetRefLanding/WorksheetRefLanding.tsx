@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import {Slide, Card} from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import DasarHukumGrid from './DasarHukumGrid';

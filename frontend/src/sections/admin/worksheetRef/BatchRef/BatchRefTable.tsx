@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import {Stack, Table, Card, TableSortLabel,Tooltip, TableHead, Grow, TableBody, 

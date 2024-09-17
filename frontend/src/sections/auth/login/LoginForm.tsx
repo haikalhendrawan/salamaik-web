@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import React, { useState, useEffect,} from 'react';
 import { useNavigate,} from 'react-router-dom';
 import { axiosPublic } from '../../../config/axios';

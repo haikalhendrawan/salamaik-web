@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import {useState, useEffect} from "react";
 import {Outlet} from "react-router-dom";
 import { useTheme } from '@mui/material/styles';

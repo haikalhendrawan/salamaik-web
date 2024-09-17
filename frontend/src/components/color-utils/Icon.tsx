@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 // @mui
 import { ReactNode } from 'react';
 import { SxProps } from '@mui/system';

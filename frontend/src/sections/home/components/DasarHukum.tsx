@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import {useState} from'react';
 // @mui
 import { Card, CardHeader, Box, Button, Stack, CardContent, Typography } from '@mui/material';

@@ -1,4 +1,9 @@
 /**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
+/**
  * Komponen digunakan utk show icon, tapi from local files bukan melalui iconify
  * lebih cepet load, but perlu download icon satu2
  */

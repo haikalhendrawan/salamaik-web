@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import {useState} from "react";
 import {Box} from '@mui/material';
 import {useTheme, alpha} from '@mui/material/styles';

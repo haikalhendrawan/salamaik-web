@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import { ReactNode, useState, createContext, useContext, useEffect } from 'react';
 import useAxiosJWT from './useAxiosJWT';
 import { useAuth } from './useAuth';

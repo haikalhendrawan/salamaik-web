@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import {useState, useEffect, useMemo, useCallback} from'react';
 import { Card,  Grow, Tabs, Tab} from '@mui/material';
 import { useTheme} from '@mui/material/styles';

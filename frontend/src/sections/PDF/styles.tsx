@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import { StyleSheet } from '@react-pdf/renderer';
 
 const styles = StyleSheet.create({

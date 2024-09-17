@@ -1,4 +1,9 @@
 /**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
+/**
  * gabungan menu dan header
  * ex: header Supervisi KPPN with dropdown
  */

@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import { useState } from 'react';
 import { Document, Page, pdfjs} from 'react-pdf';
 import {IconButton, Typography} from '@mui/material';

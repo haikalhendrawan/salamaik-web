@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import {useState, useEffect} from'react';
 import {Container, Stack, Typography, Button} from '@mui/material';
 import axiosJWT from '../../config/axios';

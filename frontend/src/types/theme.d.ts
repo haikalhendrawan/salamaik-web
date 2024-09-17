@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import { ThemeOptions} from '@material-ui/core/styles';
 
 interface CustomShadows{

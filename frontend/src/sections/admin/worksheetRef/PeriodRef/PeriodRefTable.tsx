@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import {Stack, Table, Card,  TableSortLabel, Tooltip, TableHead, Grow, TableBody, TableRow, TableCell} from '@mui/material';
 import { useTheme} from '@mui/material/styles';
 import Iconify from '../../../../components/iconify';

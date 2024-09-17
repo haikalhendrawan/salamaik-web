@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 // @mui
 import { useTheme, Breakpoint } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';

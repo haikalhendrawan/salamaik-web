@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 // component
 import SvgColor from '../../../components/svg-color';
 
@@ -30,6 +35,11 @@ const navMonitoring = [
     path: '/standard',
     icon: icon('solar--palette-round-bold-duotone'),
   },
+  {
+    title: "Riwayat Pembinaan",
+    path: '/history',
+    icon: icon('solar--database-bold-duotone'),
+  }
 ];
 
 const navAdmin = [

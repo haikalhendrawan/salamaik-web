@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import {Card, Typography, Grid, CardContent, Stack, Box} from '@mui/material';
 import Label from "../../../components/label/Label";
 // ----------------------------------------------

@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import { BrowserRouter} from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 // routes

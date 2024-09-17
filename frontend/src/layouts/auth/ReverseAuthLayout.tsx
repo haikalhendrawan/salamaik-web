@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import { Outlet, Navigate, useLocation } from 'react-router-dom';
 import {useAuth} from "../../hooks/useAuth"; 
 

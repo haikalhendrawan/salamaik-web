@@ -1,3 +1,8 @@
+/**
+ *Salamaik Client 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import { Link, useLocation } from 'react-router-dom';
 // @mui
 import { Card, CardHeader, Box, Button, Stack, CardContent, Typography } from '@mui/material';
