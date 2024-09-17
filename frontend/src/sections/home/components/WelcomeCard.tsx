@@ -62,7 +62,7 @@ export default function WelcomeCard({  }: WelcomeCardProps) {
 
           <Stack direction={'row'}>
             <Box sx={{borderRadius:'16px', alignItems:'center', my:'auto' }}>
-              <img src="/image/nasi-padang.png" style={{borderRadius:'12px', maxHeight:'300px'}} alt='welcome image'/>
+              <img src="/image/Other 11.png" style={{borderRadius:'12px', maxHeight:'300px'}} alt='welcome image'/>
             </Box>
           </Stack>
         </Stack> 
