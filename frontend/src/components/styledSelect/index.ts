@@ -5,5 +5,6 @@
 
 import StyledSelect from "./StyledSelect"
 import StyledSelectLabel from "./StyledSelectLabel"
+import StyledMenuItem from "./StyledMenuItem"
 
-export { StyledSelect, StyledSelectLabel }
+export { StyledSelect, StyledSelectLabel, StyledMenuItem }

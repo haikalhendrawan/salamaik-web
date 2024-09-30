@@ -63,6 +63,8 @@ export default function FollowUpCard(props: FollowUpCardProps) {
 
   const wsJunction = useMemo(() => matrixDetail?.ws_junction[0], [props.findingResponse]) || null;
 
+  console.log(matrixDetail);
+
   const checklist = matrixDetail?.checklist[0] || null;
 
   const [openInstruction, setOpenInstruction] = useState<boolean>(false);
@@ -192,8 +194,8 @@ export default function FollowUpCard(props: FollowUpCardProps) {
         open={openInstruction}
         anchorEl={anchorEl}
         handleClose={handleCloseInstruction}
-        instruction={wsJunction?.instruksi || null}
-        fileExample={wsJunction?.contoh_file || null}
+        instruction={checklist?.instruksi || null}
+        fileExample={checklist?.contoh_file || null}
       />
     </>
   );

@@ -12,7 +12,7 @@ import {InputLabel} from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 const StyledSelectLabel = styled(InputLabel)(({  }) => ({
-  fontSize: '14px',
+  fontSize: '0.875rem',
   '&.MuiInputLabel-shrink': {
     fontSize: '1rem', // Example font size when shrunk
     fontWeight: 600,

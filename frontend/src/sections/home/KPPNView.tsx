@@ -221,7 +221,7 @@ export default function KPPNView(){
 
       <Grid item xs={12} md={4}>
         <ScorePembinaan
-          header={`Nlai Kinerja KPPN (avg)`}
+          header={`Nlai Kinerja KPPN`}
           selfScore={avgScoreByKPPN}
           kanwilScore={avgScoreByKanwil}
         />

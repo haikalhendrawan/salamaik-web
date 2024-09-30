@@ -217,7 +217,7 @@ export default function KanwilView(){
 
       <Grid item xs={12} md={4}>
         <ScorePembinaan
-          header={`Nlai Kinerja KPPN (avg)`}
+          header={`Nilai Kinerja KPPN (avg)`}
           selfScore={avgScoreByKPPN}
           kanwilScore={avgScoreByKanwil}
         />
