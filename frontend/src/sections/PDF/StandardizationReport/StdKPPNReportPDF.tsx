@@ -18,13 +18,14 @@ interface StdKPPNReportPDFProps{
   periodRef: any,
   standardization: StandardizationType[] | [],
   unitName: string,
-  kppn?: string
+  kppn?: string,
+  kabid: string
 };
 // -------------------------------------------------------------
 
-export default function StdKPPNReportPDF({period, periodRef, standardization, unitName, kppn}: StdKPPNReportPDFProps) {
+export default function StdKPPNReportPDF({period, periodRef, standardization, unitName, kppn, kabid}: StdKPPNReportPDFProps) {
 
-  const isEvenPeriod = periodRef?.list?.filter((item: any) => item.id === period)?.[0]?.evenPeriod || 0;
+  const isEvenPeriod = periodRef?.list?.filter((item: any) => item.id === period)?.[0]?.even_period || 0;
 
   const currentDate = new Date();
   const date = currentDate.getDate();
@@ -86,7 +87,7 @@ export default function StdKPPNReportPDF({period, periodRef, standardization, un
                 <Text style={{...styles.tteText, color:'#59606b'}}>Ditandatangani secara elektronik</Text>
               </View>
               <View style={{width:'100%'}}>
-                <Text style={styles.tteText}>{'Irfan Huzairin'}</Text>
+                <Text style={styles.tteText}>{kabid}</Text>
               </View>
             </View>
           }

@@ -282,8 +282,6 @@ export function renderConditionalRow(
 export function getAmountShort(standardization: StandardizationType[] | [], isEvenPeriod: number, reportingDate: number) {
   const currentMonth = new Date().getMonth();
 
-  console.log(isEvenPeriod)
-
   const currMonthSmt = isEvenPeriod===0?currentMonth:(currentMonth-6);
 
   const currentDate = new Date().getDate();

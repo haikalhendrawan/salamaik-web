@@ -11,6 +11,7 @@ import StdKPPNReportPDF from "../../PDF/StandardizationReport/StdKPPNReportPDF";
 import useStandardization from "../useStandardization";
 import useDictionary from "../../../hooks/useDictionary";
 import { useAuth } from "../../../hooks/useAuth";
+import useAxiosJWT from "../../../hooks/useAxiosJWT";
 // ----------------------------------------------
 interface DocumentShortProps {
   header: string,
@@ -22,6 +23,8 @@ interface DocumentShortProps {
 
 export default function DocumentShort({header, subheader, image, tabValue }:DocumentShortProps){
   const [loading, setLoading] = useState<boolean>(false);
+
+  const [kabid, setKabid] = useState<string>('');
   
   const {standardization} = useStandardization();
 
@@ -29,13 +32,26 @@ export default function DocumentShort({header, subheader, image, tabValue }:Docu
 
   const {periodRef} = useDictionary();
 
+  const axiosJWT = useAxiosJWT();
+
+  const getDataKabid = async () => {
+    try{
+      const dataKabidId = 1;
+      const response = await axiosJWT.get(`/getMiscByType/${dataKabidId}`);
+      setKabid(response?.data?.rows?.[0]?.value || '');
+    }catch(err: any){
+      console.log(err);
+    }
+  };
+
   useEffect(() => {
     async function refresh(){
       setLoading(true);
       setTimeout(() => setLoading(false), 1000); 
     }
 
-    refresh()
+    refresh();
+    getDataKabid();
   },[tabValue])
 
   return(
@@ -53,6 +69,7 @@ export default function DocumentShort({header, subheader, image, tabValue }:Docu
                             standardization={standardization}
                             unitName={subheader}
                             kppn={auth?.kppn}
+                            kabid={kabid}
                           />} 
                 fileName={'standardisasi-kppn'}
               >
