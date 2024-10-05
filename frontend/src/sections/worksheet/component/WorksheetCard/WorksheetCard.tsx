@@ -17,6 +17,7 @@ import Kriteria from "./Kriteria";
 import Dokumen from "./Dokumen";
 import Nilai from "./Nilai";
 import Catatan from "./Catatan";
+import CommentPopover from "../CommentPopover";
 import { WsJunctionType, WorksheetType } from "../../types";
 import { debounce } from 'lodash';
 // ------------------------------------------------------------
@@ -64,7 +65,11 @@ export default function WorksheetCard(props: WorksheetCardProps) {
 
   const [openInstruction, setOpenInstruction] = useState<boolean>(false);
 
+  const [openComment, setOpenComment] = useState<boolean>(false);
+
   const [anchorEl, setAnchorEl] = useState<EventTarget & HTMLButtonElement | null>(null);
+
+  const [anchorElComment, setAnchorElComment] = useState<EventTarget & HTMLButtonElement | null>(null);
 
   const handleOpenInstruction = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     setOpenInstruction(true);
@@ -73,6 +78,15 @@ export default function WorksheetCard(props: WorksheetCardProps) {
 
   const handleCloseInstruction = useCallback(() => {
     setOpenInstruction(false);
+  }, []);
+
+  const handleOpenComment = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    setOpenComment(true);
+    setAnchorElComment(event.currentTarget);
+  }, []);
+
+  const handleCloseComment = useCallback(() => {
+    setOpenComment(false);
   }, []);
 
   useEffect(() => {
@@ -105,6 +119,7 @@ export default function WorksheetCard(props: WorksheetCardProps) {
                 updatedBy={props?.wsJunction?.updated_by || null}
                 wsJunction={props?.wsJunction}
                 wsDetail={props?.wsDetail} 
+                openComment={handleOpenComment}
               />
             }
           />
@@ -177,6 +192,14 @@ export default function WorksheetCard(props: WorksheetCardProps) {
         instruction={props.wsJunction?.instruksi || null}
         fileExample={props.wsJunction?.contoh_file || null}
       />
+
+      <CommentPopover
+        open={openComment}
+        anchorEl={anchorElComment}
+        handleClose={handleCloseComment}
+        wsJunctionId={props.wsJunction?.junction_id || 0}
+      />
+
     </>
   );
 }

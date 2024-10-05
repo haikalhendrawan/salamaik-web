@@ -26,10 +26,15 @@ interface HeadPropInterface{
   updatedBy: string | null,
   wsJunction: WsJunctionType | null,
   wsDetail: WorksheetType | null,
+  openComment: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
 };
 
 const StyledIconButton = styled(IconButton)(({}) => ({
   color: 'rgb(0, 167, 111)',
+  borderRadius: '50%',
+}));
+
+const StyledChatButton = styled(IconButton)(({}) => ({
   borderRadius: '50%',
 }));
 
@@ -94,7 +99,7 @@ export default function Head(props: HeadPropInterface) {  // bagian atas dari ca
             <Typography variant="body1" fontSize={15} >{props.title}</Typography>
           </Stack>
       </SubStack>
-      <SubStack direction="row" spacing={1}>
+      <SubStack direction="row" spacing={0}>
         {
           isAdmin
           ?
@@ -120,6 +125,14 @@ export default function Head(props: HeadPropInterface) {  // bagian atas dari ca
           </Tooltip>:
           null
         }
+          <Tooltip title={'Comment'} placement="left-start">
+            <StyledChatButton
+              onClick={props.openComment} 
+              disableRipple
+            >
+              <Iconify icon={"solar:chat-round-dots-bold"} />
+            </StyledChatButton >
+          </Tooltip>
       </SubStack>
       
 
