@@ -5,7 +5,7 @@
 
 import {useEffect, useState} from "react";
 import {useTheme, styled} from "@mui/material/styles";
-import { Stack, Popper, Paper, Grow, ClickAwayListener, Box, Typography, Avatar, FormControl, CircularProgress} from "@mui/material";
+import { Stack, Popper, Paper, Grow, ClickAwayListener, Box, Typography, Avatar, FormControl, CircularProgress, Link} from "@mui/material";
 import { useAuth } from "../../../hooks/useAuth";
 import StyledTextField from "../../../components/styledTextField/StyledTextField";
 import useAxiosJWT from "../../../hooks/useAxiosJWT";
@@ -64,11 +64,10 @@ export default function CommentPopover({open, anchorEl, handleClose, wsJunctionI
 
   const [comments, setComments] = useState<CommentType[] | []>([]);
 
-  const getComments = async () => {
+  const getComments = async() => {
     try{
       const response = await axiosJWT.get(`/comment/getByWsJunctionId/${wsJunctionId}`);
       setComments(response.data.rows);
-      console.log(wsJunctionId);
       setLoading(false);
     }catch(err: any){
       if(err.response){
@@ -77,7 +76,11 @@ export default function CommentPopover({open, anchorEl, handleClose, wsJunctionI
         openSnackbar(err.message, "error");
       }
     }
-  }
+  };
+
+  const refreshComment = () => {
+    getComments();
+  };
 
   useEffect(() => {
     if(open){
@@ -110,11 +113,13 @@ export default function CommentPopover({open, anchorEl, handleClose, wsJunctionI
                         </Box>
                       )
                     :
-                      comments?.map((item, index) => (
-                        <CommentItem comment={item} key={index+1} />
-                      ))
+                      comments?.length>0
+                      ? comments?.map((item, index) => (
+                          <CommentItem comment={item} key={index+1} refreshComment={refreshComment} wsJunctionId={wsJunctionId}/>
+                        ))
+                      : <Typography variant="body2" fontSize={12}>No comments available yet</Typography>
                   }
-                    <CommentItem newComment key={0} />
+                    <CommentItem newComment key={0} refreshComment={refreshComment} wsJunctionId={wsJunctionId}/>
                 </Stack>
                 </Box>
               </ClickAwayListener>
@@ -131,10 +136,58 @@ export default function CommentPopover({open, anchorEl, handleClose, wsJunctionI
 interface CommentItemProps{
   newComment?: boolean;
   comment?: CommentType;
+  refreshComment: () => void;
+  wsJunctionId: number
 };
 
-function CommentItem({newComment=false, comment}: CommentItemProps){
+function CommentItem({newComment=false, comment, refreshComment, wsJunctionId}: CommentItemProps){
   const {auth} = useAuth();
+
+  const axiosJWT = useAxiosJWT();
+
+  const isCreator = comment?.user_id === auth?.id;
+
+  const {openSnackbar} = useSnackbar();
+
+  const [commentBody, setCommentBody] = useState<string>('');
+
+  const [disableAdd, setDisableAdd] = useState<boolean>(false);
+
+  const handleDelete = async(id: number) => {
+    try{
+      await axiosJWT.post(`/comment/deleteById`, {id});
+      refreshComment();
+    }catch(err: any){
+      if(err.response){
+        openSnackbar(err.response.data.message, "error");
+      }else{
+        openSnackbar(err.message, "error");
+      }
+    }
+  };
+
+  const handleAdd = async() => {
+    try{
+      setDisableAdd(true);
+      await axiosJWT.post(`/comment/add`, {
+        wsJunctionId: wsJunctionId,
+        commentBody: commentBody
+      });
+      refreshComment();
+      setCommentBody('');
+      setDisableAdd(false);
+    }catch(err: any){
+      setDisableAdd(false);
+      if(err.response){
+        openSnackbar(err.response.data.message, "error");
+      }else{
+        openSnackbar(err.message, "error");
+      }
+    }finally{
+      setDisableAdd(false);
+    }
+  }
+
   if(newComment){
     return (
       <>
@@ -142,30 +195,59 @@ function CommentItem({newComment=false, comment}: CommentItemProps){
           <Avatar src={`${import.meta.env.VITE_API_URL}/avatar/${auth?.picture}?${new Date().getTime()}` || ''} />
           <Stack direction="row" width={'100%'} spacing={1}>
             <FormControl size="small" fullWidth>
-                <StyledTextField placeholder="Write new comment..." size="small" fontSize={12} multiline/>
+              <StyledTextField 
+                placeholder="Write new comment..." 
+                size="small" 
+                fontSize={12} 
+                multiline 
+                value={commentBody} 
+                onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setCommentBody(e.target.value)} 
+              />
             </FormControl>
-            <StyledButton variant="contained" color="primary" size="small" sx={{width: '40px'}}>
+            <StyledButton 
+              variant="contained" 
+              color="primary" 
+              size="small" 
+              sx={{width: '40px'}}
+              onClick={handleAdd}
+              disabled={disableAdd}
+            >
               <Iconify icon="solar:plain-bold"/>
             </StyledButton>
           </Stack>
         </Stack>
       </>
     )
-}
+};
 
 return (
   <>
-    <Stack direction="row" spacing={1}>
-      <Avatar src={`${import.meta.env.VITE_API_URL}/avatar/${comment?.picture}?${new Date().getTime()}` || ''} />
-      <StyledPaper elevation={0} >
-        <Stack direction="column" width={'100%'}>
-          <Stack width={'100%'} direction="row" justifyContent={'space-between'}>
-            <Typography variant="body2" fontWeight={'bold'}> {comment?.name} </Typography>
-            <Typography variant="body3" fontSize={12}> {format(parseISO(comment?.created_at || ''), 'dd/MM/yyyy \n HH:mm')} </Typography>
+
+      <Stack direction="row" spacing={1}>
+        <Avatar src={`${import.meta.env.VITE_API_URL}/avatar/${comment?.picture}?${new Date().getTime()}` || ''} />
+        <Stack direction="column" spacing={1} width={'100%'}>
+          <StyledPaper elevation={0} >
+            <Stack direction="column" width={'100%'}>
+              <Stack width={'100%'} direction="row" justifyContent={'space-between'}>
+                <Typography variant="body2" fontWeight={'bold'}> {comment?.name} </Typography>
+                <Typography variant="body3" fontSize={12}> {format(parseISO(comment?.created_at || ''), 'dd/MM/yyyy \n HH:mm')} </Typography>
+              </Stack>
+              <Typography variant="body2" fontSize={12}> {comment?.comment} </Typography>
+            </Stack>
+          </StyledPaper>
+          <Stack direction="row" width={'100%'} justifyContent={'end'} display={isCreator ? 'flex' : 'none'}>
+            <Link 
+              href='#' 
+              fontSize={12} 
+              width={'fit-content'} 
+              textAlign={'right'} 
+              marginRight={2}
+              onClick={() => handleDelete(comment?.id || 0)}
+            >
+                Delete
+            </Link>
           </Stack>
-          <Typography variant="body2" fontSize={12}> {comment?.comment} </Typography>
         </Stack>
-      </StyledPaper>
     </Stack>
   </>
 )

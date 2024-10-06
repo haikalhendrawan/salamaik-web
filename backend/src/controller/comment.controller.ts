@@ -22,9 +22,9 @@ const getByWsJunctionId = async (req: Request, res: Response, next: NextFunction
 
 const add = async (req: Request, res: Response, next: NextFunction) => {
   try{
-    const {id} = req.payload;
-    const { wsJunctionId, comment} = req.body;
-    const result = await comment.add(wsJunctionId, id, comment);  
+    const {id} = req.payload; //user uuid
+    const { wsJunctionId, commentBody} = req.body;
+    const result = await comment.add(wsJunctionId, id, commentBody);  
 
     res.status(200).json({success: true, message: 'Add comment success', rows: result});
   }catch(err){
@@ -32,8 +32,19 @@ const add = async (req: Request, res: Response, next: NextFunction) => {
   }
 }
 
+const deleteById = async (req: Request, res: Response, next: NextFunction) => {
+  try{
+    const {id} = req.body;
+    const result = await comment.delete(id);
+    res.status(200).json({success: true, message: 'Delete comment success', rows: result});
+  }catch(err){
+    next(err)
+  }
+}
+
 // ---------------------------------------------------------------------------
 export {
   getByWsJunctionId,
-  add
+  add,
+  deleteById
 }

@@ -27,7 +27,7 @@ class Comment {
                   FROM comment_data
                   LEFT JOIN user_ref
                   ON comment_data.user_id = user_ref.id
-                  WHERE ws_junction_id = $1
+                  WHERE ws_junction_id = $1 AND active = 1
                 `;
       const result = await poolInstance.query(q, [wsJunctionId]);
 
@@ -42,7 +42,7 @@ class Comment {
 
   try{
     const q = ` INSERT INTO comment_data (ws_junction_id, user_id, comment, active) 
-                VALUES ($1, $2, $3) 
+                VALUES ($1, $2, $3, $4) 
                 RETURNING *
               `;
     const result = await poolInstance.query(q, [wsJunctionId, userId, comment, 1]);
@@ -50,8 +50,21 @@ class Comment {
   }catch(err){
     throw err
   }
-   
  }
+
+ async delete(id: number, poolTrx?: PoolClient){
+  const poolInstance = poolTrx ?? pool;
+
+  try{
+    const q = `UPDATE comment_data SET active = 0 WHERE id = $1 RETURNING *`
+    const result = await poolInstance.query(q, [id]);
+
+    return result.rows[0]
+  }catch(err){
+    throw err
+  }
+ }
+
 }
 
 const comment = new Comment();

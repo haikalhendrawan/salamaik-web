@@ -11,6 +11,7 @@ const router = Router();
 
 router.get('/getByWsJunctionId/:wsJunctionId',  authenticate, commentController.getByWsJunctionId);
 router.post('/add', authenticate, commentController.add);
+router.post('/deleteById', authenticate, commentController.deleteById);
 
 export default router
 
