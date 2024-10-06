@@ -6,23 +6,33 @@
 import {useState} from 'react';
 import { Link } from "react-router-dom";
 // @mui
-import {Card, Box, CardHeader, Grow, Button,  Grid,  Skeleton} from '@mui/material';
+import {Card, Box, CardHeader, Grow, Button,  Grid,  Skeleton, Stack, Typography, Tooltip} from '@mui/material';
 import Iconify from '../../../components/iconify';
 // -----------------------------------------------------------------------
 interface KPPNSelectionCardProps{
   header: string;
-  subheader: string;
   lastUpdate: string;
   image: string;
   link: string;
+  percentKanwil: number;
+  percentKPPN: number
 };
 // -----------------------------------------------------------------------
-export default function KPPNSelectionCard({header, subheader, image, link}: KPPNSelectionCardProps){
+export default function KPPNSelectionCard({header, image, link, percentKanwil, percentKPPN}: KPPNSelectionCardProps){
   const [imageLoaded, setImageLoaded] = useState(false);
 
   const handleImageLoad = () => {
     setImageLoaded(true);
   };
+
+  const subheader = (
+    <Stack direction='row' spacing={1}> 
+      <Typography variant='body3'>{percentKanwil?.toFixed(0)?.toString() + '% complete'}</Typography>
+      <Tooltip title={`Progress pengisian mandiri oleh KPPN: ${percentKPPN.toFixed()}%`}>
+        <Iconify icon={"solar:info-circle-bold-duotone"}  sx={{borderRadius:'50%', cursor: 'pointer'}} />
+      </Tooltip> 
+    </Stack>
+  );
 
   return(
     <Grow in>
