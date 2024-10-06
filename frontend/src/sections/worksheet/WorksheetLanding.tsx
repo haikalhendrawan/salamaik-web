@@ -77,16 +77,19 @@ export default function WorksheetLanding() {
           {
             wsDetail?.map((item, index) => {
               const progressKanwil = item?.scoreProgressDetail?.totalProgressKanwil || 0;
+              const progressKPPN = item?.scoreProgressDetail?.totalProgressKPPN || 0;
               const totalChecklist = item?.scoreProgressDetail?.totalChecklist || 0;
-              const percentProgress = (progressKanwil / totalChecklist * 100) || 0;
+              const percentKanwil = (progressKanwil / totalChecklist * 100) || 0;
+              const percentKPPN = (progressKPPN / totalChecklist * 100) || 0;
               return (
                 <Grid item xs={12} md={6} key={index}>
                   <KPPNSelectionCard
                     header={item?.alias}
-                    subheader={percentProgress?.toFixed(0)?.toString() + '% complete'}
                     lastUpdate="Last Update: Apr 12, 2022"
                     image={KPPN_PICTURE[index]}
                     link={`/worksheet/kppn?id=${item?.id}`}
+                    percentKanwil={percentKanwil}
+                    percentKPPN={percentKPPN}
                   />
                 </Grid>
               )
