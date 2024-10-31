@@ -79,10 +79,10 @@ const updateNotif = async(req: Request, res: Response, next: NextFunction) => {
     const ip = req.ip || '';
 
     const userId = req.payload.id;
-    const {junctionId} = req.body;
-    const result = await notif.updateNotif(userId, junctionId);
+    const {junctionID} = req.body;
+    const result = await notif.updateNotif(userId, junctionID);
 
-    nonBlockingCall(activity.createActivity(username, 45, ip, junctionId));
+    nonBlockingCall(activity.createActivity(username, 45, ip, junctionID));
 
     return res.status(200).json(result)
   }catch(err){
