@@ -28,7 +28,7 @@ const style = {
 const StyledPaper = styled(Paper)(({theme}) => ({
   padding: theme.spacing(2),
   paddingTop: theme.spacing(1),
-  background: theme.palette.grey[200],
+  background: theme.palette.background.neutral,
   display:'flex',
   width: '100%',
   fontSize: '0.625rem',
