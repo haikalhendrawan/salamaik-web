@@ -23,7 +23,7 @@ import WorksheetKanwil from "./sections/worksheet/WorksheetKanwil";
 import Page404 from "./pages/guard/Page404";
 import MatrixPage from "./pages/MatrixPage";
 import FollowUpPage from "./pages/FollowUpPage";
-// import HistoryPage from "./pages/HistoryPage";
+import HistoryPage from "./pages/HistoryPage";
 
 // admin
 import UserRefPage from "./pages/admin/UserRefPage";
@@ -64,7 +64,7 @@ export default function Router() {
           <Route index element={<WorksheetLanding />} />
           <Route path="kppn" element={<WorksheetKanwil />} />
         </Route>
-        {/* <Route path="history" element={<HistoryPage />} /> */}
+        <Route path="history" element={<HistoryPage />} />
       </Route>
     </Route>
 

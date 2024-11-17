@@ -2,13 +2,38 @@
  *Salamaik Client 
  * © Kanwil DJPb Sumbar 2024
  */
-
+import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Container, Grid, Stack, Typography } from '@mui/material';
+import { Container, Grid, Stack, Typography, SelectChangeEvent } from '@mui/material';
 import DataSelection from './DataSelection';
 import FilterControl from './FilterControl';
+import Findings from './Findings';
+import Checklist from './Checklist';
+import { PreviewFileModalProvider } from './Checklist/usePreviewFileModal';
 
 export default function HistorySection() {
+  const [selectedData, setSelectedData] = useState<number>(0);
+
+  const [selectedUnit, setSelectedUnit] = useState<string>('');
+
+  const [selectedPeriod, setSelectedPeriod] = useState<number>(0);
+
+  const handleChange = (event: SelectChangeEvent<unknown>, type: string) => {
+    switch (type) {
+      case 'data':
+        setSelectedData(parseInt(event.target.value as string));
+        break;
+      case 'unit':
+        setSelectedUnit(event.target.value as string);
+        break;
+      case 'period':
+        setSelectedPeriod(parseInt(event.target.value as string));
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <>
       <Helmet>
@@ -24,11 +49,24 @@ export default function HistorySection() {
         
         <Grid container spacing={4}>
           <Grid item xs={12} md={4}>
-            <DataSelection />
+            <DataSelection 
+              selectedData={selectedData} 
+              handleChange={handleChange} 
+            />
           </Grid>
 
           <Grid item xs={12} md={8}>
-            <FilterControl />
+            <FilterControl
+              selectedUnit={selectedUnit}
+              selectedPeriod={selectedPeriod}
+              handleChange={handleChange}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={12}>
+            <PreviewFileModalProvider>
+              <Checklist selectedUnit={selectedUnit} selectedPeriod={selectedPeriod} selectedData={selectedData}/> 
+            </PreviewFileModalProvider>
           </Grid>
         </Grid>
 

@@ -121,6 +121,35 @@ const getWsJunctionByKPPN = async(req: Request, res: Response, next: NextFunctio
   }
 };
 
+const getByPeriodAndKPPN = async(req: Request, res: Response, next: NextFunction) => {
+  try{
+    const ip = req.ip || '';
+
+    const kppn = req.query?.kppn?.toString() || "";
+    const period = Number(req.query?.period) || 0;
+    const {username} = req.payload;
+
+    const worksheetData = await worksheet.getWorksheetByPeriodAndKPPN(period, kppn);
+    const worksheetId = worksheetData.length>0? worksheetData[0].id : null;
+
+    if(!worksheetId) {
+      throw new ErrorDetail(404, 'Worksheet not found');
+    };
+
+    const result: WsJunctionJoinChecklistType[] = await wsJunction.getWsJunctionByWorksheetId(worksheetId);
+
+    if(!result || result.length===0) {
+      throw new ErrorDetail(404, 'Worksheet not assigned');
+    };
+
+    nonBlockingCall(activity.createActivity(username, 78, ip));
+    
+    return res.status(200).json({sucess: true, message: 'Get worksheet junction success', rows: result})
+  }catch(err){
+    next(err);
+  }
+};
+
 const getWsJunctionScoreAndProgress = async(req: Request, res: Response, next: NextFunction) => {
   try{
     const username = req.payload.username;
@@ -397,6 +426,7 @@ export {
   getWsJunctionByWorksheetForKanwil,
   getWsJunctionByPeriod,
   getWsJunctionByKPPN,
+  getByPeriodAndKPPN,
   getWsJunctionScoreAndProgress,
   getWsJunctionScoreAndProgressAllKPPN,
   getWsJunctionScoreAllPeriodSingleKPPN,
