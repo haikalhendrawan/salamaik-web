@@ -41,7 +41,7 @@ export default function DataSelection({selectedData, handleChange}: DataSelectio
                   defaultValue={"0"}
                   onChange={(e) => handleChange(e, 'data')}
                 >
-                  <StyledMenuItem disabled value="0">-None-</StyledMenuItem>
+                  <StyledMenuItem value="0">-None-</StyledMenuItem>
                   <StyledMenuItem value="1">1. Permasalahan</StyledMenuItem>
                   <StyledMenuItem value="2">2. Checklist Kertas Kerja</StyledMenuItem>
                   <StyledMenuItem value="3">3. Informasi Pembinaan</StyledMenuItem>

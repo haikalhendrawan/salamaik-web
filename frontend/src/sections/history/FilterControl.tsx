@@ -8,18 +8,22 @@ import {useTheme} from '@mui/material/styles';
 import Iconify from '../../components/iconify/Iconify';
 import { StyledSelect, StyledSelectLabel, StyledMenuItem } from '../../components/styledSelect';
 import useDictionary from '../../hooks/useDictionary';
+import Icon from './AnimatedIcon';
 // ------------------------------------------------------------------------------------------------------
 interface FilterControlProps {
+  selectedData: number;
   selectedUnit: string;
   selectedPeriod: number;
   handleChange: ( event: SelectChangeEvent<unknown>, type: string) => void;
 }
 
 // ------------------------------------------------------------------------------------------------------
-export default function FilterControl({selectedUnit, selectedPeriod, handleChange}: FilterControlProps) {
+export default function FilterControl({selectedData, selectedUnit, selectedPeriod, handleChange}: FilterControlProps) {
   const theme = useTheme();
 
   const {periodRef, kppnRef} = useDictionary();
+
+  const isNoData = selectedData === 0;
 
   return (
     <Card>
@@ -88,9 +92,14 @@ export default function FilterControl({selectedUnit, selectedPeriod, handleChang
                 </StyledSelect>
               </FormControl> */}
 
-              {/* <div style={{width: '40%', height: '40%'}}>
-                <AnimatedIcon />
-              </div> */}
+              {isNoData
+                ?
+                  <div style={{width: '40%', height: '40%'}}>
+                    <Icon />
+                  </div>
+                :
+                  null}
+
               
             </Stack>
           </Grid>

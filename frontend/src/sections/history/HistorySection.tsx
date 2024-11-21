@@ -18,6 +18,15 @@ export default function HistorySection() {
 
   const [selectedPeriod, setSelectedPeriod] = useState<number>(0);
 
+  const SECTION = [
+    <></>,
+    <Findings selectedUnit={selectedUnit} selectedPeriod={selectedPeriod} selectedData={selectedData} />,
+    <PreviewFileModalProvider>
+      <Checklist selectedUnit={selectedUnit} selectedPeriod={selectedPeriod} selectedData={selectedData}/>
+    </PreviewFileModalProvider>,
+    <></>
+  ];
+
   const handleChange = (event: SelectChangeEvent<unknown>, type: string) => {
     switch (type) {
       case 'data':
@@ -57,6 +66,7 @@ export default function HistorySection() {
 
           <Grid item xs={12} md={8}>
             <FilterControl
+              selectedData={selectedData}
               selectedUnit={selectedUnit}
               selectedPeriod={selectedPeriod}
               handleChange={handleChange}
@@ -64,9 +74,7 @@ export default function HistorySection() {
           </Grid>
 
           <Grid item xs={12} md={12}>
-            <PreviewFileModalProvider>
-              <Checklist selectedUnit={selectedUnit} selectedPeriod={selectedPeriod} selectedData={selectedData}/> 
-            </PreviewFileModalProvider>
+            {SECTION[selectedData]}
           </Grid>
         </Grid>
 
