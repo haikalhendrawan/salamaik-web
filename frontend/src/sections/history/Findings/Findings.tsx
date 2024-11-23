@@ -48,7 +48,8 @@ export default function Findings({selectedUnit, selectedPeriod, selectedData}:Fi
   const getFindings = async() => {
     try{
       // setIsLoading(true);
-      const response3 = await axiosJWT.get('/getAllFindingsWithChecklistDetail');
+      const response3 = await axiosJWT.get('/getAllFindingsByKPPN/'+ selectedUnit);
+      console.log(response3.data.rows);
       setFindingsData(response3.data.rows);
       // setIsLoading(false);
     }catch(err:any){
@@ -75,7 +76,7 @@ export default function Findings({selectedUnit, selectedPeriod, selectedData}:Fi
   
   useEffect(() => {
     getFindings();
-  }, []);
+  }, [selectedPeriod, selectedUnit]);
 
   return (
     <Card>

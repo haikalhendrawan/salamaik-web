@@ -16,6 +16,8 @@ interface DataSelectionProps {
 export default function DataSelection({selectedData, handleChange}: DataSelectionProps) {
   const theme = useTheme();
 
+  const isNoData = selectedData === 0;
+
   return (
     <Card>
       <CardContent>
@@ -30,7 +32,7 @@ export default function DataSelection({selectedData, handleChange}: DataSelectio
               <Typography variant="body2" color={theme.palette.text.secondary}>
                 {"Data apa yang anda cari?"}
               </Typography>
-              <FormControl sx={{mt: 4}} size="small">
+              <FormControl sx={{mt: 4}} size="small" error={isNoData}>
                 <StyledSelectLabel id="data-selection-label">Data</StyledSelectLabel>
                 <StyledSelect 
                   labelId="data-selection-label"
@@ -41,10 +43,10 @@ export default function DataSelection({selectedData, handleChange}: DataSelectio
                   defaultValue={"0"}
                   onChange={(e) => handleChange(e, 'data')}
                 >
-                  <StyledMenuItem value="0">-None-</StyledMenuItem>
-                  <StyledMenuItem value="1">1. Permasalahan</StyledMenuItem>
-                  <StyledMenuItem value="2">2. Checklist Kertas Kerja</StyledMenuItem>
-                  <StyledMenuItem value="3">3. Informasi Pembinaan</StyledMenuItem>
+                  <StyledMenuItem value="0" key={0}>-None-</StyledMenuItem>
+                  <StyledMenuItem value="1" key={1}>1. Permasalahan</StyledMenuItem>
+                  <StyledMenuItem value="2" key={2}>2. Checklist Kertas Kerja</StyledMenuItem>
+                  <StyledMenuItem value="3" key={3}>3. Informasi Pembinaan</StyledMenuItem>
                 </StyledSelect>
               </FormControl>
               

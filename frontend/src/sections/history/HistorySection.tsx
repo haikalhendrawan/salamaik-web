@@ -14,9 +14,15 @@ import { PreviewFileModalProvider } from './Checklist/usePreviewFileModal';
 export default function HistorySection() {
   const [selectedData, setSelectedData] = useState<number>(0);
 
-  const [selectedUnit, setSelectedUnit] = useState<string>('');
+  const [selectedUnit, setSelectedUnit] = useState<string>("0");
 
   const [selectedPeriod, setSelectedPeriod] = useState<number>(0);
+
+  const isNoData = selectedData === 0;
+
+  const isNoUnit = selectedUnit === '0';
+
+  const isNoPeriod = selectedPeriod === 0;
 
   const SECTION = [
     <></>,
@@ -74,7 +80,7 @@ export default function HistorySection() {
           </Grid>
 
           <Grid item xs={12} md={12}>
-            {SECTION[selectedData]}
+            {(!isNoData && !isNoUnit && !isNoPeriod) && SECTION[selectedData]}
           </Grid>
         </Grid>
 

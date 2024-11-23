@@ -25,6 +25,10 @@ export default function FilterControl({selectedData, selectedUnit, selectedPerio
 
   const isNoData = selectedData === 0;
 
+  const isNoUnit = selectedUnit === '0';
+
+  const isNoPeriod = selectedPeriod === 0;
+
   return (
     <Card>
       <CardContent>
@@ -40,7 +44,7 @@ export default function FilterControl({selectedData, selectedUnit, selectedPerio
                 {"Pilih unit dan periode"}
               </Typography>
 
-              <FormControl sx={{mt: 4, width: '80%'}} size="small">
+              <FormControl sx={{mt: 4, width: '80%'}} size="small" error={isNoUnit && !isNoData}>
                 <StyledSelectLabel id="kppn-selection-label">KPPN</StyledSelectLabel>
                 <StyledSelect 
                   labelId="kppn-selection-label"
@@ -49,7 +53,9 @@ export default function FilterControl({selectedData, selectedUnit, selectedPerio
                   name="kppn-selection" 
                   value={selectedUnit}
                   onChange={(e) => handleChange(e, 'unit')}
+                  defaultValue={"0"}
                 >
+                  <StyledMenuItem key={0} value={"0"}>{"-None-"}</StyledMenuItem>
                   {
                     kppnRef?.list?.filter((item) => item.id.length !==5).map((item) => (
                       <StyledMenuItem key={item.id} value={item.id}>{item.alias}</StyledMenuItem>
@@ -58,7 +64,7 @@ export default function FilterControl({selectedData, selectedUnit, selectedPerio
                 </StyledSelect>
               </FormControl>
               
-              <FormControl sx={{mt: 4}} size="small">
+              <FormControl sx={{mt: 4}} size="small" error={isNoPeriod && !isNoData}>
                 <StyledSelectLabel id="period-selection-label">Periode</StyledSelectLabel>
                 <StyledSelect 
                   labelId="period-selection-label"
@@ -67,7 +73,9 @@ export default function FilterControl({selectedData, selectedUnit, selectedPerio
                   name="period-selection"
                   value={selectedPeriod}
                   onChange={(e) => handleChange(e, 'period')} 
+                  defaultValue={"0"}
                 >
+                  <StyledMenuItem key={0} value={"0"}>{"-None-"}</StyledMenuItem>
                   {
                     periodRef?.list?.map((item) => (
                       <StyledMenuItem key={item.id} value={item.id}>{item.name}</StyledMenuItem>
