@@ -176,7 +176,7 @@ const deleteStandardizationJunction = async (req: Request, res: Response, next: 
 
     const standardizationJunction = await standardization.getStandardizationById(id);
     const stdKPPN = standardizationJunction?.kppn_id;
-    const isAuthorized = (stdKPPN === kppn) || role ===(99 || 4);
+    const isAuthorized = (stdKPPN === kppn) || (role === 99  || role === 4);
 
     if(!isAuthorized){
       return res.status(401).json({sucess: false, message: 'Unauthorized'})
