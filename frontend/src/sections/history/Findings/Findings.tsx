@@ -58,18 +58,20 @@ export default function Findings({selectedUnit, selectedPeriod, selectedData}:Fi
 
   const [findingsData, setFindingsData] = useState<FindingsWithChecklist[]>([]);
 
-  const periodList =  periodRef?.list.filter((item) => item.id === selectedPeriod)|| [];
+  const periodList =  periodRef?.list.filter((item) => item.id === selectedPeriod || item.id === selectedPeriod+1)|| [];
 
   const unitString = kppnRef?.list.filter((item) => item.id === selectedUnit)?.[0]?.alias || '';
 
   const periodString = periodRef?.list.filter((item) => item.id === selectedPeriod)?.[0]?.name || '';
 
+  const currentPeriodFindings = findingsData?.filter((f) => f.period === selectedPeriod) || [];
+
   const rekapFinding = komponenRef?.map((item) => ({
     komponen: item.title,
-    totalFindingKomponen: findingsData?.filter((f) => f.komponen_id === item.id)?.length || 0,
+    totalFindingKomponen: currentPeriodFindings?.filter((f) => f.komponen_id === item.id)?.length || 0,
     subkomponen: subKomponenRef?.filter((sub) => sub.komponen_id === item.id)?.map((sub) => ({
       subTitle : sub.title,
-      subAmount: findingsData?.filter((f) => f.subkomponen_id === sub.id)?.length || 0
+      subAmount: currentPeriodFindings?.filter((f) => f.subkomponen_id === sub.id)?.length || 0
     }))
   }));
 
@@ -116,7 +118,7 @@ export default function Findings({selectedUnit, selectedPeriod, selectedData}:Fi
 
             <Stack marginTop={4} marginBottom={4}>
               <Stack direction={'row'} justifyContent={'center'} textAlign={'center'} marginBottom={2}>
-                <Typography variant="body2">{`Total Permasalahan: ${findingsData?.length}` }</Typography>
+                <Typography variant="body2">{`Total Permasalahan: ${currentPeriodFindings?.length}` }</Typography>
               </Stack>
               {
                 rekapFinding?.map((item, index) => (
@@ -175,7 +177,7 @@ export default function Findings({selectedUnit, selectedPeriod, selectedData}:Fi
             {
               showGraph && (
                 <AmountBarChart
-                  title= "Grafik Permasalahan"
+                  title= "Perbandingan 2 Periode Terakhir"
                   subheader = {periodRef?.list?.filter((item) => item.id === selectedPeriod)?.[0]?.name || 'Semester -'}
                   chartLabels={komponenRefStringArray}
                   chartData= {last2PeriodFindings}
