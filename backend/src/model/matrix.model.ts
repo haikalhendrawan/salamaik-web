@@ -125,7 +125,11 @@ class Matrix{
                     json_agg(worksheet_junction.* ORDER BY worksheet_junction.junction_id ASC) AS ws_junction, 
                     json_agg(checklist_ref.* ORDER BY checklist_ref.id ASC) AS checklist,
                     json_agg(findings_data.* ORDER BY findings_data.id ASC) AS findings,
-                    json_agg(opsi_ref.* ORDER BY opsi_ref.id ASC) AS opsi,
+                    (
+                      SELECT json_agg(opsi_ref.* ORDER BY opsi_ref.id ASC)
+                      FROM opsi_ref
+                      WHERE opsi_ref.checklist_id = matrix_data.checklist_id
+                    ) AS opsi,
                     komponen_ref.title AS komponen_string,
                     subkomponen_ref.title AS subkomponen_string,
                     checklist_ref.standardisasi AS standardisasi,
@@ -141,8 +145,6 @@ class Matrix{
                   ON subkomponen_ref.id = checklist_ref.subkomponen_id
                   LEFT JOIN findings_data
                   ON findings_data.matrix_id = matrix_data.id
-                  LEFT JOIN opsi_ref
-                  ON checklist_ref.id = opsi_ref.checklist_id
                   WHERE matrix_data.worksheet_id = $1
                   GROUP BY matrix_data.id, worksheet_junction.junction_id, komponen_ref.title, subkomponen_ref.title, checklist_ref.standardisasi, checklist_ref.standardisasi_id
                   `;
