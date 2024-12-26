@@ -62,8 +62,16 @@ const getStdWorksheet = async (req: Request, res: Response, next: NextFunction) 
   try{
     const ip = req.ip || '';
 
-    const {period: periodID, username} = req.payload;
+    const {period: periodID, username, kppn: unit, role} = req.payload;
     const {kppn} = req.params
+    const isKanwil = [3, 4, 99].includes(role);
+
+    if(!isKanwil){
+      if(kppn !== unit){
+        throw new ErrorDetail(401, 'Not authorized');
+      }
+    };
+    
     const periodRef = await period.getAllPeriod();
     const isEvenPeriod = periodRef?.filter((item: PeriodType) => item.id === periodID)?.[0]?.even_period || 0;
 

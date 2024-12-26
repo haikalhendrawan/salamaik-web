@@ -2,17 +2,17 @@ import { Request, Response, NextFunction } from "express";
 import ErrorDetail from "../model/error.model";
 import {superAdmin, adminKanwil, userKanwil} from '../config/role';
 
-export default function alterUnitPayload(req: Request, res: Response, next: NextFunction) {
-  const postedUnit = req.params.unit ?? '';
+export default function alterPeriodPayload(req: Request, res: Response, next: NextFunction) {
+  const postedPeriod = req.params.period ?? '';
 
-  if(!postedUnit || postedUnit === ''){
-    return next()
+  if(!postedPeriod || postedPeriod === ''){
+    return next();
   };
 
   const role = req.payload.role;
 
   if(role === superAdmin || role === adminKanwil || role === userKanwil){
-    req.payload.kppn = postedUnit;
+    req.payload.period = Number(postedPeriod);
   };
 
   next();

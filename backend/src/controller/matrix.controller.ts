@@ -35,7 +35,15 @@ const getMatrixWithWsDetailById = async(req: Request, res: Response, next: NextF
     const ip = req.ip || '';
 
     const {kppnId} = req.params;
-    const {username, period}  = req.payload;
+    const {username, period, role, kppn}  = req.payload;
+    const isKanwil = [3, 4, 99].includes(role);
+    
+    if(!isKanwil){
+      if(kppn !== kppnId){
+        throw new ErrorDetail(401, 'Not authorized');
+      }
+    };
+
     const result = await worksheet.getWorksheetByPeriodAndKPPN(period, kppnId); 
 
     if(result.length === 0){

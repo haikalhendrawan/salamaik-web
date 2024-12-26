@@ -90,6 +90,43 @@ const getAllFindingsByKPPN = async(req: Request, res: Response, next: NextFuncti
   }
 }
 
+const getFindingsById = async (req: Request, res: Response, next: NextFunction) => {
+  try{
+    const ip = req.ip || '';
+
+    const {findingsId} = req.params;
+    const {username, role, kppn}  = req.payload;
+    const isKanwil = [3, 4, 99].includes(role);
+    const allFindings = await findings.getFindingsById(Number(findingsId));
+
+    if(allFindings.length === 0){
+      throw new ErrorDetail(404, 'Permasalahan tidak ditemukan');
+    };
+
+    const worksheetId = allFindings[0].worksheet_id;
+    const worksheetDetail = await worksheet.getById(worksheetId);
+    const worksheetOwnedBy = worksheetDetail[0].kppn_id;
+
+    if(!isKanwil && (worksheetOwnedBy !== kppn)){
+      throw new ErrorDetail(401, 'Not authorized');
+    };
+    
+    const matrixDetail = await matrix.getMatrixWithWsJunction(worksheetId);
+    const responseBody: FindingsResponseType[] = allFindings.map((item) => {
+      return{
+        ...item,
+        matrixDetail: matrixDetail?.filter((mx) => mx?.id === item?.matrix_id) || [],
+      }
+    });
+
+    nonBlockingCall(activity.createActivity(username, 22, ip));
+
+    return res.status(200).json({sucess: true, message: 'Get findings success', rows: responseBody})
+  }catch(err){
+    next(err)
+  }
+}
+
 const addFindings = async (req: Request, res: Response, next: NextFunction) => {
   try{
     // const {worksheetId, wsJunctionId, checklistId, matrixId, scoreBefore} = req.body;
@@ -174,7 +211,7 @@ const updateFindingStatus = async(req: Request, res: Response, next: NextFunctio
   }
 }
 
-export {getFindingsByWorksheetId, getAllFindings, getAllFindingsByKPPN, updateFindingsScore, addFindings, updateFindingsResponse, updateFindingStatus}
+export {getFindingsByWorksheetId, getAllFindings, getAllFindingsByKPPN, getFindingsById, updateFindingsScore, addFindings, updateFindingsResponse, updateFindingStatus}
 
 // ---------------------------------------------------------------------------------------------------
 function verifyUpdateFindingStatus(role: number, oldStatus: number, newStatus: number){

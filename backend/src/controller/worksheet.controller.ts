@@ -33,8 +33,16 @@ const getWorksheetByPeriodAndKPPN = async(req: Request, res: Response, next: Nex
   try {
     const ip = req.ip || '';
 
-    const {username, period } = req.payload;
+    const {username, period, kppn, role} = req.payload;
+    const isKanwil = [3, 4, 99].includes(role);
     const {kppnId} = req.params;
+    
+    if(!isKanwil){
+      if(kppn !== kppnId){
+        throw new ErrorDetail(401, 'Not authorized');
+      }
+    }
+
     const worksheets: WorksheetType[] = await worksheet.getWorksheetByPeriodAndKPPN(period, kppnId);
     const mainWorksheet = worksheets[0];
 

@@ -59,6 +59,16 @@ class Worksheet{
     }
   }
 
+  async getById(id: string): Promise<WorksheetType[] | []>{
+    try{
+      const q = `SELECT * FROM worksheet_ref WHERE id = $1`;
+      const result = await pool.query(q, [id]);
+      return result.rows
+    }catch(err){
+     throw err
+    }
+  }
+
   async addWorksheet(kppnId: string, period: number, startDate: string, closeDate: string, openFollowUp: string, closeFollowUp: string){
     try{
       const id = uuidv4();
