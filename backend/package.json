@@ -6,7 +6,8 @@
   "scripts": {
     "build": "tsc",
     "start": "pm2 start dist/index.js",
-    "dev": "nodemon"
+    "dev": "nodemon",
+    "test": "jest"
   },
   "author": "haikal h",
   "license": "ISC",
@@ -33,18 +34,22 @@
     "zod": "^3.23.6"
   },
   "devDependencies": {
+    "@jest/globals": "^29.7.0",
     "@types/archiver": "^6.0.2",
     "@types/bcrypt": "^5.0.2",
     "@types/cookie-parser": "^1.4.7",
     "@types/cors": "^2.8.17",
     "@types/dotenv": "^8.2.0",
     "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.14",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/multer": "^1.4.11",
     "@types/nodemailer": "^6.4.14",
     "@types/pg": "^8.11.5",
     "@types/uuid": "^9.0.8",
     "concurrently": "^8.2.2",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
     "typescript": "^5.4.2"
   }
 }
