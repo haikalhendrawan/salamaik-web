@@ -4,6 +4,7 @@
     "outDir": "dist",
     "baseUrl": "src",
     "moduleResolution": "NodeNext",
+    "esModuleInterop": true,
     "sourceMap": true,
     "strict": true,
     "typeRoots": ["./node_modules/@types", "./src/types"],

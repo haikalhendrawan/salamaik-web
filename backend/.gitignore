@@ -1,6 +1,6 @@
 #uplaod folder
 uploads
-.zip
+*.zip
 
 
 # Logs

@@ -1,3 +1,2 @@
 # Salamaik API
-
-v 1.0.0
+  all changes documented on changelog

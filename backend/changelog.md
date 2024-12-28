@@ -20,5 +20,12 @@ All notable changes to this project will be documented in this file.
 - Fix unoptimized query on matrix module
 - Fix security flaws that allow unauthorized user to access other unit : matrix with detail, standardization worksheet, worksheet by period and unit
 
+## [1.0.3] - 2024-12-28
+
+### Changed
+- Edit tsconfig.json
+- Add test
+
+
 
  
