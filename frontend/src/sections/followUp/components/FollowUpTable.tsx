@@ -101,7 +101,7 @@ export default function FollowUpTable({findings, kppnId}: FollowUpTableProps) {
                         variant="contained" 
                         color="warning"
                         component={Link}  
-                        to={`/followUp/detail?id=${kppnId}&findingsId=${item.id}`}
+                        to={`/followUp/detail?id=${kppnId}&findingsId=${item.id}&index=${index+1}`}
                       >
                         Follow Up
                       </StyledButton>
