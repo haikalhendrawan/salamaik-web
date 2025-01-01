@@ -308,5 +308,15 @@ export function getReportingMonth(reportingDate: number) {
 
   const currentMonth = new Date().getMonth();
 
-  return currentDate<reportingDate?MONTH_NAME[currentMonth-1]:MONTH_NAME[currentMonth]
+  const assignedMonth = currentMonth === 0 ? 11 : currentMonth-1;
+
+  return currentDate<reportingDate?MONTH_NAME[assignedMonth]:MONTH_NAME[currentMonth]
+};
+
+export function getReportingYear(reportingDate: number) {
+  const currentDate = new Date().getDate();
+
+  const currentYear = new Date().getFullYear();
+
+  return currentDate<reportingDate?currentYear-1:currentYear
 };
