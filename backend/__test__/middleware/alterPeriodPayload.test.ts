@@ -15,9 +15,6 @@ describe("alterPeriodPayload", () => {
   let res: any;
   let next: jest.Mock;
 
-  const notAllowedRoles = [userKPPN, adminKPPN];
-  const allowedRoles = [superAdmin, adminKanwil, userKanwil];
-
   beforeEach(() => {
     req = {
       params: {
@@ -38,6 +35,9 @@ describe("alterPeriodPayload", () => {
     expect(next).toHaveBeenCalledTimes(1);
     expect(req.payload.period).toBe(0);
   });
+
+  const notAllowedRoles = [userKPPN, adminKPPN];
+  const allowedRoles = [superAdmin, adminKanwil, userKanwil];
 
   it.each(notAllowedRoles)('Should not alter period payload if role is not allowed', (role) => {
     req.params.period = 1;
