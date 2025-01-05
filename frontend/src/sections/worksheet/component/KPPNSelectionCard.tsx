@@ -12,6 +12,8 @@ import {Card, Box, CardHeader, Grow, Button,  Grid,  Skeleton, Stack, Typography
 import Iconify from '../../../components/iconify';
 import { WsJunctionType } from '../types';
 import useDictionary from '../../../hooks/useDictionary';
+import { useAuth } from '../../../hooks/useAuth';
+import { MatrixScoreAndProgressType } from '../../matrix/types';
 // -----------------------------------------------------------------------
 interface KPPNSelectionCardProps{
   header: string;
@@ -46,6 +48,8 @@ export default function KPPNSelectionCard({header, image, link, percentKanwil, p
 
   const {komponenRef, subKomponenRef} = useDictionary();
 
+  const {auth} = useAuth();
+
   const handleImageLoad = () => {
     setImageLoaded(true);
   };
@@ -64,9 +68,12 @@ export default function KPPNSelectionCard({header, image, link, percentKanwil, p
       const response = await axiosJWT.get(
         `/getWsJunctionByWorksheetForKanwil?kppn=${kppnId}&time=${new Date().getTime()}`
       );
-      const rows = response.data.rows;
+      const response2 = await axiosJWT.post(`/getWsJunctionScoreAndProgress`, {kppnId, period: auth?.period});
 
-      await produceExcel(rows, komponenRef, subKomponenRef);
+      const rows = response.data.rows;
+      const matrixScore = response2.data.rows;
+
+      await produceExcel(rows, matrixScore, komponenRef, subKomponenRef);
     } catch (error) {
       console.error("Error generating Excel:", error);
     }
@@ -128,10 +135,15 @@ export default function KPPNSelectionCard({header, image, link, percentKanwil, p
 
 
 // -------------------------------------------------------------------------------------------------------------------------------------------
-const produceExcel = async (rows: WsJunctionType[], komponenRef: KomponenRefType[] | null, subKomponenRef: SubKomponenRefType[] | null) => {
+const produceExcel = async (rows: WsJunctionType[], matrixScore: MatrixScoreAndProgressType, komponenRef: KomponenRefType[] | null, subKomponenRef: SubKomponenRefType[] | null) => {
   try{
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet("Checklist");
+
+    komponenRef?.forEach((komponen) => {
+      workbook.addWorksheet(komponen.alias, {
+        views: [{ state: "frozen", ySplit: 1 }],
+      })
+    });
   
     // 1. Define columns with keys, headers, and widths
     const columnConfig = [
@@ -142,14 +154,14 @@ const produceExcel = async (rows: WsJunctionType[], komponenRef: KomponenRefType
       { key: "kanwil_note", header: "Catatan Kanwil", width: 30 },
       { key: "excluded", header: "Excluded", width: 10 },
       { key: "last_update", header: "Last Update", width: 15 },
-      { key: "updated_by", header: "Updated By", width: 15 },
-      { key: "komponen", header: "Komponen", width: 15 },
+      { key: "updated_by", header: "Last Updated By", width: 15 },
       { key: "subkomponen", header: "Subkomponen", width: 15 },
-      { key: "bobot", header: "Bobot", width: 15 },
     ];
   
     // 2. Set worksheet columns
-    worksheet.columns = columnConfig;
+    workbook.eachSheet((sheet) => {
+      sheet.columns = columnConfig;
+    });
   
     // 3. Generate row and cell
     rows.forEach((row: WsJunctionType) => {
@@ -166,8 +178,10 @@ const produceExcel = async (rows: WsJunctionType[], komponenRef: KomponenRefType
         { text: `${formattedHeader} \n` || "", font: { bold: true } }, 
         { text: `\n${opsiText}` }, 
       ];
+
+      const selectedSheet = workbook.getWorksheet(komponenRef?.find((komponen) => komponen.id === row.komponen_id)?.alias);
   
-      const addedRow = worksheet.addRow({
+      const addedRow = selectedSheet?.addRow({
         no: row.checklist_id,
         checklist: { richText: checklistText },
         kppn_score: row.kppn_score || "",
@@ -176,13 +190,11 @@ const produceExcel = async (rows: WsJunctionType[], komponenRef: KomponenRefType
         excluded: row.excluded === 1 ? "Y" : "N",
         last_update: row.last_update ? new Date(row.last_update).toLocaleString("en-GB"): "",
         updated_by: row.updated_by || "",
-        komponen: komponenRef?.find((komponen) => komponen.id === row.komponen_id)?.title || '',
         subkomponen: subKomponenRef?.find((subKomponen) => subKomponen.id === row.subkomponen_id)?.title || '',
-        bobot: `${komponenRef?.find((komponen) => komponen.id === row.komponen_id)?.bobot}%`,
       });
 
       if (row.excluded === 1) {
-        addedRow.eachCell((cell) => {
+        addedRow?.eachCell((cell) => {
           cell.fill = {
             type: "pattern",
             pattern: "solid",
@@ -193,25 +205,91 @@ const produceExcel = async (rows: WsJunctionType[], komponenRef: KomponenRefType
     });
   
     // 4. Apply alignment styles
-    worksheet.columns.forEach((column) => {
-      worksheet.getColumn(column.key as string).alignment = {
-        vertical: "middle",
-        horizontal: "center",
-        wrapText: true,
-      };
-    });
-    
+    workbook.eachSheet((sheet) => {
+      sheet.columns.forEach((column) => {
+        sheet.getColumn(column.key as string).alignment = {
+          vertical: "middle",
+          horizontal: "center",
+          wrapText: true,
+        };
+      });
+    })
+
     // 5. Set row height
-    worksheet.eachRow((row, rowIndex) => {
-      row.height = 100;
-      if (rowIndex > 1) { 
-        row.height = 170;
-        const cell = row.getCell('B'); 
-        cell.alignment = { vertical: 'top', horizontal: 'justify', wrapText: true };
-      }
+    workbook.eachSheet((sheet) => {
+      sheet.eachRow((row, rowIndex) => {
+        row.height = 100;
+        if (rowIndex > 1) { 
+          row.height = 170;
+          const cell = row.getCell('B'); 
+          cell.alignment = { vertical: 'top', horizontal: 'justify', wrapText: true };
+        }
+      })
+    })
+
+    // 6. Sheet nilai
+    const sheetNilai = workbook.addWorksheet("Nilai");
+
+    const columnConfig2 = [
+      { key: "no", header: "No", width: 10 },
+      { key: "komponen", header: "Nama Komponen", width: 90 },
+      { key: "total", header: "Total Nilai", width: 10 },
+      { key: "pembagi", header: "Bilangan Pembagi", width: 10 },
+      { key: "avg", header: "Rata-Rata Nilai", width: 30 },
+      { key: "bobot", header: "Bobot Nilai", width: 10 },
+      { key: "weighted_avg", header: "Nilai Tertimbang", width: 15 },
+    ];
+    
+    sheetNilai.columns = columnConfig2;
+
+    sheetNilai.mergeCells("A1:G1");
+    sheetNilai.getCell("A1").value = "Nilai Berdasarkan Penilaian Kanwil"; 
+    sheetNilai.getCell("A1").alignment = { horizontal: "center" }; 
+    sheetNilai.getCell("A1").font = { bold: true, size: 12 }; 
+    sheetNilai.getColumn("D").width = 20;
+    sheetNilai.getRow(1).height = 34;
+
+    sheetNilai.getRow(2).values = columnConfig2.map((col) => col.header);
+
+    matrixScore.scorePerKomponen.forEach((item, index) => {
+      sheetNilai.addRow({
+        no: index + 1,
+        komponen: item.komponenTitle,
+        total: item.totalNilai,
+        pembagi: item.bilanganPembagi,
+        avg: item.avgPerKomponen,
+        bobot: `${item.komponenBobot}%`,
+        weighted_avg: item.weightedScore,
+      });
     });
+
+    sheetNilai.getRow(8).values = ["", "Nilai Akhir", "", "", "", "", matrixScore.scoreByKanwil];
+
+
+    // 6a. Nilai KPPN
+    sheetNilai.mergeCells("A10:G10");
+    sheetNilai.getCell("A10").value = "Nilai Berdasarkan Penilaian Self Assessment KPPN"; 
+    sheetNilai.getCell("A10").alignment = { horizontal: "center" }; 
+    sheetNilai.getCell("A10").font = { bold: true, size: 12 }; 
+    sheetNilai.getRow(10).height = 34;
+
+    sheetNilai.getRow(11).values = columnConfig2.map((col) => col.header);
+
+    matrixScore.scorePerKomponenKPPN.forEach((item, index) => {
+      sheetNilai.addRow({
+        no: index + 1,
+        komponen: item.komponenTitle,
+        total: item.totalNilai,
+        pembagi: item.bilanganPembagi,
+        avg: item.avgPerKomponen,
+        bobot: `${item.komponenBobot}%`,
+        weighted_avg: item.weightedScore,
+      });
+    });
+
+    sheetNilai.getRow(17).values = ["", "Nilai Akhir", "", "", "", "", matrixScore.scoreByKPPN];
   
-    // 6. Generate Excel file
+    // 7. Generate Excel file
     const buffer = await workbook.xlsx.writeBuffer();
   
     const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
