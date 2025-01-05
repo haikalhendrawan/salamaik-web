@@ -27,5 +27,11 @@ All notable changes to this project will be documented in this file.
 - Add test
 
 
+## [1.0.4] - 2025-01-05
+
+### Changed
+- add http request response compression
+
+
 
  
