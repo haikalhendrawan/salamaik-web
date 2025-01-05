@@ -18,7 +18,7 @@ import PreviewFileModal from './components/PreviewFileModal';
 import useStandardization from './useStandardization';
 import usePreviewFileModal from './usePreviewFileModal';
 import { useAuth } from '../../hooks/useAuth';
-import { getAmountShort, getReportingMonth } from './utils';
+import { getAmountShort, getReportingMonth, getReportingYear } from './utils';
 // --------------------------------------------------------------
 
 // --------------------------------------------------------------
@@ -82,7 +82,7 @@ export default function StandardizationKanwil() {
           <Grid item xs={4}>
             <AmountShort 
               header='Jumlah Kekurangan Dokumen' 
-              subheader={`Periode Pelaporan ${getReportingMonth(reportingDate)} ${new Date().getFullYear()}`}
+              subheader={`Periode Pelaporan ${getReportingMonth(reportingDate)} ${getReportingYear(reportingDate)}`}
               short={amountShort*-1} 
             />
           </Grid>

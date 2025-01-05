@@ -94,10 +94,14 @@ export default function StdKPPNReportTable({title, isEvenPeriod, standardization
 
 // ---------------------------------------------------------------------------------------------------------------
 function getCellColor(value: number, index: number, isEvenPeriod: number, reportingDate: number ) {
-  const currentMonth = new Date().getMonth();
-  const currentDate = new Date().getDate();
+  let currentMonth = new Date().getMonth();
+  const currentDate = new Date().getDate(); 
 
   const i = isEvenPeriod===0?index:index+6;
+
+  if(currentMonth === 0 && (currentDate<reportingDate)){
+    currentMonth = 12
+  };
 
   if(i>currentMonth){
     return "black"

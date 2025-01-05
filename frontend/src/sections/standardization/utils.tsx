@@ -282,9 +282,13 @@ export function renderConditionalRow(
 export function getAmountShort(standardization: StandardizationType[] | [], isEvenPeriod: number, reportingDate: number) {
   const currentMonth = new Date().getMonth();
 
-  const currMonthSmt = isEvenPeriod===0?currentMonth:(currentMonth-6);
+  let currMonthSmt = isEvenPeriod===0?currentMonth:(currentMonth-6);
 
   const currentDate = new Date().getDate();
+
+  if(currentMonth === 0){
+    currMonthSmt = 5
+  };
 
   const amountShort = standardization && standardization.length>0
     ?standardization.map((item)=> {
@@ -308,5 +312,15 @@ export function getReportingMonth(reportingDate: number) {
 
   const currentMonth = new Date().getMonth();
 
-  return currentDate<reportingDate?MONTH_NAME[currentMonth-1]:MONTH_NAME[currentMonth]
+  const assignedMonth = currentMonth === 0 ? 11 : currentMonth-1;
+
+  return currentDate<reportingDate?MONTH_NAME[assignedMonth]:MONTH_NAME[currentMonth]
+};
+
+export function getReportingYear(reportingDate: number) {
+  const currentDate = new Date().getDate();
+
+  const currentYear = new Date().getFullYear();
+
+  return currentDate<reportingDate?currentYear-1:currentYear
 };

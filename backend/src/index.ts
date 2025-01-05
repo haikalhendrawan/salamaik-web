@@ -9,6 +9,7 @@ import "dotenv/config";
 import cors from "cors";
 import cookieParser from 'cookie-parser';
 import logger from './config/logger';
+import compression from 'compression';
 //instance
 import app from './config/app';
 import io from './config/io';
@@ -41,6 +42,7 @@ import socketAuthenticate from './middleware/socketAuthenticate';
 //utils and option
 import { corsOption } from './config/option';
 // -----------------------------------------------------------
+app.use(compression());
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'uploads')));

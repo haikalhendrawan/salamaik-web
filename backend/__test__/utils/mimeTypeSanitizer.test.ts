@@ -1,3 +1,8 @@
+/**
+ *Salamaik API 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import {sanitizeMimeType} from "../../src/utils/mimeTypeSanitizer";
 import {describe, expect, it} from "@jest/globals";
 

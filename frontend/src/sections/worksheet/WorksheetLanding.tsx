@@ -90,6 +90,7 @@ export default function WorksheetLanding() {
                     link={`/worksheet/kppn?id=${item?.id}`}
                     percentKanwil={percentKanwil}
                     percentKPPN={percentKPPN}
+                    kppnId={item?.id}
                   />
                 </Grid>
               )

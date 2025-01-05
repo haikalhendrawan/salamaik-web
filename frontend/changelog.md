@@ -28,4 +28,22 @@ All notable changes to this project will be documented in this file.
 - Search fiture
 - comment background contrast on dark mode
 
+## [1.1.5] - 2025-01-01
+
+### Added
+- Changelog
+ 
+### Fixed
+- Period typography bug on standardization module
+
+
+## [1.1.6] - 2025-01-05
+
+### Added
+- Excel report on worksheet kppn selection
+ 
+### Fixed
+- Cell color bug on Standardization Report PDF
+- New year amount short bug on standardization utils
+
  

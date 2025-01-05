@@ -49,7 +49,7 @@ export default function FollowUpDetail() {
         return 
       };
 
-      const response = await axiosJWT.get(`/getFindingsByWorksheetId/${kppnId}`);
+      const response = await axiosJWT.get(`/getFindingsById/${Number(params.get('findingsId'))}`);
       setFindings(response.data.rows);
 
     }catch(err: any){
@@ -104,7 +104,7 @@ export default function FollowUpDetail() {
               </IconButton> 
 
               <Typography variant="h4" >
-                {`Tindak Lanjut Masalah #${findings?.findIndex((item) => item?.id === Number(params.get('findingsId'))) + 1}`}
+                {`Tindak Lanjut Masalah #${Number(params.get('index'))}`}
               </Typography> 
             </Stack>
             

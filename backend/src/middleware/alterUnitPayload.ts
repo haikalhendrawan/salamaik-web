@@ -1,5 +1,9 @@
+/**
+ *Salamaik API 
+ * © Kanwil DJPb Sumbar 2024
+ */
+
 import { Request, Response, NextFunction } from "express";
-import ErrorDetail from "../model/error.model";
 import {superAdmin, adminKanwil, userKanwil} from '../config/role';
 
 export default function alterUnitPayload(req: Request, res: Response, next: NextFunction) {
