@@ -33,5 +33,10 @@ All notable changes to this project will be documented in this file.
 - add http request response compression
 
 
+## [1.0.5] - 2025-01-18
+
+### Changed
+- optimize ws junction get score progress response load size
+
 
  

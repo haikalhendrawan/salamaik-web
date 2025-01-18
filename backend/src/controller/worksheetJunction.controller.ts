@@ -220,7 +220,7 @@ const getWsJunctionScoreAllPeriod = async(req: Request, res: Response, next: Nex
         const kppnResults = await Promise.all(
           allKPPN.map(async (kppn) => {
             const mainWorksheet = await worksheet.getWorksheetByPeriodAndKPPN(period.id, kppn.id);
-            return getScoreProgressResponseBodyAllKPPN(mainWorksheet, kppn);
+            return getScoreProgressResponseBodyAllKPPN(mainWorksheet, kppn, true);
           })
         );
 
@@ -251,7 +251,7 @@ const getWsJunctionScoreAllPeriodSingleKPPN = async(req: Request, res: Response,
     const result = await Promise.all(
           allPeriod.map(async (period) => {
             const mainWorksheet = await worksheet.getWorksheetByPeriodAndKPPN(period.id, kppn);
-            const scoreProgress = await getScoreProgressResponseBody(mainWorksheet);
+            const scoreProgress = await getScoreProgressResponseBody(mainWorksheet, true);
             return {
               ...period,
               ...scoreProgress
@@ -441,7 +441,7 @@ export {
 }
 
 // ------------------------------
-async function getScoreProgressResponseBody(mainWorksheet: WorksheetType[]) {
+async function getScoreProgressResponseBody(mainWorksheet: WorksheetType[], scoreOnly: boolean = false) {
   try{
     const worksheetId = mainWorksheet.length>0? mainWorksheet[0].id : null;
 
@@ -485,15 +485,15 @@ async function getScoreProgressResponseBody(mainWorksheet: WorksheetType[]) {
       totalChecklist: wsJunctionDetail?.filter((item) => item?.excluded !== 1).length,
       totalProgressKanwil: wsJunctionDetail?.filter((item) => (item?.kanwil_score !== null) && (item?.excluded !== 1)).length,
       totalProgressKPPN: wsJunctionDetail?.filter((item) => (item?.kppn_score !== null) && (item?.excluded !== 1)).length,
-      scorePerKomponen: getScoreForMatrix(komponenAll, wsJunctionDetail, true),
-      scorePerKomponenKPPN: getScoreForMatrix(komponenAll, wsJunctionDetail, false)
+      scorePerKomponen: scoreOnly ? null : getScoreForMatrix(komponenAll, wsJunctionDetail, true),
+      scorePerKomponenKPPN: scoreOnly ? null : getScoreForMatrix(komponenAll, wsJunctionDetail, false)
     };
   }catch(err){
     throw err
   }
 }
 
-async function getScoreProgressResponseBodyAllKPPN(mainWorksheet: WorksheetType[], kppn: UnitType) {
+async function getScoreProgressResponseBodyAllKPPN(mainWorksheet: WorksheetType[], kppn: UnitType, scoreOnly: boolean = false) {
   try{
     const worksheetId = mainWorksheet.length>0? mainWorksheet[0].id : null;
 
@@ -545,8 +545,8 @@ async function getScoreProgressResponseBodyAllKPPN(mainWorksheet: WorksheetType[
         totalChecklist: wsJunctionDetail?.filter((item) => item?.excluded !== 1).length,
         totalProgressKanwil: wsJunctionDetail?.filter((item) => (item?.kanwil_score !== null) && (item?.excluded !== 1)).length,
         totalProgressKPPN: wsJunctionDetail?.filter((item) => (item?.kppn_score !== null) && (item?.excluded !== 1)).length,
-        scorePerKomponen: getScoreForMatrix(komponenAll, wsJunctionDetail, true),
-        scorePerKomponenKPPN: getScoreForMatrix(komponenAll, wsJunctionDetail, false)
+        scorePerKomponen: scoreOnly ? null : getScoreForMatrix(komponenAll, wsJunctionDetail, true),
+        scorePerKomponenKPPN: scoreOnly ? null : getScoreForMatrix(komponenAll, wsJunctionDetail, false)
       }
     };
   }catch(err){
