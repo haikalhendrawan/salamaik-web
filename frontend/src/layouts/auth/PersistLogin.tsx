@@ -6,6 +6,7 @@
 import {useState, useEffect} from "react";
 import {Outlet} from "react-router-dom";
 import { useTheme } from '@mui/material/styles';
+import { useLocation } from "react-router-dom";
 // import Footer from '../dashboard/footer';
 import PuffLoader from "react-spinners/PuffLoader";
 // hooks
@@ -19,9 +20,15 @@ export default function PersistLogin() {
 
   const refresh = useRefreshToken();
 
+  const location = useLocation();
+
   useEffect(() => {
     let isMounted = true;
     const verifyRefreshToken = async () => {
+      if(location.pathname === '/login'){
+        return setIsLoading(false)
+      };
+
       try {
         await refresh();
       }catch(err){

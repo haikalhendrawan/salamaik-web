@@ -46,4 +46,9 @@ All notable changes to this project will be documented in this file.
 - Cell color bug on Standardization Report PDF
 - New year amount short bug on standardization utils
 
+## [1.1.7] - 2025-01-26
+
+### Fixed
+- remove refresh token calls on login page
+
  
