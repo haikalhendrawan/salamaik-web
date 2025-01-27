@@ -10,6 +10,7 @@ import { useTheme, styled } from '@mui/material/styles';
 import Label from '../../../components/label';
 import Iconify from '../../../components/iconify/Iconify';
 import { FindingsResponseType } from '../types';
+import ExcelPrintout from './ExcelPrintout';
 // ---------------------------------------------------
 const StyledButton = styled(Button)(({  }) => ({
   height: '30px', 
@@ -46,7 +47,15 @@ export default function FollowUpTable({findings, kppnId}: FollowUpTableProps) {
     <>
       <Grow in>
         <Card sx={{height:'auto', display:'flex', flexDirection:'column', gap:theme.spacing(1), mb: 1}}>
-          <CardHeader title={<Typography variant='h6'>Rekapitulasi Permasalahan</Typography>} sx={{mb:2}}/>
+          <CardHeader 
+            title={
+            <Stack direction={'row'} spacing={1} alignItems={'center'}>
+              <Typography variant='h6'>Rekapitulasi Permasalahan</Typography>
+              <ExcelPrintout kppnId={kppnId || ''}/>
+            </Stack>
+            } 
+            sx={{mb:2}}
+          />
 
           <Table>
             <TableHead>

@@ -51,4 +51,9 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - remove refresh token calls on login page
 
+## [1.1.8] - 2025-01-28
+
+### Added
+- excel print out on follow up module
+
  
