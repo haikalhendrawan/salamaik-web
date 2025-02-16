@@ -4,10 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import {Stack, Typography, Table, Card, CardHeader, TableSortLabel,
-        TableHead, Grow, TableBody, TableRow, TableCell, Button} from '@mui/material';
-import { useTheme, styled } from '@mui/material/styles';
-import Label from '../../../../components/label';
+import { Button} from '@mui/material';
 import Iconify from '../../../../components/iconify/Iconify';
 import FollowUpTable from './FollowUpTable';
 import { FindingsResponseType } from '../../../followUp/types';
@@ -36,8 +33,6 @@ export default function FindingsDetail({hideDetail, periodId, kppnId}: FindingsD
 
       const response = await axiosJWT.get(`/getFindingsByWorksheetId/${kppnId}/${periodId}`);
       setFindings(response.data.rows);
-      console.log(response.data.rows);
-
     }catch(err: any){
       // setIsLoading(false);
       setFindings([]);
@@ -56,8 +51,8 @@ export default function FindingsDetail({hideDetail, periodId, kppnId}: FindingsD
   }, [kppnId, periodId]);
 
   return (
-    <>
-        <Button onClick={hideDetail}>Back</Button>
+    <>  
+        <Button onClick={hideDetail} startIcon={<Iconify icon="eva:arrow-ios-back-fill" />} variant='contained' color='white' sx={{mb: 2}}>Back</Button>
         <FollowUpTable findings={findings} kppnId={kppnId}/>
     </>
 

@@ -3,7 +3,7 @@
  * © Kanwil DJPb Sumbar 2024
  */
 
-import {useRef, useState, useEffect} from "react";
+import {useState, useEffect} from "react";
 import TextField from '@mui/material/TextField';
 import FormControl from '@mui/material/FormControl';
 import Skeleton  from "@mui/material/Skeleton";
@@ -27,8 +27,6 @@ const StyledFormControl = styled(FormControl)(({theme}) => ({
 export default function Catatan({wsJunction}: CatatanPropsType) {
   const [isMounted, setIsMounted] = useState(true);
 
-  const initialNoteRef = useRef(wsJunction?.kanwil_note || '');
-
   useEffect(() => {
     setIsMounted(false);
   }, []);
@@ -42,7 +40,7 @@ export default function Catatan({wsJunction}: CatatanPropsType) {
       <StyledFormControl>
         <TextField 
           size='small' 
-          defaultValue={initialNoteRef.current}
+          value={wsJunction?.kanwil_note || ''}
           multiline 
           minRows={6} 
           maxRows={6}

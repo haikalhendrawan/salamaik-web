@@ -3,34 +3,21 @@
  * © Kanwil DJPb Sumbar 2024
  */
 
-import { Link } from 'react-router-dom';
 import {Stack, Typography, Table, Card, CardHeader, TableSortLabel,
-        TableHead, Grow, TableBody, TableRow, TableCell, Button} from '@mui/material';
-import { useTheme, styled } from '@mui/material/styles';
-import Label from '../../../../components/label';
-import Iconify from '../../../../components/iconify/Iconify';
-import { MatrixWithWsJunctionType } from '../../../matrix/types';
+        TableHead, Grow, TableBody, TableRow, TableCell} from '@mui/material';
+import { useTheme} from '@mui/material/styles';
 import { FindingsResponseType } from '../../../followUp/types';
 // ---------------------------------------------------
-const StyledButton = styled(Button)(({  }) => ({
-  height: '30px', 
-  width: '90px', 
-  fontSize:'12px', 
-  display: 'inline-flex',   
-  alignItems: 'center', 
-  justifyContent: 'center', 
-  paddingRight: 0,
-  paddingLeft: 0,
-  borderRadius: '8px'
-})) as typeof Button;  
-
 const TABLE_HEAD = [
   { id: 'no', label: 'No', alignRight: false },
   { id: 'checklist', label: 'Checklist', alignRight: false },
-  { id: 'finding', label: 'Permasalahan', alignRight: false },
-  { id: 'status', label: 'Status*', alignRight: false },
+  { id: 'hasil', label: 'Hasil Implementasi', alignRight: false },
+  { id: 'permasalahan', label: 'Permasalahan', alignRight: false },
+  { id: 'rekomendasi', label: 'Rekomendasi', alignRight: false },
+  { id: 'peraturan', label: 'Peraturan', alignRight: false },
   { id: 'pic', label: 'PIC', alignRight: false },
-  { id: 'action', label: 'Action', alignRight: false },
+  { id: 'nilai', label: 'Nilai', alignRight: false },
+  { id: 'subkomponen', label: 'Subkomponen', alignRight: false },
 ];
 
 interface FollowUpTableProps{
@@ -39,10 +26,15 @@ interface FollowUpTableProps{
 }
 
 // ----------------------------------------------------------------------------------
-export default function FollowUpTable({findings, kppnId}: FollowUpTableProps) {
+export default function FollowUpTable({findings}: FollowUpTableProps) {
   const theme = useTheme();
 
   const refKomponen = Array(...new Set(findings.map((item) => item.matrixDetail[0].komponen_string)));
+
+  const numberedFindings = findings.map((item, index) => ({
+    ...item,
+    nomor: index + 1
+  }));
 
   const refSubKomponen =  refKomponen.map((k) => {
     const findingsByKomponen = findings.filter(f => f.matrixDetail[0].komponen_string === k);
@@ -77,56 +69,11 @@ export default function FollowUpTable({findings, kppnId}: FollowUpTableProps) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {/* {findings.map((item, index) => 
-              <TableRow hover key={item.id} tabIndex={-1}>
-                <TableCell align="justify" sx={{fontSize: '13px'}}>{index+1}</TableCell>
-
-                <TableCell align="left" sx={{fontSize: '13px'}}>
-                  <Typography variant='body2' fontWeight={'bold'} fontSize={'13px'}>Komponen {item.matrixDetail[0]?.komponen_string}</Typography>
-                  <Typography variant='body2' fontSize={'13px'}>Subkomponen {item.matrixDetail[0]?.subkomponen_string}</Typography>
-                </TableCell>
-
-                <TableCell align="left" sx={{fontSize: '13px'}}>
-                  {item.matrixDetail[0].checklist[0].matrix_title}
-                </TableCell>
-
-                <TableCell align="left" sx={{fontSize: '13px'}}>{item.matrixDetail[0].permasalahan}</TableCell>
-
-                <TableCell align="left">
-                  {item.status===0
-                    ? <Label color={'error'}> Belum </Label>
-                    : item.status===1
-                      ? <Label color={'warning'}> Proses </Label>
-                      : item.status===2
-                        ? <Label color={'error'}> Ditolak </Label>
-                        : <Label color={'success'}> Disetujui </Label>
-                  }
-                </TableCell>
-
-                <TableCell align="left" sx={{fontSize: '13px'}}>
-                  {item.matrixDetail[0].uic}
-                </TableCell> 
-
-                <TableCell align="left">
-                  <Stack>
-                    <StyledButton
-                      endIcon={<Iconify icon="eva:arrow-ios-forward-outline" />} 
-                      variant="contained" 
-                      color="warning"
-                      component={Link}  
-                      to={`/followUp/detail?id=${kppnId}&findingsId=${item.id}`}
-                    >
-                      Follow Up
-                    </StyledButton>
-                  </Stack>
-                </TableCell> 
-              </TableRow>
-            )} */}
             {
               refSubKomponen.map((item, index) => 
                 (
                   <>
-                    <TableRow hover key={index} tabIndex={-1}>
+                    <TableRow hover key={index} tabIndex={-1} sx={{backgroundColor: theme.palette.warning.main}}>
                       <TableCell align="justify" colSpan={TABLE_HEAD.length}>
                         <Typography fontWeight={'bold'} fontSize={'0.9rem'}>
                           Komponen {item.komponen}
@@ -134,43 +81,50 @@ export default function FollowUpTable({findings, kppnId}: FollowUpTableProps) {
                       </TableCell>
                     </TableRow>
                     {
-                        findings.filter(f => f.matrixDetail[0].komponen_string === item.komponen).map((item, index) => 
-                          <>
-                            <TableRow hover key={item.id} tabIndex={-1}>
-                              <TableCell align="justify" sx={{fontSize: '13px'}}>{index+1}</TableCell>
+                        numberedFindings.filter(f => f.matrixDetail[0].komponen_string === item.komponen).map((item) =>{
+                          return (
+                            <>
+                              <TableRow hover key={item.id} tabIndex={-1}>
+                                <TableCell align="justify" sx={{fontSize: '13px'}}>{item.nomor}</TableCell>
 
-                              <TableCell align="left" sx={{fontSize: '13px'}}>
-                                {item.matrixDetail[0].checklist[0].matrix_title}
-                              </TableCell>
+                                <TableCell align="left" sx={{fontSize: '13px'}}>
+                                  {item.matrixDetail[0].checklist[0].matrix_title}
+                                </TableCell>
 
-                              <TableCell align="left" sx={{fontSize: '13px'}}>
-                                {item.matrixDetail[0].checklist[0].matrix_title}
-                              </TableCell>
+                                <TableCell align="left" sx={{fontSize: '13px'}}>
+                                  {item.matrixDetail[0].hasil_implementasi}
+                                </TableCell>
 
-                              <TableCell align="left" sx={{fontSize: '13px'}}>{item.matrixDetail[0].permasalahan}</TableCell>
+                                <TableCell align="left" sx={{fontSize: '13px'}}>
+                                  {item.matrixDetail[0].permasalahan}
+                                </TableCell>
 
-                              <TableCell align="left">
-                                {item.status===0
-                                  ? <Label color={'error'}> Belum </Label>
-                                  : item.status===1
-                                    ? <Label color={'warning'}> Proses </Label>
-                                    : item.status===2
-                                      ? <Label color={'error'}> Ditolak </Label>
-                                      : <Label color={'success'}> Disetujui </Label>
-                                }
-                              </TableCell>
+                                <TableCell align="left" sx={{fontSize: '13px'}}>
+                                  {item.matrixDetail[0].rekomendasi}
+                                </TableCell>
 
-                              <TableCell align="left" sx={{fontSize: '13px'}}>
-                                {item.matrixDetail[0].uic}
-                              </TableCell> 
-                              
-                            </TableRow>
-                          </>  
+                                <TableCell align="left" sx={{fontSize: '13px'}}>
+                                  {item.matrixDetail[0].peraturan}
+                                </TableCell>
+
+                                <TableCell align="left" sx={{fontSize: '13px'}}>
+                                  {item.matrixDetail[0].uic}
+                                </TableCell> 
+
+                                <TableCell align="left" sx={{fontSize: '13px'}}>
+                                  {item.matrixDetail[0].ws_junction[0].kanwil_score}
+                                </TableCell> 
+
+                                <TableCell align="left" sx={{fontSize: '13px'}}>
+                                  {item.matrixDetail[0].subkomponen_string}
+                                </TableCell> 
+                              </TableRow>
+                            </>  
+                          ) 
+                        } 
                         )
                     }
-                  </>
-
-                                      
+                  </>                 
                 )
               )
             }

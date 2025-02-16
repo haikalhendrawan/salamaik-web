@@ -13,7 +13,7 @@ import Skeleton  from "@mui/material/Skeleton";
 import { TextField } from '@mui/material';
 import styled  from '@mui/material/styles/styled';
 import { WorksheetType, WsJunctionType } from "../../types";
-import {useAuth} from "../../../../../hooks/useAuth";
+// import {useAuth} from "../../../../../hooks/useAuth";
 // ------------------------------------------------------------
 interface NilaiPropsType{
   wsJunction: WsJunctionType | null,
@@ -53,20 +53,20 @@ const StyledNumberTextField = styled(TextField)(({}) => ({
 }));
 
 // ------------------------------------------------------------
-export default function Nilai({wsJunction, wsDetail, isExcluded}: NilaiPropsType) {
+export default function Nilai({wsJunction, isExcluded}: NilaiPropsType) {
   const [isMounted, setIsMounted] = useState(true);
 
   const [stdScoreKanwil, _setStdScoreKanwil] = useState(wsJunction?.kanwil_score || '');
   
   const [stdScoreKPPN, _setStdScoreKPPN] = useState(wsJunction?.kppn_score || '');
 
-  const { auth } = useAuth();
+  // const { auth } = useAuth();
 
-  const isPastDue = useMemo(() => new Date().getTime() > new Date(wsDetail?.close_period || "").getTime(), [wsDetail]);
+  // const isPastDue = useMemo(() => new Date().getTime() > new Date(wsDetail?.close_period || "").getTime(), [wsDetail]);
 
-  const isKanwil = useMemo(() =>{
-    return auth?.kppn==='03010';
-  }, [auth]);
+  // const isKanwil = useMemo(() =>{
+  //   return auth?.kppn==='03010';
+  // }, [auth]);
 
   const opsiSelection = useMemo(() => wsJunction?.opsi?.map((item, index) => (
     <StyledMenuItem key={index+1} value={item?.value?.toString() || ''}>{item?.value}</StyledMenuItem>

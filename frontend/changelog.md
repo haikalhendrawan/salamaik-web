@@ -56,4 +56,13 @@ All notable changes to this project will be documented in this file.
 ### Added
 - excel print out on follow up module
 
+## [1.1.9] - 2025-02-16
+
+### Added
+- history findings module
+
+### Fixed
+- adjust chart 4th color
+
+
  
