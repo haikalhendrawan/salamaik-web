@@ -46,7 +46,8 @@ export default function DataSelection({selectedData, handleChange}: DataSelectio
                   <StyledMenuItem value="0" key={0}>-None-</StyledMenuItem>
                   <StyledMenuItem value="1" key={1}>1. Permasalahan</StyledMenuItem>
                   <StyledMenuItem value="2" key={2}>2. Checklist Kertas Kerja</StyledMenuItem>
-                  <StyledMenuItem value="3" key={3}>3. Informasi Pembinaan</StyledMenuItem>
+                  <StyledMenuItem value="3" key={3}>3. Standardisasi</StyledMenuItem>
+                  <StyledMenuItem value="4" key={4}>4. Informasi Pembinaan</StyledMenuItem>
                 </StyledSelect>
               </FormControl>
               

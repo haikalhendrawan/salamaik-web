@@ -7,6 +7,7 @@ import {Stack, Typography, Table, Card, CardHeader, TableSortLabel,
         TableHead, Grow, TableBody, TableRow, TableCell} from '@mui/material';
 import { useTheme} from '@mui/material/styles';
 import { FindingsResponseType } from '../../../followUp/types';
+import ExcelPrintout from './ExcelPrintout';
 // ---------------------------------------------------
 const TABLE_HEAD = [
   { id: 'no', label: 'No', alignRight: false },
@@ -22,11 +23,12 @@ const TABLE_HEAD = [
 
 interface FollowUpTableProps{
   findings: FindingsResponseType[] | [],
-  kppnId: string | null
+  kppnId: string | null,
+  period: number
 }
 
 // ----------------------------------------------------------------------------------
-export default function FollowUpTable({findings}: FollowUpTableProps) {
+export default function FollowUpTable({findings, kppnId, period}: FollowUpTableProps) {
   const theme = useTheme();
 
   const refKomponen = Array(...new Set(findings.map((item) => item.matrixDetail[0].komponen_string)));
@@ -51,7 +53,17 @@ export default function FollowUpTable({findings}: FollowUpTableProps) {
     <>
       <Grow in>
       <Card sx={{height:'auto', display:'flex', flexDirection:'column', gap:theme.spacing(1), mb: 1}}>
-        <CardHeader title={<Typography variant='h6'>Rekapitulasi Permasalahan</Typography>} sx={{mb:2}}/>
+        <CardHeader 
+          title={
+            <>
+              <Stack direction="row"  justifyContent={'space-between'} maxWidth={'100%'}>
+                <Typography variant='h6'>Rekapitulasi Permasalahan</Typography>
+                <ExcelPrintout kppnId={kppnId || ""} period={period}/>
+              </Stack>
+            </>
+          } 
+          sx={{mb:2}}
+        />
 
         <Table>
           <TableHead>

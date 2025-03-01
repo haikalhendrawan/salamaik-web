@@ -9,7 +9,10 @@ import DataSelection from './DataSelection';
 import FilterControl from './FilterControl';
 import Findings from './Findings';
 import Checklist from './Checklist';
+import Standardization from './Standardization';
 import { PreviewFileModalProvider } from './Checklist/usePreviewFileModal';
+import {PreviewFileModalProvider as PreviewFileModalProvider2} from './Standardization/usePreviewFileModal';
+import { StandardizationProvider } from './Standardization/useStandardization';
 
 export default function HistorySection() {
   const [selectedData, setSelectedData] = useState<number>(0);
@@ -30,6 +33,11 @@ export default function HistorySection() {
     <PreviewFileModalProvider>
       <Checklist selectedUnit={selectedUnit} selectedPeriod={selectedPeriod} selectedData={selectedData}/>
     </PreviewFileModalProvider>,
+    <StandardizationProvider>
+      <PreviewFileModalProvider2>
+        <Standardization selectedUnit={selectedUnit} selectedPeriod={selectedPeriod} selectedData={selectedData} />
+      </PreviewFileModalProvider2>
+    </StandardizationProvider>,
     <></>
   ];
 

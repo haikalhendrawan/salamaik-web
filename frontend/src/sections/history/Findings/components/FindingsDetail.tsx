@@ -53,7 +53,7 @@ export default function FindingsDetail({hideDetail, periodId, kppnId}: FindingsD
   return (
     <>  
         <Button onClick={hideDetail} startIcon={<Iconify icon="eva:arrow-ios-back-fill" />} variant='contained' color='white' sx={{mb: 2}}>Back</Button>
-        <FollowUpTable findings={findings} kppnId={kppnId}/>
+        <FollowUpTable findings={findings} kppnId={kppnId} period={periodId}/>
     </>
 
   )

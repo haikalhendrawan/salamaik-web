@@ -4,7 +4,6 @@ import {Tooltip, IconButton} from '@mui/material';
 import Iconify from '../../../../components/iconify';
 import useAxiosJWT from '../../../../hooks/useAxiosJWT';
 import useDictionary from '../../../../hooks/useDictionary';
-import { useAuth } from '../../../../hooks/useAuth';
 import { MatrixScoreAndProgressType, MatrixWithWsJunctionType } from '../../../matrix/types';
 import useSnackbar from '../../../../hooks/display/useSnackbar';
 
@@ -43,11 +42,13 @@ export interface FindingsResponseType{
 export default function ExcelPrintout({kppnId, period}: {kppnId: string, period: number}) {
   const axiosJWT = useAxiosJWT();
 
-  const {komponenRef, subKomponenRef} = useDictionary();
+  const {komponenRef, subKomponenRef, kppnRef, periodRef} = useDictionary();
+
+  const kppnName = kppnRef?.list?.find((item) =>item.id === kppnId)?.alias || '';
+
+  const periodName = periodRef?.list?.find((item) =>item.id === period)?.name || '';
 
   const [findings, setFindings] = useState<FindingsResponseType[] | []>([]);
-
-  const {auth} = useAuth();
 
   const {openSnackbar} = useSnackbar();
 
@@ -75,7 +76,7 @@ export default function ExcelPrintout({kppnId, period}: {kppnId: string, period:
 
       const matrixScore = response2.data.rows;
 
-      await produceExcel(findings, matrixScore, komponenRef, subKomponenRef);
+      await produceExcel(findings, matrixScore, komponenRef, subKomponenRef, kppnName, periodName);
     } catch (error) {
       console.error("Error generating Excel:", error);
     }
@@ -102,12 +103,14 @@ const produceExcel = async (
     findings: FindingsResponseType[], 
     matrixScore: MatrixScoreAndProgressType,
     komponenRef: KomponenRefType[] | null, 
-    subKomponenRef: SubKomponenRefType[] | null
+    subKomponenRef: SubKomponenRefType[] | null,
+    kppnName: string,
+    periodName: string
   ) => {
     try{
       let workbook = new ExcelJS.Workbook();
-      workbook = generateSheet1(workbook, findings);
-      workbook = generateSheet2(workbook, findings);
+      workbook = generateSheet1(workbook, findings, kppnName, periodName);
+      workbook = generateSheet2(workbook, findings, kppnName, periodName);
       workbook = generateSheet3(workbook, findings, komponenRef, subKomponenRef);
 
       if(!(matrixScore?.isFinal)){
@@ -131,7 +134,9 @@ const produceExcel = async (
 
 const generateSheet1 = (
     workbook: ExcelJS.Workbook,
-    findings: FindingsResponseType[] | [], 
+    findings: FindingsResponseType[] | [],
+    kppnName: string,
+    periodName: string 
   ) => {
     const sheet1 = workbook.addWorksheet("Permasalahan Final", {
       views: [{ state: "frozen", ySplit: 1 }]
@@ -151,7 +156,7 @@ const generateSheet1 = (
     sheet1.columns = columnConfig;
 
     sheet1.mergeCells("A1:H1");
-    sheet1.getCell("A1").value = "Rekapitulasi Permasalahan (Final)"; 
+    sheet1.getCell("A1").value = `Rekapitulasi Permasalahan (Final) \n ${kppnName} \n ${periodName}`; 
     sheet1.getCell("A1").alignment = { horizontal: "center" }; 
     sheet1.getCell("A1").font = { bold: true, size: 12 }; 
     sheet1.getColumn("D").width = 20;
@@ -193,7 +198,9 @@ const generateSheet1 = (
 
 const generateSheet2 = (
   workbook: ExcelJS.Workbook,
-  findings: FindingsResponseType[] | [], 
+  findings: FindingsResponseType[] | [],
+  kppnName: string,
+  periodName: string  
 ) => {
   const sheet1 = workbook.addWorksheet("Permasalahan Non Final", {
     views: [{ state: "frozen", ySplit: 1 }]
@@ -213,7 +220,7 @@ const generateSheet2 = (
   sheet1.columns = columnConfig;
 
   sheet1.mergeCells("A1:H1");
-  sheet1.getCell("A1").value = "Rekapitulasi Permasalahan (Non-Final)"; 
+  sheet1.getCell("A1").value = `Rekapitulasi Permasalahan (Non-Final) \n ${kppnName} \n ${periodName}`; 
   sheet1.getCell("A1").alignment = { horizontal: "center" }; 
   sheet1.getCell("A1").font = { bold: true, size: 12 }; 
   sheet1.getColumn("D").width = 20;

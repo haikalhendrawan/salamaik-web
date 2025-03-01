@@ -64,5 +64,11 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - adjust chart 4th color
 
+## [1.1.10] - 2025-03-01
+
+### Added
+- history standardization module
+- add unit name on findings excel printout
+
 
  
