@@ -38,5 +38,10 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - optimize ws junction get score progress response load size
 
+## [1.0.6] - 2025-03-02
+
+### Changed
+- add alter period payload on standardization route
+
 
  
