@@ -37,7 +37,7 @@ const StandardizationProvider = ({children}: StandardizationProviderProps) => {
     try{
       setIsLoading(true);
       const time = new Date().getTime();
-      const response = await axiosJWT.get(`/getStdWorksheet/${kppnId}?period=${period}&time=${time}`);
+      const response = await axiosJWT.get(`/getStdWorksheet/${kppnId}/${period}?time=${time}`);
       setStandardization(response.data.rows);
       setIsLoading(false);
     }catch(err: any){
