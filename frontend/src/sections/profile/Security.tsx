@@ -12,6 +12,7 @@ import { styled } from '@mui/material/styles';
 import useSnackbar from '../../hooks/display/useSnackbar';
 import useAxiosJWT from '../../hooks/useAxiosJWT';
 import z from 'zod';
+import { passwordRegex } from '../../utils/schema';
 // ---------------------------------------------------------
 const ResetPassContainer = styled(Box)(({theme}) => ({
   height:'100%',
@@ -32,7 +33,7 @@ interface ValueType{
 const passwordSchema =  z
                       .string()
                       .regex(
-                        /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
+                        passwordRegex,
                         'Minimum 8 characters, at least one letter and one number'
                       );
 

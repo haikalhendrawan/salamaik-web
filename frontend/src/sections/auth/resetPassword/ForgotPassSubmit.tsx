@@ -14,6 +14,7 @@ import useSnackbar from '../../../hooks/display/useSnackbar';
 import useLoading from '../../../hooks/display/useLoading';
 import { axiosPublic } from '../../../config/axios';
 import { z } from 'zod';
+import { passwordRegex } from '../../../utils/schema';
 //-------------------------------------------------------------------------------------
 interface ValueType{
   username: string;
@@ -29,7 +30,7 @@ interface ForgotPassSubmitPropsType{
 const passwordSchema =  z
                       .string()
                       .regex(
-                        /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
+                        passwordRegex,
                         'Minimum 8 characters, at least one letter and one number'
                       );
 //-------------------------------------------------------------------------------------

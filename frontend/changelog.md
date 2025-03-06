@@ -70,5 +70,9 @@ All notable changes to this project will be documented in this file.
 - history standardization module
 - add unit name on findings excel printout
 
+## [1.1.11] - 2025-03-06
+
+### Fixed
+- fix password regex to allow special character
 
  

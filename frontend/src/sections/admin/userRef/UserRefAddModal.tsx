@@ -19,6 +19,7 @@ import useSnackbar from '../../../hooks/display/useSnackbar';
 import useUser from './useUser';
 import {useAuth} from '../../../hooks/useAuth';
 import { z } from 'zod';
+import { passwordRegex } from '../../../utils/schema';
 // --------------------------------------------------------------------------------------------
 const style = {
     position: 'absolute',
@@ -79,7 +80,7 @@ const AddUserSchema = z.object({
   username: z.string().min(18, 'Must be 18 characters long').max(18, 'Must be 18 characters long'),
   name: z.string().min(1, 'Invalid name'),
   email: z.string().email('Invalid email'),
-  password: z.string().regex(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d\W]{8,}$/, 'Minimum 8 characters, at least one letter and one number'),
+  password: z.string().regex(passwordRegex, 'Minimum 8 characters, at least one letter and one number'),
   kppn: z.string().min(3, 'Invalid unit'),
   gender: z.number().min(0).max(1, 'Invalid gender specified')
 });
