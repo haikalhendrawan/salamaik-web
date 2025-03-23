@@ -10,6 +10,7 @@ import FilterControl from './FilterControl';
 import Findings from './Findings';
 import Checklist from './Checklist';
 import Standardization from './Standardization';
+import Info from './Info';
 import { PreviewFileModalProvider } from './Checklist/usePreviewFileModal';
 import {PreviewFileModalProvider as PreviewFileModalProvider2} from './Standardization/usePreviewFileModal';
 import { StandardizationProvider } from './Standardization/useStandardization';
@@ -38,6 +39,7 @@ export default function HistorySection() {
         <Standardization selectedUnit={selectedUnit} selectedPeriod={selectedPeriod} selectedData={selectedData} />
       </PreviewFileModalProvider2>
     </StandardizationProvider>,
+    <Info selectedUnit={selectedUnit} selectedPeriod={selectedPeriod} selectedData={selectedData} />,
     <></>
   ];
 
