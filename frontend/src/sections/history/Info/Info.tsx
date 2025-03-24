@@ -3,6 +3,7 @@ import useDictionary from '../../../hooks/useDictionary';
 import Iconify from '../../../components/iconify';
 import Label from '../../../components/label';
 import {useTheme} from '@mui/material/styles';
+import UserItem from './components/UserItem';
 
 interface InfoProps{
   selectedUnit: string;
@@ -33,6 +34,24 @@ export default function Info({selectedUnit, selectedPeriod, selectedData}:InfoPr
               </Stack>
               <Stack direction={'row'} gap={2} marginBottom={4}>
                 <div>
+                  <Iconify icon="solar:sledgehammer-bold-duotone" color={theme.palette.grey[500]}/>
+                </div>
+                <div>
+                  <Typography fontWeight={600} variant="body2">{`Nilai Kinerja KPPN :`}</Typography>
+                  <Typography variant='body3'>{`9.25`} </Typography>
+                </div>
+              </Stack>
+              <Stack direction={'row'} gap={2} marginBottom={4}>
+                <div>
+                  <Iconify icon="solar:document-add-bold-duotone" color={theme.palette.grey[500]}/>
+                </div>
+                <div>
+                  <Typography fontWeight={600} variant="body2">{`Permasalahan :`}</Typography>
+                  <Typography variant='body3'>{`8 (Final)`} </Typography>
+                </div>
+              </Stack>
+              <Stack direction={'row'} gap={2} marginBottom={4}>
+                <div>
                   <Iconify icon="solar:calendar-bold-duotone" color={theme.palette.grey[500]}/>
                 </div>
                 <div>
@@ -55,7 +74,7 @@ export default function Info({selectedUnit, selectedPeriod, selectedData}:InfoPr
               </Stack>
               <Stack direction={'row'} gap={2} marginBottom={4}>
                 <div>
-                  <Iconify icon="solar:rocket-bold-duotone" color={theme.palette.grey[500]} />
+                  <Iconify icon="solar:city-bold-duotone" color={theme.palette.grey[500]} />
                 </div>
                 <div>
                   <Typography fontWeight={600} variant="body2">{`User Kanwil :`}</Typography>
@@ -63,14 +82,7 @@ export default function Info({selectedUnit, selectedPeriod, selectedData}:InfoPr
                     {
                       new Array(10).fill(10).map((item, index) => (
                         <>
-                          <Stack direction="row" alignItems="center" spacing={1}>
-                            <Avatar alt={"0"} src={`${import.meta.env.VITE_API_URL}/avatar/199904082021011001?${new Date().getTime()}`} sx={{ width: 24, height: 24 }}/>
-                            <List disablePadding dense>
-                              <ListItemText>
-                                <Typography variant="body2" noWrap>{"Aqima Hesnatita"}</Typography>
-                              </ListItemText>
-                            </List>
-                          </Stack>
+                          <UserItem name="" nip="/" />
                         </>
                       ))
                     }
@@ -79,7 +91,7 @@ export default function Info({selectedUnit, selectedPeriod, selectedData}:InfoPr
               </Stack>
               <Stack direction={'row'} gap={2} marginBottom={4}>
                 <div>
-                  <Iconify icon="solar:rocket-bold-duotone" color={theme.palette.grey[500]} />
+                  <Iconify icon="solar:garage-bold-duotone" color={theme.palette.grey[500]} />
                 </div>
                 <div>
                   <Typography fontWeight={600} variant="body2">{`User KPPN :`}</Typography>
@@ -87,14 +99,7 @@ export default function Info({selectedUnit, selectedPeriod, selectedData}:InfoPr
                     {
                       new Array(10).fill(10).map((item, index) => (
                         <>
-                          <Stack direction="row" alignItems="center" spacing={1}>
-                            <Avatar alt={"0"} src={`${import.meta.env.VITE_API_URL}/avatar/199904082021011001?${new Date().getTime()}`} sx={{ width: 24, height: 24 }}/>
-                            <List disablePadding dense>
-                              <ListItemText>
-                                <Typography variant="body2" noWrap>{"Aqima Hesnatita"}</Typography>
-                              </ListItemText>
-                            </List>
-                          </Stack>
+                          <UserItem name="" nip="/" />
                         </>
                       ))
                     }
