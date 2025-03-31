@@ -52,7 +52,7 @@ const addGallery = async (req: Request, res: Response, next: NextFunction) => {
       const {miscId, value, detail1, detail2, detail3} = req.body;
       const result = await misc.addMisc(parseInt(miscId), value, detail1, detail2, detail3);
 
-      nonBlockingCall(activity.createActivity(username, 39, ip, value));
+      nonBlockingCall(activity.createActivity(username, 39, ip, {'value': value}));
 
       return res.status(200).json({sucess: true, message: 'Add gallery success', rows: result});
     } catch (err) {
@@ -70,7 +70,7 @@ const deleteMisc= async (req: Request, res: Response, next: NextFunction) => {
     const {id} = req.params;
     const result = await misc.deleteMiscById(parseInt(id));
 
-    nonBlockingCall(activity.createActivity(username, 40, ip, id));
+    nonBlockingCall(activity.createActivity(username, 40, ip, {'id':id}));
 
     return res.status(200).json({sucess: true, message: 'Delete gallery success', rows: result});
   } catch (err) {

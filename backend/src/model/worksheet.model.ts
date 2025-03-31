@@ -21,13 +21,13 @@ export interface WorksheetType{
   alias: string,
   period: number,
   status: number,
-  open_period: string,
-  close_period: string,
+  open_period: Date,
+  close_period: Date,
   created_at: string,
   updated_at: string,
   matrix_status: number,
-  open_follow_up: string,
-  close_follow_up: string
+  open_follow_up: Date,
+  close_follow_up: Date
 }
 // ------------------------------------------------------
 

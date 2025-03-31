@@ -77,7 +77,7 @@ const addWorksheet = async(req: Request, res: Response, next: NextFunction) => {
       return res.status(400).json({sucess: false, message: 'Worksheet already exist'})
     };
 
-    nonBlockingCall(activity.createActivity(username, 73, ip, `kppnId: ${kppnId}, period: ${period}`));
+    nonBlockingCall(activity.createActivity(username, 73, ip, {'kppnId': kppnId, 'period': period}));
 
     const result = await worksheet.addWorksheet(kppnId, period, startDate, closeDate, openFollowUp, closeFollowUp);
     return res.status(200).json({sucess: true, message: 'Add worksheet success', rows: result})
@@ -104,7 +104,7 @@ const assignWorksheet = async(req: Request, res: Response, next: NextFunction) =
     const result = await worksheet.editWorksheetStatus(worksheetId, client);
     await client.query('COMMIT');
 
-    nonBlockingCall(activity.createActivity(username, 74, ip, worksheetId));
+    nonBlockingCall(activity.createActivity(username, 74, ip, {'worksheetId': worksheetId}));
 
     return res.status(200).json({sucess: true, message: 'Assign worksheet success', rows: result, detail: mapChecklist})
   } catch (err){
@@ -127,7 +127,7 @@ const editWorksheetPeriod = async(req: Request, res: Response, next: NextFunctio
       return res.status(400).json({sucess: false, message: isValidDate.message})
     };
     
-    nonBlockingCall(activity.createActivity(username, 75, ip, worksheetId));
+    nonBlockingCall(activity.createActivity(username, 75, ip, {'worksheetId': worksheetId}));
 
     const result = await worksheet.editWorksheetPeriod(worksheetId, startDate, closeDate, openFollowUp, closeFollowUp);
     return res.status(200).json({sucess: true, message: 'Edit worksheet period success', rows: result})
@@ -144,7 +144,7 @@ const deleteWorksheet = async(req: Request, res: Response, next: NextFunction) =
     const { worksheetId } = req.body;
     const result = await worksheet.deleteWorksheet(worksheetId);
 
-    nonBlockingCall(activity.createActivity(username, 76, ip, worksheetId));
+    nonBlockingCall(activity.createActivity(username, 76, ip, {'worksheetId': worksheetId}));
 
     return res.status(200).json({sucess: true, message: 'Delete worksheet success', rows: result})
   }catch(err){

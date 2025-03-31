@@ -33,6 +33,7 @@ import matrixRoute from './routes/matrixRoute';
 import miscRoute from './routes/miscRoute';
 import activityRoute from './routes/activityRoute';
 import commentRoute from './routes/commentRoute';
+import infoRoute from './routes/infoRoute';
 //middleware
 import errorHandler from './middleware/errorHandler';
 import rateLimiter from './middleware/rateLimiter';
@@ -65,6 +66,7 @@ app.use(matrixRoute);
 app.use(findingsRoute);
 app.use(miscRoute);
 app.use('/comment', commentRoute);
+app.use('/info', infoRoute);
 app.use(activityRoute);
 app.use(notFoundRoute);
 app.use(errorHandler);

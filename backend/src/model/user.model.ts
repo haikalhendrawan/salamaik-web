@@ -42,10 +42,24 @@ interface EditUserBodyType{
   gender: number
 }
 
+export interface UserType{
+  id: string,
+  username: string;
+  name: string;
+  email: string;
+  picture: string;
+  period: number;
+  role: number;
+  status: number;
+  kppn: string;
+  gender: number;
+  created_at: Date;
+}
+
 class User{
-  async getAllUser(){
+  async getAllUser(): Promise<UserType[] | []>{
     try{
-      const q = ` SELECT id, username, name, email, picture, period, role, status, kppn, gender 
+      const q = ` SELECT id, username, name, email, picture, period, role, status, kppn, gender, created_at 
                   FROM user_ref`;
       const result = await pool.query(q);
       return result.rows;
@@ -54,9 +68,9 @@ class User{
     }
   }
 
-  async getUserKPPN(kppn: string){
+  async getUserKPPN(kppn: string): Promise<UserType[] | []>{
     try{
-      const q = ` SELECT id, username, name, email, picture, period, role, status, kppn, gender 
+      const q = ` SELECT id, username, name, email, picture, period, role, status, kppn, gender, created_at
                   FROM user_ref 
                   WHERE kppn = $1`;
       const result = await pool.query(q, [kppn]);
@@ -66,9 +80,9 @@ class User{
     }
   }
 
-  async getAllUserWtAdmin(){
+  async getAllUserWtAdmin(): Promise<UserType[] | []> {
     try{
-      const q = ` SELECT id, username, name, email, picture, period, role, status, kppn, gender 
+      const q = ` SELECT id, username, name, email, picture, period, role, status, kppn, gender, created_at
                   FROM user_ref
                   WHERE role != 99`;
       const result = await pool.query(q);
