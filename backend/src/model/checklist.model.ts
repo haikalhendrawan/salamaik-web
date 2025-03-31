@@ -13,7 +13,7 @@ export interface ChecklistType{
   komponen_id: number,
   subkomponen_id: number,
   subsubkomponen_id: number,
-  standardisasi: number, 
+  standardisasi: 0 | 1, 
   matrix_title: string | null, 
   file1: string | null,
   file2: string | null,

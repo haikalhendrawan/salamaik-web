@@ -37,7 +37,7 @@ class WorksheetEvent{
           return socketError(callback, 'Worksheet is not assigned')
         };
 
-        nonBlockingCall(activity.createActivity(username, 80, ip));
+        nonBlockingCall(activity.createActivity(username, 80, ip, `worksheetId: ${worksheetId}`));
   
         return callback({
           success: true,
@@ -70,7 +70,7 @@ class WorksheetEvent{
 
       socket.broadcast.emit('kanwilScoreHasUpdated', {worksheetId, junctionId, kanwilScore});
 
-      nonBlockingCall(activity.createActivity(username, 85, ip));
+      nonBlockingCall(activity.createActivity(username, 85, ip, `junctionId: ${junctionId}, kanwilScore: ${kanwilScore}`));
 
       return callback({success: true, rows: result, message: 'Nilai has been updated'});
     }catch(err: any){
@@ -99,7 +99,7 @@ class WorksheetEvent{
 
       socket.broadcast.emit('KPPNScoreHasUpdated', {worksheetId, junctionId, kppnScore});
 
-      nonBlockingCall(activity.createActivity(username, 91, ip));
+      nonBlockingCall(activity.createActivity(username, 91, ip, `junctionId: ${junctionId}, kppnScore: ${kppnScore}`));
 
       return callback({success: true, rows: result, message: 'Nilai has been updated'});
     }catch(err: any){
@@ -118,7 +118,7 @@ class WorksheetEvent{
 
       socket.broadcast.emit('kanwilNoteHasUpdated', {worksheetId, junctionId, kanwilNote});
 
-      nonBlockingCall(activity.createActivity(username, 86, ip));
+      nonBlockingCall(activity.createActivity(username, 86, ip, `worksheetId: ${worksheetId}, junctionId: ${junctionId}, kanwilNote: ${kanwilNote}`));
 
       return callback({success: true, rows: result, message: 'Note has been updated'});
     }catch(err: any){
@@ -141,7 +141,7 @@ class WorksheetEvent{
 
       socket.broadcast.emit('wsJunctionFileHasDeleted', {id, fileName, option});
 
-      nonBlockingCall(activity.createActivity(username, 89, ip));
+      nonBlockingCall(activity.createActivity(username, 89, ip, `id: ${id}, fileName: ${fileName}, option: ${option}`));
 
       return callback({success: true, rows: result, message: 'File deleted successfully'});   
     }catch(err: any){

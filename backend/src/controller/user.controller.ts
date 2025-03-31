@@ -112,7 +112,7 @@ const editUser = async (req: Request, res: Response, next: NextFunction) => {
     
     const result = await user.editUser(req.body);
 
-    nonBlockingCall(activity.createActivity(nip, 66, ip, username));
+    nonBlockingCall(activity.createActivity(nip, 66, ip, {'username': username}));
 
     return res.status(200).json({sucess: true, message: 'User has been edited', detail: result})
   }catch(err){
@@ -136,7 +136,7 @@ const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
 
     const result = await user.deleteUser(targetId);
 
-    nonBlockingCall(activity.createActivity(username, 67, ip, username));
+    nonBlockingCall(activity.createActivity(username, 67, ip, {'username': username}));
 
     return res.status(200).json({sucess: true, message: 'Delete user success', detail: result})
   }catch(err){
@@ -160,7 +160,7 @@ const updateStatus = async (req: Request, res: Response, next: NextFunction) => 
 
     const result = await user.updateStatus(targetId);
 
-    nonBlockingCall(activity.createActivity(username, 68, ip, targetId));
+    nonBlockingCall(activity.createActivity(username, 68, ip, {'targetId': targetId}));
 
     return res.status(200).json({sucess: true, message: 'User has been activated', detail: result})
   }catch(err){
@@ -184,7 +184,7 @@ const demoteStatus = async (req: Request, res: Response, next: NextFunction) => 
 
     const result = await user.demoteStatus(targetId);
 
-    nonBlockingCall(activity.createActivity(username, 69, ip, targetId));
+    nonBlockingCall(activity.createActivity(username, 69, ip, {'targetId': targetId}));
 
     return res.status(200).json({sucess: true, message: 'User has been deactivated', detail: result})
   }catch(err){
@@ -213,7 +213,7 @@ const updateRole = async (req: Request, res: Response, next: NextFunction) => {
 
     const result = await user.updateRole(targetId, newRole);
 
-    nonBlockingCall(activity.createActivity(username, 70, ip, `targetId:${targetId}, oldRole:${oldRole}, newRole: ${newRole}`));
+    nonBlockingCall(activity.createActivity(username, 70, ip, {'targetId': targetId, 'oldRole': oldRole, 'newRole': newRole}));
 
     return res.status(200).json({sucess: true, message: 'Role updated', rows: result})
   }catch(err){

@@ -61,7 +61,7 @@ const addPeriod = async(req: Request, res: Response, next: NextFunction) => {
 
     const result = await period.addPeriod(semester, tahun);
 
-    nonBlockingCall(activity.createActivity(username, 49, ip, `${semester} ${tahun}`));
+    nonBlockingCall(activity.createActivity(username, 49, ip, {'semester': semester, 'tahun': tahun}));
 
     return res.status(200).json({sucess: true, message: 'Add period success', rows: result});
   }catch(err){
