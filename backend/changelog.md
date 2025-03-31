@@ -55,5 +55,9 @@ All notable changes to this project will be documented in this file.
 - update impacted data on database with custom query (set conflicted activity junction with id 88-> 87 and 89 -> 88) (DB)
 - update checklist, activity, worksheet type
 
+## [1.0.7b] - 2025-03-31
+
+### Fixed
+- fix findings count bug on findings util
 
  
