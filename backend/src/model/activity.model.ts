@@ -45,13 +45,14 @@ export interface ActivityJoinUserType{
   detail: {[key: string]: any} | null,
   user_name: string, 
   nip: string, 
-  kppn: string
+  kppn: string,
+  picture: string
 }
 
 class Activity{
   async getAllActivityLimited(){
     try{
-      const q = ` SELECT activity_junction.*, activity_ref.name AS activity_name, activity_ref.description, activity_ref.cluster, user_ref.name AS user_name
+      const q = ` SELECT activity_junction.*, activity_ref.name AS activity_name, activity_ref.description, activity_ref.cluster, user_ref.name AS user_name, user_ref.picture
                   FROM activity_junction
                   INNER JOIN activity_ref
                   ON activity_junction.activity_id = activity_ref.id
@@ -114,7 +115,7 @@ class Activity{
 
   async getByTypeDates(type: number[], startDate: Date, endDate: Date): Promise<ActivityJoinUserType[]>{ //Use date.toISOString() function , ex: 2023-01-01 00:00:00.
     try{
-      const q = `SELECT activity_junction.*, activity_ref.name, activity_ref.description, user_ref.name AS user_name, user_ref.username AS nip, user_ref.kppn
+      const q = `SELECT activity_junction.*, activity_ref.name, activity_ref.description, user_ref.name AS user_name, user_ref.username AS nip, user_ref.kppn, user_ref.picture
                  FROM activity_junction
                  INNER JOIN activity_ref
                  ON activity_junction.activity_id = activity_ref.id
