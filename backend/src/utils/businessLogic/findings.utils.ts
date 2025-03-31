@@ -20,7 +20,7 @@ export class FindingsUtil {
     };
 
     return comprehensiveFindings
-            .filter((item) => ChecklistUtil.isMaxedScore(item.kanwil_score, item.standardisasi))
+            .filter((item) => !(ChecklistUtil.isMaxedScore(item.kanwil_score, item.standardisasi)))
             .length
   }
 
@@ -50,7 +50,7 @@ export class FindingsUtil {
     };
 
     const finalFindings = comprehensiveFindings
-                          .filter((item) => ChecklistUtil.isMaxedScore(item.kanwil_score, item.standardisasi))
+                          .filter((item) => !(ChecklistUtil.isMaxedScore(item.kanwil_score, item.standardisasi)))
 
     return finalFindings
   }
