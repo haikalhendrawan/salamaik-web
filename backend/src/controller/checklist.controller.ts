@@ -90,7 +90,7 @@ const editChecklist = async (req: Request, res: Response, next: NextFunction) =>
 
     const result = await checklist.editChecklist(req.body);
 
-    nonBlockingCall(activity.createActivity(username, 17, ip, req.body.id));
+    nonBlockingCall(activity.createActivity(username, 17, ip, {'id': req.body.id}));
 
     return res.status(200).json({sucess: true, message: 'Checklist has been updated', rows: result});
   } catch (err) {
@@ -123,7 +123,7 @@ const editChecklistFile = async (req: Request, res: Response, next: NextFunction
       const filename = `checklist_${req.body.id}_${req.body.option}.${fileExt}`;
       const result = await checklist.editChecklistFile(id, filename, option);
 
-      nonBlockingCall(activity.createActivity(username, 18, ip, id));
+      nonBlockingCall(activity.createActivity(username, 18, ip, {'id': req.body.id}));
 
       return res.status(200).json({sucess: true, message: 'file inserted successfully', rows: result});
     } catch (err) {
@@ -145,7 +145,7 @@ const deleteChecklistFile = async (req: Request, res: Response, next: NextFuncti
     const filePath = path.join(__dirname,`../uploads/checklist/`, filename);
     fs.unlinkSync(filePath);
 
-    nonBlockingCall(activity.createActivity(username, 19, ip, id));
+    nonBlockingCall(activity.createActivity(username, 19, ip, {'id': req.body.id}));
 
     return res.status(200).json({sucess: true, message: 'file deleted successfully', rows: result});
   }catch(err){
@@ -165,7 +165,7 @@ const editOpsiById = async (req: Request, res: Response, next: NextFunction) => 
     };
     const result = await checklist.editOpsiById(id, title, value, checklistId, positiveFallback, negativeFallback, rekomendasi);
 
-    nonBlockingCall(activity.createActivity(username, 20, ip, id));
+    nonBlockingCall(activity.createActivity(username, 20, ip, {'id': req.body.id}));
 
     return res.status(200).json({sucess: true, message: 'Opsi updated successfully', rows: result});
   }catch(err){

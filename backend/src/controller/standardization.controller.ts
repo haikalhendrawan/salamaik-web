@@ -164,7 +164,7 @@ const addStandardizationJunction = async (req: Request, res: Response, next: Nex
       const fileName = `std_${allowedKPPN}_${periodId}${month}${standardizationId}_${timeStamp}.${fileExt}`;
       const result = await standardization.addStandardizationJunction(allowedKPPN, periodId, standardizationId, month, fileName);
 
-      nonBlockingCall(activity.createActivity(username, 60, ip, `kppnId:${allowedKPPN}, periodId: ${periodId}, stdId: ${standardizationId}, monthId: ${month}`));
+      nonBlockingCall(activity.createActivity(username, 60, ip, {'kppnId': allowedKPPN, 'periodId': periodId, 'stdId': standardizationId, 'monthId': month}));
 
       return res.status(200).json({sucess: true, message: 'Add File success', rows: result})
     }catch(err){
@@ -195,7 +195,7 @@ const deleteStandardizationJunction = async (req: Request, res: Response, next: 
     const filePath = path.join(__dirname,`../uploads/standardization/`, fileName);
     fs.unlinkSync(filePath);
 
-    nonBlockingCall(activity.createActivity(username, 61, ip, id));
+    nonBlockingCall(activity.createActivity(username, 61, ip, {'id': id}));
 
     return res.status(200).json({sucess: true, message: 'Delete file success', rows: result})
   }catch(err){

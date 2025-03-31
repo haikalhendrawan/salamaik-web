@@ -36,7 +36,7 @@ const updateCommonProfile = async (req: Request, res: Response, next: NextFuncti
 
     const response = await profile.updateCommonProfile(userId, name, username, email, period );
 
-    nonBlockingCall(activity.createActivity(nip, 51, ip, username));
+    nonBlockingCall(activity.createActivity(nip, 51, ip, {'username': username}));
 
     return res.status(200).json({sucess: true, message: 'Profile has been updated', detail: response});
   } catch (err) {
@@ -59,7 +59,7 @@ const updatePassword = async (req: Request, res: Response, next: NextFunction) =
 
     const response = await profile.updatePassword(userId, oldPassword, newPassword );
 
-    nonBlockingCall(activity.createActivity(nip, 52, ip, userId));
+    nonBlockingCall(activity.createActivity(nip, 52, ip, {'userId': userId}));
 
     return res.status(200).json({sucess: true, message: 'Password has been updated', detail: response});
   } catch (err) {
@@ -88,7 +88,7 @@ const updateProfilePicture = async (req: Request, res: Response, next: NextFunct
       const fileName =`avatar_${nip}.${fileExt}`;
       const response = await profile.updateProfilePicture(userID, fileName);
 
-      nonBlockingCall(activity.createActivity(nip, 53, ip, fileName));
+      nonBlockingCall(activity.createActivity(nip, 53, ip, {'fileName': fileName}));
 
       return res.status(200).json({ success: true, message: 'Profile picture has been updated', rows: response });
     } catch (err) {

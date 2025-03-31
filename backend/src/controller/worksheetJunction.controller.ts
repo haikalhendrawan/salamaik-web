@@ -285,7 +285,7 @@ const editWsJunctionKPPNScore = async(req: Request, res: Response, next: NextFun
 
     const result = await wsJunction.editWsJunctionKPPNScore(worksheetId, junctionId, kppnScore, username);
 
-    nonBlockingCall(activity.createActivity(username, 85, ip));
+    nonBlockingCall(activity.createActivity(username, 91, ip, {'junctionId': junctionId,' kppnScore': kppnScore}));
 
     return res.status(200).json({sucess: true, message: 'Edit worksheet junction success', rows: result})
   }catch(err){
@@ -312,7 +312,7 @@ const editWsJunctionKanwilScore = async(req: Request, res: Response, next: NextF
 
     const result = await wsJunction.editWsJunctionKanwilScore(worksheetId, junctionId, kanwilScore, username);
 
-    nonBlockingCall(activity.createActivity(username, 86, ip, `junctionId: ${junctionId}, kanwilScore: ${kanwilScore}`));
+    nonBlockingCall(activity.createActivity(username, 85, ip, {'junctionId': junctionId,' kanwilScore': kanwilScore}));
 
     return res.status(200).json({sucess: true, message: 'Edit worksheet junction success', rows: result})
   }catch(err){
@@ -329,7 +329,7 @@ const editWsJunctionKanwilNote = async(req: Request, res: Response, next: NextFu
     const {worksheetId, junctionId, kanwilNote} = req.body; 
     const result = await wsJunction.editWsJunctionKanwilNote(worksheetId, junctionId, kanwilNote, username);
 
-    nonBlockingCall(activity.createActivity(username, 87, ip, `junctionId: ${junctionId}, kanwilNote: ${kanwilNote}`));
+    nonBlockingCall(activity.createActivity(username, 86, ip, {'junctionId': junctionId, 'kanwilNote': kanwilNote}));
 
     return res.status(200).json({sucess: true, message: 'Edit worksheet junction success', rows: result})
   }catch(err){
@@ -358,7 +358,7 @@ const editWsJunctionFile = async(req: Request, res: Response, next: NextFunction
 
       const result = await wsJunction.editWsJunctionFile(junctionId, worksheetId, fileName, option, name);
 
-      nonBlockingCall(activity.createActivity(username, 88, ip, `junctionId: ${junctionId}, fileName: ${fileName}, option: ${option}`));
+      nonBlockingCall(activity.createActivity(username, 87, ip, {'junctionId': junctionId, 'fileName': fileName, 'option': option}));
 
       io.emit('fileHasUpdated', {worksheetId, junctionId, checklistId, kppnId, fileName, option});
       return res.status(200).json({sucess: true, message: 'Edit worksheet junction success', rows: result})
@@ -377,7 +377,7 @@ const editWsJunctionExclude = async(req: Request, res: Response, next: NextFunct
     const {junctionId, exclude} = req.body;
     const result = await wsJunction.editWsJunctionExclude(junctionId, exclude);
 
-    nonBlockingCall(activity.createActivity(username, 89, ip, junctionId));
+    nonBlockingCall(activity.createActivity(username, 88, ip, {'junctionId': junctionId,' exclude': exclude}));
 
     return res.status(200).json({sucess: true, message: 'Edit worksheet junction success', rows: result})
   }catch(err){
@@ -396,7 +396,7 @@ const deleteWsJunctionFile = async(req: Request, res: Response, next: NextFuncti
     const filePath = path.join(__dirname,`../uploads/worksheet/`, fileName);
     fs.unlinkSync(filePath);
 
-    nonBlockingCall(activity.createActivity(username, 90, ip, id));
+    nonBlockingCall(activity.createActivity(username, 89, ip, {'id': id, 'fileName': fileName, 'option': option}));
  
     return res.status(200).json({sucess: true, message: 'file deleted successfully', rows: result});
   }catch(err){
@@ -413,7 +413,7 @@ const deleteWsJunctionByWorksheetId = async(req: Request, res: Response, next: N
     const {worksheetId} = req.body; 
     const result = await wsJunction.deleteWsJunctionByWorksheetId(worksheetId);
 
-    nonBlockingCall(activity.createActivity(username, 91, ip, worksheetId));
+    nonBlockingCall(activity.createActivity(username, 90, ip, {'worksheetId': worksheetId}));
 
     return res.status(200).json({sucess: true, message: 'Delete worksheet junction success', rows: result})
   }catch(err){
@@ -441,7 +441,7 @@ export {
 }
 
 // ------------------------------
-async function getScoreProgressResponseBody(mainWorksheet: WorksheetType[], scoreOnly: boolean = false) {
+export async function getScoreProgressResponseBody(mainWorksheet: WorksheetType[], scoreOnly: boolean = false) {
   try{
     const worksheetId = mainWorksheet.length>0? mainWorksheet[0].id : null;
 
@@ -493,7 +493,7 @@ async function getScoreProgressResponseBody(mainWorksheet: WorksheetType[], scor
   }
 }
 
-async function getScoreProgressResponseBodyAllKPPN(mainWorksheet: WorksheetType[], kppn: UnitType, scoreOnly: boolean = false) {
+export async function getScoreProgressResponseBodyAllKPPN(mainWorksheet: WorksheetType[], kppn: UnitType, scoreOnly: boolean = false) {
   try{
     const worksheetId = mainWorksheet.length>0? mainWorksheet[0].id : null;
 

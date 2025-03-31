@@ -6,6 +6,9 @@
 import pool from "../config/db";
 import "dotenv/config";
 import { PoolClient } from "pg";
+import { WorksheetType } from "./worksheet.model";
+import { ChecklistType } from "./checklist.model";
+import { WorksheetJunctionType } from "./worksheetJunction.model";
 /**
  *
  *
@@ -26,6 +29,8 @@ export interface FindingsType{
   status: number,
   updated_by: string
 };
+
+export type ComprehensiveFindingsType = (FindingsType & WorksheetJunctionType & ChecklistType & WorksheetType);
 
 interface FindingsBodyType{
   worksheetId: string,
@@ -137,6 +142,26 @@ class Findings{
                   WHERE worksheet_ref.kppn_id = $1
                   ORDER BY findings_data.id DESC`;
       const result = await pool.query(q, [kppnId]);
+      return result.rows
+    }catch(err){
+      throw err
+    }
+  }
+
+  // findings comprehensive = findings + ws junction + checklist + worksheet
+  async getComprehensiveByKPPNPeriod(kppnId: string, period: number): Promise<ComprehensiveFindingsType[]>{
+    try{
+      const q = `SELECT findings_data.*, worksheet_junction.*, checklist_ref.*, worksheet_ref.*
+        FROM public.findings_data 
+        LEFT JOIN worksheet_junction 
+        ON findings_data.ws_junction_id = worksheet_junction.junction_id
+        LEFT JOIN checklist_ref
+        ON worksheet_junction.checklist_id = checklist_ref.id
+        LEFT JOIN worksheet_ref
+        ON worksheet_junction.worksheet_id = worksheet_ref.id
+        WHERE worksheet_junction.kppn_id = $1 AND worksheet_junction.period = $2
+      `;
+      const result = await pool.query(q, [kppnId, period]);
       return result.rows
     }catch(err){
       throw err

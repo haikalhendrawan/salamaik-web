@@ -43,5 +43,17 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - add alter period payload on standardization route
 
+## [1.0.7] - 2025-03-29
+
+### Changed
+- add more detail on every worksheet related activity log
+- change activity detail column to jsonb format (DB)
+- convert acitivity detail from string to json on controller
+
+### Fixed
+- fix activity id on activity controller does not match with activity reference
+- update impacted data on database with custom query (set conflicted activity junction with id 88-> 87 and 89 -> 88) (DB)
+- update checklist, activity, worksheet type
+
 
  

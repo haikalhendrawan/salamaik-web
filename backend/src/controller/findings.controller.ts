@@ -151,7 +151,7 @@ const updateFindingsScore = async (req: Request, res: Response, next: NextFuncti
     const {id, scoreBefore, scoreAfter, userName} = req.body;
     const result = await findings.updateFindingsScore(id, scoreBefore, scoreAfter, userName);
 
-    nonBlockingCall(activity.createActivity(username, 26, ip, `id: ${id}, score: ${scoreAfter}`));
+    nonBlockingCall(activity.createActivity(username, 26, ip, {'id': id, 'score': scoreAfter}));
 
     return res.status(200).json({sucess: true, message: 'Score has been updated', rows: result})
   }catch(err){
@@ -171,7 +171,7 @@ const updateFindingsResponse = async (req: Request, res: Response, next: NextFun
     const matrixResult = await matrix.updateMatrixTindakLanjut(matrixId, kanwilResponse, connection);
     await connection.query('COMMIT');
 
-    nonBlockingCall(activity.createActivity(username, 27, ip, `id: ${id}, responseKanwil: ${kanwilResponse}, responseKppn: ${kppnResponse}`));
+    nonBlockingCall(activity.createActivity(username, 27, ip, {'id': id, 'responseKanwil': kanwilResponse, 'responseKppn': kppnResponse}));
 
     return res.status(200).json({sucess: true, message: 'Response has been updated  ', rows: {result, matrixResult}})
   }catch(err){
@@ -203,7 +203,7 @@ const updateFindingStatus = async(req: Request, res: Response, next: NextFunctio
 
     const result = await findings.updateFindingStatus(id, status, userName);
 
-    nonBlockingCall(activity.createActivity(username, 28, ip, `id: ${id}, status: ${status}`));
+    nonBlockingCall(activity.createActivity(username, 28, ip, {'id': id, 'status': status}));
 
     return res.status(200).json({sucess: true, message: 'Status has been updated', rows: result})
   }catch(err){

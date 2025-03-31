@@ -155,7 +155,7 @@ const createMatrix = async(req: Request, res: Response, next: NextFunction) => {
     await worksheet.editWorksheetMatrixStatus(worksheetId, 1, connection);
     await connection.query('COMMIT');
 
-    nonBlockingCall(activity.createActivity(username, 34, ip, `worksheetId: ${worksheetId}`));
+    nonBlockingCall(activity.createActivity(username, 34, ip, {'worksheetId': worksheetId}));
 
     return res.status(200).json({sucess: true, message: 'Matrix created successfully', rows: {result, result2}})
   }catch(err){
@@ -247,7 +247,7 @@ const reAssignMatrix = async(req: Request, res: Response, next: NextFunction) =>
     // const {hasilImplementasi, permasalahan, isFinding} = matrix
     await connection.query('COMMIT');
 
-    nonBlockingCall(activity.createActivity(username, 35, ip, `worksheetId: ${worksheetId}`));
+    nonBlockingCall(activity.createActivity(username, 35, ip, {'worksheetId': worksheetId}));
 
     return res.status(200).json({sucess: true, message: 'Repost matrix success', rows: result})
   }catch(err){
@@ -267,7 +267,7 @@ const updateMatrix = async(req: Request, res: Response, next: NextFunction) => {
 
     const result = await matrix.updateMatrix(req.body);
 
-    nonBlockingCall(activity.createActivity(username, 36, ip, `matrixJunctionId: ${req.body.id}`));
+    nonBlockingCall(activity.createActivity(username, 36, ip, {'matrixJunctionId': req.body.id}));
 
     return res.status(200).json({sucess: true, message: 'Update matrix success', rows: result})
   }catch(err){
@@ -296,7 +296,7 @@ const deleteMatrix = async(req: Request, res: Response, next: NextFunction) => {
     const result3 = await worksheet.editWorksheetMatrixStatus(worksheetId, 0, connection);
     await connection.query('COMMIT');
 
-    nonBlockingCall(activity.createActivity(username, 37, ip, `worksheetId: ${worksheetId}`));
+    nonBlockingCall(activity.createActivity(username, 37, ip,  {'worksheetId': worksheetId}));
 
     return res.status(200).json({sucess: true, message: 'Delete matrix success', rows: [result, result2, result3]})
   }catch(err){  

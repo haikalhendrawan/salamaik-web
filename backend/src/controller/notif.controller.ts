@@ -48,7 +48,7 @@ const addNotif = async(req: Request, res: Response, next: NextFunction) => {
     const {title, message, categories} = req.body;
     const result = await notif.addNotif(title, message, categories, userID);
 
-    nonBlockingCall(activity.createActivity(username, 43, ip, title));
+    nonBlockingCall(activity.createActivity(username, 43, ip, {'title': title}));
 
     return res.status(200).json(result)
   }catch(err){
@@ -65,7 +65,7 @@ const assignNotif = async(req: Request, res: Response, next: NextFunction) => {
     const {notifId} = req.body;
     const result = await notif.assignNotif(userId, notifId);
 
-    nonBlockingCall(activity.createActivity(username, 44, ip, notifId));
+    nonBlockingCall(activity.createActivity(username, 44, ip, {'notifId': notifId}));
 
     return res.status(200).json(result)
   }catch(err){
@@ -82,7 +82,7 @@ const updateNotif = async(req: Request, res: Response, next: NextFunction) => {
     const {junctionID} = req.body;
     const result = await notif.updateNotif(userId, junctionID);
 
-    nonBlockingCall(activity.createActivity(username, 45, ip, junctionID));
+    nonBlockingCall(activity.createActivity(username, 45, ip, {'junctionID': junctionID}));
 
     return res.status(200).json(result)
   }catch(err){
@@ -98,7 +98,7 @@ const deleteNotif = async (req: Request, res: Response, next: NextFunction) => {
     const {notifId} = req.body;
     const result = await notif.deleteNotif(notifId);
 
-    nonBlockingCall(activity.createActivity(username, 46, ip, notifId));
+    nonBlockingCall(activity.createActivity(username, 46, ip, {'notifId': notifId}));
 
     return res.status(200).json(result)
   }catch(err){
