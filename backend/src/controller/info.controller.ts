@@ -76,7 +76,8 @@ export {
 interface SimpleUser{
   name: string,
   nip: string,
-  kppn: string
+  kppn: string,
+  picture: string
 }
 
 function getInvolvedUserFromList(users: UserType[], kppn: string, closePeriod: string) {
@@ -88,7 +89,8 @@ function getInvolvedUserFromList(users: UserType[], kppn: string, closePeriod: s
           .map((item) => ({
             nip: item.username,
             name: item.name,
-            kppn: item.kppn
+            kppn: item.kppn,
+            picture: item.picture
           }));
 } 
 
@@ -101,7 +103,8 @@ function getInvolvedUserFromWsJunction(wsActivity: ActivityJoinUserType[], wsJun
   const userFromActivity = wsActivity.filter((item) => uniqueIds.includes(item.detail?.junction_id)).map((item) =>({
     nip: item.nip,
     name: item.user_name,
-    kppn: item.kppn
+    kppn: item.kppn,
+    picture: item.picture
   }));
 
   const uniqueNIP: string[] = [];

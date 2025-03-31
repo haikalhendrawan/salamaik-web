@@ -60,4 +60,10 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - fix findings count bug on findings util
 
+## [1.0.7c] - 2025-03-31
+
+### Changed
+- upscale rate limiter request limit
+- add user avatar information on activity api
+
  
