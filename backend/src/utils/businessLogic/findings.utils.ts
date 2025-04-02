@@ -1,4 +1,4 @@
-import { FindingsType, ComprehensiveFindingsType } from "../../model/findings.model";
+import { FindingsType, ComprehensiveFindingsType, DerivedFindingsType } from "../../model/findings.model";
 import { ChecklistType } from "../../model/checklist.model";
 import { WorksheetType } from "../../model/worksheet.model";
 import { WorksheetJunctionType } from "../../model/worksheetJunction.model";
@@ -6,51 +6,52 @@ import { ChecklistUtil } from "./checklist.utils";
 import { WorksheetUtil } from "./worksheet.utils";
 
 export class FindingsUtil {
-  static isFinal(comprehensiveFindings: ComprehensiveFindingsType[]) {
-    if(!comprehensiveFindings || comprehensiveFindings.length === 0) {
+  static isFinal(derivedFindings: DerivedFindingsType[]) {
+    if(!derivedFindings || derivedFindings.length === 0) {
       return false
     };
 
-    return WorksheetUtil.isPastFollowUpPeriod(comprehensiveFindings[0].close_follow_up)
+    return WorksheetUtil.isPastFollowUpPeriod(derivedFindings[0].worksheet.close_follow_up)
   }
 
-  static getAmountFinal(comprehensiveFindings: ComprehensiveFindingsType[]) {
-    if(!comprehensiveFindings || comprehensiveFindings.length === 0) {
-      return false
+  static getAmountFinal(derivedFindings: DerivedFindingsType[]) {
+    if(!derivedFindings || derivedFindings.length === 0) {
+      return 0
     };
 
-    return comprehensiveFindings
-            .filter((item) => !(ChecklistUtil.isMaxedScore(item.kanwil_score, item.standardisasi)))
+    return derivedFindings
+            .filter((item) => !(ChecklistUtil.isMaxedScore(item.ws_junction.kanwil_score, item.checklist.standardisasi)))
             .length
+  
   }
 
-  static getAmountNonFinal(comprehensiveFindings: ComprehensiveFindingsType[]) {
-    if(!comprehensiveFindings || comprehensiveFindings.length === 0) {
-      return false
+  static getAmountNonFinal(derivedFindings: DerivedFindingsType[]) {
+    if(!derivedFindings || derivedFindings.length === 0) {
+      return 0
     };
 
-    return comprehensiveFindings.length
+    return derivedFindings.length
   }
 
-  static getAmount(comprehensiveFindings: ComprehensiveFindingsType[]) {
-    if(!comprehensiveFindings || comprehensiveFindings.length === 0) {
-      return false
+  static getAmount(derivedFindings: DerivedFindingsType[]) {
+    if(!derivedFindings || derivedFindings.length === 0) {
+      return 0
     };
 
-    if(this.isFinal(comprehensiveFindings)) {
-      return this.getAmountFinal(comprehensiveFindings)
+    if(this.isFinal(derivedFindings)) {
+      return this.getAmountFinal(derivedFindings)
     }
 
-    return this.getAmountNonFinal(comprehensiveFindings)
+    return this.getAmountNonFinal(derivedFindings)
   }
 
-  static getFinal(comprehensiveFindings: ComprehensiveFindingsType[]){
-    if(!comprehensiveFindings || comprehensiveFindings.length === 0) {
-      return false
+  static getFinal(derivedFindings: DerivedFindingsType[]){
+    if(!derivedFindings || derivedFindings.length === 0) {
+      return null
     };
 
-    const finalFindings = comprehensiveFindings
-                          .filter((item) => !(ChecklistUtil.isMaxedScore(item.kanwil_score, item.standardisasi)))
+    const finalFindings = derivedFindings
+                          .filter((item) => !(ChecklistUtil.isMaxedScore(item.ws_junction.kanwil_score, item.checklist.standardisasi)))
 
     return finalFindings
   }

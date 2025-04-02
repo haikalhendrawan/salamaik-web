@@ -25,6 +25,14 @@ export interface SubKomponenType{
   alias: string
 };
 
+export interface SubSubKomponenType{
+  id: number;
+  komponen_id: number;
+  subkomponen_id: number;
+  title: number;
+  detail: string | null;
+}
+
 export interface KomponenWithSubKomponen{
   id: number,
   title: string,

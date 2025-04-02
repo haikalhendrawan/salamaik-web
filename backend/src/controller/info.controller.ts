@@ -30,9 +30,9 @@ const getByKPPN = async(req: Request, res: Response, next: NextFunction) => {
     const openFollowUp = ws?.[0]?.open_follow_up;
     const closeFollowUp = ws?.[0]?.close_follow_up;
 
-    const comprehensiveFindings = await findings.getComprehensiveByKPPNPeriod(kppn, period);
-    const findingsCount = FindingsUtil.getAmount(comprehensiveFindings);
-    const isFinal = FindingsUtil.isFinal(comprehensiveFindings);
+    const derivedFindings = await findings.getDerived(ws[0].id);
+    const findingsCount = FindingsUtil.getAmount(derivedFindings);
+    const isFinal = FindingsUtil.isFinal(derivedFindings);
 
     if(!ws || ws.length === 0) {
       throw new ErrorDetail(404, 'Worksheet not found')

@@ -66,4 +66,14 @@ All notable changes to this project will be documented in this file.
 - upscale rate limiter request limit
 - add user avatar information on activity api
 
+## [1.0.8] - 2025-04-02
+
+### Added
+- new derived findings endpoint
+
+### Changed
+- derived findings type
+- findings util parameter
+
+
  

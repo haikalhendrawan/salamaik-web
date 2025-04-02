@@ -7,14 +7,16 @@ import { WorksheetJunctionType } from "../../model/worksheetJunction.model";
 export class WorksheetUtil{
   static isPastClosePeriod(closePeriod: Date){
     const now = new Date();
-    const pastDue = now > closePeriod;
+    const dueDate = new Date(closePeriod);
+    const pastDue = now > dueDate;
 
     return pastDue
   }
 
   static isPastFollowUpPeriod(closeFollowUp: Date){
     const now = new Date();
-    const pastDue = now > closeFollowUp;
+    const dueDate = new Date(closeFollowUp);
+    const pastDue = now > dueDate;
 
     return pastDue
   }
