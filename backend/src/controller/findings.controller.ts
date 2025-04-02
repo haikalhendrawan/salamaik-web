@@ -12,6 +12,7 @@ import pool from '../config/db';
 import { MatrixWithWsJunctionType } from '../model/matrix.model';
 import nonBlockingCall from '../utils/nonBlockingCall';
 import activity from '../model/activity.model';
+import { FindingsUtil } from '../utils/businessLogic/findings.utils';
 // ---------------------------------------------------------------------------------------------------
 interface FindingsResponseType{
   id: number,
@@ -127,6 +128,41 @@ const getFindingsById = async (req: Request, res: Response, next: NextFunction) 
   }
 }
 
+const getDerived = async (req: Request, res: Response, next: NextFunction) => {
+  try{
+    const ip = req.ip || '';
+
+    const {username, period, kppn}  = req.payload;
+    const allWorksheet = await worksheet.getWorksheetByPeriodAndKPPN(period, kppn); 
+
+    if(allWorksheet.length === 0){
+      throw new ErrorDetail(404, 'Worksheet not found');
+    };
+
+    const worksheetId = allWorksheet[0].id;
+    const derivedFindings = await findings.getDerived(worksheetId);
+    const isFinal = FindingsUtil.isFinal(derivedFindings);
+    const nonFinalFindings = derivedFindings;
+    const nonFinalCount = nonFinalFindings?.length || 0;
+    const finalFindings = FindingsUtil.getFinal(derivedFindings);
+    const finalCount = finalFindings?.length || 0;
+
+    const responseBody = {
+      isFinal,
+      nonFinalFindings,
+      nonFinalCount,
+      finalFindings,
+      finalCount
+    };
+
+    nonBlockingCall(activity.createActivity(username, 22, ip));
+
+    return res.status(200).json({sucess: true, message: 'Get findings success', rows: responseBody})
+  }catch(err){
+    next(err)
+  }
+}
+
 const addFindings = async (req: Request, res: Response, next: NextFunction) => {
   try{
     // const {worksheetId, wsJunctionId, checklistId, matrixId, scoreBefore} = req.body;
@@ -211,7 +247,7 @@ const updateFindingStatus = async(req: Request, res: Response, next: NextFunctio
   }
 }
 
-export {getFindingsByWorksheetId, getAllFindings, getAllFindingsByKPPN, getFindingsById, updateFindingsScore, addFindings, updateFindingsResponse, updateFindingStatus}
+export {getFindingsByWorksheetId, getAllFindings, getAllFindingsByKPPN, getFindingsById, getDerived, updateFindingsScore, addFindings, updateFindingsResponse, updateFindingStatus}
 
 // ---------------------------------------------------------------------------------------------------
 function verifyUpdateFindingStatus(role: number, oldStatus: number, newStatus: number){

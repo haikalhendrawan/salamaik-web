@@ -16,6 +16,7 @@ router.get('/getFindingsByWorksheetId/:kppnId/:period?', authenticate, authorize
 router.get('/getAllFindingsWithChecklistDetail', authenticate, authorize([99, 4, 3, 2, 1]), findingsController.getAllFindings);
 router.get('/getAllFindingsByKPPN/:unit?', authenticate, authorize([99, 4, 3, 2, 1]), alterUnitPayload, findingsController.getAllFindingsByKPPN);
 router.get('/getFindingsById/:findingsId', authenticate, authorize([99, 4, 3, 2, 1]), findingsController.getFindingsById);
+router.get('/getDerivedFindings/:unit?/:period?', authenticate, authorize([99, 4, 3, 2, 1]), alterUnitPayload, alterPeriodPayload, findingsController.getDerived);
 router.post('/createFindings', authenticate, authorize([99, 4]), findingsController.addFindings);
 router.post('/updateFindingsScore', authenticate, authorize([99, 4, 2]), findingsController.updateFindingsScore);
 router.post('/updateFindingsResponse', authenticate, authorize([99, 4, 2]), findingsController.updateFindingsResponse);

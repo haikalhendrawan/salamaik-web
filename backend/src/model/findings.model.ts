@@ -9,6 +9,9 @@ import { PoolClient } from "pg";
 import { WorksheetType } from "./worksheet.model";
 import { ChecklistType } from "./checklist.model";
 import { WorksheetJunctionType } from "./worksheetJunction.model";
+import { MatrixType } from "./matrix.model";
+import { KomponenType, SubKomponenType } from "./komponen.model";
+import { OpsiType } from "./worksheetJunction.model";
 /**
  *
  *
@@ -31,6 +34,28 @@ export interface FindingsType{
 };
 
 export type ComprehensiveFindingsType = (FindingsType & WorksheetJunctionType & ChecklistType & WorksheetType);
+
+export interface DerivedFindingsType {
+  id: number,
+  ws_junction_id: number,
+  worksheet_id: string,
+  checklist_id: number,
+  matrix_id: number, 
+  kppn_reponse: string,
+  kanwil_response: string,
+  score_before: number,
+  score_after: number,
+  last_update: string,
+  status: number,
+  updated_by: string,
+  worksheet: WorksheetType,
+  ws_junction: WorksheetJunctionType,
+  checklist: ChecklistType,
+  matrix: MatrixType,
+  komponen: KomponenType,
+  subkomponen: SubKomponenType,
+  opsi: OpsiType[] | null
+}
 
 interface FindingsBodyType{
   worksheetId: string,
@@ -162,6 +187,48 @@ class Findings{
         WHERE worksheet_junction.kppn_id = $1 AND worksheet_junction.period = $2
       `;
       const result = await pool.query(q, [kppnId, period]);
+      return result.rows
+    }catch(err){
+      throw err
+    }
+  }
+
+  // derived findings = findings + ws junction + checklist + matrix + komponen + subkomponen + opsi in subderived format
+  async getDerived(worksheetId: string, poolTrx?: PoolClient): Promise<DerivedFindingsType []> {
+    const poolInstance = poolTrx??pool;
+      
+    try{
+      const q = ` SELECT 
+                    findings_data.*,
+                    to_jsonb(worksheet_ref) AS worksheet,
+                    to_jsonb(worksheet_junction) AS ws_junction, 
+                    to_jsonb(checklist_ref) AS checklist,
+                    to_jsonb(matrix_data) AS matrix,
+                    to_jsonb(komponen_ref) AS komponen,
+                    to_jsonb(subkomponen_ref) AS subkomponen,
+                    (
+                      SELECT json_agg(opsi_ref.* ORDER BY opsi_ref.id ASC)
+                      FROM opsi_ref
+                      WHERE opsi_ref.checklist_id = findings_data.checklist_id
+                    ) AS opsi
+                  FROM findings_data 
+                  LEFT JOIN worksheet_ref
+                  ON findings_data.worksheet_id = worksheet_ref.id
+                  LEFT JOIN worksheet_junction
+                  ON findings_data.ws_junction_id = worksheet_junction.junction_id
+                  LEFT JOIN checklist_ref
+                  ON findings_data.checklist_id = checklist_ref.id
+                  LEFT JOIN matrix_data
+                  ON findings_data.matrix_id = matrix_data.id
+                  LEFT JOIN komponen_ref
+                  ON komponen_ref.id = checklist_ref.komponen_id
+                  LEFT JOIN subkomponen_ref
+                  ON subkomponen_ref.id = checklist_ref.subkomponen_id
+                  WHERE findings_data.worksheet_id = $1
+                  GROUP BY findings_data.id, worksheet_ref.id, worksheet_junction.junction_id, checklist_ref.id, matrix_data.id, subkomponen_ref.id, komponen_ref.id
+                  ORDER BY findings_data.id
+                  `;
+      const result = await poolInstance.query(q, [worksheetId]);
       return result.rows
     }catch(err){
       throw err
