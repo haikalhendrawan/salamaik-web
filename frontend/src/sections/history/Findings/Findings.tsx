@@ -11,6 +11,7 @@ import Iconify from '../../../components/iconify';
 import useSnackbar from '../../../hooks/display/useSnackbar';
 import ExcelPrintout from './components/ExcelPrintout';
 import AmountPieChart from './components/AmountPieChart';
+import { DerivedFindingsType } from '../../../types/findings.type';
 // -----------------------------------------------------------------------
 interface FindingsWithChecklist{
   id: number,
@@ -50,6 +51,14 @@ const StyledButton = styled(Button)(({  }) => ({
   paddingLeft: 0,
   borderRadius: '8px'
 })) as typeof Button; 
+
+interface APIResponseType{
+  isFinal: boolean,
+  nonFinalFindings : DerivedFindingsType[],
+  nonFinalCount: number,
+  finalFindings: DerivedFindingsType[],
+  finalCount: number
+}
 // -----------------------------------------------------------------------
 
 export default function Findings({selectedUnit, selectedPeriod}:FindingsProps) {
@@ -67,7 +76,19 @@ export default function Findings({selectedUnit, selectedPeriod}:FindingsProps) {
 
   const komponenRefStringArray = komponenRef?.map((item) => item.alias) || [];
 
-  const [findingsData, setFindingsData] = useState<FindingsWithChecklist[]>([]);
+  const [isFinal, setIsFinal] = useState<boolean | null>(null);
+
+  const [derivedFindings, setDerivedFindings] = useState<DerivedFindingsType[] | null>(null);
+
+  const [currentPeriodAmount, setCurrentPeriodAmount] = useState<number | null>(null);
+
+  const [nonFinalDerivedFindings, setNonFinalDerivedFindings] = useState<DerivedFindingsType[] | null>(null);
+
+  const [derivedFindingsYMin1, setDerivedFindingsYMin1] = useState<DerivedFindingsType[] | null>(null);
+
+  const [yMin1PeriodAmount, setYMin1PeriodAmount] = useState<number | null>(null);
+
+  const last2PeriodFindings = derivedFindings?.concat(derivedFindingsYMin1 || []) || [];
 
   const last2PeriodList =  periodRef?.list.filter((item) => item.id === selectedPeriod || item.id === selectedPeriod-1)|| [];
 
@@ -75,30 +96,62 @@ export default function Findings({selectedUnit, selectedPeriod}:FindingsProps) {
 
   const periodString = periodRef?.list.filter((item) => item.id === selectedPeriod)?.[0]?.name || '';
 
-  const currentPeriodFindings = findingsData?.filter((f) => f.period === selectedPeriod) || [];
-
   const rekapFinding = komponenRef?.map((item) => ({
     komponen: item.title,
-    totalFindingKomponen: currentPeriodFindings?.filter((f) => f.komponen_id === item.id)?.length || 0,
+    totalFindingKomponen: derivedFindings?.filter((f) => f.checklist.komponen_id === item.id)?.length || 0,
     subkomponen: subKomponenRef?.filter((sub) => sub.komponen_id === item.id)?.map((sub) => ({
       subTitle : sub.title,
-      subAmount: currentPeriodFindings?.filter((f) => f.subkomponen_id === sub.id)?.length || 0
+      subAmount: derivedFindings?.filter((f) => f.checklist.subkomponen_id === sub.id)?.length || 0
     }))
   }));
 
   const getFindings = async() => {
     try{
-      const response3 = await axiosJWT.get('/getAllFindingsByKPPN/'+ selectedUnit);
-      console.log(response3.data.rows);
-      setFindingsData(response3.data.rows);
+      const response = await axiosJWT.get(`/getDerivedFindings/${selectedUnit}/${selectedPeriod}`);
+      const data: APIResponseType = response.data.rows;
+
+      setNonFinalDerivedFindings(data.nonFinalFindings)
+      if(data.isFinal){
+        setCurrentPeriodAmount(data.finalCount);
+        setDerivedFindings(data.finalFindings);
+      }else{
+        setCurrentPeriodAmount(data.nonFinalCount);
+        setDerivedFindings(data.nonFinalFindings);
+      }
+
     }catch(err:any){
+      setDerivedFindings(null);
+      openSnackbar(err.response.data.message, 'error');
+      setIsFinal(null);
+      setNonFinalDerivedFindings(null);
+      setCurrentPeriodAmount(null);
+    }
+  };
+
+  const getFindingsYMin1 = async() => {
+    try{
+      const response = await axiosJWT.get(`/getDerivedFindings/${selectedUnit}/${selectedPeriod-1}`);
+      const data: APIResponseType = response.data.rows;
+
+      if(data.isFinal){
+        setYMin1PeriodAmount(data.finalCount);
+        setDerivedFindingsYMin1(data.finalFindings);
+        setIsFinal(true);
+      }else{
+        setYMin1PeriodAmount(data.nonFinalCount);
+        setDerivedFindingsYMin1(data.nonFinalFindings);
+        setIsFinal(false);
+      }
+
+    }catch(err:any){
+      setDerivedFindingsYMin1(null);
       openSnackbar(err.response.data.message, 'error');
     }
   };
 
-  const last2PeriodFindings = last2PeriodList?.map((item) => {
+  const last2PeriodChartData = last2PeriodList?.map((item) => {
     const findingsPerKomponen = komponenRef?.map((k) => {
-      return findingsData?.filter((f) => (f.komponen_id === k.id) && (f.period === item.id))?.length || 0;
+      return last2PeriodFindings?.filter((f) => (f.checklist.komponen_id === k.id) && (f.worksheet.period === item.id))?.length || 0;
     });
 
     const totalFinding = findingsPerKomponen?.reduce((a, b) => a + b, 0);
@@ -115,30 +168,39 @@ export default function Findings({selectedUnit, selectedPeriod}:FindingsProps) {
   
   useEffect(() => {
     getFindings();
+    getFindingsYMin1();
   }, [selectedPeriod, selectedUnit]);
 
   return (
     showDetail
-      ? <FindingsDetail hideDetail={() => setSearchParams((prev) => {
-        prev.set("showDetail", "0")
-        return prev
-      })} periodId={selectedPeriod} kppnId={selectedUnit}/> 
+      ? <FindingsDetail 
+          isFinal={isFinal}
+          nonFinalFindings={nonFinalDerivedFindings}
+          finalFindings={derivedFindings}
+          hideDetail={() => setSearchParams((prev) => {
+            prev.set("showDetail", "0")
+            return prev
+          })} 
+          periodId={selectedPeriod} 
+          kppnId={selectedUnit}
+        /> 
       :
         <Card>
           <CardContent>
             <Grid container spacing={4}>
               <Grid item xs={12} md={12}>
                 <Stack direction={'row'} justifyContent={'space-between'}>
-                  <Stack>
+                  <div></div>
+                  <Stack alignContent={'center'} textAlign={'center'} paddingLeft={4}>
                     <Typography variant='h6'>{`Rekapitulasi Permasalahan`} </Typography>
                     <Typography variant='body3'>{`${unitString}, Periode ${periodString}`} </Typography>
                   </Stack>
                   <ExcelPrintout kppnId={selectedUnit} period={selectedPeriod} />
                 </Stack>
 
-                <Stack marginTop={4} marginBottom={4}>
+                <Stack marginTop={6} marginBottom={4}>
                   <Stack direction={'row'} justifyContent={'center'} textAlign={'center'} marginBottom={2}>
-                    <Typography variant="body2">{`Total Permasalahan: ${currentPeriodFindings?.length}` }</Typography>
+                    <Typography variant="body2">{`Total Permasalahan: ${currentPeriodAmount || '-'} ${isFinal !== null ? (isFinal ? '(Final)' : '(Non-Final)') : ''}` }</Typography>
                   </Stack>
                   {
                     rekapFinding?.map((item, index) => (
@@ -211,23 +273,23 @@ export default function Findings({selectedUnit, selectedPeriod}:FindingsProps) {
                             title= "Tren Permasalahan"
                             subheader = {"2 periode terakhir"}
                             chartLabels={komponenRefStringArray}
-                            chartData= {last2PeriodFindings}
+                            chartData= {last2PeriodChartData}
                           />
                         </Grid>
                         <Grid item xs={6}>
                           <AmountPieChart
                             title= "Komposisi Permasalahan"
-                            subheader = {`Periode ${last2PeriodFindings?.[0]?.periodName}` || ""}
+                            subheader = {`Periode ${last2PeriodChartData?.[0]?.periodName}` || ""}
                             chartLabels={komponenRefStringArray}
-                            chartData= {last2PeriodFindings?.[0]?.data || []}
+                            chartData= {last2PeriodChartData?.[0]?.data || []}
                           />
                         </Grid>
                         <Grid item xs={6}>
                           <AmountPieChart
                             title= "Komposisi Permasalahan"
-                            subheader = {`Periode ${last2PeriodFindings?.[1]?.periodName}` || ""}
+                            subheader = {`Periode ${last2PeriodChartData?.[1]?.periodName}` || ""}
                             chartLabels={komponenRefStringArray}
-                            chartData= {last2PeriodFindings?.[1]?.data || []}
+                            chartData= {last2PeriodChartData?.[1]?.data || []}
                           />
                         </Grid>
                       </Grid>

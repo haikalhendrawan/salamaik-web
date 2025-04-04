@@ -68,7 +68,7 @@ export default function HistorySection() {
       <Container maxWidth='xl'>
         <Stack direction='row' spacing={1} sx={{mb: 5}} maxWidth={'100%'}>
           <Typography variant="h4">
-            {`Riwayat Pembinaan`}
+            {`Data Pembinaan`}
           </Typography>
         </Stack>
         

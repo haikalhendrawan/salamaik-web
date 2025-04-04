@@ -19,7 +19,7 @@ interface ChecklistProps {
 export default function Checklist({selectedUnit, selectedPeriod}: ChecklistProps) {
   const axiosJWT = useAxiosJWT();
 
-  const { periodRef } = useDictionary();
+  const { periodRef, kppnRef } = useDictionary();
 
   const [compare, setCompare] = useState<boolean>(false);
 
@@ -44,6 +44,10 @@ export default function Checklist({selectedUnit, selectedPeriod}: ChecklistProps
   const selectedWsJunctionAlt = wsJunctionAlt?.find((item: WsJunctionType) => item.id === selectedJunctionAltId);
 
   const isWsJunctionAltSelected = selectedJunctionAltId>0;
+
+  const unitString = kppnRef?.list.filter((item) => item.id === selectedUnit)?.[0]?.alias || '';
+
+  const periodString = periodRef?.list.filter((item) => item.id === selectedPeriod)?.[0]?.name || '';
 
   const handleChecklistChange = (e: SelectChangeEvent<unknown>) => {
     setSelectedJunctionId(Number(e.target.value));
@@ -112,7 +116,10 @@ export default function Checklist({selectedUnit, selectedPeriod}: ChecklistProps
       <CardContent>
         <Grid container spacing={4}>
           <Grid item xs={12} md={12} textAlign={'center'}>
-            <Typography variant="h6">Data Checklist Kertas Kerja</Typography>
+            <Stack alignContent={'center'} textAlign={'center'}>
+              <Typography variant='h6'>{`Data Checklist Kertas Kerja`} </Typography>
+              <Typography variant='body3'>{`${unitString}, Periode ${periodString}`} </Typography>
+            </Stack>
           </Grid>
           <Grid item xs={12} md={12} textAlign={'center'}>
             <Stack direction={'row'} justifyContent={'start'} spacing={2} marginBottom={2} alignItems={'center'}>

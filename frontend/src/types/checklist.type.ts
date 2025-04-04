@@ -1,0 +1,18 @@
+export interface ChecklistType{
+  id: number,
+  title: string | null, 
+  header: string | null,
+  komponen_id: number,
+  subkomponen_id: number,
+  subsubkomponen_id: number,
+  standardisasi: 0 | 1, 
+  matrix_title: string | null, 
+  file1: string | null,
+  file2: string | null,
+  instruksi: string | null,
+  contoh_file: string | null,
+  peraturan: string | null,
+  uic: string | null,
+  checklist_id: number | null,
+  standardisasi_id: number | null,
+};

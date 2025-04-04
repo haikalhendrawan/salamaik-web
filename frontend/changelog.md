@@ -75,4 +75,14 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - fix password regex to allow special character
 
+## [1.1.12] - 2025-04-04
+
+### Added
+- history info module
+
+### Fixed
+- history module interface
+- history finding module data structure
+- refactor types
+
  

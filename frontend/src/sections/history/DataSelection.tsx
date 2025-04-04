@@ -25,7 +25,7 @@ export default function DataSelection({selectedData, handleChange}: DataSelectio
           <Grid item xs={12} md={12}>
             <Stack direction='column'>
               <span style={{display: 'flex', flexDirection: 'row', gap: 4}}>
-                <Typography variant="subtitle2">Data</Typography>
+                <Typography variant="subtitle2">Kategori</Typography>
                 <Iconify icon="solar:signpost-2-bold-duotone" color={theme.palette.grey[500]} />
               </span>
 
