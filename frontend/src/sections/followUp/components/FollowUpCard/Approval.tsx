@@ -16,9 +16,9 @@ import { FindingsResponseType } from '../../types';
 export default function Approval({findingResponse, getData, isDisabled}: {findingResponse: FindingsResponseType | null, getData: () => Promise<void>, isDisabled: boolean}) {
   const {auth} = useAuth();
 
-  const isKanwilnAdmin = auth?.kppn ==='03010' && (auth?.role === 4 || auth?.role === 99);
+  const isKanwilnAdmin = auth?.kppn?.length === 5 && (auth?.role === 4 || auth?.role === 99);
 
-  const isKPPNAdmin = (auth?.kppn!=='03010' && (auth?.role === 2));
+  const isKPPNAdmin = (auth?.kppn?.length !==5 && (auth?.role === 2));
 
   const axiosJWT = useAxiosJWT();
 

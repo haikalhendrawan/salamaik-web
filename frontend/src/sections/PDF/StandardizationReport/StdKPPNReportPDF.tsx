@@ -37,7 +37,7 @@ export default function StdKPPNReportPDF({period, periodRef, standardization, un
   const PDF_TITLE_DATE = new Date().toLocaleDateString('id-ID', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
   }) || '';
-  const requireTTE = kppn==='03010'?true:false;
+  const requireTTE = kppn?.length === 5?true:false;
 
   const cluster1 = useMemo(() => standardization?.filter((item) => item.cluster === 1), [standardization]);
   const cluster2 = useMemo(() => standardization?.filter((item) => item.cluster === 2), [standardization]);

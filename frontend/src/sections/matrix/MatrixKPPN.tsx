@@ -38,7 +38,7 @@ export default function MatrixKPPN() {
   
   const {auth} = useAuth();
 
-  const isKanwil = auth?.kppn === '03010';
+  const isKanwil = auth?.kppn?.length === 5;
 
   const payloadKPPN = auth?.kppn || '';
 

@@ -46,7 +46,7 @@ export default function Catatan({findingResponse, getData, isDisabled}: CatatanP
   const axiosJWT = useAxiosJWT();
 
   const isKanwil = useMemo(() =>{
-    return auth?.kppn==='03010';
+    return auth?.kppn?.length===5;
   }, [auth]);
 
   const handleEditKanwilNote = async(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

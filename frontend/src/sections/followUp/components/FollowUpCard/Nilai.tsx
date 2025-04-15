@@ -89,7 +89,7 @@ export default function Nilai({findingResponse, getData, isDisabled}: NilaiProps
   const isStandardisasi = findingResponse?.matrixDetail[0]?.standardisasi || 0;
 
   const isKanwil = useMemo(() =>{
-    return auth?.kppn==='03010';
+    return auth?.kppn?.length===5;
   }, [auth]);
 
   const opsiSelection = useMemo(() => matrixDetail?.opsi?.map((item, index) => (
