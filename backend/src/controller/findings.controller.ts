@@ -10,8 +10,6 @@ import worksheet, { WorksheetType } from '../model/worksheet.model';
 import ErrorDetail from '../model/error.model';
 import pool from '../config/db';
 import { MatrixWithWsJunctionType } from '../model/matrix.model';
-import nonBlockingCall from '../utils/nonBlockingCall';
-import activity from '../model/activity.model';
 import { FindingsUtil } from '../utils/businessLogic/findings.utils';
 // ---------------------------------------------------------------------------------------------------
 interface FindingsResponseType{
@@ -32,10 +30,8 @@ interface FindingsResponseType{
 // ---------------------------------------------------------------------------------------------------
 const getFindingsByWorksheetId = async (req: Request, res: Response, next: NextFunction) => {
   try{
-    const ip = req.ip || '';
-
     const {kppnId} = req.params;
-    const {username, period}  = req.payload;
+    const {period}  = req.payload;
     const allWorksheet = await worksheet.getWorksheetByPeriodAndKPPN(period, kppnId); 
 
     if(allWorksheet.length === 0){
@@ -53,8 +49,6 @@ const getFindingsByWorksheetId = async (req: Request, res: Response, next: NextF
       }
     });
 
-    nonBlockingCall(activity.createActivity(username, 22, ip));
-
     return res.status(200).json({sucess: true, message: 'Get findings success', rows: responseBody})
   }catch(err){
     next(err)
@@ -63,12 +57,7 @@ const getFindingsByWorksheetId = async (req: Request, res: Response, next: NextF
 
 const getAllFindings = async(req: Request, res: Response, next: NextFunction) => {
   try{
-    const username = req.payload.username;
-    const ip = req.ip || '';
-
     const allFindings = await findings.getAllFindingsWithChecklistDetail();
-
-    nonBlockingCall(activity.createActivity(username, 23, ip));
 
     return res.status(200).json({sucess: true, message: 'Get all findings success', rows: allFindings})
   }catch(err){
@@ -78,12 +67,8 @@ const getAllFindings = async(req: Request, res: Response, next: NextFunction) =>
 
 const getAllFindingsByKPPN = async(req: Request, res: Response, next: NextFunction) => {
   try{
-    const ip = req.ip || '';
-
-    const {username, kppn} = req.payload;
+    const {kppn} = req.payload;
     const allFindings = await findings.getAllFindingsWithChecklistDetailByKPPN(kppn);
-
-    nonBlockingCall(activity.createActivity(username, 24, ip));
 
     return res.status(200).json({sucess: true, message: 'Get all findings success', rows: allFindings})
   }catch(err){
@@ -93,10 +78,8 @@ const getAllFindingsByKPPN = async(req: Request, res: Response, next: NextFuncti
 
 const getFindingsById = async (req: Request, res: Response, next: NextFunction) => {
   try{
-    const ip = req.ip || '';
-
     const {findingsId} = req.params;
-    const {username, role, kppn}  = req.payload;
+    const {role, kppn}  = req.payload;
     const isKanwil = [3, 4, 99].includes(role);
     const allFindings = await findings.getFindingsById(Number(findingsId));
 
@@ -120,8 +103,6 @@ const getFindingsById = async (req: Request, res: Response, next: NextFunction) 
       }
     });
 
-    nonBlockingCall(activity.createActivity(username, 22, ip));
-
     return res.status(200).json({sucess: true, message: 'Get findings success', rows: responseBody})
   }catch(err){
     next(err)
@@ -130,9 +111,7 @@ const getFindingsById = async (req: Request, res: Response, next: NextFunction) 
 
 const getDerived = async (req: Request, res: Response, next: NextFunction) => {
   try{
-    const ip = req.ip || '';
-
-    const {username, period, kppn}  = req.payload;
+    const {period, kppn}  = req.payload;
     const allWorksheet = await worksheet.getWorksheetByPeriodAndKPPN(period, kppn); 
 
     if(allWorksheet.length === 0){
@@ -155,8 +134,6 @@ const getDerived = async (req: Request, res: Response, next: NextFunction) => {
       finalCount
     };
 
-    nonBlockingCall(activity.createActivity(username, 22, ip));
-
     return res.status(200).json({sucess: true, message: 'Get findings success', rows: responseBody})
   }catch(err){
     next(err)
@@ -166,12 +143,8 @@ const getDerived = async (req: Request, res: Response, next: NextFunction) => {
 const addFindings = async (req: Request, res: Response, next: NextFunction) => {
   try{
     // const {worksheetId, wsJunctionId, checklistId, matrixId, scoreBefore} = req.body;
-    const username = req.payload.username;
-    const ip = req.ip || '';
 
     const result = await findings.createFindings(req.body);
-
-    nonBlockingCall(activity.createActivity(username, 25, ip));
 
     return res.status(200).json({sucess: true, message: 'Add findings success', rows: result})
   }catch(err){
@@ -181,13 +154,8 @@ const addFindings = async (req: Request, res: Response, next: NextFunction) => {
 
 const updateFindingsScore = async (req: Request, res: Response, next: NextFunction) => {
   try{
-    const username = req.payload.username;
-    const ip = req.ip || '';
-
     const {id, scoreBefore, scoreAfter, userName} = req.body;
     const result = await findings.updateFindingsScore(id, scoreBefore, scoreAfter, userName);
-
-    nonBlockingCall(activity.createActivity(username, 26, ip, {'id': id, 'score': scoreAfter}));
 
     return res.status(200).json({sucess: true, message: 'Score has been updated', rows: result})
   }catch(err){
@@ -198,16 +166,11 @@ const updateFindingsScore = async (req: Request, res: Response, next: NextFuncti
 const updateFindingsResponse = async (req: Request, res: Response, next: NextFunction) => {
   const connection = await pool.connect();
   try{
-    const username = req.payload.username;
-    const ip = req.ip || '';
-
     await connection.query('BEGIN');
     const {id, kppnResponse, kanwilResponse, userName, matrixId} = req.body;
     const result = await findings.updateFindingsResponse(id, kppnResponse, kanwilResponse, userName);
     const matrixResult = await matrix.updateMatrixTindakLanjut(matrixId, kanwilResponse, connection);
     await connection.query('COMMIT');
-
-    nonBlockingCall(activity.createActivity(username, 27, ip, {'id': id, 'responseKanwil': kanwilResponse, 'responseKppn': kppnResponse}));
 
     return res.status(200).json({sucess: true, message: 'Response has been updated  ', rows: {result, matrixResult}})
   }catch(err){
@@ -220,9 +183,7 @@ const updateFindingsResponse = async (req: Request, res: Response, next: NextFun
 
 const updateFindingStatus = async(req: Request, res: Response, next: NextFunction) => {
   try{
-    const ip = req.ip || '';
-
-    const {username, role} = req.payload;
+    const {role} = req.payload;
     const {id, status, userName} = req.body;
 
     const currentFinding = await findings.getFindingsById(id);
@@ -238,8 +199,6 @@ const updateFindingStatus = async(req: Request, res: Response, next: NextFunctio
     };
 
     const result = await findings.updateFindingStatus(id, status, userName);
-
-    nonBlockingCall(activity.createActivity(username, 28, ip, {'id': id, 'status': status}));
 
     return res.status(200).json({sucess: true, message: 'Status has been updated', rows: result})
   }catch(err){

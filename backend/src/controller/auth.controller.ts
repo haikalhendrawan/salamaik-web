@@ -12,8 +12,6 @@ import user from '../model/user.model';
 import transporter from '../config/mailer';
 import "dotenv/config";
 import { passwordSchema } from '../utils/schema';
-import nonBlockingCall from '../utils/nonBlockingCall';
-import activity from '../model/activity.model';
 import { otpEmailHTML } from '../utils/emailHTML';
 // -------------------------------------------------
 type JwtPayloadType = {
@@ -32,10 +30,7 @@ type JwtPayloadType = {
 const login = async (req: Request, res: Response, next: NextFunction) => {
   try{
     const{ username, password } = req.body;
-    const ip = req.ip || '';
     const authInfo = await auth.login(username, password); // return object dengan informasi user
-
-    nonBlockingCall(activity.createActivity(username, 1, ip));
 
     const accessToken = jwt.sign(authInfo, process.env.JWT_KEY, {expiresIn:60*60*3});
     const refreshToken = jwt.sign(authInfo, process.env.JWT_REFRESH_KEY, {expiresIn:60*60*23});
@@ -78,8 +73,6 @@ const refresh = async (req: Request, res: Response, next: NextFunction) => {
 const updateToken = async (req: Request, res: Response, next: NextFunction) => {
   try{
     const userID = req.payload.id;
-    const username = req.payload.username;
-    const ip = req.ip || '';
 
     if(!userID){
       throw new ErrorDetail(401,'Invalid jwt payload')
@@ -100,7 +93,6 @@ const updateToken = async (req: Request, res: Response, next: NextFunction) => {
     const newAccessToken = jwt.sign(authInfo, process.env.JWT_KEY, {expiresIn:60*60*3});
     const newRefreshToken = jwt.sign(authInfo, process.env.JWT_REFRESH_KEY, {expiresIn:60*60*24});
 
-    nonBlockingCall(activity.createActivity(username, 10, ip));
 
     res.setHeader('Set-Cookie', `refreshToken=${newRefreshToken}; HttpOnly`);
     return res.status(200).json({sucess: true, message: 'token payload has been updated', authInfo: authInfo, accessToken: newAccessToken})
@@ -111,14 +103,11 @@ const updateToken = async (req: Request, res: Response, next: NextFunction) => {
 
 const logout = async (req: Request, res: Response, next: NextFunction) => {
   const userID = req.payload.id;
-  const username = req.payload.username;
-  const ip = req.ip || '';
 
   if(!userID){
     throw new ErrorDetail(401,'You are not logged in')
   };
 
-  nonBlockingCall(activity.createActivity(username, 2, ip));
   res.clearCookie('refreshToken', {httpOnly:true });
   return res.status(200).json({success: true, message:`User logged out`})
 }
@@ -127,7 +116,6 @@ const getForgotPasswordToken = async (req: Request, res: Response, next: NextFun
   try{
     const {username, email} = req.body;
     const userEmailIsValid = await auth.verifyUserEmail(username, email);
-    const ip = req.ip || '';
 
     if(!userEmailIsValid){
       throw new ErrorDetail(404,'Invalid username or email')
@@ -143,7 +131,6 @@ const getForgotPasswordToken = async (req: Request, res: Response, next: NextFun
       html:otpEmailHTML(email, otp)
     });
 
-    nonBlockingCall(activity.createActivity(username, 11, ip));
 
     return res.status(200).json({
       success: true, 
@@ -160,7 +147,6 @@ const getForgotPasswordToken = async (req: Request, res: Response, next: NextFun
 const forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { nip, password, confirmPassword, token, otp } = req.body;
-    const ip = req.ip || '';
 
     if(password !== confirmPassword){
       return next(new ErrorDetail(400,'Password does not match'))
@@ -178,7 +164,6 @@ const forgotPassword = async (req: Request, res: Response, next: NextFunction) =
 
     const response = await auth.updatePassword(nip, password);
 
-    nonBlockingCall(activity.createActivity(nip, 12, ip));
     return res.status(200).json({sucess: true, message: 'Password has been updated', detail: response});
   } catch (err) {
     next(err);
@@ -190,7 +175,6 @@ const getRegisterToken = async (req: Request, res: Response, next: NextFunction)
     const {username, email} = req.body;
     const emailIsValid = await user.checkEmail(email);
     const nipIsValid = await user.checkUsername(username);
-    const ip = req.ip || '';
 
     if(!emailIsValid){
       return next( new ErrorDetail(400,'Email has been taken'))
@@ -214,8 +198,6 @@ const getRegisterToken = async (req: Request, res: Response, next: NextFunction)
       html:otpEmailHTML(email, otp)
     });
 
-    nonBlockingCall(activity.createActivity(username, 13, ip));
-
     return res.status(200).json({
       success: true, 
       message:`Otp has been sent to ${email}`, 
@@ -230,14 +212,11 @@ const getRegisterToken = async (req: Request, res: Response, next: NextFunction)
 const verifyRegister = async (req: Request, res: Response, next: NextFunction) => {
   try{
     const { nip, token, otp } = req.body;
-    const ip = req.ip || '';
 
     const tokenIsValid = await otpToken.verifyToken(nip, token, otp);
     if(!tokenIsValid){
       return next(new ErrorDetail(400,'Token is not valid, please generate new OTP'))
     };
-
-    nonBlockingCall(activity.createActivity(nip, 14, ip));
 
     return res.status(200).json({sucess: true, message: 'Token verified'});
   }catch(err){

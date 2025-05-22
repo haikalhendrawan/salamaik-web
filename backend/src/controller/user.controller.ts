@@ -10,14 +10,9 @@ import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from 'uuid';
 import { passwordSchema } from '../utils/schema';
 import period from '../model/period.model';
-import nonBlockingCall from '../utils/nonBlockingCall';
-import activity from '../model/activity.model';
 // ------------------------------------------------------
 const getUser = async (req: Request, res: Response, next: NextFunction) => {
   try{
-    const username = req.payload.username;
-    const ip = req.ip || '';
-
     const role = req.payload.role;
     const kppn = req.payload.kppn;
     const isAdminKanwil = role === 4 || role === 99; // filter role user biasa di middleware
@@ -29,8 +24,6 @@ const getUser = async (req: Request, res: Response, next: NextFunction) => {
                       : await user.getAllUserWtAdmin()
                     :await user.getUserKPPN(kppn);
 
-    nonBlockingCall(activity.createActivity(username, 64, ip));
-
     return res.status(200).json({sucess: true, message: 'Get user success', rows: result})
   }catch(err){
     next(err)
@@ -39,8 +32,6 @@ const getUser = async (req: Request, res: Response, next: NextFunction) => {
 
 const addUser = async (req: Request, res: Response, next: NextFunction) => {
   try{
-    const ip = req.ip || '';
-
     const usernameIsUnique = await user.checkUsername(req.body.username);
     if(!usernameIsUnique) {
       return next(new ErrorDetail(400, 'NIP has been taken'))
@@ -80,8 +71,6 @@ const addUser = async (req: Request, res: Response, next: NextFunction) => {
 
     const result = await user.addUser(userBody);
 
-    nonBlockingCall(activity.createActivity(username, 65, ip));
-
     return res.status(200).json({sucess: true, message: 'User has been added', detail: result})
   }catch(err){
     next(err)
@@ -90,9 +79,6 @@ const addUser = async (req: Request, res: Response, next: NextFunction) => {
 
 const editUser = async (req: Request, res: Response, next: NextFunction) => {
   try{
-    const nip = req.payload.username;
-    const ip = req.ip || '';
-
     const { id, username, name, email, kppn, gender} = req.body;
     if(!id || !username  || !name || !kppn || !email){
       return next(new ErrorDetail(400, 'Required field contain null values'))
@@ -112,8 +98,6 @@ const editUser = async (req: Request, res: Response, next: NextFunction) => {
     
     const result = await user.editUser(req.body);
 
-    nonBlockingCall(activity.createActivity(nip, 66, ip, {'username': username}));
-
     return res.status(200).json({sucess: true, message: 'User has been edited', detail: result})
   }catch(err){
     next(err)
@@ -122,10 +106,8 @@ const editUser = async (req: Request, res: Response, next: NextFunction) => {
 
 const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
   try{
-    const ip = req.ip || '';
-
     const targetId = req.body.id;
-    const {kppn, role, username} = req.payload;
+    const {kppn, role} = req.payload;
     const targetDetail = await user.getUserById(targetId);
     const targetKPPN = targetDetail.kppn;
     const isAllowed = (targetKPPN === kppn) || (role===99 || role===4);
@@ -136,8 +118,6 @@ const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
 
     const result = await user.deleteUser(targetId);
 
-    nonBlockingCall(activity.createActivity(username, 67, ip, {'username': username}));
-
     return res.status(200).json({sucess: true, message: 'Delete user success', detail: result})
   }catch(err){
     next(err)
@@ -146,9 +126,7 @@ const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
 
 const updateStatus = async (req: Request, res: Response, next: NextFunction) => {
   try{
-    const ip = req.ip || '';
-
-    const {kppn, role, username} = req.payload;
+    const {kppn, role} = req.payload;
     const targetId = req.body.id;
     const targetDetail = await user.getUserById(targetId);
     const targetKPPN = targetDetail.kppn;
@@ -160,8 +138,6 @@ const updateStatus = async (req: Request, res: Response, next: NextFunction) => 
 
     const result = await user.updateStatus(targetId);
 
-    nonBlockingCall(activity.createActivity(username, 68, ip, {'targetId': targetId}));
-
     return res.status(200).json({sucess: true, message: 'User has been activated', detail: result})
   }catch(err){
     next(err)
@@ -170,9 +146,7 @@ const updateStatus = async (req: Request, res: Response, next: NextFunction) => 
 
 const demoteStatus = async (req: Request, res: Response, next: NextFunction) => {
   try{
-    const ip = req.ip || '';
-
-    const {kppn, role, username} = req.payload;
+    const {kppn, role} = req.payload;
     const targetId = req.body.id;
     const targetDetail = await user.getUserById(targetId);
     const targetKPPN = targetDetail.kppn;
@@ -184,8 +158,6 @@ const demoteStatus = async (req: Request, res: Response, next: NextFunction) => 
 
     const result = await user.demoteStatus(targetId);
 
-    nonBlockingCall(activity.createActivity(username, 69, ip, {'targetId': targetId}));
-
     return res.status(200).json({sucess: true, message: 'User has been deactivated', detail: result})
   }catch(err){
     next(err)
@@ -194,9 +166,6 @@ const demoteStatus = async (req: Request, res: Response, next: NextFunction) => 
 
 const updateRole = async (req: Request, res: Response, next: NextFunction) => {
   try{
-    const ip = req.ip || '';
-    const username = req.payload.username;
-
     const {oldRole, newRole, adminRole, targetId} = req.body;
 
     if(oldRole === newRole){
@@ -212,8 +181,6 @@ const updateRole = async (req: Request, res: Response, next: NextFunction) => {
     };
 
     const result = await user.updateRole(targetId, newRole);
-
-    nonBlockingCall(activity.createActivity(username, 70, ip, {'targetId': targetId, 'oldRole': oldRole, 'newRole': newRole}));
 
     return res.status(200).json({sucess: true, message: 'Role updated', rows: result})
   }catch(err){

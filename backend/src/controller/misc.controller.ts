@@ -7,24 +7,14 @@ import {Request, Response, NextFunction} from 'express';
 import misc from '../model/misc.model';
 import multer from 'multer';
 import ErrorDetail from '../model/error.model';
-import fs from 'fs';
-import path from 'path';
-import { MiscType } from '../model/misc.model';
 import { uploadGallery } from '../config/multer';
-import nonBlockingCall from '../utils/nonBlockingCall';
-import activity from '../model/activity.model';
 // -------------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------------
 const getMiscByType = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const username = req.payload.username;
-    const ip = req.ip || '';
-
     const {miscId} = req.params;
     const result = await misc.getMiscByType(parseInt(miscId));
-
-    nonBlockingCall(activity.createActivity(username, 38, ip));
 
     return res.status(200).json({sucess: true, message: 'Get misc success', rows: result});
   } catch (err) {
@@ -46,13 +36,8 @@ const addGallery = async (req: Request, res: Response, next: NextFunction) => {
       };
 
     try {
-      const username = req.payload.username;
-      const ip = req.ip || '';
-
       const {miscId, value, detail1, detail2, detail3} = req.body;
       const result = await misc.addMisc(parseInt(miscId), value, detail1, detail2, detail3);
-
-      nonBlockingCall(activity.createActivity(username, 39, ip, {'value': value}));
 
       return res.status(200).json({sucess: true, message: 'Add gallery success', rows: result});
     } catch (err) {
@@ -62,15 +47,10 @@ const addGallery = async (req: Request, res: Response, next: NextFunction) => {
   })
 }
 
-const deleteMisc= async (req: Request, res: Response, next: NextFunction) => {
+const deleteMisc = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const username = req.payload.username;
-    const ip = req.ip || '';
-
     const {id} = req.params;
     const result = await misc.deleteMiscById(parseInt(id));
-
-    nonBlockingCall(activity.createActivity(username, 40, ip, {'id':id}));
 
     return res.status(200).json({sucess: true, message: 'Delete gallery success', rows: result});
   } catch (err) {

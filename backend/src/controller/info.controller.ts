@@ -5,7 +5,6 @@
 
 import {Request, Response, NextFunction} from 'express';
 import worksheet, { WorksheetType } from '../model/worksheet.model';
-import nonBlockingCall from '../utils/nonBlockingCall';
 import activity from '../model/activity.model';
 import { getScoreProgressResponseBody } from './worksheetJunction.controller';
 import findings from '../model/findings.model';
@@ -18,9 +17,6 @@ import { ActivityJoinUserType } from '../model/activity.model';
 // ------------------------------------------------------------------------------------------------------------
 const getByKPPN = async(req: Request, res: Response, next: NextFunction) => {
   try{
-    const username = req.payload.username;
-    const ip = req.ip || '';
-
     const kppn = req.payload.kppn;
     const period = req.payload.period;
 
@@ -59,8 +55,6 @@ const getByKPPN = async(req: Request, res: Response, next: NextFunction) => {
       closeFollowUp,
       users: isAfter2025 ? usersFromActivity : userFromReference,
     };
-
-    nonBlockingCall(activity.createActivity(username, 82, ip));
 
     return res.status(200).json(output);
   }catch(err){
