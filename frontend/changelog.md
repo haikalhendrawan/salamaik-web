@@ -85,4 +85,12 @@ All notable changes to this project will be documented in this file.
 - history finding module data structure
 - refactor types
 
+## [1.1.13] - 2025-04-04
+
+### Added
+- toggle finding feature on follow up module
+
+### Fixed
+- follow up module data structure
+
  

@@ -13,27 +13,6 @@ import ExcelPrintout from './components/ExcelPrintout';
 import AmountPieChart from './components/AmountPieChart';
 import { DerivedFindingsType } from '../../../types/findings.type';
 // -----------------------------------------------------------------------
-interface FindingsWithChecklist{
-  id: number,
-  ws_junction_id: number,
-  worksheet_id: string,
-  checklist_id: number,
-  matrix_id: number, 
-  kppn_reponse: string,
-  kanwil_response: string,
-  score_before: number,
-  score_after: number,
-  last_update: string,
-  status: number,
-  updated_by: string,
-  title: string | null, 
-  komponen_id: number,
-  subkomponen_id: number,
-  komponen_title: string,
-  subkomponen_title: string,
-  period: number
-}
-
 interface FindingsProps{
   selectedUnit: string,
   selectedPeriod: number,
@@ -86,8 +65,6 @@ export default function Findings({selectedUnit, selectedPeriod}:FindingsProps) {
 
   const [derivedFindingsYMin1, setDerivedFindingsYMin1] = useState<DerivedFindingsType[] | null>(null);
 
-  const [yMin1PeriodAmount, setYMin1PeriodAmount] = useState<number | null>(null);
-
   const last2PeriodFindings = derivedFindings?.concat(derivedFindingsYMin1 || []) || [];
 
   const last2PeriodList =  periodRef?.list.filter((item) => item.id === selectedPeriod || item.id === selectedPeriod-1)|| [];
@@ -114,9 +91,11 @@ export default function Findings({selectedUnit, selectedPeriod}:FindingsProps) {
       if(data.isFinal){
         setCurrentPeriodAmount(data.finalCount);
         setDerivedFindings(data.finalFindings);
+        setIsFinal(true);
       }else{
         setCurrentPeriodAmount(data.nonFinalCount);
         setDerivedFindings(data.nonFinalFindings);
+        setIsFinal(false);
       }
 
     }catch(err:any){
@@ -134,13 +113,9 @@ export default function Findings({selectedUnit, selectedPeriod}:FindingsProps) {
       const data: APIResponseType = response.data.rows;
 
       if(data.isFinal){
-        setYMin1PeriodAmount(data.finalCount);
         setDerivedFindingsYMin1(data.finalFindings);
-        setIsFinal(true);
       }else{
-        setYMin1PeriodAmount(data.nonFinalCount);
         setDerivedFindingsYMin1(data.nonFinalFindings);
-        setIsFinal(false);
       }
 
     }catch(err:any){
@@ -200,7 +175,7 @@ export default function Findings({selectedUnit, selectedPeriod}:FindingsProps) {
 
                 <Stack marginTop={6} marginBottom={4}>
                   <Stack direction={'row'} justifyContent={'center'} textAlign={'center'} marginBottom={2}>
-                    <Typography variant="body2">{`Total Permasalahan: ${currentPeriodAmount || '-'} ${isFinal !== null ? (isFinal ? '(Final)' : '(Non-Final)') : ''}` }</Typography>
+                    <Typography variant="body2">{`Total Permasalahan: ${currentPeriodAmount || '-'} ${isFinal ? '(Final)' : '(Non-Final)'}` }</Typography>
                   </Stack>
                   {
                     rekapFinding?.map((item, index) => (

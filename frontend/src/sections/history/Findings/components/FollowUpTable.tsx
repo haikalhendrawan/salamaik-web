@@ -171,7 +171,7 @@ export default function FollowUpTable({isFinal, nonFinalFindings, finalFindings,
                 sx={{mt: 2}}
                 onClick={() => handleChangeFinal(false)}
               >
-                Show Permasalahan Non Final
+                Lihat Permasalahan Non Final
               </Button>
             )
           : (
@@ -181,7 +181,7 @@ export default function FollowUpTable({isFinal, nonFinalFindings, finalFindings,
                 sx={{mt: 2}}
                 onClick={() => handleChangeFinal(true)}
               >
-                Hide Permasalahan Non Final
+                Sembunyikan Permasalahan Non Final
               </Button>
             )
         : null

@@ -21,8 +21,15 @@ import {useAuth} from '../../hooks/useAuth';
 import useDictionary from '../../hooks/useDictionary';
 import { FindingsResponseType } from './types';
 import { WorksheetType } from '../worksheet/types';
+import { DerivedFindingsType } from '../../types/findings.type';
 // --------------------------------------------------------------
-
+interface APIResponseType{
+  isFinal: boolean,
+  nonFinalFindings : DerivedFindingsType[],
+  nonFinalCount: number,
+  finalFindings: DerivedFindingsType[],
+  finalCount: number
+}
 
 // --------------------------------------------------------------
 export default function FollowUpKPPN() {
@@ -50,9 +57,15 @@ export default function FollowUpKPPN() {
 
   const kppnId= params.get('id');
 
-  const kppnName = kppnRef?.list.filter((item) => item.id === kppnId)[0]?.alias || ''
+  const kppnName = kppnRef?.list.filter((item) => item.id === kppnId)[0]?.alias || '';
 
-  const [findings, setFindings] = useState<FindingsResponseType[] | []>([]);
+  const [findings, setFindings] = useState<DerivedFindingsType[] | null>([]);
+
+  const [nonFinalFindings, setNonFinalFindings] = useState<DerivedFindingsType[] | null>([]);
+
+  const [isFinal, setIsFinal] = useState<boolean | null>(false);
+
+  const [findingsAmount, setfindingsAmount] = useState<number | null>(null);
 
   const [worksheet, setWorksheet] = useState<WorksheetType | null>(null);
 
@@ -69,12 +82,26 @@ export default function FollowUpKPPN() {
         return null
       };
 
-      const response = await axiosJWT.get(`/getFindingsByWorksheetId/${kppnId}`);
-      setFindings(response.data.rows);
+      const response = await axiosJWT.get(`/getDerivedFindings/${kppnId}`);
+      const data: APIResponseType = response.data.rows;
+
+      setNonFinalFindings(data.nonFinalFindings);
+      if(data.isFinal){
+        setfindingsAmount(data.finalCount);
+        setFindings(data.finalFindings);
+        setIsFinal(true);
+      }else{
+        setfindingsAmount(data.nonFinalCount);
+        setFindings(data.nonFinalFindings);
+        setIsFinal(false);
+      }
 
     }catch(err: any){
       setIsLoading(false);
-      setFindings([]);
+      setFindings(null);
+      setIsFinal(null);
+      setfindingsAmount(null);
+      setNonFinalFindings(null);
       if(err.response){
         openSnackbar(err.response.data.message, "error");
       }else{
@@ -126,17 +153,13 @@ export default function FollowUpKPPN() {
     getData();
   }, [location.search, tabValue]);
 
-  const totalFindingsNonFinal = findings?.filter(isNotMaxScoreAndTouched).length;
-  const totalFindingsFinal = findings?.filter(isNotMaxScoreAndTouched).length;
-  const countFindingsOnProgress = findings?.filter((f) => f?.status > 0)?.length;
-  const findingsPercentProgress = ((countFindingsOnProgress / totalFindingsNonFinal) * 100) || 0;
+  const countFindingsOnProgress = findings?.filter((f) => f?.status > 0)?.length || 0;
+  const findingsPercentProgress = ((countFindingsOnProgress / (findingsAmount || 0)) * 100) || 0;
 
   const semester = periodRef?.list?.filter((item) => item.id === auth?.period)[0]?.semester || '';
   const year = periodRef?.list?.filter((item) => item.id === auth?.period)[0]?.tahun || '';
 
-  const today = new Date();
-  const isPastClosePeriod = new Date(worksheet?.close_follow_up || '').getTime() < today?.getTime();
-  const isFinalText = isPastClosePeriod ? 'Final' : 'Non-Final';
+  const isFinalText = isFinal ? 'Final' : 'Non-Final';
 
   return (
     <>
@@ -155,7 +178,7 @@ export default function FollowUpKPPN() {
               <AmountTemuan
                 header={`Jumlah Permasalahan ${kppnName}`}
                 subheader={`Semester ${semester} ${year} (${isFinalText})`}
-                temuan={isPastClosePeriod ? totalFindingsFinal : totalFindingsNonFinal}
+                temuan={findingsAmount || 0}
               />
             </Grid>
             <Grid item xs={4}>
@@ -163,7 +186,7 @@ export default function FollowUpKPPN() {
                 header={`Progress Tindak Lanjut`}
                 number={findingsPercentProgress}
                 footer={kppnName}
-                detail={`${countFindingsOnProgress}/${totalFindingsNonFinal}`}
+                detail={`${countFindingsOnProgress}/${findingsAmount || 0}`}
                 icon={`mdi:cash-register`}
                 color={theme.palette.primary.main}
               />
@@ -177,7 +200,7 @@ export default function FollowUpKPPN() {
             </Grid>
 
             <Grid item xs={12}>
-              <FollowUpTable findings={findings} kppnId={kppnId} />
+              <FollowUpTable findings={findings} nonFinalFindings={nonFinalFindings} isFinal={isFinal} kppnId={kppnId} />
             </Grid>
 
           </Grid>
@@ -189,8 +212,8 @@ export default function FollowUpKPPN() {
 }
 
 // -------------------------------------------------------------------------------------------------
-function isNotMaxScoreAndTouched(finding: FindingsResponseType) {
-  // const isNotTouched = finding?.status === 0 || finding?.status ===1 || finding?.status ===2;
-  const maxScore = finding?.matrixDetail[0]?.standardisasi === 1 ? 12 : 10;
-  return finding?.score_after !== maxScore 
-};
+// function isNotMaxScoreAndTouched(finding: FindingsResponseType) {
+//   // const isNotTouched = finding?.status === 0 || finding?.status ===1 || finding?.status ===2;
+//   const maxScore = finding?.matrixDetail[0]?.standardisasi === 1 ? 12 : 10;
+//   return finding?.score_after !== maxScore 
+// };

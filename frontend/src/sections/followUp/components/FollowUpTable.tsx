@@ -3,14 +3,15 @@
  * © Kanwil DJPb Sumbar 2024
  */
 
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {Stack, Typography, Table, Card, CardHeader, TableSortLabel,
         TableHead, Grow, TableBody, TableRow, TableCell, Button} from '@mui/material';
 import { useTheme, styled } from '@mui/material/styles';
 import Label from '../../../components/label';
 import Iconify from '../../../components/iconify/Iconify';
-import { FindingsResponseType } from '../types';
 import ExcelPrintout from './ExcelPrintout';
+import { DerivedFindingsType } from '../../../types/findings.type';
 // ---------------------------------------------------
 const StyledButton = styled(Button)(({  }) => ({
   height: '30px', 
@@ -35,13 +36,27 @@ const TABLE_HEAD = [
 ];
 
 interface FollowUpTableProps{
-  findings: FindingsResponseType[] | [],
-  kppnId: string | null
+  findings: DerivedFindingsType[] | null,
+  kppnId: string | null,
+  isFinal: boolean | null,
+  nonFinalFindings: DerivedFindingsType[] | null,
 }
 
 // ----------------------------------------------------------------------------------
-export default function FollowUpTable({findings, kppnId}: FollowUpTableProps) {
+export default function FollowUpTable({findings, kppnId, isFinal, nonFinalFindings}: FollowUpTableProps) {
   const theme = useTheme();
+
+  const [showFinal, setShowFinal] = useState<boolean>(isFinal || false);
+
+  const handleChangeFinal = (final: boolean) => {
+    if(isFinal){
+      setShowFinal(final);
+    }
+  };
+
+  const allowFinalState = isFinal && showFinal;
+
+  const findingsToShow = allowFinalState ? findings : nonFinalFindings;
 
   return (
     <>
@@ -73,20 +88,20 @@ export default function FollowUpTable({findings, kppnId}: FollowUpTableProps) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {findings.map((item, index) => 
+              {findingsToShow?.map((item, index) => 
                 <TableRow hover key={item.id} tabIndex={-1}>
                   <TableCell align="justify" sx={{fontSize: '13px'}}>{index+1}</TableCell>
 
                   <TableCell align="left" sx={{fontSize: '13px'}}>
-                    <Typography variant='body2' fontWeight={'bold'} fontSize={'13px'}>Komponen {item.matrixDetail[0]?.komponen_string}</Typography>
-                    <Typography variant='body2' fontSize={'13px'}>Subkomponen {item.matrixDetail[0]?.subkomponen_string}</Typography>
+                    <Typography variant='body2' fontWeight={'bold'} fontSize={'13px'}>Komponen {item.komponen.title}</Typography>
+                    <Typography variant='body2' fontSize={'13px'}>Subkomponen {item.subkomponen.title}</Typography>
                   </TableCell>
 
                   <TableCell align="left" sx={{fontSize: '13px'}}>
-                    {item.matrixDetail[0].checklist[0].matrix_title}
+                    {item.checklist.title}
                   </TableCell>
 
-                  <TableCell align="left" sx={{fontSize: '13px'}}>{item.matrixDetail[0].permasalahan}</TableCell>
+                  <TableCell align="left" sx={{fontSize: '13px'}}>{item.matrix.permasalahan}</TableCell>
 
                   <TableCell align="left">
                     {item.status===0
@@ -100,7 +115,7 @@ export default function FollowUpTable({findings, kppnId}: FollowUpTableProps) {
                   </TableCell>
 
                   <TableCell align="left" sx={{fontSize: '13px'}}>
-                    {item.matrixDetail[0].uic}
+                    {item.matrix.uic}
                   </TableCell> 
 
                   <TableCell align="left">
@@ -124,8 +139,33 @@ export default function FollowUpTable({findings, kppnId}: FollowUpTableProps) {
         </Card>
       </Grow>
 
+      {
+        isFinal ? showFinal 
+          ? (
+              <Button 
+                variant='contained' 
+                endIcon={<Iconify icon="solar:eye-bold-duotone" />} 
+                sx={{mt: 2}}
+                onClick={() => handleChangeFinal(false)}
+              >
+                Lihat Permasalahan Non Final
+              </Button>
+            )
+          : (
+              <Button 
+                variant='contained' 
+                endIcon={<Iconify icon="solar:eye-closed-bold-duotone" />} 
+                sx={{mt: 2}}
+                onClick={() => handleChangeFinal(true)}
+              >
+                Sembunyikan Permasalahan Non Final
+              </Button>
+            )
+        : null
+      }
+
       <Grow in>
-        <Stack direction='column' spacing={1} sx={{pl: 2}}>
+        <Stack direction='column' spacing={1} sx={{pl: 2, pt:2}}>
           <Typography variant='body2' fontWeight='bold' sx={{fontSize: '12px'}}>*Status:</Typography>
           <Typography variant='body2' sx={{fontSize: '12px'}}>1. Belum: belum ditindaklanjuti KPPN </Typography>
           <Typography variant='body2' sx={{fontSize: '12px'}}>2. Proses: sudah ditindaklanjuti & proses verifikasi Kanwil </Typography>

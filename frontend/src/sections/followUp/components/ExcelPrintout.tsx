@@ -368,6 +368,9 @@ const generateSheet3 = (
       }
     })
 
+    // Insert an empty row before the note
+    sheet3.addRow({});
+
     const lastRow = sheet3?.addRow({
       no: "",
       checklist_num: `: Permasalahan telah diselesaikan (tidak dihitung sebagai permasalahan final)`,
