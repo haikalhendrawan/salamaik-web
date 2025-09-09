@@ -5,8 +5,6 @@
 
 import {Request, Response, NextFunction} from 'express';
 import unit from '../model/unit.model';
-import nonBlockingCall from '../utils/nonBlockingCall';
-import activity from '../model/activity.model';
 // -------------------------------------------------
 interface UnitType{
   id: string;
@@ -21,12 +19,7 @@ interface UnitType{
 // ------------------------------------------------------
 const getAllUnit = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const username = req.payload.username;
-    const ip = req.ip || '';
-
     const units: UnitType[] = await unit.getAllUnit();
-
-    nonBlockingCall(activity.createActivity(username, 62, ip));
 
     return res.status(200).json({sucess: true, message: 'Get unit success', rows: units});
   } catch (err) {
@@ -36,13 +29,8 @@ const getAllUnit = async (req: Request, res: Response, next: NextFunction) => {
 
 const getUnitById = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const username = req.payload.username;
-    const ip = req.ip || '';
-
     const unitID = req.payload.kppn;
     const units = await unit.getUnitById(unitID);
-
-    nonBlockingCall(activity.createActivity(username, 63, ip));
 
     return res.status(200).json({sucess: true, message: 'Get unit success', rows: units});
   } catch (err) {

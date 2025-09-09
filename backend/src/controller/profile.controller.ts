@@ -8,17 +8,12 @@ import profile from '../model/profile.model';
 import multer from 'multer';
 import {uploadPP} from '../config/multer';
 import ErrorDetail from '../model/error.model';
-import nonBlockingCall from '../utils/nonBlockingCall';
-import activity from '../model/activity.model';
 import { passwordSchema, emailSchema } from '../utils/schema';
 // -------------------------------------------------
 
 // ------------------------------------------------------
 const updateCommonProfile = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const nip = req.payload.username;
-    const ip = req.ip || '';
-
     const userId = req.payload.id;
     const { name, username, email, period } = req.body;
 
@@ -36,8 +31,6 @@ const updateCommonProfile = async (req: Request, res: Response, next: NextFuncti
 
     const response = await profile.updateCommonProfile(userId, name, username, email, period );
 
-    nonBlockingCall(activity.createActivity(nip, 51, ip, {'username': username}));
-
     return res.status(200).json({sucess: true, message: 'Profile has been updated', detail: response});
   } catch (err) {
     next(err);
@@ -46,9 +39,6 @@ const updateCommonProfile = async (req: Request, res: Response, next: NextFuncti
 
 const updatePassword = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const nip = req.payload.username;
-    const ip = req.ip || '';
-
     const userId = req.payload.id;
     const { oldPassword, newPassword } = req.body;
     const validPassword = passwordSchema.safeParse(newPassword);
@@ -58,8 +48,6 @@ const updatePassword = async (req: Request, res: Response, next: NextFunction) =
     };
 
     const response = await profile.updatePassword(userId, oldPassword, newPassword );
-
-    nonBlockingCall(activity.createActivity(nip, 52, ip, {'userId': userId}));
 
     return res.status(200).json({sucess: true, message: 'Password has been updated', detail: response});
   } catch (err) {
@@ -80,15 +68,11 @@ const updateProfilePicture = async (req: Request, res: Response, next: NextFunct
     };
 
     try {
-      const ip = req.ip || '';
-
       const userID = req.payload.id;
       const nip = req.payload.username;
       const fileExt = req.file.mimetype.split("/")[1];
       const fileName =`avatar_${nip}.${fileExt}`;
       const response = await profile.updateProfilePicture(userID, fileName);
-
-      nonBlockingCall(activity.createActivity(nip, 53, ip, {'fileName': fileName}));
 
       return res.status(200).json({ success: true, message: 'Profile picture has been updated', rows: response });
     } catch (err) {

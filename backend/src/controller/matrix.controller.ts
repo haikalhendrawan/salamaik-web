@@ -11,18 +11,11 @@ import pool from '../config/db';
 import findings from "../model/findings.model";
 import ErrorDetail from "../model/error.model";
 import logger from "../config/logger";
-import nonBlockingCall from '../utils/nonBlockingCall';
-import activity from '../model/activity.model';
 // ------------------------------------------------------------------------
 const getMatrixByWorksheetId = async(req: Request, res: Response, next: NextFunction) => {
   try{
-    const username = req.payload.username;
-    const ip = req.ip || '';
-
     const {worksheetId} = req.params;
     const result = await matrix.getMatrixByWorksheetId(worksheetId);
-
-    nonBlockingCall(activity.createActivity(username, 32, ip));
 
     return res.status(200).json({sucess: true, message: 'Get matrix success', rows: result})
   }catch(err){
@@ -32,10 +25,8 @@ const getMatrixByWorksheetId = async(req: Request, res: Response, next: NextFunc
 
 const getMatrixWithWsDetailById = async(req: Request, res: Response, next: NextFunction) => {
   try{
-    const ip = req.ip || '';
-
     const {kppnId} = req.params;
-    const {username, period, role, kppn}  = req.payload;
+    const {period, role, kppn}  = req.payload;
     const isKanwil = [3, 4, 99].includes(role);
     
     if(!isKanwil){
@@ -53,8 +44,6 @@ const getMatrixWithWsDetailById = async(req: Request, res: Response, next: NextF
     const mainWorksheet = result[0];
     const result2 = await matrix.getMatrixWithWsJunction(mainWorksheet.id); 
 
-    nonBlockingCall(activity.createActivity(username, 33, ip));
-
     return res.status(200).json({sucess: true, message: 'Get matrix success', rows: {matrix: result2, worksheet: mainWorksheet}})
   }catch(err){
     next(err)
@@ -64,11 +53,9 @@ const getMatrixWithWsDetailById = async(req: Request, res: Response, next: NextF
 const createMatrix = async(req: Request, res: Response, next: NextFunction) => {
   const connection = await pool.connect();
   try{
-    const ip = req.ip || '';
-
     await connection.query('BEGIN');
     const {kppnId} = req.body;
-    const {username, period} = req.payload;
+    const {period} = req.payload;
 
     // query #1 dapatkan worksheet Id
     const worksheetProfile: WorksheetType[] = await worksheet.getWorksheetByPeriodAndKPPN(period, kppnId); 
@@ -155,8 +142,6 @@ const createMatrix = async(req: Request, res: Response, next: NextFunction) => {
     await worksheet.editWorksheetMatrixStatus(worksheetId, 1, connection);
     await connection.query('COMMIT');
 
-    nonBlockingCall(activity.createActivity(username, 34, ip, {'worksheetId': worksheetId}));
-
     return res.status(200).json({sucess: true, message: 'Matrix created successfully', rows: {result, result2}})
   }catch(err){
     await connection.query('ROLLBACK');
@@ -169,11 +154,9 @@ const createMatrix = async(req: Request, res: Response, next: NextFunction) => {
 const reAssignMatrix = async(req: Request, res: Response, next: NextFunction) => {
   const connection = await pool.connect();
   try{
-    const ip = req.ip || '';
-
     await connection.query('BEGIN');
     const {kppnId} = req.body;
-    const {username, period} = req.payload;
+    const {period} = req.payload;
 
     if(!kppnId ) {
       throw new ErrorDetail(400, 'Insufficient request body');
@@ -247,8 +230,6 @@ const reAssignMatrix = async(req: Request, res: Response, next: NextFunction) =>
     // const {hasilImplementasi, permasalahan, isFinding} = matrix
     await connection.query('COMMIT');
 
-    nonBlockingCall(activity.createActivity(username, 35, ip, {'worksheetId': worksheetId}));
-
     return res.status(200).json({sucess: true, message: 'Repost matrix success', rows: result})
   }catch(err){
     logger.error(err);
@@ -262,12 +243,7 @@ const reAssignMatrix = async(req: Request, res: Response, next: NextFunction) =>
 const updateMatrix = async(req: Request, res: Response, next: NextFunction) => {
   try{
     // const {id, hasilImplementasi, permasalahan, rekomendasi, peraturan, uic, tindakLanjut, isFinding} = req.body;
-    const username = req.payload.username;
-    const ip = req.ip || '';
-
     const result = await matrix.updateMatrix(req.body);
-
-    nonBlockingCall(activity.createActivity(username, 36, ip, {'matrixJunctionId': req.body.id}));
 
     return res.status(200).json({sucess: true, message: 'Update matrix success', rows: result})
   }catch(err){
@@ -279,9 +255,6 @@ const deleteMatrix = async(req: Request, res: Response, next: NextFunction) => {
   const connection = await pool.connect();
 
   try{
-    const username = req.payload.username;
-    const ip = req.ip || '';
-
     await connection.query('BEGIN');
     const {worksheetId} = req.body;
 
@@ -295,8 +268,6 @@ const deleteMatrix = async(req: Request, res: Response, next: NextFunction) => {
 
     const result3 = await worksheet.editWorksheetMatrixStatus(worksheetId, 0, connection);
     await connection.query('COMMIT');
-
-    nonBlockingCall(activity.createActivity(username, 37, ip,  {'worksheetId': worksheetId}));
 
     return res.status(200).json({sucess: true, message: 'Delete matrix success', rows: [result, result2, result3]})
   }catch(err){  
