@@ -47,7 +47,7 @@ const WsJunctionProvider = ({children}: WsJunctionProviderProps) => {
   const {auth} = useAuth();
 
   async function getWsJunctionKanwil(kppnId: string) {
-    return auth?.kppn==="03010"?  getWsJunctionForKanwil(kppnId): getWsJunctionKPPN() ;
+    return auth?.kppn?.length===5?  getWsJunctionForKanwil(kppnId): getWsJunctionKPPN() ;
   };
 
   async function getWsJunctionForKanwil(kppnId: string) {

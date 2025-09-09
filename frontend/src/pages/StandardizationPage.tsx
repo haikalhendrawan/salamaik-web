@@ -22,7 +22,7 @@ export default function StandardizationPage() {
     <>
       <StandardizationProvider>
         <PreviewFileModalProvider>
-          {auth?.kppn==='03010'?<StandardizationKanwil/>:<StandardizationKPPN/>}
+          {auth?.kppn?.length === 5?<StandardizationKanwil/>:<StandardizationKPPN/>}
         </PreviewFileModalProvider>
       </StandardizationProvider>
     </>

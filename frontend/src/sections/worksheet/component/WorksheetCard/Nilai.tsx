@@ -85,7 +85,7 @@ export default function Nilai({wsJunction, wsDetail, isExcluded}: NilaiPropsType
   const isPastDue = useMemo(() => new Date().getTime() > new Date(wsDetail?.close_period || "").getTime(), [wsDetail]);
 
   const isKanwil = useMemo(() =>{
-    return auth?.kppn==='03010';
+    return auth?.kppn?.length === 5;
   }, [auth]);
 
   const opsiSelection = useMemo(() => wsJunction?.opsi?.map((item, index) => (

@@ -71,15 +71,15 @@ export function applySortFilter(array: any[], comparator: any, query: string, st
 
 
 export async function sanitizeRole(role: number, kppn: string) {
-  if((role===3 || role===4) && kppn!=='03010'){
+  if((role===3 || role===4) && kppn.length !== 5){
     return false
   };
 
-  if((role===1 || role===2) && kppn==='03010'){
+  if((role===1 || role===2) && kppn.length === 5){
     return false
   };
 
-  if(role===99 && kppn!=='03010'){
+  if(role===99 && kppn.length !== 5){
     return false
   };
 

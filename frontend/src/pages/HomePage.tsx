@@ -23,7 +23,7 @@ export default function HomePage() {
 
   const [gallery, setGallery] = useState<string[] | []>([]);
 
-  const isKanwil = auth?.kppn === '03010';
+  const isKanwil = auth?.kppn?.length === 5;
 
   const username = auth?.name;
 

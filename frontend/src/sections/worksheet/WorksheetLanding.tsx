@@ -59,7 +59,7 @@ export default function WorksheetLanding() {
     getScoreProgress();
   }, []);
 
-  if(auth?.kppn !== '03010' ){
+  if(auth?.kppn?.length !== 5 ){
     navigate(`kppn?id=${auth?.kppn}`)
   };
 
