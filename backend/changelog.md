@@ -75,5 +75,9 @@ All notable changes to this project will be documented in this file.
 - derived findings type
 - findings util parameter
 
+## [1.0.9] - 2025-09-09
+
+### Changed
+- Refactor activity log
 
  

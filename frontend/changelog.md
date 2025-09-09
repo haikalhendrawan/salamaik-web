@@ -93,4 +93,11 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - follow up module data structure
 
+## [1.1.14] - 2025-09-09
+
+### Added
+- image component
+
+### Fixed
+- unit conditional logic
  
