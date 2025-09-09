@@ -9,10 +9,11 @@
  import authorize from "../middleware/authorize";
  import alterUnitPayload from "../middleware/alterUnitPayload";
  import alterPeriodPayload from "../middleware/alterPeriodPayload";
+ import logActivity from "../middleware/logActivity";
  
  
  const router = express.Router(); 
  
- router.get("/getByKPPN/:unit?/:period?", authenticate, authorize([99, 4, 3, 2 , 1]), alterPeriodPayload, alterUnitPayload, infoController.getByKPPN);
+ router.get("/getByKPPN/:unit?/:period?", authenticate, authorize([99, 4, 3, 2 , 1]), logActivity(94), alterPeriodPayload, alterUnitPayload, infoController.getByKPPN);
  
  export default router

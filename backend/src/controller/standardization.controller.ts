@@ -17,8 +17,6 @@ import { stdScoreGenerator } from '../utils/standardizationCounter';
 import fs from 'fs';
 import path from 'path';
 import { PeriodType } from '../model/period.model';
-import nonBlockingCall from '../utils/nonBlockingCall';
-import activity from '../model/activity.model';
 // -------------------------------------------------
 interface StandardizationType{
   id: number;
@@ -29,12 +27,7 @@ interface StandardizationType{
 // ------------------------------------------------------
 const getAllStandardization = async (req: Request, res: Response, next: NextFunction) => {
   try{
-    const username = req.payload.username;
-    const ip = req.ip || '';
-
     const result = await standardization.getStandardization();
-
-    nonBlockingCall(activity.createActivity(username, 56, ip));
 
     return res.status(200).json({sucess: true, message: 'Get standardization success', rows: result})
   }catch(err){
@@ -44,13 +37,8 @@ const getAllStandardization = async (req: Request, res: Response, next: NextFunc
 
 const getStandardizationJunction = async (req: Request, res: Response, next: NextFunction) => {
   try{
-    const username = req.payload.username;
-    const ip = req.ip || '';
-
     const {kppn, period} = req.payload;
     const result = await standardization.getStandardizationJunction(kppn, period);
-
-    nonBlockingCall(activity.createActivity(username, 57, ip));
 
     return res.status(200).json({sucess: true, message: 'Get standardization junction success', rows: result})
   }catch(err){
@@ -60,9 +48,7 @@ const getStandardizationJunction = async (req: Request, res: Response, next: Nex
 
 const getStdWorksheet = async (req: Request, res: Response, next: NextFunction) => {
   try{
-    const ip = req.ip || '';
-
-    const {period: periodID, username, kppn: unit, role} = req.payload;
+    const {period: periodID, kppn: unit, role} = req.payload;
     const {kppn} = req.params
     const isKanwil = [3, 4, 99].includes(role);
 
@@ -95,8 +81,6 @@ const getStdWorksheet = async (req: Request, res: Response, next: NextFunction) 
       short:  stdScoreGenerator(item.interval, stdJunction, item, isEvenPeriod).short
     }));
 
-    nonBlockingCall(activity.createActivity(username, 58, ip));
-
     return res.status(200).json({sucess: true, message: 'Get standardization worksheet success', rows: stdWorksheet})
   }catch(err){
     next(err)
@@ -105,8 +89,7 @@ const getStdWorksheet = async (req: Request, res: Response, next: NextFunction) 
 
 const getStdFilePerMonthKPPN = async (req: Request, res: Response, next: NextFunction) => {
   try{
-    const ip = req.ip || '';
-    const {period, kppn, username} = req.payload;
+    const {period, kppn} = req.payload;
     const {kppnId, month} = req.body;
     const allowedKPPN = kppn === '03010'? kppnId: kppn ;
 
@@ -134,9 +117,6 @@ const getStdFilePerMonthKPPN = async (req: Request, res: Response, next: NextFun
     });
     
     archive.finalize();
-
-    nonBlockingCall(activity.createActivity(username, 59, ip));
-
   }catch(err){
     next(err)
   }
@@ -155,16 +135,12 @@ const addStandardizationJunction = async (req: Request, res: Response, next: Nex
     };
 
     try{
-      const ip = req.ip || '';
-
-      const {kppn, username} = req.payload;
+      const {kppn} = req.payload;
       const {kppnId, periodId, standardizationId, month, timeStamp} = req.body;
       const allowedKPPN = kppn.length===5 ? kppnId : kppn;
       const fileExt = sanitizeMimeType(req.file.mimetype);
       const fileName = `std_${allowedKPPN}_${periodId}${month}${standardizationId}_${timeStamp}.${fileExt}`;
       const result = await standardization.addStandardizationJunction(allowedKPPN, periodId, standardizationId, month, fileName);
-
-      nonBlockingCall(activity.createActivity(username, 60, ip, {'kppnId': allowedKPPN, 'periodId': periodId, 'stdId': standardizationId, 'monthId': month}));
 
       return res.status(200).json({sucess: true, message: 'Add File success', rows: result})
     }catch(err){
@@ -177,10 +153,8 @@ const addStandardizationJunction = async (req: Request, res: Response, next: Nex
 
 const deleteStandardizationJunction = async (req: Request, res: Response, next: NextFunction) => {
   try{
-    const ip = req.ip || '';
-
     const {id, fileName} = req.body;
-    const {kppn, role, username} = req.payload;
+    const {kppn, role} = req.payload;
 
     const standardizationJunction = await standardization.getStandardizationById(id);
     const stdKPPN = standardizationJunction?.kppn_id;
@@ -194,8 +168,6 @@ const deleteStandardizationJunction = async (req: Request, res: Response, next: 
 
     const filePath = path.join(__dirname,`../uploads/standardization/`, fileName);
     fs.unlinkSync(filePath);
-
-    nonBlockingCall(activity.createActivity(username, 61, ip, {'id': id}));
 
     return res.status(200).json({sucess: true, message: 'Delete file success', rows: result})
   }catch(err){
