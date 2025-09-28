@@ -19,7 +19,6 @@ import useSnackbar from '../../hooks/display/useSnackbar';
 import useLoading from '../../hooks/display/useLoading';
 import {useAuth} from '../../hooks/useAuth';
 import useDictionary from '../../hooks/useDictionary';
-import { FindingsResponseType } from './types';
 import { WorksheetType } from '../worksheet/types';
 import { DerivedFindingsType } from '../../types/findings.type';
 // --------------------------------------------------------------

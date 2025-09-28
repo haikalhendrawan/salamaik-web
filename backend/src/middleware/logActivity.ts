@@ -14,7 +14,7 @@
    const username = req.payload?.username || '';
    const ip = req.ip || '';
    const isPost = req.method === 'POST';
-   const detail = isPost ? JSON.parse(req.body) : null;
+   const detail = isPost ? JSON.stringify(req.body) : null;
 
    nonBlockingCall(activity.createActivity(username, activityId, ip, detail));
   

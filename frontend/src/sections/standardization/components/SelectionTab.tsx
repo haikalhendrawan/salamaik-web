@@ -85,6 +85,15 @@ export default function SelectionTab({tab, changeTab}: SelectionTabProps){
                 } 
           value={'142'} 
         />
+        <Tab 
+          icon={<Iconify icon="solar:point-on-map-bold-duotone" />} 
+          label={    
+                <StyledLabel>
+                  Kanwil DJPb Sumbar
+                </StyledLabel>
+                } 
+          value={'03010'} 
+        />
         
       </Tabs>
     </Stack>

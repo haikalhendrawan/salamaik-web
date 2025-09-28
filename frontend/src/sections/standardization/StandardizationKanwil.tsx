@@ -5,7 +5,7 @@
 
 import { Helmet } from 'react-helmet-async';
 import { useState, useEffect, useMemo } from 'react';
-import { Container, Stack, Typography, Grid} from '@mui/material';
+import { Container, Stack, Typography, Grid, FormControl} from '@mui/material';
 import useDictionary from '../../hooks/useDictionary';
 // sections
 import SelectionTab from './components/SelectionTab';
@@ -18,7 +18,8 @@ import PreviewFileModal from './components/PreviewFileModal';
 import useStandardization from './useStandardization';
 import usePreviewFileModal from './usePreviewFileModal';
 import { useAuth } from '../../hooks/useAuth';
-import { getAmountShort, getReportingMonth, getReportingYear } from './utils';
+import { getAmountShort, getReportingMonth, getReportingYear, clusterize } from './utils';
+import { StyledSelect, StyledSelectLabel, StyledMenuItem } from '../../components/styledSelect';
 // --------------------------------------------------------------
 
 // --------------------------------------------------------------
@@ -27,7 +28,9 @@ export default function StandardizationKanwil() {
 
   const {kppnRef, periodRef} = useDictionary();
 
-  const {getStandardization, standardization} = useStandardization();
+  const {getStandardization, standardization, dasar, selectedDasar, setSelectedDasar} = useStandardization();
+
+  const clusteredStandardization = clusterize(standardization);
 
   const {auth} = useAuth();
 
@@ -48,6 +51,11 @@ export default function StandardizationKanwil() {
   const unitName = useMemo(() => (
     kppnRef?.list?.filter((item) => item.id === tabValue)[0]?.alias || ''
   ),[kppnRef, tabValue]);
+
+  const handleChangeDasar = (e: any) => {
+    setSelectedDasar(e.target.value as string);
+    getStandardization(tabValue, e.target.value);
+  };
 
   useEffect(() => {
     async function getData(){
@@ -110,24 +118,32 @@ export default function StandardizationKanwil() {
           {loading
             ?<PageLoading duration={2}/>
             : <>
-                <StandardizationTable 
-                  header={'Manajemen Eksternal'} 
-                  modalOpen={modalOpen} 
-                  kppnTab={tabValue}
-                  cluster={1} 
-                />
-                <StandardizationTable 
-                  header={'Penguatan Kapasitas Perbendaharaan'} 
-                  modalOpen={modalOpen} 
-                  kppnTab={tabValue} 
-                  cluster={2} 
-                />
-                <StandardizationTable 
-                  header={'Penguatan Manajemen Internal'} 
-                  modalOpen={modalOpen} 
-                  kppnTab={tabValue}
-                  cluster={3}  
-                />
+                <FormControl style={{width:'30%'}}>
+                  <StyledSelectLabel id="dasar-select-label">Dasar</StyledSelectLabel>
+                  <StyledSelect
+                    name="dasar"
+                    label="Dasar"
+                    labelId="dasar-select-label"
+                    size="small"
+                    value={selectedDasar}
+                    onChange={handleChangeDasar}
+                    defaultValue={selectedDasar}
+                  >
+                    {dasar?.map(item => <StyledMenuItem value={item.id}>{item.dasar}</StyledMenuItem>)}
+                  </StyledSelect>
+                </FormControl>
+
+                {
+                  clusteredStandardization?.map((item, index) => (
+                    <StandardizationTable 
+                      header={item.cluster_name} 
+                      modalOpen={modalOpen} 
+                      kppnTab={tabValue} 
+                      cluster={item.cluster} 
+                      key={index}
+                    />
+                  ))
+                }
               </>
           }
           

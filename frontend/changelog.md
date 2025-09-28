@@ -100,4 +100,8 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - unit conditional logic
- 
+
+## [1.1.15] - 2025-09-28
+
+### Changed
+- standardization module, allow addition of standardization reference

@@ -3,10 +3,9 @@
  * © Kanwil DJPb Sumbar 2024
  */
 
-import {useMemo} from "react";
 import { Document, Page, Text, View, Image, Font} from '@react-pdf/renderer';
 import styles from "../styles";
-import { StandardizationType } from "../../standardization/types";
+import { ClusteredStandardizationType } from "../../standardization/types";
 import StdKPPNReportTable from "./StdKPPNReportTable";
 
 // ----------------------------------------------------------------
@@ -16,7 +15,7 @@ Font.registerHyphenationCallback(word => [word]);
 interface StdKPPNReportPDFProps{
   period: number | null | undefined,
   periodRef: any,
-  standardization: StandardizationType[] | [],
+  standardization: ClusteredStandardizationType[] | [],
   unitName: string,
   kppn?: string,
   kabid: string
@@ -39,10 +38,6 @@ export default function StdKPPNReportPDF({period, periodRef, standardization, un
   }) || '';
   const requireTTE = kppn?.length === 5?true:false;
 
-  const cluster1 = useMemo(() => standardization?.filter((item) => item.cluster === 1), [standardization]);
-  const cluster2 = useMemo(() => standardization?.filter((item) => item.cluster === 2), [standardization]);
-  const cluster3 = useMemo(() => standardization?.filter((item) => item.cluster === 3), [standardization]);
-
   return(
     <>
       <Document>
@@ -59,23 +54,15 @@ export default function StdKPPNReportPDF({period, periodRef, standardization, un
               </View>
           </View>
 
-          <StdKPPNReportTable 
-            title="Manajemen Eksternal" 
-            isEvenPeriod={isEvenPeriod} 
-            standardizationFilter={cluster1}
-          />
-
-          <StdKPPNReportTable 
-            title="Penguatan Kapasitas Perbendaharaan" 
-            isEvenPeriod={isEvenPeriod} 
-            standardizationFilter={cluster2}
-          />
-
-          <StdKPPNReportTable 
-            title="Penguatan Manajemen Internal" 
-            isEvenPeriod={isEvenPeriod} 
-            standardizationFilter={cluster3}
-          />
+          {
+            standardization?.map((item) => (
+              <StdKPPNReportTable 
+                title={item.cluster_name}
+                isEvenPeriod={isEvenPeriod} 
+                standardizationFilter={item.data}
+              />
+            ))
+          }
 
           {requireTTE && 
             <View style={{...styles.tte, marginTop:0, display:'flex'}} wrap={false}>

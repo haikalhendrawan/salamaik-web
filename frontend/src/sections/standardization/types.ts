@@ -7,7 +7,9 @@ export interface StandardizationType{
   id: number;
   title: string;
   cluster: number;
+  cluster_name?: string;
   interval: number;
+  interval_name?: string;
   list:[
     StandardizationJunctionType[],
     StandardizationJunctionType[],
@@ -28,4 +30,18 @@ export interface StandardizationJunctionType{
   month: number;
   file: string;
   uploaded_at: string
+};
+
+export interface StandardizationDasarType{
+  id: number,
+  dasar: string,
+  active: boolean,
+  date: string,
+  current: boolean
+};
+
+export interface ClusteredStandardizationType{
+  cluster: number;
+  cluster_name: string;
+  data: StandardizationType[]
 };

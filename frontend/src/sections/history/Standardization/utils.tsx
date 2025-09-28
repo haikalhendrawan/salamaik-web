@@ -13,7 +13,7 @@ import AddButton from './components/AddButton';
 import CheckButton from './components/CheckButton';
 import { useAuth } from '../../../hooks/useAuth';
 import useDictionary from '../../../hooks/useDictionary';
-import { StandardizationType } from './types';
+import { StandardizationType } from '../../standardization/types';
 // --------------------------------------------------------------
 const INTERVAL_DESC = [
   "Minimal 1x tiap Bulan",

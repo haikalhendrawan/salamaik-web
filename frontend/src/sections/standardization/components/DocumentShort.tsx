@@ -12,6 +12,7 @@ import useStandardization from "../useStandardization";
 import useDictionary from "../../../hooks/useDictionary";
 import { useAuth } from "../../../hooks/useAuth";
 import useAxiosJWT from "../../../hooks/useAxiosJWT";
+import { clusterize } from "../utils";
 // ----------------------------------------------
 interface DocumentShortProps {
   header: string,
@@ -27,6 +28,8 @@ export default function DocumentShort({header, subheader, image, tabValue }:Docu
   const [kabid, setKabid] = useState<string>('');
   
   const {standardization} = useStandardization();
+
+  const clusteredStandardization = clusterize(standardization);
 
   const {auth} = useAuth();
 
@@ -66,7 +69,7 @@ export default function DocumentShort({header, subheader, image, tabValue }:Docu
                 document={<StdKPPNReportPDF
                             period={auth?.period} 
                             periodRef={periodRef} 
-                            standardization={standardization}
+                            standardization={clusteredStandardization}
                             unitName={subheader}
                             kppn={auth?.kppn}
                             kabid={kabid}

@@ -80,4 +80,9 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - Refactor activity log
 
+## [1.0.10] - 2025-09-28
+
+### Changed
+- standardization module, allow addition of standardization reference
+
  

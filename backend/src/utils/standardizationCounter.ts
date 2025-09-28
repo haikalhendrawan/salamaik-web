@@ -82,6 +82,12 @@ export function stdScoreGenerator(
       short.push(0, 0, (list[2].length-2), 0, 0, (list[5].length-2));
       break;
 
+    case 7: // 1 x Tiap Semester
+      const qSemester = (list[5].length)*12;
+      score += qSemester;
+      short.push(0, 0, 0, 0, 0, (list[5].length-12));
+      break;
+
     default : score+=0
   }
 

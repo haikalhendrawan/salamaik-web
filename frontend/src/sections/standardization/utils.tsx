@@ -13,17 +13,8 @@ import AddButton from './components/AddButton';
 import CheckButton from './components/CheckButton';
 import { useAuth } from '../../hooks/useAuth';
 import useDictionary from '../../hooks/useDictionary';
-import { StandardizationType } from './types';
+import { StandardizationType, ClusteredStandardizationType } from './types';
 // --------------------------------------------------------------
-const INTERVAL_DESC = [
-  "Minimal 1x tiap Bulan",
-  "Minimal 2x tiap Bulan",
-  "Minimal 4x tiap Bulan",
-  "Minimal 20x tiap Bulan",
-  "Minimal 1x tiap Triwulan",
-  "Minimal 2x tiap Triwulan"
-];
-
 const MONTH_NAME = [
   'Januari',
   'Februari',
@@ -57,12 +48,12 @@ export function renderConditionalRow(
           case 1: // bulanan (1x tiap bulan)
             content = (
               <TableRow hover key={row.id} tabIndex={-1}>
-                <TableCell align="justify" sx={{ fontSize: '13px' }}>
+                <TableCell align="justify" sx={{ fontSize: '13px' }} width={'5%'}>
                   {index + 1}
                 </TableCell>
-                <TableCell align="left" sx={{ fontSize: '13px' }}>
+                <TableCell align="left" sx={{ fontSize: '13px' }} width={'20%'}>
                   <Typography variant="body2">{row.title}</Typography>
-                  <Typography variant="body3">{INTERVAL_DESC[row.interval - 1]}</Typography>
+                  <Typography variant="body3">Minimal {row.interval_name}</Typography>
                   <Typography variant="body3" color="primary">{`, Nilai: ${row.score}`}</Typography>
                 </TableCell>
                 {row.list.map((item, id) => (
@@ -83,12 +74,12 @@ export function renderConditionalRow(
           case 2: // 2 mingguan (2x tiap bulan)
             content = (
               <TableRow hover key={row.id} tabIndex={-1}>
-                <TableCell align="justify" sx={{ fontSize: '13px' }}>
+                <TableCell align="justify" sx={{ fontSize: '13px' }} width={'5%'}>
                   {index + 1}
                 </TableCell>
-                <TableCell align="left" sx={{ fontSize: '13px' }}>
+                <TableCell align="left" sx={{ fontSize: '13px' }} width={'20%'}>
                   <Typography variant="body2">{row.title}</Typography>
-                  <Typography variant="body3">{INTERVAL_DESC[row.interval - 1]}</Typography>
+                  <Typography variant="body3">Minimal {row.interval_name}</Typography>
                   <Typography variant="body3" color="primary">{`, Nilai: ${row.score}`}</Typography>
                 </TableCell>
                 {row.list.map((item, id) => (
@@ -124,12 +115,12 @@ export function renderConditionalRow(
           case 3: // 1 mingguan (4x tiap bulan)
             content = (
               <TableRow hover key={row.id} tabIndex={-1}>
-                <TableCell align="justify" sx={{ fontSize: '13px' }}>
+                <TableCell align="justify" sx={{ fontSize: '13px' }} width={'5%'}>
                   {index + 1}
                 </TableCell>
-                <TableCell align="left" sx={{ fontSize: '13px' }}>
+                <TableCell align="left" sx={{ fontSize: '13px' }} width={'20%'}>
                   <Typography variant="body2">{row.title}</Typography>
-                  <Typography variant="body3">{INTERVAL_DESC[row.interval - 1]}</Typography>
+                  <Typography variant="body3">Minimal {row.interval_name}</Typography>
                   <Typography variant="body3" color="primary">{`, Nilai: ${row.score}`}</Typography>
                 </TableCell>
                 {row.list.map((item, id) => {
@@ -162,12 +153,12 @@ export function renderConditionalRow(
           case 4: // harian (20 hari tiap bulan)
             content = (
               <TableRow hover key={row.id} tabIndex={-1}>
-                <TableCell align="justify" sx={{ fontSize: '13px' }}>
+                <TableCell align="justify" sx={{ fontSize: '13px' }} width={'5%'}>
                   {index + 1}
                 </TableCell>
-                <TableCell align="left" sx={{ fontSize: '13px' }}>
+                <TableCell align="left" sx={{ fontSize: '13px' }} width={'20%'}>
                   <Typography variant="body2">{row.title}</Typography>
-                  <Typography variant="body3">{INTERVAL_DESC[row.interval - 1]}</Typography>
+                  <Typography variant="body3">Minimal {row.interval_name}</Typography>
                   <Typography variant="body3" color="primary">{`, Nilai: ${row.score}`}</Typography>
                 </TableCell>
                 {row.list.map((item, id) => (
@@ -188,12 +179,12 @@ export function renderConditionalRow(
           case 5: // Triwulanan
             content = (
               <TableRow hover key={row.id} tabIndex={-1}>
-                <TableCell align="justify" sx={{ fontSize: '13px' }}>
+                <TableCell align="justify" sx={{ fontSize: '13px' }} width={'5%'}>
                   {index + 1}
                 </TableCell>
-                <TableCell align="left" sx={{ fontSize: '13px' }}>
+                <TableCell align="left" sx={{ fontSize: '13px' }} width={'20%'}>
                   <Typography variant="body2">{row.title}</Typography>
-                  <Typography variant="body3">{INTERVAL_DESC[row.interval - 1]}</Typography>
+                  <Typography variant="body3">Minimal {row.interval_name}</Typography>
                   <Typography variant="body3" color="primary">{`, Nilai: ${row.score}`}</Typography>
                 </TableCell>
                 <TableCell align="center" sx={{ fontSize: '13px' }} colSpan={3}>
@@ -226,12 +217,12 @@ export function renderConditionalRow(
             const q2Short = expectedLength - q2Length;
             content = (
               <TableRow hover key={row.id} tabIndex={-1}>
-                <TableCell align="justify" sx={{ fontSize: '13px' }}>
+                <TableCell align="justify" sx={{ fontSize: '13px' }} width={'5%'}>
                   {index + 1}
                 </TableCell>
-                <TableCell align="left" sx={{ fontSize: '13px' }}>
+                <TableCell align="left" sx={{ fontSize: '13px' }} width={'20%'}>
                   <Typography variant="body2">{row.title}</Typography>
-                  <Typography variant="body3">{INTERVAL_DESC[row.interval - 1]}</Typography>
+                  <Typography variant="body3">Minimal {row.interval_name}</Typography>
                   <Typography variant="body3" color="primary">{`, Nilai: ${row.score}`}</Typography>
                 </TableCell>
                 <TableCell align="center" sx={{ fontSize: '13px' }} colSpan={3}>
@@ -265,6 +256,35 @@ export function renderConditionalRow(
               </TableRow>
             );
           break;
+
+          case 7: // Semesteran
+            content = (
+              <TableRow hover key={row.id} tabIndex={-1}>
+                <TableCell align="justify" sx={{ fontSize: '13px' }}>
+                  {index + 1}
+                </TableCell>
+                <TableCell align="left" sx={{ fontSize: '13px' }}>
+                  <Typography variant="body2">{row.title}</Typography>
+                  <Typography variant="body3">Minimal {row.interval_name}</Typography>
+                  <Typography variant="body3" color="primary">{`, Nilai: ${row.score}`}</Typography>
+                </TableCell>
+                <TableCell align="center" sx={{ fontSize: '13px' }} colSpan={6}>
+                  <Stack direction="row" spacing={0} alignContent="center" textAlign={'center'} justifyContent={'center'}>
+                    {
+                      Array.from({ length: row.list[5].length }).map((_, index) =>  (
+                        <CheckButton file={row.list[5][index].file} id={row.list[5][index].id} />
+                      ))
+                    }
+                    {
+                      Array.from({ length: 1-(row.list[5].length) }).map((_) =>  (
+                        <AddButton kppn={kppnTab} standardizationId={row.id} month={isEvenPeriod===0? 6 : 12} />
+                      ))
+                    }
+                  </Stack>
+                </TableCell>
+              </TableRow>
+            );
+            break;
 
           default:
             content = null;
@@ -324,3 +344,25 @@ export function getReportingYear(reportingDate: number) {
 
   return currentDate<reportingDate?currentYear-1:currentYear
 };
+
+export function clusterize(standardization: StandardizationType[] | []) {
+  if(!standardization || !standardization.length) {
+    return [];
+  }
+
+  let clusteredStandardization: ClusteredStandardizationType[] = [];
+
+  standardization?.forEach((item) => {
+    const existingCluster = clusteredStandardization.find(
+      (group) => group.cluster === item.cluster
+    );
+  
+    if (existingCluster) {
+      existingCluster.data.push(item);
+    } else {
+      clusteredStandardization.push({ cluster: item.cluster, cluster_name: item.cluster_name || "",data: [item] });
+    }
+  });
+
+  return clusteredStandardization;
+}

@@ -27,7 +27,8 @@ interface StandardizationType{
 // ------------------------------------------------------
 const getAllStandardization = async (req: Request, res: Response, next: NextFunction) => {
   try{
-    const result = await standardization.getStandardization();
+    const currentDasar = await standardization.getCurrentStandardizationDasar();
+    const result = await standardization.getStandardization(currentDasar.id);
 
     return res.status(200).json({sucess: true, message: 'Get standardization success', rows: result})
   }catch(err){
@@ -49,26 +50,33 @@ const getStandardizationJunction = async (req: Request, res: Response, next: Nex
 const getStdWorksheet = async (req: Request, res: Response, next: NextFunction) => {
   try{
     const {period: periodID, kppn: unit, role} = req.payload;
-    const {kppn} = req.params
-    const isKanwil = [3, 4, 99].includes(role);
+    const {kppn} = req.params;
+    const dasar = Number(req.query.dasar) || null;
+    const currentDasar = await standardization.getCurrentStandardizationDasar();
+    const selectedDasar = dasar ? dasar : currentDasar.id;
 
-    if(!isKanwil){
+    const isUserKanwil = [3, 4, 99].includes(role);
+
+    if(!isUserKanwil){
       if(kppn !== unit){
         throw new ErrorDetail(401, 'Not authorized');
       }
     };
-    
     const periodRef = await period.getAllPeriod();
     const isEvenPeriod = periodRef?.filter((item: PeriodType) => item.id === periodID)?.[0]?.even_period || 0;
 
-    const stdRef = await standardization.getStandardization();
+    const isUnitKanwil = kppn.length === 5;
+    const stdRef = await standardization.getStandardization(selectedDasar, isUnitKanwil);
     const stdJunction = await standardization.getStandardizationJunction(kppn, periodID);
-    
+    const stdDasar = await standardization.getStandardizationDasar();
+
     const stdWorksheet = stdRef.map((item) => ({
       id: item.id,
       title: item.title,
       interval: item.interval,
+      interval_name: item.interval_name,
       cluster: item.cluster,
+      cluster_name: item.cluster_name,
       list: [
         [...stdJunction?.filter((row) => (row.standardization_id === item.id) && row.month === (isEvenPeriod===0?1:7))],
         [...stdJunction?.filter((row) => (row.standardization_id === item.id) && row.month === (isEvenPeriod===0?2:8))],
@@ -81,7 +89,13 @@ const getStdWorksheet = async (req: Request, res: Response, next: NextFunction) 
       short:  stdScoreGenerator(item.interval, stdJunction, item, isEvenPeriod).short
     }));
 
-    return res.status(200).json({sucess: true, message: 'Get standardization worksheet success', rows: stdWorksheet})
+    return res.status(200).json({sucess: true, message: 'Get standardization worksheet success', rows: {
+      worksheet: stdWorksheet,
+      dasar: stdDasar.map((item) => ({
+        ...item,
+        current: item.id === currentDasar.id ? true : false
+      })),
+    }});
   }catch(err){
     next(err)
   }
@@ -90,7 +104,7 @@ const getStdWorksheet = async (req: Request, res: Response, next: NextFunction) 
 const getStdFilePerMonthKPPN = async (req: Request, res: Response, next: NextFunction) => {
   try{
     const {period, kppn} = req.payload;
-    const {kppnId, month} = req.body;
+    const {kppnId, month, dasar} = req.body;
     const allowedKPPN = kppn === '03010'? kppnId: kppn ;
 
     const monthName = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
@@ -98,9 +112,7 @@ const getStdFilePerMonthKPPN = async (req: Request, res: Response, next: NextFun
     const unitAll = await unit.getAllKPPN();
     const kppnString = unitAll.filter((item) => item.id === allowedKPPN)[0]?.name || '';
 
-    const CLUSTER = [
-      'Manajemen Eksternal', 'Penguatan Kapasitas Perbendaharaan', 'Penguatan Manajemen Internal'
-    ];
+    const cluster = await standardization.getStandardizationCluster(dasar);
 
     const archive = archiver('zip', {
       zlib: { level: 9 } // Set the compression level
@@ -108,10 +120,11 @@ const getStdFilePerMonthKPPN = async (req: Request, res: Response, next: NextFun
     res.attachment(`${kppnString} - ${monthString}.zip`);
     const basePath = `${__dirname}/../uploads/standardization`;
     archive.pipe(res);
-    const fileToAdd = await standardization.getStdFileNameCollection(allowedKPPN, month, period);
+    const fileToAdd = await standardization.getStdFileNameCollection(allowedKPPN, month, period, dasar);
 
     fileToAdd.forEach(fileObj => {
-      const fileName = `${CLUSTER[fileObj.cluster-1]}/${fileObj.title}/${fileObj.file}`;
+      const clusterName = cluster.filter((item) => item.id === fileObj.cluster)[0]?.name || '';
+      const fileName = `${clusterName}/${fileObj.title}/${fileObj.file}`;
       const filePath = path.join(basePath, fileObj.file);
       archive.file(filePath, { name: fileName });
     });

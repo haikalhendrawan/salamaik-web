@@ -7,11 +7,14 @@ import { ReactNode, useState, createContext, useContext} from 'react';
 import useAxiosJWT from '../../hooks/useAxiosJWT';
 import useLoading from '../../hooks/display/useLoading';
 import useSnackbar from '../../hooks/display/useSnackbar';
-import { StandardizationType } from './types';
+import { StandardizationType, StandardizationDasarType } from './types';
 //------------------------------------------------------------------
 interface StandardizationContextType{
   standardization: StandardizationType[] | [],
-  getStandardization: (kppnId: string) => Promise<void>,
+  getStandardization: (kppnId: string, dasarC?: string) => Promise<void>,
+  dasar: StandardizationDasarType[] | [],
+  selectedDasar: string | null,
+  setSelectedDasar: (id: string) => void
 };
 
 type StandardizationProviderProps = {
@@ -22,6 +25,9 @@ type StandardizationProviderProps = {
 const StandardizationContext = createContext<StandardizationContextType>({
   standardization: [], 
   getStandardization: async() => {},
+  dasar: [],
+  selectedDasar: "",
+  setSelectedDasar: () => {}
 });
 
 const StandardizationProvider = ({children}: StandardizationProviderProps) => {
@@ -33,12 +39,20 @@ const StandardizationProvider = ({children}: StandardizationProviderProps) => {
 
   const [standardization, setStandardization] = useState<StandardizationType[] | []  >([]);
 
-  const getStandardization = async(kppnId: string) => {
+  const [dasar, setDasar] = useState<StandardizationDasarType[] | []  >([]);
+
+  const [selectedDasar, setSelectedDasar] = useState<string | null>(null);
+
+  const getStandardization = async(kppnId: string, dasarC?: string) => {
     try{
       setIsLoading(true);
       const time = new Date().getTime();
-      const response = await axiosJWT.get(`/getStdWorksheet/${kppnId}?time=${time}`);
-      setStandardization(response.data.rows);
+      const response = await axiosJWT.get(`/getStdWorksheet/${kppnId}?time=${time}&dasar=${dasarC ? dasarC : selectedDasar}`);
+      setStandardization(response.data.rows.worksheet);
+      setDasar(response.data.rows.dasar);
+      if(!selectedDasar){
+        setSelectedDasar(response.data.rows.dasar.find((item: StandardizationDasarType) => item.current === true)?.id || "");
+      }
       setIsLoading(false);
     }catch(err: any){
       setIsLoading(false);
@@ -50,7 +64,7 @@ const StandardizationProvider = ({children}: StandardizationProviderProps) => {
 
 
   return(
-    <StandardizationContext.Provider value={{standardization, getStandardization}}>
+    <StandardizationContext.Provider value={{standardization, getStandardization, dasar, selectedDasar, setSelectedDasar}}>
       {children}
     </StandardizationContext.Provider>
   )

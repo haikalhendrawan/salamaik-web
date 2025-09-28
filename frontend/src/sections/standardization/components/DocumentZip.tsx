@@ -12,6 +12,7 @@ import useAxiosJWT from "../../../hooks/useAxiosJWT";
 import { StyledSelect} from "../../../components/styledSelect";
 import useSnackbar from "../../../hooks/display/useSnackbar";
 import { useAuth } from "../../../hooks/useAuth";
+import useStandardization from "../useStandardization";
 // ----------------------------------------------
 interface DocumentShortProps {
   header: string,
@@ -37,6 +38,8 @@ const semester2Object = [{month: 'Juli', value: 7}, {month: 'Agustus', value: 8}
 
 export default function DocumentZip({header, subheader, image, tabValue }:DocumentShortProps){
   const [loading, setLoading] = useState<boolean>(false);
+
+  const {selectedDasar} = useStandardization();
 
   const {auth} = useAuth();
 
@@ -65,7 +68,8 @@ export default function DocumentZip({header, subheader, image, tabValue }:Docume
       const year = periodRef?.list?.filter((item) => item.id === auth?.period)[0]?.tahun || 0;
       const response = await axiosJWT.post('/getStdFilePerMonthKPPN', {
         kppnId,
-        month
+        month,
+        dasar: selectedDasar
       }, {
         responseType: 'blob'
       });
