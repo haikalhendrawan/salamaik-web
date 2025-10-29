@@ -22,7 +22,7 @@ const style = {
 };
 
 // -------------------------------------------------------------------------------------------
-export default function PreviewFileModal({isDisabled}: {isDisabled: boolean}) {
+export default function PreviewFileModal({isDisabled, kppn}: {isDisabled: boolean, kppn: string | null}) {
   const {
     open, 
     file, 
@@ -62,7 +62,7 @@ export default function PreviewFileModal({isDisabled}: {isDisabled: boolean}) {
       }, async() => {
         try{
           setIsLoading(true);
-          await getWsJunctionKanwil('010');
+          await getWsJunctionKanwil(kppn || '');
           modalClose();
           setIsLoading(false);
         }catch(err: any){

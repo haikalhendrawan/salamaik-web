@@ -176,7 +176,7 @@ export default function WorksheetKPPN() {
 
           </Container>
 
-          <PreviewFileModal isDisabled={isPastDue}/>
+          <PreviewFileModal isDisabled={isPastDue} kppn={id}/>
 
           <NavigationDrawer tabValue={tabValue} scrollToElement={scrollToElement}/> 
           
