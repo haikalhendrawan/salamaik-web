@@ -25,6 +25,16 @@ class Misc{
     }
   }
 
+  async getMiscById(id: number){
+    try{
+      const q = `SELECT * FROM misc_data WHERE id = $1`;
+      const result = await pool.query(q, [id]);
+      return result.rows[0]
+    }catch(err){
+      throw err
+    }
+  }
+
   async addMisc(miscId: number, value: string, detail_1?: string | null, detail_2?: string | null, detail_3?: string | null){
     try{
       const q = `INSERT INTO misc_data (misc_id, value, detail_1, detail_2, detail_3) VALUES ($1, $2, $3, $4, $5) RETURNING *`;
@@ -44,6 +54,17 @@ class Misc{
       throw err
     }
   }
+
+  async editMiscById(id: number, value: string, detail_1?: string | null, detail_2?: string | null, detail_3?: string | null){
+    try{
+      const q = `UPDATE misc_data SET value = $1, detail_1 = $2, detail_2 = $3, detail_3 = $4 WHERE id = $5 RETURNING *`;
+      const result = await pool.query(q, [value, detail_1, detail_2, detail_3, id]);
+      return result.rows[0]
+    }catch(err){
+      throw err
+    }
+  }
+
 }
 
 const misc = new Misc;

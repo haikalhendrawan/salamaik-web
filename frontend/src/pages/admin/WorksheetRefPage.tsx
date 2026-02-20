@@ -105,7 +105,6 @@ export default function WorksheetRefPage() {
             </Stack>
             <Button 
               variant="contained"
-              disabled={section===1 || section ===5 || section ===6? false : true} 
               startIcon={<Iconify icon="eva:plus-fill" />} 
               onClick={() => setAddState(true)}
             >

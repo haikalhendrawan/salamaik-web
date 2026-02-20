@@ -192,3 +192,33 @@ const galleryLimit = {
 const uploadGallery = multer({storage:galleryStorage, limits:galleryLimit, fileFilter:galleryFileFilter}).single('gallery');
 
 export {uploadGallery}
+
+// ----------------------------------------------------------------------------------------------------------
+// Peraturan File Uplaod
+const peraturanStorage= multer.diskStorage(
+  { 
+    destination:(req, file, callback) => {
+      callback(null, `${__dirname}/../uploads/peraturan`)
+    },
+    filename:(req, file, callback) => {
+      const fileExt = sanitizeMimeType(file.mimetype);
+      callback(null, `dasar_pembinaan.${fileExt}`)
+    }
+  }
+);
+
+const peraturanFileFilter = (req: any, file: any, callback: any) => {
+  if(file.mimetype === 'application/pdf'){
+    callback(null, true)
+  }else{
+    callback(null, false)
+  }
+}; 
+
+const peraturanLimit = {
+  fileSize: 2097152 //2 mb
+};
+
+const uploadPeraturan = multer({storage:peraturanStorage, limits:peraturanLimit, fileFilter:peraturanFileFilter}).single('peraturan');
+
+export {uploadPeraturan}

@@ -12,7 +12,10 @@ import Label from '../../../../components/label';
 import Scrollbar from '../../../../components/scrollbar';
 import StyledTextField from '../../../../components/styledTextField/StyledTextField';
 import StyledButton from '../../../../components/styledButton/StyledButton';
-import useDictionary from '../../../../hooks/useDictionary';
+import useAxiosJWT from '../../../../hooks/useAxiosJWT';
+import useSnackbar from '../../../../hooks/display/useSnackbar';
+import StyledNumberTextField from '../../../../components/styledNumberTextField/StyledNumberTextField';
+import useDialog from '../../../../hooks/display/useDialog';
 // ---------------------------------------------------
 const TABLE_HEAD = [
   { id: 'id', label: 'Id', alignRight: false },
@@ -28,6 +31,7 @@ interface KomponenData{
   bobot: number,
   detail?: string,
   alias?: string,
+  deleted?: boolean
 };
 
 
@@ -45,7 +49,13 @@ export default function KomponenRef({section, addState, resetAddState}: Komponen
 
   const [editID, setEditID] = useState<number | null>(null);
 
-  const { komponenRef } = useDictionary();
+  const [komponenRef, setKomponenRef] = useState<KomponenData[]>([]);
+
+  const axiosJWT = useAxiosJWT();
+
+  const {openSnackbar} = useSnackbar();
+
+  const {openDialog} = useDialog();
 
   const handleOpen = (id: number) => {
     setOpen(true);
@@ -56,6 +66,25 @@ export default function KomponenRef({section, addState, resetAddState}: Komponen
     setOpen(false);
     resetAddState();
   };
+
+  const getData = async () => {
+    try {
+      const response = await axiosJWT.get("/getAllKomponenExisting");
+      setKomponenRef(response.data.rows);
+    } catch (err) {
+      openSnackbar("Fail to get referensi peraturan", "error");
+    }
+  };
+
+  const handleDeleteKomponen = async (id: number) => {
+    try {
+      const response = await axiosJWT.get(`/deleteKomponen/${id}`);
+      openSnackbar(response.data.message, "success");
+      getData();
+    } catch (err) {
+      openSnackbar("Fail to delete referensi peraturan", "error");
+    }
+  };
   
   //set modal state utk add Data dan hide modal state buat nge edit
   useEffect(() => {
@@ -65,6 +94,10 @@ export default function KomponenRef({section, addState, resetAddState}: Komponen
     }
 
   }, [addState, section]);
+
+  useEffect(() => {
+    getData();
+  }, []);
 
   return (
     <>
@@ -86,9 +119,9 @@ export default function KomponenRef({section, addState, resetAddState}: Komponen
               </TableRow>
             </TableHead>
             <TableBody>
-              {komponenRef?.map((row) => 
+              {komponenRef?.filter(item=>item.deleted===false).map((row, index) => 
                 <TableRow hover key={row.id} tabIndex={-1}>
-                  <TableCell align="justify">{row.id}</TableCell>
+                  <TableCell align="justify">{index+1}</TableCell>
 
                   <TableCell align="left">{row.title}</TableCell>
 
@@ -109,7 +142,6 @@ export default function KomponenRef({section, addState, resetAddState}: Komponen
                             variant='contained' 
                             size='small' 
                             color='warning'
-                            disabled
                             onClick={() => handleOpen(row.id)}
                           >
                             <Iconify icon="solar:pen-bold-duotone"/>
@@ -118,7 +150,19 @@ export default function KomponenRef({section, addState, resetAddState}: Komponen
                       </Tooltip>
                       <Tooltip title='delete'>
                         <span>
-                          <StyledButton aria-label="delete" disabled variant='contained' size='small' color='white'>
+                          <StyledButton 
+                            aria-label="delete" 
+                            value='contained'
+                            size='small' 
+                            color='pink'
+                            onClick={() => openDialog(
+                              "Delete",
+                              "Yakin hapus komponen ini?",
+                              'pink',
+                              'Delete',
+                              () => handleDeleteKomponen(row.id)
+                            )}
+                          >
                             <Iconify icon="solar:trash-bin-trash-bold"/>
                           </StyledButton>
                         </span>
@@ -138,7 +182,8 @@ export default function KomponenRef({section, addState, resetAddState}: Komponen
         addState={addState}
         editID={editID}
         data={komponenRef || []}
-        /> 
+        getData={getData}
+      /> 
     </>
   )
 }
@@ -150,7 +195,7 @@ const style = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  height:'55vh',
+  height:'60vh',
   width: '50vw',
   bgcolor: 'background.paper',
   boxShadow: 24,
@@ -173,22 +218,28 @@ interface KomponenRefModalProps {
   modalClose: () => void,
   addState: boolean,
   editID: number | null,
-  data: KomponenData[]
+  data: KomponenData[],
+  getData: () => void
 }
 
 
 //----------------------------------------------------------------
-function KomponenRefModal({modalOpen, modalClose, addState, editID, data}: KomponenRefModalProps) {
+function KomponenRefModal({modalOpen, modalClose, addState, editID, data, getData}: KomponenRefModalProps) {
+  const {openSnackbar} = useSnackbar();
+
+  const axiosJWT = useAxiosJWT();
+
   const [addValue, setAddValue] = useState<KomponenData>({
     id: 0,
     title: '',
     bobot: 0,
+    alias: '',
   });
 
   const handleChangeAdd = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setAddValue({
       ...addValue,
-      [e.target.name]:e.target.value
+      [e.target.name]:e.target.name === 'bobot' ? Number(e.target.value) : e.target.value
     })
   };
 
@@ -197,6 +248,7 @@ function KomponenRefModal({modalOpen, modalClose, addState, editID, data}: Kompo
       id: 0,
       title: '',
       bobot: 0,
+      alias: '',
     })
   };
 
@@ -204,12 +256,13 @@ function KomponenRefModal({modalOpen, modalClose, addState, editID, data}: Kompo
     id: 0,
     title: 'null',
     bobot: 0,
+    alias: '',
   });
 
   const handleChangeEdit = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setEditValue({
       ...editValue,
-      [e.target.name]:e.target.value
+      [e.target.name]: e.target.name === 'bobot' ? Number(e.target.value) : e.target.value
     })
   };
 
@@ -218,7 +271,55 @@ function KomponenRefModal({modalOpen, modalClose, addState, editID, data}: Kompo
       id: data.filter((row) => row.id===editID)[0].id,
       title: data.filter((row) => row.id===editID)[0].title,
       bobot: data.filter((row) => row.id===editID)[0].bobot,
+      alias: data.filter((row) => row.id===editID)[0].alias,
     })
+  };
+
+  const handleAddKomponen = async () => {
+    try {
+      if(addValue.bobot<0 || addValue.bobot>100) {
+        return openSnackbar('Bobot tidak boleh kurang dari 0 atau lebih besar dari 100', 'error');
+      }
+
+      const form = {
+        title: addValue.title,
+        bobot: addValue.bobot,
+        alias: addValue.alias,
+      };
+
+      const response = await axiosJWT.post('/createKomponen', form);
+
+      openSnackbar(response.data.message, 'success');
+      getData();
+      modalClose();
+      handleResetAdd();
+    } catch (error) {
+      openSnackbar('Failed to add komponen', 'error');
+    }
+  };
+
+  const handleEditKomponen = async () => {
+    try {
+      if(editValue.bobot<0 || editValue.bobot>100) {
+        return openSnackbar('Bobot tidak boleh kurang dari 0 atau lebih besar dari 100', 'error');
+      }
+
+      const form = {
+        id: editValue.id,
+        title: editValue.title,
+        bobot: editValue.bobot,
+        alias: editValue.alias,
+      };
+
+      const response = await axiosJWT.post('/editKomponen', form);
+
+      openSnackbar(response.data.message, 'success');
+      getData();
+      modalClose();
+      handleResetEdit();
+    } catch (error) {
+      openSnackbar('Failed to edit komponen', 'error');
+    }
   };
 
   useEffect(() => {
@@ -227,6 +328,7 @@ function KomponenRefModal({modalOpen, modalClose, addState, editID, data}: Kompo
         id: data.filter((row) => row.id===editID)[0].id,
         title: data.filter((row) => row.id===editID)[0].title,
         bobot: data.filter((row) => row.id===editID)[0].bobot,
+        alias: data.filter((row) => row.id===editID)[0].alias,
       })
     }
   }, [data, editID])
@@ -249,7 +351,7 @@ function KomponenRefModal({modalOpen, modalClose, addState, editID, data}: Kompo
                       <Stack direction='column' spacing={3} sx={{width:'45%'}}>
                         <FormControl>
                           <StyledTextField 
-                            name="komponen" 
+                            name="title" 
                             label="Nama Komponen"
                             multiline
                             minRows={2}
@@ -258,15 +360,28 @@ function KomponenRefModal({modalOpen, modalClose, addState, editID, data}: Kompo
                           />
                         </FormControl>
 
-                      </Stack>
-                      <Stack direction='column' spacing={3} sx={{width:'45%'}}>
                         <FormControl>
                           <StyledTextField 
+                            name="alias" 
+                            label="Alias Komponen (opsional)"
+                            multiline
+                            minRows={2}
+                            value={ addState? addValue.alias : editValue.alias}
+                            onChange={addState? handleChangeAdd : handleChangeEdit}
+                            helperText="singkatan"
+                          />
+                        </FormControl>
+
+                      </Stack>
+                      <Stack direction='column' spacing={3} sx={{width:'45%'}}>
+                        <FormControl sx={{display:'flex', alignItems:'center', flexDirection: 'row', gap:2}}>
+                          <StyledNumberTextField 
                             name="bobot" 
                             label="Bobot"
                             value={ addState? addValue.bobot : editValue.bobot}
                             onChange={addState? handleChangeAdd : handleChangeEdit}  
-                          />
+                            helperText="isi angka 0 - 100"
+                          />%
                         </FormControl>
                       </Stack>
                     </Stack>
@@ -276,6 +391,7 @@ function KomponenRefModal({modalOpen, modalClose, addState, editID, data}: Kompo
                         variant='contained'
                         color={addState? 'primary' : 'warning'} 
                         sx={{borderRadius:'8px'}}
+                        onClick={addState? handleAddKomponen : handleEditKomponen}
                       >
                         {addState? 'Add' : 'Edit'} 
                       </Button>

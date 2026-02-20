@@ -11,7 +11,9 @@ import Iconify from '../../../../components/iconify';
 import Scrollbar from '../../../../components/scrollbar';
 import StyledTextField from '../../../../components/styledTextField/StyledTextField';
 import StyledButton from '../../../../components/styledButton/StyledButton';
-import useDictionary from '../../../../hooks/useDictionary';
+import useAxiosJWT from '../../../../hooks/useAxiosJWT';
+import useSnackbar from '../../../../hooks/display/useSnackbar';
+import useDialog from '../../../../hooks/display/useDialog';
 //----------------------------------------------------
 const TABLE_HEAD = [
   { id: 'id', label: 'Id', alignRight: false },
@@ -20,6 +22,15 @@ const TABLE_HEAD = [
   { id: 'checklist', label: 'Checklist', alignRight: false },
   { id: 'action', label: 'Action', alignRight: false },
 ];
+
+interface KomponenData{
+  id: number,
+  title: string,
+  bobot: number,
+  detail?: string,
+  alias?: string,
+  deleted?: boolean
+};
 
 interface SubKomponenRefType{
   id: number,
@@ -43,7 +54,17 @@ export default function SubKomponenRef({section, addState, resetAddState}: SubKo
 
   const [editID, setEditID] = useState<number | null>(null);
 
-  const { komponenRef, subKomponenRef } = useDictionary();
+  // const { komponenRef, subKomponenRef } = useDictionary();
+
+  const [komponenRef, setKomponenRef] = useState<KomponenData[]>([]);
+
+  const [subKomponenRef, setSubKomponenRef] = useState<SubKomponenRefType[]>([]);
+
+  const axiosJWT = useAxiosJWT();
+
+  const {openSnackbar} = useSnackbar();
+
+  const {openDialog} = useDialog();
 
   const handleOpen = (id: number) => {
     setOpen(true);
@@ -54,6 +75,17 @@ export default function SubKomponenRef({section, addState, resetAddState}: SubKo
     setOpen(false);
     resetAddState();
   };
+
+  const getData = async () => {
+    try {
+      const response = await axiosJWT.get("/getAllKomponenExisting");
+      const response2 = await axiosJWT.get("/getAllSubKomponenExisting");
+      setKomponenRef(response.data.rows);
+      setSubKomponenRef(response2.data.rows);
+    } catch (err) {
+      openSnackbar("Fail to get referensi peraturan", "error");
+    }
+  };
   
   //set modal state utk add Data dan hide modal state buat nge edit
   useEffect(() => {
@@ -63,6 +95,10 @@ export default function SubKomponenRef({section, addState, resetAddState}: SubKo
     }
 
   }, [addState, section]);
+
+  useEffect(() => {
+    getData();
+  }, []);
 
   return (
     <>
@@ -103,7 +139,6 @@ export default function SubKomponenRef({section, addState, resetAddState}: SubKo
                       <Tooltip title='edit'>
                         <span>
                           <StyledButton 
-                            disabled
                             aria-label="edit" 
                             variant='contained' 
                             size='small' 
@@ -116,7 +151,7 @@ export default function SubKomponenRef({section, addState, resetAddState}: SubKo
                       </Tooltip>
                       <Tooltip title='delete'>
                         <span>
-                          <StyledButton aria-label="delete" disabled variant='contained' size='small' color='white'>
+                          <StyledButton aria-label="delete" size='small' color='pink'>
                             <Iconify icon="solar:trash-bin-trash-bold"/>
                           </StyledButton>
                         </span>

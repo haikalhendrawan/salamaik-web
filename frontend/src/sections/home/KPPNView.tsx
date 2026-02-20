@@ -71,6 +71,8 @@ export default function KPPNView(){
 
   const [worksheet, setWorksheet] = useState<WorksheetType | null>(null);
 
+  const [peraturan, setPeraturan] = useState<string>('');
+
   const getScoreProgress = async() => {
     try{
       setIsLoading(true);
@@ -127,11 +129,28 @@ export default function KPPNView(){
     }
   };
 
+  const getPeraturan = async () => {
+    try{
+      setIsLoading(true);
+      const response = await axiosJWT.get('/getMiscByType/0');
+      if(response.data.rows.length>0){
+        setPeraturan(response.data.rows[0].value);
+      }
+      setIsLoading(false);
+    }catch(err:any){
+      setIsLoading(false);
+      openSnackbar(err.response.data.message, 'error');
+    }finally{
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     getScoreProgress();
     getHistorical();
     getFindings();
     getWorksheet();
+    getPeraturan();
     setIsMounted(true);
 
   }, []);
@@ -248,7 +267,7 @@ export default function KPPNView(){
       <Grid item xs={12} md={4}>
         <DasarHukum 
           title={'Dasar Hukum'} 
-          subheader="Peraturan Direktur Jenderal Perbendaharaan Nomor PER-1/PB/2023"
+          subheader={`Peraturan Direktur Jenderal Perbendaharaan Nomor ${peraturan}`}
         /> 
       </Grid>
 

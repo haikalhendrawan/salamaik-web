@@ -7,7 +7,7 @@ import {Request, Response, NextFunction} from 'express';
 import misc from '../model/misc.model';
 import multer from 'multer';
 import ErrorDetail from '../model/error.model';
-import { uploadGallery } from '../config/multer';
+import { uploadGallery, uploadPeraturan } from '../config/multer';
 // -------------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------------
@@ -58,9 +58,45 @@ const deleteMisc = async (req: Request, res: Response, next: NextFunction) => {
   }
 }
 
+const editMiscById = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const {id, value, detail1, detail2, detail3} = req.body;
+    const result = await misc.getMiscById(parseInt(id));
+
+    if(!result){
+      return next(new ErrorDetail(404, 'Data not found'));
+    }
+
+    const result2 = await misc.editMiscById(parseInt(id), value, detail1, detail2, detail3);
+
+    return res.status(200).json({sucess: true, message: 'Get misc success', rows: result2});
+  } catch (err) {
+    next(err);
+  }
+}
+
+const editPeraturan = async (req: Request, res: Response, next: NextFunction) => {
+  uploadPeraturan(req, res, async (err: any) => {
+    if(err instanceof multer.MulterError) {
+      return next(new ErrorDetail(400, 'File too large (Max 20mb)', err));
+    } else if(err) {
+      return next(err);
+    };
+
+    if(!req.file){
+      console.log(err);
+      return next(new ErrorDetail(400, 'Incorrect file type', err));
+    };
+
+    return res.status(200).json({sucess: true, message: 'Edit file peraturan success'});
+  })
+}
+
 
 export {
   getMiscByType,
   addGallery,
-  deleteMisc
+  deleteMisc,
+  editMiscById,
+  editPeraturan,
 }
