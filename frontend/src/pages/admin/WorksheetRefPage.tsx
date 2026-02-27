@@ -12,6 +12,7 @@
  * 4: Sub sub komponen
  * 5: batch
  * 6: periode
+ * 7: peraturan
  */
 
 import {useState} from'react';
@@ -24,6 +25,7 @@ import SubKomponenRef from '../../sections/admin/worksheetRef/SubKomponenRef';
 import SubSubKomponenRef from '../../sections/admin/worksheetRef/SubSubKomponenRef';
 import BatchRef from '../../sections/admin/worksheetRef/BatchRef';
 import PeriodRefSection from '../../sections/admin/worksheetRef/PeriodRef';
+import PeraturanRef from '../../sections/admin/worksheetRef/PeraturanRef';
 import { ChecklistProvider } from '../../sections/admin/worksheetRef/ChecklistRef/useChecklist';
 import { BatchProvider } from '../../sections/admin/worksheetRef/BatchRef/useBatch';
 import { DialogProvider } from '../../hooks/display/useDialog';
@@ -58,6 +60,7 @@ export default function WorksheetRefPage() {
       <BatchRef section={section} addState={addState} resetAddState={resetAddState} />
     </BatchProvider>,
     <PeriodRefSection section={section} addState={addState} resetAddState={resetAddState} />,
+    <PeraturanRef section={section} addState={addState} resetAddState={resetAddState} />,
   ];
 
   const SECTION_NAME: string[] = [
@@ -68,6 +71,7 @@ export default function WorksheetRefPage() {
     'Sub Sub Komponen',
     'Kertas Kerja',
     'Periode',
+    'Peraturan'
   ];
 
 

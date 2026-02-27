@@ -44,7 +44,7 @@ export interface KomponenWithSubKomponen{
 class Komponen{
   async getAllKomponen(){
     try{
-      const q = "SELECT * FROM komponen_ref WHERE deleted <> TRUE ORDER BY id ASC";
+      const q = "SELECT * FROM komponen_ref WHERE deleted IS NULL ORDER BY id ASC";
       const result = await pool.query(q);
       return result.rows;
     }catch(err){
@@ -67,8 +67,8 @@ class Komponen{
       const q = ` SELECT komponen_ref.*, json_agg(subkomponen_ref.* ORDER BY subkomponen_ref.id ASC) AS subkomponen 
                   FROM komponen_ref 
                   INNER JOIN subkomponen_ref ON komponen_ref.id = subkomponen_ref.komponen_id 
-                  WHERE komponen_ref.deleted <> TRUE
-                  AND subkomponen_ref.deleted <> TRUE
+                  WHERE komponen_ref.deleted IS NULL
+                  AND subkomponen_ref.deleted IS NULL
                   GROUP BY komponen_ref.id
                   ORDER BY komponen_ref.id ASC`;
       const result = await pool.query(q);
@@ -82,7 +82,7 @@ class Komponen{
     try{
       const {title, bobot, detail, alias} = form;
       const q = "INSERT INTO komponen_ref (title, bobot, detail, alias, deleted) VALUES ($1, $2, $3, $4, $5) RETURNING *";
-      const result = await pool.query(q, [title, bobot, detail, alias, false]);
+      const result = await pool.query(q, [title, bobot, detail, alias, null]);
       return result.rows[0];
     }catch(err){
       throw err;
@@ -91,7 +91,7 @@ class Komponen{
 
   async deleteKomponen(id: number){
     try{
-      const q = "UPDATE komponen_ref SET deleted = TRUE WHERE id = $1 RETURNING *";
+      const q = "UPDATE komponen_ref SET deleted = CURRENT_TIMESTAMP WHERE id = $1 RETURNING *";
       const result = await pool.query(q, [id]);
       return result.rows[0];
     }catch(err){
@@ -116,7 +116,7 @@ const komponen = new Komponen();
 class SubKomponen{
   async getAllSubKomponen(){
     try{
-      const q = "SELECT * FROM subkomponen_ref WHERE deleted <> TRUE ORDER BY id ASC";
+      const q = "SELECT * FROM subkomponen_ref WHERE deleted IS NULL ORDER BY id ASC";
       const result = await pool.query(q);
       return result.rows;
     }catch(err){
@@ -138,7 +138,7 @@ class SubKomponen{
     try{
       const {title, komponen_id, detail} = form;
       const q = "INSERT INTO subkomponen_ref (title, komponen_id, detail, deleted) VALUES ($1, $2, $3, $4) RETURNING *";
-      const result = await pool.query(q, [title, komponen_id, detail, false]);
+      const result = await pool.query(q, [title, komponen_id, detail, null]);
       return result.rows[0];
     }catch(err){
       throw err;
@@ -147,7 +147,7 @@ class SubKomponen{
 
   async deleteSubKomponen(id: number){
     try{
-      const q = "UPDATE subkomponen_ref SET deleted = TRUE WHERE id = $1 RETURNING *";
+      const q = "UPDATE subkomponen_ref SET deleted = CURRENT_TIMESTAMP WHERE id = $1 RETURNING *";
       const result = await pool.query(q, [id]);
       return result.rows[0];
     }catch(err){
@@ -161,7 +161,7 @@ const subKomponen = new SubKomponen();
 class SubSubKomponen{
   async getAllSubSubKomponen(){
     try{
-      const q = "SELECT * FROM subsubkomponen_ref WHERE deleted <> TRUE ORDER BY id ASC";
+      const q = "SELECT * FROM subsubkomponen_ref WHERE deleted IS NULL TRUE ORDER BY id ASC";
       const result = await pool.query(q);
       return result.rows;
     }catch(err){
@@ -183,7 +183,7 @@ class SubSubKomponen{
     try{
       const {title, komponen_id, subkomponen_id, detail} = form;
       const q = "INSERT INTO subsubkomponen_ref (title, komponen_id, subkomponen_id, detail, deleted) VALUES ($1, $2, $3, $4, $5) RETURNING *";
-      const result = await pool.query(q, [title, komponen_id,subkomponen_id, detail, false]);
+      const result = await pool.query(q, [title, komponen_id,subkomponen_id, detail, null]);
       return result.rows[0];
     }catch(err){
       throw err;
@@ -192,7 +192,7 @@ class SubSubKomponen{
 
   async deleteSubSubKomponen(id: number){
     try{
-      const q = "UPDATE subsubkomponen_ref SET deleted = TRUE WHERE id = $1 RETURNING *";
+      const q = "UPDATE subsubkomponen_ref SET deleted = CURRENT_TIMESTAMP WHERE id = $1 RETURNING *";
       const result = await pool.query(q, [id]);
       return result.rows[0];
     }catch(err){

@@ -16,7 +16,7 @@ router.get("/getMiscByType/:miscId", authenticate, authorize([99, 4, 3, 2, 1]), 
 router.post("/addGallery", authenticate, authorize([99, 4, 3, 2, 1]), logActivity(39), miscController.addGallery);
 router.post("/deleteGallery/:id", authenticate, authorize([99, 4, 3, 2, 1]), logActivity(40), miscController.deleteMisc);
 router.post("/editMiscById", authenticate, authorize([99, 4]), logActivity(41), miscController.editMiscById);
-router.post("/editPeraturan", authenticate, authorize([99, 4]), logActivity(42), miscController.editPeraturan);
+// router.post("/editPeraturan", authenticate, authorize([99, 4]), logActivity(42), miscController.editPeraturan);
 
 
 export default router

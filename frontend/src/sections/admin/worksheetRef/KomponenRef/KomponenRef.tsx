@@ -31,7 +31,7 @@ interface KomponenData{
   bobot: number,
   detail?: string,
   alias?: string,
-  deleted?: boolean
+  deleted?: string | null
 };
 
 
@@ -119,7 +119,7 @@ export default function KomponenRef({section, addState, resetAddState}: Komponen
               </TableRow>
             </TableHead>
             <TableBody>
-              {komponenRef?.filter(item=>item.deleted===false).map((row, index) => 
+              {komponenRef?.filter(item=>item.deleted===null).map((row, index) => 
                 <TableRow hover key={row.id} tabIndex={-1}>
                   <TableCell align="justify">{index+1}</TableCell>
 

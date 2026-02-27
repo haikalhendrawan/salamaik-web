@@ -34,6 +34,7 @@ import miscRoute from './routes/miscRoute';
 import activityRoute from './routes/activityRoute';
 import commentRoute from './routes/commentRoute';
 import infoRoute from './routes/infoRoute';
+import peraturanRoute from './routes/peraturanRoute';
 //middleware
 import errorHandler from './middleware/errorHandler';
 import rateLimiter from './middleware/rateLimiter';
@@ -65,6 +66,7 @@ app.use(WsJunctionRoute);
 app.use(matrixRoute);
 app.use(findingsRoute);
 app.use(miscRoute);
+app.use(peraturanRoute);
 app.use('/comment', commentRoute);
 app.use('/info', infoRoute);
 app.use(activityRoute);

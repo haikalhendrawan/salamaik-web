@@ -102,6 +102,30 @@ const editKomponen = async (req: Request, res: Response, next: NextFunction) => 
   }
 }
 
+const createSubKomponen = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+
+  } catch (err) {
+    next(err);
+  }
+}
+
+const deleteSubKomponen = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+
+  } catch (err) {
+    next(err);
+  }
+}
+
+const editSubKomponen = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+
+  } catch (err) {
+    next(err);
+  }
+}
+
 
 
 export { 

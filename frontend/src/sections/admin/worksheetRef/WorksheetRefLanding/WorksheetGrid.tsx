@@ -36,6 +36,21 @@ export default function WorksheetGrid({changeSection}: WorksheetGridProps) {
         <StatsContainer>
           <Grid container>
             <Grid item md={6}>
+              <Typography variant='body2'>Peraturan</Typography>
+            </Grid>
+            <Grid item md={6}>
+              <Button 
+                variant="contained" 
+                size="small" 
+                endIcon={<Iconify icon="solar:round-alt-arrow-right-bold" />}
+                onClick={() => changeSection(7)}
+                >
+                Edit
+              </Button>
+            </Grid>
+          </Grid>
+          <Grid container>
+            <Grid item md={6}>
               <Typography variant='body2'>Checklist kertas kerja</Typography>
             </Grid>
             <Grid item md={6}>
