@@ -15,7 +15,7 @@ import { passwordSchema, emailSchema } from '../utils/schema';
 const updateCommonProfile = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = req.payload.id;
-    const { name, username, email, period } = req.body;
+    const { name, username, email, period, peraturan } = req.body;
 
     if(name.length === 0 || !name){
       throw new ErrorDetail(400, 'Name cannot be empty')
@@ -29,7 +29,7 @@ const updateCommonProfile = async (req: Request, res: Response, next: NextFuncti
       throw new ErrorDetail(400, 'Invalid email')
     };
 
-    const response = await profile.updateCommonProfile(userId, name, username, email, period );
+    const response = await profile.updateCommonProfile(userId, name, username, email, period, peraturan );
 
     return res.status(200).json({sucess: true, message: 'Profile has been updated', detail: response});
   } catch (err) {

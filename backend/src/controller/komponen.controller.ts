@@ -61,13 +61,13 @@ const getAllSubSubKomponen= async (req: Request, res: Response, next: NextFuncti
 
 const createKomponen = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const {title, bobot, alias} = req.body;
+    const {title, bobot, alias, detail} = req.body;
 
     if(bobot === undefined || bobot=== null || isNaN(bobot) || bobot< 0 || bobot > 100){
       throw new ErrorDetail(401, 'Nilai bobot tidak valid');
     }
 
-    const result = await komponen.createKomponen({title, bobot, alias, detail: ''});
+    const result = await komponen.createKomponen({title, bobot, alias, detail, deleted: null});
 
     return res.status(200).json({sucess: true, message: 'Create komponen success', rows: result});
   } catch (err) {
@@ -104,7 +104,10 @@ const editKomponen = async (req: Request, res: Response, next: NextFunction) => 
 
 const createSubKomponen = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const { title, komponen_id, detail} = req.body;
+    const result = await subKomponen.createSubKomponen({title, komponen_id, detail, deleted: null});
 
+    return res.status(200).json({sucess: true, message: 'Create subkomponen success', rows: result});
   } catch (err) {
     next(err);
   }
@@ -112,7 +115,10 @@ const createSubKomponen = async (req: Request, res: Response, next: NextFunction
 
 const deleteSubKomponen = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const {id} = req.params;
+    const result = await subKomponen.deleteSubKomponen(parseInt(id));
 
+    return res.status(200).json({sucess: true, message: 'Delete subkomponen success', rows: result});
   } catch (err) {
     next(err);
   }
@@ -120,7 +126,11 @@ const deleteSubKomponen = async (req: Request, res: Response, next: NextFunction
 
 const editSubKomponen = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const {id, title, komponen_id, detail} = req.body;
 
+    const result = await subKomponen.editSubKomponen({id, title, komponen_id, detail});
+
+    return res.status(200).json({sucess: true, message: 'Edit komponen success', rows: result});
   } catch (err) {
     next(err);
   }
@@ -136,4 +146,8 @@ export {
   getAllSubSubKomponen, 
   createKomponen, 
   deleteKomponen, 
-  editKomponen };
+  editKomponen,
+  createSubKomponen,
+  deleteSubKomponen,
+  editSubKomponen
+};

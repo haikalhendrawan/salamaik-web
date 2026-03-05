@@ -12,6 +12,7 @@
    hal: string;
    tahun: number;
    deleted: string;
+   file: string;
  };
  // ------------------------------------------------------
  class Peraturan{

@@ -66,6 +66,15 @@ interface UnitRefType{
   list: UnitType[];
 }
 
+interface PeraturanRefType{
+  id: number,
+  nomor: string,
+  hal: string,
+  tahun: number,
+  file: string,
+  deleted?: string
+}
+
 interface DictionaryContextType{
   statusRef: DictionaryType | null,
   periodRef: PeriodRefType | null,
@@ -74,6 +83,7 @@ interface DictionaryContextType{
   komponenRef: KomponenRefType[] | null,
   subKomponenRef: SubKomponenRefType[] | null,
   subSubKomponenRef: SubSubKomponenRefType[] | null,
+  peraturanRef: PeraturanRefType[] | null,
   getDictionary: () => void,
 };
 
@@ -90,6 +100,7 @@ const DictionaryContext = createContext<DictionaryContextType>({
   komponenRef: null,
   subKomponenRef: null,
   subSubKomponenRef: null,
+  peraturanRef: null,
   getDictionary: () => {},
 });
 
@@ -115,6 +126,8 @@ const DictionaryProvider = ({children}: DictionaryProviderProps) => {
   const [subKomponenRef, setSubKomponenRef] = useState(null);
 
   const [subSubKomponenRef, setSubSubKomponenRef] = useState(null);
+
+  const [peraturanRef, setPeraturanRef] = useState(null);
 
   const getPeriod = async() => {
     try{
@@ -185,6 +198,15 @@ const DictionaryProvider = ({children}: DictionaryProviderProps) => {
     }
   };
 
+  const getPeraturan = async() => {
+    try {
+      const response = await axiosJWT.get("/getAllPeraturan");
+      setPeraturanRef(response.data.rows);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const getDictionary = async() => {
     getPeriod();
     getKPPN();
@@ -192,6 +214,7 @@ const DictionaryProvider = ({children}: DictionaryProviderProps) => {
     getKomponen();
     getSubKomponen();
     getSubSubKomponen();
+    getPeraturan();
   };
 
   useEffect(() => {
@@ -207,6 +230,7 @@ const DictionaryProvider = ({children}: DictionaryProviderProps) => {
       komponenRef, 
       subKomponenRef,
       subSubKomponenRef,
+      peraturanRef,
       getDictionary
     }}>
       {children}

@@ -18,10 +18,10 @@ import "dotenv/config";
  * @method updateProfilePicture update pp user => return void
  */
 class Profile{
-  async updateCommonProfile(id: string, name: string, username: string, email: string, period: number){
+  async updateCommonProfile(id: string, name: string, username: string, email: string, period: number, peraturan: number){
     try{
-      const q = "UPDATE user_ref SET name = $1, username = $2, email = $3, period = $4 WHERE id = $5 RETURNING *";
-      const result = await pool.query(q, [name, username, email, period, id]);
+      const q = "UPDATE user_ref SET name = $1, username = $2, email = $3, period = $4, peraturan = $5 WHERE id = $6 RETURNING *";
+      const result = await pool.query(q, [name, username, email, period, peraturan, id]);
       return result
     }catch(err){
       throw err

@@ -16,6 +16,7 @@ interface Auth{
     period: number | null;
     accessToken: string | null;
     status: number | null;
+    peraturan: number | null
 };
 
 type AuthContextType = {

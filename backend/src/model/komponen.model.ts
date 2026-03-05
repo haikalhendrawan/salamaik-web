@@ -14,7 +14,8 @@ export interface KomponenType{
   title: string,
   bobot: number,
   detail: string | null,
-  alias: string
+  alias: string,
+  deleted: string | null,
 };
 
 export interface SubKomponenType{
@@ -22,6 +23,7 @@ export interface SubKomponenType{
   title: string,
   komponen_id: number,
   detail: string | null,
+  deleted: string | null,
 };
 
 export interface SubSubKomponenType{
@@ -30,6 +32,7 @@ export interface SubSubKomponenType{
   subkomponen_id: number;
   title: number;
   detail: string | null;
+  deleted: string | null;
 }
 
 export interface KomponenWithSubKomponen{
@@ -38,6 +41,7 @@ export interface KomponenWithSubKomponen{
   bobot: number,
   detail: string | null,
   alias: string,
+  deleted: string | null,
   subkomponen: SubKomponenType[]
 }
 // ------------------------------------------------------
@@ -149,6 +153,17 @@ class SubKomponen{
     try{
       const q = "UPDATE subkomponen_ref SET deleted = CURRENT_TIMESTAMP WHERE id = $1 RETURNING *";
       const result = await pool.query(q, [id]);
+      return result.rows[0];
+    }catch(err){
+      throw err;
+    }
+  }
+
+  async editSubKomponen(form: Omit<SubKomponenType, 'deleted'>){
+    try{
+      const {id, title, komponen_id, detail} = form;
+      const q = "UPDATE subkomponen_ref SET title = $2, komponen_id = $3, detail = $4 WHERE id = $1 RETURNING *";
+      const result = await pool.query(q, [id, title, komponen_id, detail]);
       return result.rows[0];
     }catch(err){
       throw err;

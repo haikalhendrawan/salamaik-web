@@ -29,6 +29,7 @@
    nomor: string,
    hal: string,
    tahun: number,
+   file: string,
    deleted?: string
  };
  
@@ -231,6 +232,7 @@
      nomor: '',
      hal: '',
      tahun: new Date().getFullYear(),
+     file: '',
    });
  
    const handleChangeAdd = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -246,6 +248,7 @@
       nomor: '',
       hal: '',
       tahun:new Date().getFullYear(),
+      file: '',
      })
    };
  
@@ -254,6 +257,7 @@
      nomor: '',
      hal: '',
      tahun: new Date().getFullYear(),
+     file: '',
    });
  
    const handleChangeEdit = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -269,6 +273,7 @@
        nomor: data.filter((row) => row.id===editID)[0].nomor,
        hal: data.filter((row) => row.id===editID)[0].hal,
        tahun: data.filter((row) => row.id===editID)[0].tahun,
+       file: data.filter((row) => row.id===editID)[0].file,
      })
    };
  
@@ -318,6 +323,7 @@
          nomor: data.filter((row) => row.id===editID)[0].nomor,
          hal: data.filter((row) => row.id===editID)[0].hal,
          tahun: data.filter((row) => row.id===editID)[0].tahun,
+         file: data.filter((row) => row.id===editID)[0].file,
        })
      }
    }, [data, editID])

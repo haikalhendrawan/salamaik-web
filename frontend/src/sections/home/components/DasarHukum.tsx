@@ -16,14 +16,13 @@ import PreviewFileModal from '../../../components/previewFileModal/PreviewFileMo
 interface DasarHukumProps{
   title: string,
   subheader: string,
+  file: string
 };
 
-export default function DasarHukum({ title, subheader, ...other }: DasarHukumProps) {
+export default function DasarHukum({ title, subheader, file, ...other }: DasarHukumProps) {
   const theme = useTheme();
 
   const [open, setOpen] = useState<boolean>(false); // for preview file modal
-
-  const [file, _] = useState<string | undefined>(`${import.meta.env.VITE_API_URL}/peraturan/dasar_pembinaan.pdf`); // for preview file modal
 
   const handleOpenFile = () => {
     setOpen(true);
@@ -61,7 +60,7 @@ export default function DasarHukum({ title, subheader, ...other }: DasarHukumPro
 
     </Card>
 
-    <PreviewFileModal open={open} modalClose={handleCloseFile} file={file} />
+    <PreviewFileModal open={open} modalClose={handleCloseFile} file={`${import.meta.env.VITE_API_URL}/peraturan/${file}`} />
 
     </>
   );

@@ -56,7 +56,7 @@ export default function KanwilView(){
 
   const {openSnackbar} = useSnackbar();
 
-  const {komponenRef, periodRef} = useDictionary();
+  const {komponenRef, periodRef, peraturanRef} = useDictionary();
 
   const {auth} = useAuth();
 
@@ -66,7 +66,7 @@ export default function KanwilView(){
 
   const [findingsData, setFindingsData] = useState<FindingsWithChecklist[]>([]);
 
-  const [peraturan, setPeraturan] = useState<string>('');
+  const peraturan = peraturanRef?.find((item) => item.id === auth?.peraturan) || null;
 
   // const isDataReady = useMemo(() => {
   //   return kppnScoreProgress.length > 0 && historicalScore.length > 0 && findingsData.length > 0;
@@ -114,27 +114,11 @@ export default function KanwilView(){
     }
   };
 
-  const getPeraturan = async () => {
-    try{
-      setIsLoading(true);
-      const response = await axiosJWT.get('/getMiscByType/0');
-      if(response.data.rows.length>0){
-        setPeraturan(response.data.rows[0].value);
-      }
-      setIsLoading(false);
-    }catch(err:any){
-      setIsLoading(false);
-      openSnackbar(err.response.data.message, 'error');
-    }finally{
-      setIsLoading(false);
-    }
-  };
 
   useEffect(() => {
     getScoreProgress();
     getHistorical();
     getFindings();
-    getPeraturan();
     setIsMounted(true);
 
   }, []);
@@ -245,7 +229,8 @@ export default function KanwilView(){
       <Grid item xs={12} md={4}>
         <DasarHukum 
           title={'Dasar Hukum'} 
-          subheader={`Peraturan Direktur Jenderal Perbendaharaan Nomor ${peraturan}`}
+          subheader={`Peraturan Direktur Jenderal Perbendaharaan Nomor ${peraturan?.nomor}`}
+          file={peraturan?.file || ''}
         /> 
       </Grid>
 

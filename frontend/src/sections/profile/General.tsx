@@ -12,6 +12,7 @@ import useLoading from '../../hooks/display/useLoading';
 import useSnackbar from '../../hooks/display/useSnackbar';
 import { useAuth } from '../../hooks/useAuth';
 import useAxiosJWT from '../../hooks/useAxiosJWT';
+import useDictionary from '../../hooks/useDictionary';
 // @mui
 import { Stack, Typography, Box, FormControl,  Grid, Card, Button, Slide,  MenuItem} from '@mui/material';
 import { useTheme, styled } from '@mui/material/styles';
@@ -45,6 +46,7 @@ interface ValueType{
   role: number | null;
   period: number | string;
   status: number | null;
+  peraturan: number | null;
 };
 
 interface refValueType{
@@ -67,6 +69,8 @@ export default function General(){
 
   const axiosJWT = useAxiosJWT();
 
+  const {peraturanRef} = useDictionary();
+
   const [value, setValue] = useState<ValueType>({
     id: auth?.id || '',
     username: auth?.username || '',
@@ -76,7 +80,8 @@ export default function General(){
     kppn: auth?.kppn || '',
     role: auth?.role || 0,
     period: auth?.period || '0',
-    status: auth?.status || 0
+    status: auth?.status || 0,
+    peraturan: auth?.peraturan || 0
   });
 
   const [refValue, setRefValue] = useState<refValueType>({
@@ -90,6 +95,12 @@ export default function General(){
       <MenuItem key={index} sx={{fontSize:14}} value={item.id.toString()}>{item.name}</MenuItem>
     ) || <></>);
   }, [refValue]);
+
+  const peraturanSelection = useMemo(() => {
+    return peraturanRef?.map((item, index) => (
+      <MenuItem key={index} sx={{fontSize:14}} value={item.id.toString()}>{item.nomor}</MenuItem>
+    ) || <></>);
+  }, [peraturanRef]);
 
   const handleClick = () => {
     fileInputRef.current?fileInputRef.current.click():null
@@ -126,7 +137,8 @@ export default function General(){
         name: value.name,
         username: value.username,
         email: value.email,
-        period: value.period
+        period: value.period,
+        peraturan: Number(value.peraturan)
       };
       const response = await axiosJWT.post(`/updateCommonProfile`, profileData);
       const response2 = await axiosJWT.get("/updateToken");
@@ -147,7 +159,8 @@ export default function General(){
         kppn: auth?.kppn || '',
         role: auth?.role || 0,
         period: auth?.period || 0,
-        status: auth?.status || 0
+        status: auth?.status || 0,
+        peraturan: auth?.peraturan || 0
       });
       openSnackbar(`Update profile failed, error: ${err?.response?.data?.message}`, "error");
     }finally{
@@ -165,7 +178,8 @@ export default function General(){
       kppn: auth?.kppn || '',
       role: auth?.role || 0,
       period: auth?.period || 0,
-      status: auth?.status || 0
+      status: auth?.status || 0,
+      peraturan: auth?.peraturan || 0
     })
   };
 
@@ -283,7 +297,17 @@ export default function General(){
                   </StyledSelect>
                 </FormControl>
                 <FormControl>
-                  <StyledTextField name="status" disabled value={value.status===1?'Active User':'Pending User'} label="Status" />
+                  <StyledSelectLabel id="peraturan-select-label">Peraturan</StyledSelectLabel>
+                  <StyledSelect 
+                    required 
+                    name="peraturan" 
+                    label="peraturan"
+                    labelId="peraturan-select-label"
+                    value={value.peraturan}
+                    onChange={(e: any) => handleChange(e)}
+                  >
+                    {peraturanSelection}
+                  </StyledSelect>
                 </FormControl>
                 <FormControl>
                   <StyledTextField name="unit" disabled value={refValue.unit} label="Unit" />
