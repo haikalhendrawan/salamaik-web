@@ -3,7 +3,7 @@
  * © Kanwil DJPb Sumbar 2024
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {NavLink, NavLinkProps} from "react-router-dom"
 // @mui
 import { alpha } from '@mui/material/styles';
@@ -14,6 +14,7 @@ import useSnackbar from '../../../hooks/display/useSnackbar';
 // hooks and other stuff
 import {useAuth} from "../../../hooks/useAuth";
 import useAxiosJWT from '../../../hooks/useAxiosJWT';
+import useDictionary from '../../../hooks/useDictionary';
 // ----------------------------------------------------------------------
 interface MenuOptionType{
   label:string,
@@ -28,9 +29,15 @@ interface MenuOptionType{
 export default function AccountPopover() {
   const [open, setOpen] = useState<null | EventTarget & HTMLButtonElement>(null);
 
-  const [periodText, setPeriodText] = useState<string>("");
+  const {periodRef, peraturanRef} = useDictionary();
 
-  const {auth, setAuth} = useAuth() as AuthType;
+  const {auth, setAuth} = useAuth();
+
+  const period = periodRef?.list?.find((item) => item.id === auth?.period) || null;
+  const periodText = `Smt ${period?.semester} ${period?.tahun}`;
+
+  const peraturan = peraturanRef?.find((peraturan) => peraturan.id === auth?.peraturan) || null;
+  const peraturanText = peraturan?.nomor || '';
 
   const {openSnackbar} = useSnackbar();
 
@@ -44,23 +51,6 @@ export default function AccountPopover() {
     setOpen(null);
   };
 
-  // const handleOpenPeriod = (event) => {
-  //   setAnchorEl(event.currentTarget);
-  //   console.log(openPeriod)
-  // }
-
-  const getPeriod = async() => {
-    try{
-      const response = await axiosJWT.get("/getPeriodById");
-      const semester = response?.data?.rows[0]?.semester;
-      const tahun = response?.data?.rows[0]?.tahun;
-      const periodText = `Smt ${semester} ${tahun}`;
-      setPeriodText(periodText);
-    }catch(err: any){
-      openSnackbar(err?.response?.data?.message, "error");
-    }
-  }
-
   const logout = async () => {
     setAuth(null);
     try {
@@ -70,11 +60,6 @@ export default function AccountPopover() {
       openSnackbar(err?.response?.data?.message, "error");
     }
   };
-
-  useEffect(() => {
-    getPeriod();
-  }, [auth?.period]);
-
   
   const MENU_OPTIONS: Array<MenuOptionType> =  [
     {
@@ -89,6 +74,12 @@ export default function AccountPopover() {
       link: '/profile',
       component:NavLink
     },
+    {
+      label: peraturanText,
+      icon: 'mdi:book-open-variant',
+      link: '/profile',
+      component:NavLink
+    }
   ];
 
 

@@ -5,7 +5,7 @@
 
 import {useState, useEffect} from'react';
 import {Stack, Button, Box, Typography, Table, Card, Modal, FormControl, Paper, InputLabel, TableSortLabel,
-  Tooltip, TableHead, Grow, TableBody, TableRow, TableCell, Select, MenuItem} from '@mui/material';
+  Tooltip, TableHead, Grow, TableBody, TableRow, TableCell, Select, MenuItem, SelectChangeEvent} from '@mui/material';
 import { useTheme, styled } from '@mui/material/styles';
 import Iconify from '../../../../components/iconify';
 import Scrollbar from '../../../../components/scrollbar';
@@ -14,6 +14,7 @@ import StyledButton from '../../../../components/styledButton/StyledButton';
 import useAxiosJWT from '../../../../hooks/useAxiosJWT';
 import useSnackbar from '../../../../hooks/display/useSnackbar';
 import useDialog from '../../../../hooks/display/useDialog';
+import useDictionary from '../../../../hooks/useDictionary';
 //----------------------------------------------------
 const TABLE_HEAD = [
   { id: 'id', label: 'Id', alignRight: false },
@@ -22,15 +23,6 @@ const TABLE_HEAD = [
   { id: 'checklist', label: 'Checklist', alignRight: false },
   { id: 'action', label: 'Action', alignRight: false },
 ];
-
-interface KomponenData{
-  id: number,
-  title: string,
-  bobot: number,
-  detail?: string,
-  alias?: string,
-  deleted?: boolean
-};
 
 interface SubKomponenRefType{
   id: number,
@@ -52,19 +44,15 @@ export default function SubKomponenRef({section, addState, resetAddState}: SubKo
 
   const [open, setOpen] = useState<boolean>(false); // for edit modal
 
+  const {openDialog} = useDialog();
+
   const [editID, setEditID] = useState<number | null>(null);
 
-  // const { komponenRef, subKomponenRef } = useDictionary();
-
-  const [komponenRef, setKomponenRef] = useState<KomponenData[]>([]);
-
-  const [subKomponenRef, setSubKomponenRef] = useState<SubKomponenRefType[]>([]);
-
-  const axiosJWT = useAxiosJWT();
+  const { komponenRef, subKomponenRef, getDictionary } = useDictionary();
 
   const {openSnackbar} = useSnackbar();
 
-  const {openDialog} = useDialog();
+  const axiosJWT = useAxiosJWT();
 
   const handleOpen = (id: number) => {
     setOpen(true);
@@ -76,14 +64,13 @@ export default function SubKomponenRef({section, addState, resetAddState}: SubKo
     resetAddState();
   };
 
-  const getData = async () => {
+  const handleDeleteKomponen = async (id: number) => {
     try {
-      const response = await axiosJWT.get("/getAllKomponenExisting");
-      const response2 = await axiosJWT.get("/getAllSubKomponenExisting");
-      setKomponenRef(response.data.rows);
-      setSubKomponenRef(response2.data.rows);
+      const response = await axiosJWT.get(`/deleteSubKomponen/${id}`);
+      openSnackbar(response.data.message, "success");
+      getDictionary();
     } catch (err) {
-      openSnackbar("Fail to get referensi peraturan", "error");
+      openSnackbar("Fail to delete referensi peraturan", "error");
     }
   };
   
@@ -97,7 +84,7 @@ export default function SubKomponenRef({section, addState, resetAddState}: SubKo
   }, [addState, section]);
 
   useEffect(() => {
-    getData();
+    getDictionary();
   }, []);
 
   return (
@@ -122,8 +109,8 @@ export default function SubKomponenRef({section, addState, resetAddState}: SubKo
               </TableRow>
             </TableHead>
             <TableBody>
-              {subKomponenRef?.map((row: any) => 
-                <TableRow hover key={0} tabIndex={-1}>
+              {subKomponenRef?.map((row) => 
+                <TableRow hover key={row.id} tabIndex={-1}>
                   <TableCell align="justify">{row.id}</TableCell>
 
                   <TableCell align="left">{row.title}</TableCell>
@@ -149,7 +136,15 @@ export default function SubKomponenRef({section, addState, resetAddState}: SubKo
                           </StyledButton>
                         </span>
                       </Tooltip>
-                      <Tooltip title='delete'>
+                      <Tooltip title='delete' onClick={() => 
+                        openDialog(
+                          "Yakin hapus subkomponen?", 
+                          "Subkomponen yang terhapus dapat mempengaruhi kertas kerja", 
+                          'pink', 
+                          'Delete', 
+                          () => handleDeleteKomponen(row.id)
+                        )
+                      }>
                         <span>
                           <StyledButton aria-label="delete" size='small' color='pink'>
                             <Iconify icon="solar:trash-bin-trash-bold"/>
@@ -170,7 +165,6 @@ export default function SubKomponenRef({section, addState, resetAddState}: SubKo
         modalClose={handleClose} 
         addState={addState}
         editID={editID}
-        data={subKomponenRef || []}
         /> 
     </>
   )
@@ -206,19 +200,24 @@ interface SubKomponenRefModalProps {
   modalClose: () => void,
   addState: boolean,
   editID: number | null,
-  data: SubKomponenRefType[]
 }
 
 
 //----------------------------------------------------------------
-function SubKomponenRefModal({modalOpen, modalClose, addState, editID, data}: SubKomponenRefModalProps) {
+function SubKomponenRefModal({modalOpen, modalClose, addState, editID}: SubKomponenRefModalProps) {
+  const { komponenRef, subKomponenRef, getDictionary } = useDictionary();
+
+  const {openSnackbar} = useSnackbar();
+
+  const axiosJWT = useAxiosJWT();
+
   const [addValue, setAddValue] = useState<SubKomponenRefType>({
     id: 0,
     komponen_id: 0,
     title:'',
   });
 
-  const handleChangeAdd = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChangeAdd = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement> | SelectChangeEvent<unknown>) => {
     setAddValue({
       ...addValue,
       [e.target.name]:e.target.value
@@ -239,7 +238,7 @@ function SubKomponenRefModal({modalOpen, modalClose, addState, editID, data}: Su
     title:'',
   });
 
-  const handleChangeEdit = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChangeEdit = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement> | SelectChangeEvent<unknown>) => {
     setEditValue({
       ...editValue,
       [e.target.name]:e.target.value
@@ -248,21 +247,60 @@ function SubKomponenRefModal({modalOpen, modalClose, addState, editID, data}: Su
 
   const handleResetEdit = () => {
     setEditValue({
-      id: data.filter((row) => row.id===editID)[0].id,
-      title: data.filter((row) => row.id===editID)[0].title,
-      komponen_id: data.filter((row) => row.id===editID)[0].komponen_id,
+      id: subKomponenRef?.filter((row) => row?.id===editID)[0]?.id || 0,
+      title: subKomponenRef?.filter((row) => row?.id===editID)[0]?.title || '',
+      komponen_id: subKomponenRef?.filter((row) => row?.id===editID)[0]?.komponen_id || 0,
     })
   };
 
+  const handleAddSubKomponen = async () => {
+    try {
+
+      const form = {
+        title: addValue.title,
+        komponen_id: addValue.komponen_id,
+      };
+
+      const response = await axiosJWT.post('/createSubKomponen', form);
+
+      openSnackbar(response.data.message, 'success');
+      getDictionary();
+      modalClose();
+      handleResetAdd();
+    } catch (error) {
+      openSnackbar('Failed to add subkomponen', 'error');
+    }
+  };
+
+  const handleEditSubKomponen = async () => {
+    try {
+
+      const form = {
+        id: editValue.id,
+        title: editValue.title,
+        komponen_id: editValue.komponen_id,
+      };
+
+      const response = await axiosJWT.post('/editSubKomponen', form);
+
+      openSnackbar(response.data.message, 'success');
+      getDictionary();
+      modalClose();
+      handleResetEdit();
+    } catch (error) {
+      openSnackbar('Failed to edit komponen', 'error');
+    }
+  };
+
   useEffect(() => {
-    if(data && editID){
+    if(subKomponenRef && editID){
       setEditValue({
-        id: data.filter((row) => row.id===editID)[0].id,
-        title: data.filter((row) => row.id===editID)[0].title,
-        komponen_id: data.filter((row) => row.id===editID)[0].komponen_id,
+        id: subKomponenRef?.filter((row) => row?.id===editID)[0]?.id || 0,
+        title: subKomponenRef?.filter((row) => row?.id===editID)[0]?.title || '',
+        komponen_id: subKomponenRef?.filter((row) => row?.id===editID)[0]?.komponen_id || 0,
       })
     }
-  }, [data, editID])
+  }, [subKomponenRef, editID])
 
 
   // ----------------------------------------------------------------------------------------
@@ -282,7 +320,7 @@ function SubKomponenRefModal({modalOpen, modalClose, addState, editID, data}: Su
                       <Stack direction='column' spacing={3} sx={{width:'45%'}}>
                         <FormControl>
                           <StyledTextField 
-                            name="subkomponen" 
+                            name="title" 
                             label="Nama Sub Komponen"
                             multiline
                             minRows={2}
@@ -297,16 +335,18 @@ function SubKomponenRefModal({modalOpen, modalClose, addState, editID, data}: Su
                           <InputLabel id="komponen-select-label" sx={{typography:'body2'}}>Komponen</InputLabel>
                           <Select 
                             required 
-                            name="kondisi" 
+                            name="komponen_id" 
                             label='Komponen'
                             labelId="komponen-select-label"
-                            value={addState? addValue.komponen_id : editValue.komponen_id}
+                            value={addState? addValue.komponen_id.toString() : editValue.komponen_id.toString()}
                             sx={{typography:'body2', fontSize:14, height:'100%'}}
+                            onChange={addState? handleChangeAdd : handleChangeEdit}
                           >
-                            <MenuItem key={0} sx={{fontSize:14}} value={0}>Treasurer</MenuItem>
-                            <MenuItem key={1} sx={{fontSize:14}} value={1}>Pengelola Fiskal Representasi Kemenkeu di Daerah</MenuItem>
-                            <MenuItem key={2} sx={{fontSize:14}} value={2}>Financial Advisor</MenuItem>
-                            <MenuItem key={3} sx={{fontSize:14}} value={3}>Tata Kelola Internal</MenuItem>
+                            {
+                              komponenRef?.map((item) => (
+                                <MenuItem key={item.id} sx={{fontSize:14}} value={item.id}>{item.title}</MenuItem>
+                              ))
+                            }
                           </Select>
                         </FormControl>
                       </Stack>
@@ -317,6 +357,7 @@ function SubKomponenRefModal({modalOpen, modalClose, addState, editID, data}: Su
                         variant='contained'
                         color={addState? 'primary' : 'warning'} 
                         sx={{borderRadius:'8px'}}
+                        onClick={addState? handleAddSubKomponen : handleEditSubKomponen}
                       >
                         {addState? 'Add' : 'Edit'} 
                       </Button>

@@ -5,6 +5,9 @@
 
  import {Request, Response, NextFunction} from 'express';
  import peraturan from '../model/peraturan.model';
+ import { uploadPeraturan } from '../config/multer';
+ import ErrorDetail from '../model/error.model';
+ import multer from 'multer';
  // ---------------------------------------------------------
 
  const getAll = async (req: Request, res: Response, next: NextFunction) => {
@@ -51,6 +54,27 @@
   }
  }
 
+ const editFile = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    uploadPeraturan(req, res, async (err: any) => {
+      if(err instanceof multer.MulterError) {
+        return next(new ErrorDetail(400, 'File too large (Max 20mb)', err));
+      } else if(err) {
+        return next(err);
+      };
+  
+      if(!req.file){
+        console.log(err);
+        return next(new ErrorDetail(400, 'Incorrect file type', err));
+      };
+  
+      return res.status(200).json({sucess: true, message: 'Edit file peraturan success'});
+    })
+  } catch (err) {
+    next(err);
+  }
+ }
+
  const deleteById = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const id = parseInt(req.params.id);
@@ -67,5 +91,6 @@
    getById,
    create,
    edit,
+   editFile,
    deleteById
  }

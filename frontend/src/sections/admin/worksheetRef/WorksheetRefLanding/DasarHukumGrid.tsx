@@ -59,7 +59,7 @@ export default function DasarHukumGrid() {
 
   const [open, setOpen] = useState<boolean>(false); // for preview file modal
 
-  const [file, _] = useState<string | undefined>(`${import.meta.env.VITE_API_URL}/peraturan/dasar_pembinaan.pdf`);
+  const [file, _] = useState<string | undefined>(`${import.meta.env.VITE_API_URL}/peraturan/${peraturan?.file}`);
 
   const {openSnackbar} = useSnackbar();
 
@@ -71,13 +71,14 @@ export default function DasarHukumGrid() {
 
     try{
       const formData = new FormData();
+      formData.append("filename", `peraturan${peraturan?.id}`);
       formData.append("peraturan", selectedFile);
-      await axiosJWT.post(`/editPeraturan`, formData, {
+      await axiosJWT.post(`/editFilePeraturan`, formData, {
         headers:{"Content-Type": "multipart/form-data"}
       });
       // getData();
     }catch(err: any){
-      openSnackbar("Handle to update file peraturan", "error");
+      openSnackbar("fail to update file peraturan", "error");
     }
   };
 

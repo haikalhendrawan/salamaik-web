@@ -16,6 +16,7 @@ import useAxiosJWT from '../../../../hooks/useAxiosJWT';
 import useSnackbar from '../../../../hooks/display/useSnackbar';
 import StyledNumberTextField from '../../../../components/styledNumberTextField/StyledNumberTextField';
 import useDialog from '../../../../hooks/display/useDialog';
+import useDictionary from '../../../../hooks/useDictionary';
 // ---------------------------------------------------
 const TABLE_HEAD = [
   { id: 'id', label: 'Id', alignRight: false },
@@ -49,7 +50,9 @@ export default function KomponenRef({section, addState, resetAddState}: Komponen
 
   const [editID, setEditID] = useState<number | null>(null);
 
-  const [komponenRef, setKomponenRef] = useState<KomponenData[]>([]);
+  // const [komponenRef, setKomponenRef] = useState<KomponenData[]>([]);
+
+  const {komponenRef, getDictionary} = useDictionary();
 
   const axiosJWT = useAxiosJWT();
 
@@ -67,20 +70,11 @@ export default function KomponenRef({section, addState, resetAddState}: Komponen
     resetAddState();
   };
 
-  const getData = async () => {
-    try {
-      const response = await axiosJWT.get("/getAllKomponenExisting");
-      setKomponenRef(response.data.rows);
-    } catch (err) {
-      openSnackbar("Fail to get referensi peraturan", "error");
-    }
-  };
-
   const handleDeleteKomponen = async (id: number) => {
     try {
       const response = await axiosJWT.get(`/deleteKomponen/${id}`);
       openSnackbar(response.data.message, "success");
-      getData();
+      getDictionary();
     } catch (err) {
       openSnackbar("Fail to delete referensi peraturan", "error");
     }
@@ -96,7 +90,7 @@ export default function KomponenRef({section, addState, resetAddState}: Komponen
   }, [addState, section]);
 
   useEffect(() => {
-    getData();
+    getDictionary();
   }, []);
 
   return (
@@ -119,7 +113,7 @@ export default function KomponenRef({section, addState, resetAddState}: Komponen
               </TableRow>
             </TableHead>
             <TableBody>
-              {komponenRef?.filter(item=>item.deleted===null).map((row, index) => 
+              {komponenRef?.map((row, index) => 
                 <TableRow hover key={row.id} tabIndex={-1}>
                   <TableCell align="justify">{index+1}</TableCell>
 
@@ -182,7 +176,6 @@ export default function KomponenRef({section, addState, resetAddState}: Komponen
         addState={addState}
         editID={editID}
         data={komponenRef || []}
-        getData={getData}
       /> 
     </>
   )
@@ -219,13 +212,14 @@ interface KomponenRefModalProps {
   addState: boolean,
   editID: number | null,
   data: KomponenData[],
-  getData: () => void
 }
 
 
 //----------------------------------------------------------------
-function KomponenRefModal({modalOpen, modalClose, addState, editID, data, getData}: KomponenRefModalProps) {
+function KomponenRefModal({modalOpen, modalClose, addState, editID, data}: KomponenRefModalProps) {
   const {openSnackbar} = useSnackbar();
+
+  const {getDictionary} = useDictionary();
 
   const axiosJWT = useAxiosJWT();
 
@@ -290,7 +284,7 @@ function KomponenRefModal({modalOpen, modalClose, addState, editID, data, getDat
       const response = await axiosJWT.post('/createKomponen', form);
 
       openSnackbar(response.data.message, 'success');
-      getData();
+      getDictionary();
       modalClose();
       handleResetAdd();
     } catch (error) {
@@ -314,7 +308,7 @@ function KomponenRefModal({modalOpen, modalClose, addState, editID, data, getDat
       const response = await axiosJWT.post('/editKomponen', form);
 
       openSnackbar(response.data.message, 'success');
-      getData();
+      getDictionary();
       modalClose();
       handleResetEdit();
     } catch (error) {

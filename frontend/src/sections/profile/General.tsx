@@ -69,7 +69,7 @@ export default function General(){
 
   const axiosJWT = useAxiosJWT();
 
-  const {peraturanRef} = useDictionary();
+  const {peraturanRef, getDictionary} = useDictionary();
 
   const [value, setValue] = useState<ValueType>({
     id: auth?.id || '',
@@ -142,6 +142,7 @@ export default function General(){
       };
       const response = await axiosJWT.post(`/updateCommonProfile`, profileData);
       const response2 = await axiosJWT.get("/updateToken");
+      getDictionary();
       openSnackbar(`${response.data.message}`, "success");
       setAuth({
         ...response2.data.authInfo,

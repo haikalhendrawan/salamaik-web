@@ -104,8 +104,8 @@ const editKomponen = async (req: Request, res: Response, next: NextFunction) => 
 
 const createSubKomponen = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { title, komponen_id, detail} = req.body;
-    const result = await subKomponen.createSubKomponen({title, komponen_id, detail, deleted: null});
+    const { title, komponen_id} = req.body;
+    const result = await subKomponen.createSubKomponen({title, komponen_id, detail: null, deleted: null});
 
     return res.status(200).json({sucess: true, message: 'Create subkomponen success', rows: result});
   } catch (err) {
@@ -126,9 +126,9 @@ const deleteSubKomponen = async (req: Request, res: Response, next: NextFunction
 
 const editSubKomponen = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const {id, title, komponen_id, detail} = req.body;
+    const {id, title, komponen_id} = req.body;
 
-    const result = await subKomponen.editSubKomponen({id, title, komponen_id, detail});
+    const result = await subKomponen.editSubKomponen({id, title, komponen_id, detail: null});
 
     return res.status(200).json({sucess: true, message: 'Edit komponen success', rows: result});
   } catch (err) {

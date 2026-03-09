@@ -202,7 +202,8 @@ const peraturanStorage= multer.diskStorage(
     },
     filename:(req, file, callback) => {
       const fileExt = sanitizeMimeType(file.mimetype);
-      callback(null, `dasar_pembinaan.${fileExt}`)
+      const name = req.body.filename || 'dasar_pembinaan';
+      callback(null, `${name}.${fileExt}`)
     }
   }
 );
