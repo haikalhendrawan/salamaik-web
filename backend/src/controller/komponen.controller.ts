@@ -136,6 +136,39 @@ const editSubKomponen = async (req: Request, res: Response, next: NextFunction) 
   }
 }
 
+const createSubSubKomponen = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const {title, komponen_id, subkomponen_id, detail} = req.body;
+    const result = await subSubKomponen.createSubSubKomponen({title, komponen_id, subkomponen_id, detail, deleted: null});
+
+    return res.status(200).json({sucess: true, message: 'Create subsubkomponen success', rows: result});
+  } catch (err) {
+    next(err);
+  }
+}
+
+const deleteSubSubKomponen = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const {id} = req.params;
+    const result = await subSubKomponen.deleteSubSubKomponen(parseInt(id));
+
+    return res.status(200).json({sucess: true, message: 'Delete subsubkomponen success', rows: result});
+  } catch (err) {
+    next(err);
+  }
+}
+
+const editSubSubKomponen = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const {id, title, komponen_id, subkomponen_id, detail} = req.body;
+    const result = await subSubKomponen.editSubSubKomponen({id, title, komponen_id, subkomponen_id, detail});
+
+    return res.status(200).json({sucess: true, message: 'Edit subsubkomponen success', rows: result});
+  } catch (err) {
+    next(err);
+  }
+}
+
 
 
 export { 
@@ -149,5 +182,8 @@ export {
   editKomponen,
   createSubKomponen,
   deleteSubKomponen,
-  editSubKomponen
+  editSubKomponen,
+  createSubSubKomponen,
+  deleteSubSubKomponen,
+  editSubSubKomponen
 };

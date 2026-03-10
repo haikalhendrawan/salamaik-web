@@ -18,6 +18,6 @@ export interface SubSubKomponenType{
   id: number;
   komponen_id: number;
   subkomponen_id: number;
-  title: number;
+  title: string;
   detail: string | null;
 }

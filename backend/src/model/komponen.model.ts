@@ -176,7 +176,7 @@ const subKomponen = new SubKomponen();
 class SubSubKomponen{
   async getAllSubSubKomponen(){
     try{
-      const q = "SELECT * FROM subsubkomponen_ref WHERE deleted IS NULL TRUE ORDER BY id ASC";
+      const q = "SELECT * FROM subsubkomponen_ref WHERE deleted IS NULL ORDER BY id ASC";
       const result = await pool.query(q);
       return result.rows;
     }catch(err){
@@ -209,6 +209,17 @@ class SubSubKomponen{
     try{
       const q = "UPDATE subsubkomponen_ref SET deleted = CURRENT_TIMESTAMP WHERE id = $1 RETURNING *";
       const result = await pool.query(q, [id]);
+      return result.rows[0];
+    }catch(err){
+      throw err;
+    }
+  }
+
+  async editSubSubKomponen(form: Omit<SubSubKomponenType, 'deleted'>){
+    try{
+      const {id, title, komponen_id, subkomponen_id, detail} = form;
+      const q = "UPDATE subsubkomponen_ref SET title = $2, komponen_id = $3, subkomponen_id = $4, detail = $5 WHERE id = $1 RETURNING *";
+      const result = await pool.query(q, [id, title, komponen_id, subkomponen_id, detail]);
       return result.rows[0];
     }catch(err){
       throw err;

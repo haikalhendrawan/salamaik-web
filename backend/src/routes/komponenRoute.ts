@@ -25,4 +25,8 @@ router.post("/createSubKomponen", authenticate, authorize([99, 4]), logActivity(
 router.get("/deleteSubKomponen/:id", authenticate, authorize([99, 4]), logActivity(36), komponenController.deleteSubKomponen);
 router.post("/editSubKomponen", authenticate, authorize([99, 4]), logActivity(37), komponenController.editSubKomponen);
 
+router.post("/createSubSubKomponen", authenticate, authorize([99, 4]), logActivity(38), komponenController.createSubSubKomponen);
+router.get("/deleteSubSubKomponen/:id", authenticate, authorize([99, 4]), logActivity(39), komponenController.deleteSubSubKomponen);
+router.post("/editSubSubKomponen", authenticate, authorize([99, 4]), logActivity(40), komponenController.editSubSubKomponen);
+
 export default router
