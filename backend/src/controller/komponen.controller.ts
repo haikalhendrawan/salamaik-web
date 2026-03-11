@@ -11,7 +11,8 @@ import ErrorDetail from '../model/error.model';
 // ------------------------------------------------------
 const getAllKomponen= async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const result = await komponen.getAllKomponen();
+    const {peraturan} = req.payload;
+    const result = await komponen.getAllKomponen(peraturan);
 
     return res.status(200).json({sucess: true, message: 'Get komponen success', rows: result});
   } catch (err) {
@@ -31,7 +32,8 @@ const getAllKomponenExisting = async (req: Request, res: Response, next: NextFun
 
 const getAllSubKomponen= async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const result = await subKomponen.getAllSubKomponen();
+    const {peraturan} = req.payload;
+    const result = await subKomponen.getAllSubKomponen(peraturan);
 
     return res.status(200).json({sucess: true, message: 'Get sub komponen success', rows: result});
   } catch (err) {
@@ -61,13 +63,14 @@ const getAllSubSubKomponen= async (req: Request, res: Response, next: NextFuncti
 
 const createKomponen = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const {peraturan} = req.payload;
     const {title, bobot, alias, detail} = req.body;
 
     if(bobot === undefined || bobot=== null || isNaN(bobot) || bobot< 0 || bobot > 100){
       throw new ErrorDetail(401, 'Nilai bobot tidak valid');
     }
 
-    const result = await komponen.createKomponen({title, bobot, alias, detail, deleted: null});
+    const result = await komponen.createKomponen({title, bobot, alias, detail, deleted: null, peraturan});
 
     return res.status(200).json({sucess: true, message: 'Create komponen success', rows: result});
   } catch (err) {

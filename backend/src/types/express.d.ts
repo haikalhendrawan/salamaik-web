@@ -15,6 +15,7 @@ type JwtPayloadType = {
   role: number;
   period: number;
   status: number;
+  peraturan: number;
 };
 
 declare global {

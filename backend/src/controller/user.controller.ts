@@ -10,6 +10,7 @@ import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from 'uuid';
 import { passwordSchema } from '../utils/schema';
 import period from '../model/period.model';
+import peraturan from '../model/peraturan.model';
 // ------------------------------------------------------
 const getUser = async (req: Request, res: Response, next: NextFunction) => {
   try{
@@ -54,6 +55,8 @@ const addUser = async (req: Request, res: Response, next: NextFunction) => {
     const status = 0;
     const allPeriod = await period.getAllPeriod();
     const currPeriod = allPeriod[allPeriod?.length-1]?.id;
+    const allPeraturan = await peraturan.getAll();
+    const currPeraturan = allPeraturan[allPeraturan?.length-1]?.id;
 
     const userBody = {
       id,
@@ -67,6 +70,7 @@ const addUser = async (req: Request, res: Response, next: NextFunction) => {
       status,
       kppn,
       gender,
+      peraturan: currPeraturan
     };
 
     const result = await user.addUser(userBody);

@@ -15,6 +15,7 @@ export interface KomponenType{
   bobot: number,
   detail: string | null,
   alias: string,
+  peraturan: number,
   deleted: string | null,
 };
 
@@ -46,10 +47,10 @@ export interface KomponenWithSubKomponen{
 }
 // ------------------------------------------------------
 class Komponen{
-  async getAllKomponen(){
+  async getAllKomponen(peraturan: number){
     try{
-      const q = "SELECT * FROM komponen_ref WHERE deleted IS NULL ORDER BY id ASC";
-      const result = await pool.query(q);
+      const q = "SELECT * FROM komponen_ref WHERE deleted IS NULL AND peraturan = $1 ORDER BY id ASC";
+      const result = await pool.query(q, [peraturan]);
       return result.rows;
     }catch(err){
       throw err;
@@ -66,16 +67,17 @@ class Komponen{
     }
   }
 
-  async getAllKomponenWithSubKomponen(): Promise<KomponenWithSubKomponen[]>{
+  async getAllKomponenWithSubKomponen(peraturan: number): Promise<KomponenWithSubKomponen[]>{
     try{
       const q = ` SELECT komponen_ref.*, json_agg(subkomponen_ref.* ORDER BY subkomponen_ref.id ASC) AS subkomponen 
                   FROM komponen_ref 
                   INNER JOIN subkomponen_ref ON komponen_ref.id = subkomponen_ref.komponen_id 
                   WHERE komponen_ref.deleted IS NULL
+                  AND komponen_ref.peraturan = $1
                   AND subkomponen_ref.deleted IS NULL
                   GROUP BY komponen_ref.id
                   ORDER BY komponen_ref.id ASC`;
-      const result = await pool.query(q);
+      const result = await pool.query(q, [peraturan]);
       return result.rows;
     }catch(err){
       throw err;
@@ -84,9 +86,9 @@ class Komponen{
 
   async createKomponen(form: Omit<KomponenType, 'id'>){
     try{
-      const {title, bobot, detail, alias} = form;
-      const q = "INSERT INTO komponen_ref (title, bobot, detail, alias, deleted) VALUES ($1, $2, $3, $4, $5) RETURNING *";
-      const result = await pool.query(q, [title, bobot, detail, alias, null]);
+      const {title, bobot, detail, alias, peraturan} = form;
+      const q = "INSERT INTO komponen_ref (title, bobot, detail, alias, deleted, peraturan) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *";
+      const result = await pool.query(q, [title, bobot, detail, alias, null, peraturan]);
       return result.rows[0];
     }catch(err){
       throw err;
@@ -118,10 +120,14 @@ class Komponen{
 const komponen = new Komponen();
 
 class SubKomponen{
-  async getAllSubKomponen(){
+  async getAllSubKomponen(peraturan: number){
     try{
-      const q = "SELECT * FROM subkomponen_ref WHERE deleted IS NULL ORDER BY id ASC";
-      const result = await pool.query(q);
+      const q = ` SELECT subkomponen_ref.* FROM subkomponen_ref
+                  INNER JOIN komponen_ref ON subkomponen_ref.komponen_id = komponen_ref.id 
+                  WHERE subkomponen_ref.deleted IS NULL
+                    AND komponen_ref.peraturan = $1 
+                  ORDER BY subkomponen_ref.id ASC`;
+      const result = await pool.query(q, [peraturan]);
       return result.rows;
     }catch(err){
       throw err;

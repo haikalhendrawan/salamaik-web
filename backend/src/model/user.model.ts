@@ -29,6 +29,7 @@ interface AddUserBodyType{
   status: number;
   kppn: string;
   gender: number;
+  peraturan: number;
 }
 interface EditUserBodyType{
   id: string,
@@ -39,7 +40,8 @@ interface EditUserBodyType{
   role: number,
   status: number,
   kppn: string,
-  gender: number
+  gender: number,
+  peraturan: number
 }
 
 export interface UserType{
@@ -54,12 +56,13 @@ export interface UserType{
   kppn: string;
   gender: number;
   created_at: Date;
+  peraturan: number;
 }
 
 class User{
   async getAllUser(): Promise<UserType[] | []>{
     try{
-      const q = ` SELECT id, username, name, email, picture, period, role, status, kppn, gender, created_at 
+      const q = ` SELECT id, username, name, email, picture, period, role, status, kppn, gender, created_at, peraturan 
                   FROM user_ref`;
       const result = await pool.query(q);
       return result.rows;
@@ -70,7 +73,7 @@ class User{
 
   async getUserKPPN(kppn: string): Promise<UserType[] | []>{
     try{
-      const q = ` SELECT id, username, name, email, picture, period, role, status, kppn, gender, created_at
+      const q = ` SELECT id, username, name, email, picture, period, role, status, kppn, gender, created_at, peraturan
                   FROM user_ref 
                   WHERE kppn = $1`;
       const result = await pool.query(q, [kppn]);
@@ -82,7 +85,7 @@ class User{
 
   async getAllUserWtAdmin(): Promise<UserType[] | []> {
     try{
-      const q = ` SELECT id, username, name, email, picture, period, role, status, kppn, gender, created_at
+      const q = ` SELECT id, username, name, email, picture, period, role, status, kppn, gender, created_at, peraturan
                   FROM user_ref
                   WHERE role != 99`;
       const result = await pool.query(q);
@@ -104,7 +107,7 @@ class User{
 
   async addUser(body: AddUserBodyType){
     try{
-      const {id, username, name, email, password_hash, picture, period, role, status, kppn, gender} = body;
+      const {id, username, name, email, password_hash, picture, period, role, status, kppn, gender, peraturan} = body;
       const q = `INSERT 
                 INTO user_ref (
                   id,
@@ -116,11 +119,12 @@ class User{
                   role, 
                   status, 
                   kppn, 
-                  gender
+                  gender,
+                  peraturan
                 ) 
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) 
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) 
                 RETURNING *`;
-      const result = await pool.query(q, [id, username, name, email, password_hash, picture, period, role, status, kppn, gender]);
+      const result = await pool.query(q, [id, username, name, email, password_hash, picture, period, role, status, kppn, gender, peraturan]);
       return result.rows[0]
     }catch(err){
       throw err;

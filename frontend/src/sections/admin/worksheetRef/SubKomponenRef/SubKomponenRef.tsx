@@ -116,7 +116,7 @@ export default function SubKomponenRef({section, addState, resetAddState}: SubKo
                   <TableCell align="left">{row.title}</TableCell>
 
                   <TableCell align="left">
-                    {komponenRef?.filter((item) => item.id === row.komponen_id)[0].title}
+                    {komponenRef?.filter((item) => item.id === row.komponen_id)[0]?.title}
                   </TableCell>
 
                   <TableCell align="center">{6}</TableCell>
@@ -247,9 +247,9 @@ function SubKomponenRefModal({modalOpen, modalClose, addState, editID}: SubKompo
 
   const handleResetEdit = () => {
     setEditValue({
-      id: subKomponenRef?.filter((row) => row?.id===editID)[0]?.id || 0,
-      title: subKomponenRef?.filter((row) => row?.id===editID)[0]?.title || '',
-      komponen_id: subKomponenRef?.filter((row) => row?.id===editID)[0]?.komponen_id || 0,
+      id: subKomponenRef?.filter((row) => row?.id===editID)?.[0]?.id || 0,
+      title: subKomponenRef?.filter((row) => row?.id===editID)?.[0]?.title || '',
+      komponen_id: subKomponenRef?.filter((row) => row?.id===editID)?.[0]?.komponen_id || 0,
     })
   };
 
@@ -295,9 +295,9 @@ function SubKomponenRefModal({modalOpen, modalClose, addState, editID}: SubKompo
   useEffect(() => {
     if(subKomponenRef && editID){
       setEditValue({
-        id: subKomponenRef?.filter((row) => row?.id===editID)[0]?.id || 0,
-        title: subKomponenRef?.filter((row) => row?.id===editID)[0]?.title || '',
-        komponen_id: subKomponenRef?.filter((row) => row?.id===editID)[0]?.komponen_id || 0,
+        id: subKomponenRef?.filter((row) => row?.id===editID)?.[0]?.id || 0,
+        title: subKomponenRef?.filter((row) => row?.id===editID)?.[0]?.title || '',
+        komponen_id: subKomponenRef?.filter((row) => row?.id===editID)?.[0]?.komponen_id || 0,
       })
     }
   }, [subKomponenRef, editID])

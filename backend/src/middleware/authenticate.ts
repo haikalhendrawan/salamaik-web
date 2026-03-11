@@ -18,6 +18,7 @@ type JwtPayloadType = {
     role: number;
     period: number;
     status: number;
+    peraturan: number;
 };
 
 //Middleware untuk memastikan yg request memiliki token (minimal user biasa)

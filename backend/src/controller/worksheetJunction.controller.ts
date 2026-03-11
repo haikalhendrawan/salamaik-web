@@ -128,7 +128,7 @@ const getByPeriodAndKPPN = async(req: Request, res: Response, next: NextFunction
 const getWsJunctionScoreAndProgress = async(req: Request, res: Response, next: NextFunction) => {
   try{
     const {kppn} = req.payload;
-    const {kppnId, period} = req.body;
+    const {kppnId, period, peraturan} = req.body;
 
     const allowedKPPN = kppn?.length===5?kppnId:kppn;
 
@@ -140,7 +140,7 @@ const getWsJunctionScoreAndProgress = async(req: Request, res: Response, next: N
     };
     
     // query #2 #3 get komponen dan wsJunction
-    const responseBody = await getScoreProgressResponseBody(mainWorksheet);
+    const responseBody = await getScoreProgressResponseBody(mainWorksheet, false, peraturan);
 
     return res.status(200).json({sucess: true, message: 'Get worksheet junction success', rows: responseBody})
   }catch(err){
@@ -150,7 +150,7 @@ const getWsJunctionScoreAndProgress = async(req: Request, res: Response, next: N
 
 const getWsJunctionScoreAndProgressAllKPPN = async(req: Request, res: Response, next: NextFunction) => {
   try{
-    const {period} = req.payload;
+    const {period, peraturan} = req.payload;
     const allKPPN = await unit.getAllKPPN();
 
     const result = await Promise.all(allKPPN.map(async(kppn) => {
@@ -165,7 +165,7 @@ const getWsJunctionScoreAndProgressAllKPPN = async(req: Request, res: Response, 
         }
       };
 
-      return await getScoreProgressResponseBodyAllKPPN(mainWorksheet, kppn);
+      return await getScoreProgressResponseBodyAllKPPN(mainWorksheet, kppn, false, peraturan);
     }));
 
     return res.status(200).json({sucess: true, message: 'Get worksheet junction success', rows: result})
@@ -176,6 +176,7 @@ const getWsJunctionScoreAndProgressAllKPPN = async(req: Request, res: Response, 
 
 const getWsJunctionScoreAllPeriod = async(req: Request, res: Response, next: NextFunction) => {
   try {
+    const {peraturan} = req.payload;
     const allPeriod = await period.getAllPeriod();
     const allKPPN = await unit.getAllKPPN();
 
@@ -184,7 +185,7 @@ const getWsJunctionScoreAllPeriod = async(req: Request, res: Response, next: Nex
         const kppnResults = await Promise.all(
           allKPPN.map(async (kppn) => {
             const mainWorksheet = await worksheet.getWorksheetByPeriodAndKPPN(period.id, kppn.id);
-            return getScoreProgressResponseBodyAllKPPN(mainWorksheet, kppn, true);
+            return getScoreProgressResponseBodyAllKPPN(mainWorksheet, kppn, true, peraturan);
           })
         );
 
@@ -204,13 +205,13 @@ const getWsJunctionScoreAllPeriod = async(req: Request, res: Response, next: Nex
 const getWsJunctionScoreAllPeriodSingleKPPN = async(req: Request, res: Response, next: NextFunction) => {
   try {
     const allPeriod = await period.getAllPeriod();
-    const {kppn} = req.payload;
+    const {kppn, peraturan} = req.payload;
 
 
     const result = await Promise.all(
           allPeriod.map(async (period) => {
             const mainWorksheet = await worksheet.getWorksheetByPeriodAndKPPN(period.id, kppn);
-            const scoreProgress = await getScoreProgressResponseBody(mainWorksheet, true);
+            const scoreProgress = await getScoreProgressResponseBody(mainWorksheet, true, peraturan);
             return {
               ...period,
               ...scoreProgress
@@ -372,7 +373,7 @@ export {
 }
 
 // ------------------------------
-export async function getScoreProgressResponseBody(mainWorksheet: WorksheetType[], scoreOnly: boolean = false) {
+export async function getScoreProgressResponseBody(mainWorksheet: WorksheetType[], scoreOnly: boolean = false, peraturan: number) {
   try{
     const worksheetId = mainWorksheet.length>0? mainWorksheet[0].id : null;
 
@@ -389,7 +390,7 @@ export async function getScoreProgressResponseBody(mainWorksheet: WorksheetType[
       }
     };
 
-    const komponenAll = await komponen.getAllKomponenWithSubKomponen();
+    const komponenAll = await komponen.getAllKomponenWithSubKomponen(peraturan);
     const wsJunctionDetail = await wsJunction.getWsJunctionWithKomponenDetail(worksheetId || '');
 
     if(!wsJunctionDetail || wsJunctionDetail.length===0) {
@@ -424,7 +425,7 @@ export async function getScoreProgressResponseBody(mainWorksheet: WorksheetType[
   }
 }
 
-export async function getScoreProgressResponseBodyAllKPPN(mainWorksheet: WorksheetType[], kppn: UnitType, scoreOnly: boolean = false) {
+export async function getScoreProgressResponseBodyAllKPPN(mainWorksheet: WorksheetType[], kppn: UnitType, scoreOnly: boolean = false, peraturan: number) {
   try{
     const worksheetId = mainWorksheet.length>0? mainWorksheet[0].id : null;
 
@@ -444,7 +445,7 @@ export async function getScoreProgressResponseBodyAllKPPN(mainWorksheet: Workshe
       }
     };
 
-    const komponenAll = await komponen.getAllKomponenWithSubKomponen();
+    const komponenAll = await komponen.getAllKomponenWithSubKomponen(peraturan);
     const wsJunctionDetail = await wsJunction.getWsJunctionWithKomponenDetail(worksheetId);
 
     if(!wsJunctionDetail || wsJunctionDetail.length===0) {

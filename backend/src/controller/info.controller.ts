@@ -19,6 +19,7 @@ const getByKPPN = async(req: Request, res: Response, next: NextFunction) => {
   try{
     const kppn = req.payload.kppn;
     const period = req.payload.period;
+    const peraturan = req.payload.peraturan;
 
     const ws = await worksheet.getWorksheetByPeriodAndKPPN(period, kppn);
     const openPeriod = ws?.[0]?.open_period;
@@ -34,7 +35,7 @@ const getByKPPN = async(req: Request, res: Response, next: NextFunction) => {
       throw new ErrorDetail(404, 'Worksheet not found')
     };
     
-    const wsDetail = await getScoreProgressResponseBody(ws, true);
+    const wsDetail = await getScoreProgressResponseBody(ws, true, peraturan);
 
     const users = await user.getAllUserWtAdmin();
     const userFromReference = getInvolvedUserFromList(users, kppn, closePeriod.toISOString());
