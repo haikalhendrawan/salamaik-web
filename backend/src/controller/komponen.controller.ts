@@ -53,7 +53,8 @@ const getAllSubKomponenExisting = async (req: Request, res: Response, next: Next
 
 const getAllSubSubKomponen= async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const result = await subSubKomponen.getAllSubSubKomponen();
+    const {peraturan} = req.payload;
+    const result = await subSubKomponen.getAllSubSubKomponen(peraturan);
 
     return res.status(200).json({sucess: true, message: 'Get sub sub komponen success', rows: result});
   } catch (err) {

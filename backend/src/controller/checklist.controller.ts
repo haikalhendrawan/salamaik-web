@@ -34,7 +34,8 @@ interface ChecklistType{
 // ---------------------------------------------------------------------------
 const getAllChecklist = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const result = await checklist.getAllChecklist();
+    const {peraturan} = req.payload;
+    const result = await checklist.getAllChecklist(peraturan);
 
     return res.status(200).json({sucess: true, message: 'Get checklist success', rows: result});
   } catch (err) {
@@ -44,7 +45,8 @@ const getAllChecklist = async (req: Request, res: Response, next: NextFunction) 
 
 const getChecklistWithOpsi = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const check = await checklist.getAllChecklist();
+    const {peraturan} = req.payload;
+    const check = await checklist.getAllChecklist(peraturan);
     const option = await checklist.getAllOpsi();
     const combined = check.map(row => {
       const array:any = [];

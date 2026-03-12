@@ -72,10 +72,11 @@ const addWorksheet = async(req: Request, res: Response, next: NextFunction) => {
 
 const assignWorksheet = async(req: Request, res: Response, next: NextFunction) => {
   const client = await pool.connect();
+  const {peraturan} = req.payload;
   try {
     await client.query('BEGIN');
     const { worksheetId, kppnId, period } = req.body;
-    const allChecklist: ChecklistType[]  = await checklist.getAllChecklist(client);
+    const allChecklist: ChecklistType[]  = await checklist.getAllChecklist(peraturan, client);
 
     const mapChecklist = Promise.all (allChecklist.map(async(item) => {
         const isExcluded = item.standardisasi;

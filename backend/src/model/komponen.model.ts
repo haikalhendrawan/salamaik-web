@@ -180,10 +180,14 @@ class SubKomponen{
 const subKomponen = new SubKomponen();
 
 class SubSubKomponen{
-  async getAllSubSubKomponen(){
+  async getAllSubSubKomponen(peraturan: number){
     try{
-      const q = "SELECT * FROM subsubkomponen_ref WHERE deleted IS NULL ORDER BY id ASC";
-      const result = await pool.query(q);
+      const q = ` SELECT subsubkomponen_ref.* FROM subsubkomponen_ref
+                  INNER JOIN komponen_ref ON subsubkomponen_ref.komponen_id = komponen_ref.id 
+                  WHERE subsubkomponen_ref.deleted IS NULL 
+                    AND komponen_ref.peraturan = $1
+                  ORDER BY subsubkomponen_ref.id ASC`;
+      const result = await pool.query(q, [peraturan]);
       return result.rows;
     }catch(err){
       throw err;

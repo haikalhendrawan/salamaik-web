@@ -11,6 +11,7 @@ import ChecklistRefTable from './ChecklistRefTable';
 import ChecklistRefModal from './ChecklistRefModal';
 import ChecklistFileModal from './ChecklistFileModal';
 import useChecklist from './useChecklist';
+import useDictionary from '../../../../hooks/useDictionary';
 //---------------------------------------------------------------------------------------------
 interface ChecklistRefProps {
   section: number,
@@ -37,14 +38,10 @@ export default function ChecklistRef({section, addState, resetAddState}: Checkli
 
   const {checklist, getChecklist} = useChecklist();
 
-  const komponen1Count = useMemo(() => checklist?.filter((item) => item.komponen_id === 1).length, [checklist]);
-  
-  const komponen2Count = useMemo(() => checklist?.filter((item) => item.komponen_id === 2).length, [checklist]);
-  
-  const komponen3Count = useMemo(() => checklist?.filter((item) => item.komponen_id === 3).length, [checklist]);
-  
-  const komponen4Count = useMemo(() => checklist?.filter((item) => item.komponen_id === 4).length, [checklist]);
-  
+  const {komponenRef} = useDictionary();
+
+  const komponenCount = (id: number) => useMemo(() => checklist?.filter((item) => item.komponen_id === id).length, [checklist]);
+
   const allKomponenCount = useMemo(() => checklist?.length, [checklist]);
 
   const handleOpen = (id: number) => { // for edit modal
@@ -110,34 +107,20 @@ export default function ChecklistRef({section, addState, resetAddState}: Checkli
           > 
             <Tab 
               icon={<Label sx={{color: theme.palette.text.primary, cursor:'pointer'}}>{allKomponenCount}</Label>} 
-              label="All" 
+              label="all"
               iconPosition="end"  
               value={0} 
             />
-            <Tab 
-              icon={<Label color={'primary'} sx={{cursor:'pointer'}}>{komponen1Count}</Label>} 
-              label="Treasurer" 
+          {
+            komponenRef?.map((item) => (
+              <Tab 
+              icon={<Label sx={{color: theme.palette.text.primary, cursor:'pointer'}}>{komponenCount(item.id)}</Label>} 
+              label={item.title} 
               iconPosition="end"  
-              value={1} 
-            />
-            <Tab 
-              icon={<Label color={'primary'} sx={{cursor:'pointer'}}>{komponen2Count}</Label>} 
-              label="Pengelola Fiskal, Representasi Kemenkeu di Daerah, dan Special Mission" 
-              iconPosition="end"  
-              value={2} 
-            />
-            <Tab 
-              icon={<Label color={'primary'} sx={{cursor:'pointer'}}>{komponen3Count}</Label>} 
-              label="Financial Advisor" 
-              iconPosition="end"  
-              value={3} 
-            />
-            <Tab 
-              icon={<Label color={'primary'} sx={{cursor:'pointer'}}>{komponen4Count}</Label>} 
-              label="Tata Kel. Internal" 
-              iconPosition="end"  
-              value={4} 
-            />
+              value={item.id} 
+              />
+            ))
+          }
           </Tabs>
           {pageLoading 
             ? 

@@ -26,12 +26,15 @@ export interface ChecklistType{
 };
 //-----------------------------------------------------------------------------
 class Checklist{
-  async getAllChecklist(poolTrx?: PoolClient){
+  async getAllChecklist(peraturan: number, poolTrx?: PoolClient){
     const poolInstance = poolTrx??pool;
 
     try{
-      const q = "SELECT * FROM checklist_ref ORDER BY id ASC";
-      const result = await poolInstance.query(q);
+      const q = `SELECT checklist_ref.* FROM checklist_ref 
+                  INNER JOIN komponen_ref ON checklist_ref.komponen_id = komponen_ref.id
+                  WHERE komponen_ref.peraturan = $1
+                  ORDER BY checklist_ref.id ASC`;
+      const result = await poolInstance.query(q, [peraturan]);
       return result.rows
     }catch(err){
       throw err
