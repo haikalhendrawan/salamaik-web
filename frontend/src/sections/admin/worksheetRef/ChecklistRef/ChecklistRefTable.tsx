@@ -71,10 +71,12 @@ export default function ChecklistRefTable({tab, handleOpen, fileOpen,  setFile}:
     setEditID(0);
   };
 
-  // const handleAddOpsi = () => {  // Opsi Modal
-  //   setAddState(true);
-  //   setOpen(true); 
-  // };
+  const handleAddOpsi = (id: number) => {  // Opsi Modal
+    setAddState(true);
+    setOpen(true); 
+    setOpsiID(0);
+    setEditID(id);
+  };
 
   const handleEditOpsi = (id: number, opsiID: number) => {
     setEditID(id);
@@ -158,9 +160,9 @@ export default function ChecklistRefTable({tab, handleOpen, fileOpen,  setFile}:
                         </Label>
                       )}
 
-                      {/* <IconButton>
-                        <Iconify sx={{color:theme.palette.grey[500]}} icon="solar:add-circle-bold"/>
-                      </IconButton> */}
+                      <IconButton sx={{padding: 0}} onClick={() => handleAddOpsi(row.id)}>
+                        <Iconify sx={{color:theme.palette.grey[500]}} icon="solar:add-square-bold"/>
+                      </IconButton>
                     </Stack>
                   </TableCell>
 

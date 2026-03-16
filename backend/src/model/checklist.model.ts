@@ -33,6 +33,8 @@ class Checklist{
       const q = `SELECT checklist_ref.* FROM checklist_ref 
                   INNER JOIN komponen_ref ON checklist_ref.komponen_id = komponen_ref.id
                   WHERE komponen_ref.peraturan = $1
+                    AND checklist_ref.deleted IS NULL
+                    AND komponen_ref.deleted IS NULL
                   ORDER BY checklist_ref.id ASC`;
       const result = await poolInstance.query(q, [peraturan]);
       return result.rows
@@ -109,9 +111,46 @@ class Checklist{
     }
   }
 
+  async createChecklist (body: Omit<ChecklistType, 'id'>){
+    try {
+      const {
+        title, 
+        header,
+        komponen_id,
+        subkomponen_id,
+        subsubkomponen_id,
+        standardisasi, 
+        matrix_title, 
+        file1,
+        file2,
+        instruksi,
+        contoh_file,
+        peraturan,
+        uic
+      } = body;
+
+      const q = `INSERT INTO checklist_ref (title, header, komponen_id, subkomponen_id, subsubkomponen_id, standardisasi, matrix_title, file1, file2, instruksi, contoh_file, peraturan, uic) 
+                  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *`;
+      const result = await pool.query(q, [title, header, komponen_id, subkomponen_id, subsubkomponen_id, standardisasi, matrix_title, file1, file2, instruksi, contoh_file, peraturan, uic]);
+      return result.rows
+    } catch (err) {
+      throw err
+    }
+  }
+
+  async deleteChecklist (id: number){
+    try {
+      const q = "UPDATE checklist_ref SET deleted = CURRENT_TIMESTAMP WHERE id = $1 RETURNING *";
+      const result = await pool.query(q, [id]);
+      return result.rows
+    } catch (err) {
+      throw err
+    }
+  }
+
   async getAllOpsi(){
     try{
-      const q = "SELECT * FROM opsi_ref ORDER BY id ASC";
+      const q = "SELECT * FROM opsi_ref WHERE deleted IS NULL ORDER BY id ASC";
       const result = await pool.query(q);
       return result.rows
     }catch(err){
@@ -121,7 +160,7 @@ class Checklist{
 
   async getOpsiByChecklistId(checklistId: number){
     try{
-      const q = "SELECT * FROM opsi_ref WHERE checklist_id = $1 ORDER BY id ASC";
+      const q = "SELECT * FROM opsi_ref WHERE checklist_id = $1 AND deleted IS NULL ORDER BY id ASC";
       const result = await pool.query(q, [checklistId]);
       return result.rows
     }catch(err){
@@ -133,6 +172,26 @@ class Checklist{
     try{
       const q = "UPDATE opsi_ref SET title = $1, value = $2, checklist_id = $3, positive_fallback = $4, negative_fallback = $5, rekomendasi = $6 WHERE id = $7 RETURNING *";
       const result = await pool.query(q, [title, value, checklistId, positiveFallback, negativeFallback, rekomendasi, id]);
+      return result.rows
+    }catch(err){
+      throw err
+    }
+  }
+
+  async createOpsi(checklistId: number, title: string, value: number, positiveFallback: string, negativeFallback: string, rekomendasi: string){
+    try {
+      const q = "INSERT INTO opsi_ref (title, value, checklist_id, positive_fallback, negative_fallback, rekomendasi) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *";
+      const result = await pool.query(q, [title, value, checklistId, positiveFallback, negativeFallback, rekomendasi]);
+      return result.rows;
+    } catch (err) {
+      throw err
+    }
+  }
+
+  async deleteOpsi(id: number){
+    try{
+      const q = "UPDATE opsi_ref SET deleted = CURRENT_TIMESTAMP WHERE id = $1 RETURNING *";
+      const result = await pool.query(q, [id]);
       return result.rows
     }catch(err){
       throw err

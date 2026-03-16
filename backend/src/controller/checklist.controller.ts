@@ -128,6 +128,27 @@ const deleteChecklistFile = async (req: Request, res: Response, next: NextFuncti
   }
 }
 
+const createChecklist = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const result = await checklist.createChecklist(req.body);
+
+    return res.status(200).json({sucess: true, message: 'Checklist created successfully', rows: result});
+  } catch (err) {
+    next(err);
+  }
+}
+
+const deleteChecklist = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const {id} = req.body;
+    const result = await checklist.deleteChecklist(id);
+
+    return res.status(200).json({sucess: true, message: 'Checklist deleted successfully', rows: result});
+  } catch (err) {
+    next(err);
+  }
+}
+
 const editOpsiById = async (req: Request, res: Response, next: NextFunction) => {
   try{
     const {id, title, value, checklistId, positiveFallback, negativeFallback, rekomendasi} = req.body;
@@ -153,13 +174,39 @@ const getAllOpsi = async (req: Request, res: Response, next: NextFunction) => {
   }
 }
 
+const createOpsi = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const {checklistId, title, value, positiveFallback, negativeFallback, rekomendasi} = req.body;
+    const result = await checklist.createOpsi(checklistId, title, value, positiveFallback, negativeFallback, rekomendasi);
+
+    return res.status(200).json({sucess: true, message: 'Opsi created successfully', rows: result});
+  } catch (err) {
+    next(err);
+  }
+}
+
+const deleteOpsi = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const {id} = req.body;
+    const result = await checklist.deleteOpsi(id);
+
+    return res.status(200).json({sucess: true, message: 'Opsi deleted successfully', rows: result});
+  } catch (err) {
+    next(err);
+  }
+}
+
 export {
   getAllChecklist, 
   getChecklistWithOpsi, 
   editChecklist,
   editChecklistFile, 
   deleteChecklistFile, 
+  createChecklist, 
+  deleteChecklist,
   getAllOpsi, 
   editOpsiById,
+  createOpsi, 
+  deleteOpsi
 }
 //------------------------------------------------------------------------------------------------------------

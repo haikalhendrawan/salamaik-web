@@ -72,28 +72,34 @@ export default function ChecklistOpsiModal({
     headerTitle: ''
   });
 
-  // const [addValue, setAddValue] = useState<OpsiType>({
-  //   id: 0,
-  //   title: '',
-  //   value: 0,
-  //   checklist_id:0,
-  // });
+  const [addValue, setAddValue] = useState<OpsiType>({
+    id: 0,
+    title: '',
+    value: 0,
+    checklist_id:0,
+    positive_fallback: '',
+    negative_fallback: '',
+    rekomendasi: ''
+  });
 
-  // const handleChangeAdd = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-  //   setAddValue({
-  //     ...addValue,
-  //     [e.target.name]:e.target.value
-  //   })
-  // };
+  const handleChangeAdd = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> |  SelectChangeEvent) => {
+    setAddValue({
+      ...addValue,
+      [e.target.name]:e.target.value
+    })
+  };
 
-  // const handleResetAdd = () => {
-  //   setAddValue({
-  //     id: 0,
-  //     title: '',
-  //     value: 0,
-  //     checklist_id:0,
-  //   })
-  // };
+  const handleResetAdd = () => {
+    setAddValue({
+      id: 0,
+      title: '',
+      value: 0,
+      checklist_id:0,
+      positive_fallback: '',
+      negative_fallback: '',
+      rekomendasi: ''
+    })
+  };
 
   const [editValue, setEditValue] = useState<OpsiType>({
     id: 0,
@@ -118,9 +124,9 @@ export default function ChecklistOpsiModal({
       title: opsi?.filter((row) => row.id===opsiID)[0]?.title || '',
       value: opsi?.filter((row) => row.id===opsiID)[0]?.value || 0,
       checklist_id: opsi?.filter((row) => row.id===opsiID)[0]?.checklist_id || 0,
-      positive_fallback: '',
-      negative_fallback: '',
-      rekomendasi: ''
+      positive_fallback: opsi?.filter((row) => row.id===opsiID)[0]?.positive_fallback || '',
+      negative_fallback: opsi?.filter((row) => row.id===opsiID)[0]?.negative_fallback || '',
+      rekomendasi: opsi?.filter((row) => row.id===opsiID)[0]?.rekomendasi || ''
     })
   };
 
@@ -223,9 +229,9 @@ export default function ChecklistOpsiModal({
                         name="value" 
                         label='Nilai'
                         labelId="opsiValue-select-label"
-                        value={editValue.value.toString()}
+                        value={addState ? addValue.value.toString() :editValue.value.toString()}
                         sx={{typography:'body2', fontSize:14, height:'100%'}}
-                        onChange={handleChangeEdit}
+                        onChange={addState ? handleChangeAdd : handleChangeEdit}
                       >
                         <MenuItem key={0} sx={{fontSize:14}} value={0}>0</MenuItem>
                         <MenuItem key={1} sx={{fontSize:14}} value={5}>5</MenuItem>
@@ -240,8 +246,8 @@ export default function ChecklistOpsiModal({
                         label="Kriteria"
                         multiline
                         minRows={2}
-                        value={editValue.title}
-                        onChange={handleChangeEdit}
+                        value={addState ? addValue.title : editValue.title}
+                        onChange={addState ? handleChangeAdd : handleChangeEdit}
                       />
                     </FormControl>
                   </Stack>
@@ -252,8 +258,8 @@ export default function ChecklistOpsiModal({
                         label="Positive Fallback"
                         multiline
                         minRows={2}
-                        value={editValue.positive_fallback}
-                        onChange={handleChangeEdit}
+                        value={addState ? addValue.positive_fallback : editValue.positive_fallback}
+                        onChange={addState ? handleChangeAdd : handleChangeEdit}
                       />
                     </FormControl>
 
@@ -263,8 +269,8 @@ export default function ChecklistOpsiModal({
                         label="Negative Fallback"
                         multiline
                         minRows={2}
-                        value={editValue.negative_fallback}
-                        onChange={handleChangeEdit}
+                        value={addState ? addValue.negative_fallback : editValue.negative_fallback}
+                        onChange={addState ? handleChangeAdd : handleChangeEdit}
                       />
                     </FormControl>
 
@@ -274,8 +280,8 @@ export default function ChecklistOpsiModal({
                         label="Rekomendasi"
                         multiline
                         minRows={2}
-                        value={editValue.rekomendasi}
-                        onChange={handleChangeEdit}
+                        value={addState ? addValue.rekomendasi : editValue.rekomendasi}
+                        onChange={addState ? handleChangeAdd : handleChangeEdit}
                       />
                     </FormControl>
                   </Stack>
@@ -294,7 +300,7 @@ export default function ChecklistOpsiModal({
                   <Button 
                     variant='contained' 
                     color="white"
-                    onClick={handleResetEdit}
+                    onClick={addState ? handleResetAdd : handleResetEdit}
                   >
                     Reset
                   </Button>
