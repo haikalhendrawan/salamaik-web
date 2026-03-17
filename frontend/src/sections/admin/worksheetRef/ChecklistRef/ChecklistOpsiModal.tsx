@@ -12,6 +12,7 @@ import StyledTextField from '../../../../components/styledTextField/StyledTextFi
 import useAxiosJWT from '../../../../hooks/useAxiosJWT';
 import useSnackbar from '../../../../hooks/display/useSnackbar';
 import useChecklist, {ChecklistType ,OpsiType} from './useChecklist';
+import useDialog from '../../../../hooks/display/useDialog';
 // -------------------------------------------------------------------------------------------
 const style = {
   position: 'absolute',
@@ -66,6 +67,8 @@ export default function ChecklistOpsiModal({
   const {openSnackbar} = useSnackbar();
 
   const {getChecklist} = useChecklist();
+
+  const {openDialog} = useDialog();
 
   const [title, setTitle] = useState<TitleType>({
     checklistTitle: '',
@@ -152,9 +155,51 @@ export default function ChecklistOpsiModal({
     }
   };
 
+  const handleSubmitAdd = async () => {
+    try {
+      await axiosJWT.post("/createOpsi", {
+        title: addValue.title,
+        value: addValue.value,
+        checklistId: addValue.checklist_id,
+        positiveFallback: addValue.positive_fallback,
+        negativeFallback: addValue.negative_fallback,
+        rekomendasi: addValue.rekomendasi
+      });
+      await getChecklist();
+      modalClose();
+    } catch (err: any) {
+      if(err.response){
+        openSnackbar(err.response.data.message, "error");
+      }else{
+        openSnackbar("Network Error", "error");
+      }
+    }
+  };
+
+  const handleSubmitDelete = async () => {
+    try{
+      await axiosJWT.post("/deleteOpsi", {
+       id: editValue.id,
+     });
+     await getChecklist();
+     modalClose();
+    }catch(err: any){
+      if(err.response){
+        openSnackbar(err.response.data.message, "error");
+      }else{
+        openSnackbar("Network Error", "error");
+      }
+    }
+  };
+
   useEffect(() => {
     if(opsi && editID && checklist){
-      setEditValue({
+      addState ? 
+      setAddValue({
+        ...addValue,
+        checklist_id: editID
+      })
+      : setEditValue({
         id: opsi?.filter((row) => row.id===opsiID)[0]?.id || 0,
         title: opsi?.filter((row) => row.id===opsiID)[0]?.title || '',
         value: opsi?.filter((row) => row.id===opsiID)[0]?.value || 0,
@@ -293,7 +338,7 @@ export default function ChecklistOpsiModal({
                     variant='contained'
                     color={addState? 'primary' : 'warning'} 
                     sx={{borderRadius:'8px'}}
-                    onClick={handleSubmitEdit}
+                    onClick={addState ? handleSubmitAdd : handleSubmitEdit}
                   >
                     {addState? 'Add' : 'Edit'} 
                   </Button>
@@ -344,6 +389,22 @@ export default function ChecklistOpsiModal({
                     </Grid>
                 </Grid>
                 ))}
+
+                <Button 
+                  variant='contained' 
+                  color="pink"
+                  onClick={addState 
+                    ? () => {} 
+                    : () => openDialog
+                      ('Hapus Opsi',
+                        'Yakin hapus opsi ini?',
+                        'pink',
+                        'Hapus',
+                        () => handleSubmitDelete())
+                  }
+                >
+                  Hapus
+                </Button>
 
               </FormDataContainer>
 
