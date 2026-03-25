@@ -6,10 +6,14 @@
 /**
  *
  *
- * Refer to dasar hukum PER-1/PB/2023
+ * Refer to dasar hukum 
  */
 
-export async function sanitizeSubKomponen(komponenId: number, subKomponenId: number) {
+export async function sanitizeSubKomponen(komponenId: number, subKomponenId: number, peraturan: number) {
+  if(peraturan !== 1){
+    return true
+  }
+
   if(komponenId===0 || !komponenId || komponenId>4){
     return false
   };

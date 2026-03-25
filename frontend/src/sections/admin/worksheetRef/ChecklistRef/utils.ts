@@ -17,6 +17,7 @@ interface ChecklistType{
   file1: string | null,
   file2: string | null,
   opsi: OpsiType[] | null
+  urut: number
 };
 
 interface OpsiType{

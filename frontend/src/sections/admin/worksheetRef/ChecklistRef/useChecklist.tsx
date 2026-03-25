@@ -24,7 +24,9 @@ export interface ChecklistType{
   contoh_file: string | null
   peraturan: string | null,
   uic: string | null,
-  checklist_id: number | null
+  checklist_id: number | null,
+  critical_point: string | null,
+  urut: number 
 };
 
 export interface OpsiType{

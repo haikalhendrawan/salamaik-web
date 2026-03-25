@@ -75,7 +75,9 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
     contoh_file: '',
     peraturan: '',
     uic: '',
-    checklist_id: null
+    checklist_id: null,
+    critical_point: '',
+    urut: 0
   });
 
   const handleChangeAdd = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>) => {
@@ -102,7 +104,9 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
       contoh_file: '',
       peraturan: '',
       uic: '',
-      checklist_id: null
+      checklist_id: null,
+      critical_point: '',
+      urut: 0
     })
   };
 
@@ -122,7 +126,9 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
     contoh_file: '',
     peraturan: '',
     uic: '',
-    checklist_id: null
+    checklist_id: null,
+    critical_point: '',
+    urut: 0
   });
 
   const handleChangeEdit = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>) => {
@@ -149,7 +155,9 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
       contoh_file: checklist?.filter((row) => row.id===editID)[0]?.contoh_file || '',
       peraturan: checklist?.filter((row) => row.id===editID)[0]?.peraturan || '',
       uic: checklist?.filter((row) => row.id===editID)[0]?.uic || '',
-      checklist_id: checklist?.filter((row) => row.id===editID)[0]?.checklist_id || null
+      checklist_id: checklist?.filter((row) => row.id===editID)[0]?.checklist_id || null,
+      critical_point: checklist?.filter((row) => row.id===editID)[0]?.critical_point || '',
+      urut: checklist?.filter((row) => row.id===editID)[0]?.urut || 0
     })
   };
 
@@ -169,7 +177,9 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
       contoh_file: editValue.contoh_file===''?null:editValue.contoh_file,
       peraturan: editValue.peraturan===''?null:editValue.peraturan,
       uic: editValue.uic===''?null:editValue.uic,
-      checklist_id: editValue.checklist_id
+      checklist_id: editValue.checklist_id,
+      critical_point: editValue.critical_point,
+      urut: editValue.urut
     }
     try{
       setIsLoading(true);
@@ -189,7 +199,48 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
     }finally{
       setIsLoading(false);
     }
-  }
+  };
+
+  const handleSubmitAdd = async () => {
+    try {
+      const body = {
+        id: addValue.id, //if this invalid will be checked on server
+        title: addValue.title, //if this invalid will be checked on server
+        header: addValue.header===''?null:addValue.header,
+        komponen_id: addValue.komponen_id, //if this invalid will be checked on server
+        subkomponen_id: addValue.subkomponen_id, //if this invalid will be checked on server
+        subsubkomponen_id: addValue.subsubkomponen_id===0?null:addValue.subsubkomponen_id,
+        standardisasi: addValue.standardisasi===null?0:addValue.standardisasi, 
+        matrix_title: addValue.matrix_title===null?addValue.title:addValue.matrix_title, 
+        file1: addValue.file1===''?null:addValue.file1,
+        file2: addValue.file2===''?null:addValue.file2,
+        instruksi: addValue.instruksi===''?null:addValue.instruksi,
+        contoh_file: addValue.contoh_file===''?null:addValue.contoh_file,
+        peraturan: addValue.peraturan===''?null:addValue.peraturan,
+        uic: addValue.uic===''?null:addValue.uic,
+        critical_point: addValue.critical_point,
+        urut: addValue.urut
+      }
+
+      setIsLoading(true);
+      const response = await axiosJWT.post("/createChecklist", body);
+      openSnackbar(response.data.message, "success");
+      setIsLoading(false);
+      modalClose();
+      getChecklist();
+
+    }catch(err: any){
+      if(err.response){
+        setIsLoading(false);
+        openSnackbar(err.response.data.message, "error");
+      }else{
+        setIsLoading(false);
+        openSnackbar(err.response.data.message, "error");
+      }
+    }finally{
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     if(checklist && editID){
@@ -209,7 +260,9 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
         contoh_file: checklist?.filter((row) => row.id===editID)[0]?.contoh_file || '',
         peraturan: checklist?.filter((row) => row.id===editID)[0]?.peraturan || '',
         uic: checklist?.filter((row) => row.id===editID)[0]?.uic || '',
-        checklist_id: checklist?.filter((row) => row.id===editID)[0]?.checklist_id || null
+        checklist_id: checklist?.filter((row) => row.id===editID)[0]?.checklist_id || null,
+        critical_point: checklist?.filter((row) => row.id===editID)[0]?.critical_point || '',
+        urut: checklist?.filter((row) => row.id===editID)[0]?.urut || 0
       })
     }
 
@@ -241,6 +294,18 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
                   <Stack direction='column' spacing={3} sx={{width:'45%'}}>
                     <FormControl>
                       <StyledTextField 
+                        name="urut" 
+                        label="Nomor urut"
+                        multiline
+                        minRows={1}
+                        sx={{width:'25%'}}
+                        value={ addState? addValue?.urut : editValue?.urut}
+                        onChange={addState? handleChangeAdd : handleChangeEdit}
+                      />
+                    </FormControl>
+
+                    <FormControl>
+                      <StyledTextField 
                         name="title" 
                         label="Judul Checklist"
                         multiline
@@ -250,6 +315,52 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
                       />
                     </FormControl>
 
+                    <FormControl>
+                      <StyledTextField 
+                        name="header" 
+                        label="Header"
+                        multiline
+                        minRows={2}
+                        value={ addState? addValue.header : editValue.header}
+                        onChange={addState? handleChangeAdd : handleChangeEdit}
+                      />
+                    </FormControl>
+
+                    <FormControl>
+                      <StyledTextField 
+                        name="instruksi" 
+                        label="Instruksi"
+                        multiline
+                        minRows={2}
+                        value={ addState? addValue?.instruksi : editValue?.instruksi}
+                        onChange={addState? handleChangeAdd : handleChangeEdit}
+                      />
+                    </FormControl>
+
+                    <FormControl>
+                      <StyledTextField 
+                        name="critical_point" 
+                        label="Critical Point"
+                        multiline
+                        minRows={2}
+                        value={ addState? addValue?.critical_point : editValue?.critical_point}
+                        onChange={addState? handleChangeAdd : handleChangeEdit}
+                      />
+                    </FormControl>
+
+                    <FormControl>
+                      <StyledTextField 
+                        name="peraturan" 
+                        label="Peraturan terkait"
+                        multiline
+                        minRows={2}
+                        value={ addState? addValue?.peraturan : editValue?.peraturan}
+                        onChange={addState? handleChangeAdd : handleChangeEdit}
+                      />
+                    </FormControl>
+
+                  </Stack>
+                  <Stack direction='column' spacing={3} sx={{width:'45%'}}>
                     <FormControl>
                       <InputLabel id="komponen-select-label" sx={{typography:'body2'}}>Komponen</InputLabel>
                       <Select 
@@ -262,6 +373,24 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
                       >
                         {komponenRef?.map((row) => (
                           <MenuItem key={row.id} sx={{fontSize:14}} value={row.id}>{row.title}</MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  
+                    <FormControl>
+                      <InputLabel id="subkomponen-select-label" sx={{typography:'body2'}}>Sub Komponen</InputLabel>
+                      <Select 
+                        name="subkomponen_id" 
+                        label='Sub Komponen'
+                        labelId="subkomponen-select-label"
+                        value={addState? addValue?.subkomponen_id?.toString() : editValue?.subkomponen_id?.toString()}
+                        onChange={addState? handleChangeAdd : handleChangeEdit}
+                        sx={{typography:'body2', fontSize:14, height:'100%'}}
+                      >
+                        {subKomponenRef
+                          ?.filter((row) => row.komponen_id===(addState? addValue.komponen_id : editValue.komponen_id))
+                          .map((row) => (
+                            <MenuItem key={row.id} sx={{fontSize:14}} value={row?.id?.toString()}>{row.title}</MenuItem>
                         ))}
                       </Select>
                     </FormControl>
@@ -281,59 +410,6 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
                         ?.filter((row) => row.komponen_id===(addState? addValue.komponen_id : editValue.komponen_id))
                         .map((row) => (
                           <MenuItem key={row.id} sx={{fontSize:14}} value={row?.id?.toString()}>{row.title}</MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-
-                    <FormControl>
-                      <StyledTextField 
-                        name="instruksi" 
-                        label="Instruksi"
-                        multiline
-                        minRows={2}
-                        value={ addState? addValue?.instruksi : editValue?.instruksi}
-                        onChange={addState? handleChangeAdd : handleChangeEdit}
-                      />
-                    </FormControl>
-
-                    <FormControl>
-                      <StyledTextField 
-                        name="peraturan" 
-                        label="Peraturan terkait"
-                        multiline
-                        minRows={2}
-                        value={ addState? addValue?.peraturan : editValue?.peraturan}
-                        onChange={addState? handleChangeAdd : handleChangeEdit}
-                      />
-                    </FormControl>
-
-                  </Stack>
-                  <Stack direction='column' spacing={3} sx={{width:'45%'}}>
-                    <FormControl>
-                      <StyledTextField 
-                        name="header" 
-                        label="Header"
-                        multiline
-                        minRows={2}
-                        value={ addState? addValue.header : editValue.header}
-                        onChange={addState? handleChangeAdd : handleChangeEdit}
-                      />
-                    </FormControl>
-                  
-                    <FormControl>
-                      <InputLabel id="subkomponen-select-label" sx={{typography:'body2'}}>Sub Komponen</InputLabel>
-                      <Select 
-                        name="subkomponen_id" 
-                        label='Sub Komponen'
-                        labelId="subkomponen-select-label"
-                        value={addState? addValue?.subkomponen_id?.toString() : editValue?.subkomponen_id?.toString()}
-                        onChange={addState? handleChangeAdd : handleChangeEdit}
-                        sx={{typography:'body2', fontSize:14, height:'100%'}}
-                      >
-                        {subKomponenRef
-                          ?.filter((row) => row.komponen_id===(addState? addValue.komponen_id : editValue.komponen_id))
-                          .map((row) => (
-                            <MenuItem key={row.id} sx={{fontSize:14}} value={row?.id?.toString()}>{row.title}</MenuItem>
                         ))}
                       </Select>
                     </FormControl>
@@ -382,7 +458,7 @@ export default function ChecklistRefModal({modalOpen, modalClose, addState, edit
                     variant='contained'
                     color={addState? 'primary' : 'warning'} 
                     sx={{borderRadius:'8px'}}
-                    onClick={addState? () => {} : handleSubmitEdit}
+                    onClick={addState? handleSubmitAdd : handleSubmitEdit}
                   >
                     {addState? 'Add' : 'Edit'} 
                   </Button>

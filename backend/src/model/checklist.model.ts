@@ -23,6 +23,8 @@ export interface ChecklistType{
   uic: string | null,
   checklist_id: number | null,
   standardisasi_id: number | null,
+  critical_point: string| null,
+  urut: number | null,
 };
 //-----------------------------------------------------------------------------
 class Checklist{
@@ -59,7 +61,9 @@ class Checklist{
         instruksi,
         contoh_file,
         peraturan,
-        uic
+        uic,
+        critical_point,
+        urut
       } = body;
 
       const q = ` UPDATE checklist_ref
@@ -76,10 +80,12 @@ class Checklist{
                     instruksi = $10, 
                     contoh_file = $11,
                     peraturan = $12,
-                    uic = $13
-                  WHERE id = $14 
+                    uic = $13,
+                    critical_point = $14,
+                    urut = $15
+                  WHERE id = $16 
                   RETURNING *`;
-      const result = await pool.query(q, [title, header, komponen_id, subkomponen_id, subsubkomponen_id, standardisasi, matrix_title, file1, file2, instruksi, contoh_file, peraturan, uic, id]);
+      const result = await pool.query(q, [title, header, komponen_id, subkomponen_id, subsubkomponen_id, standardisasi, matrix_title, file1, file2, instruksi, contoh_file, peraturan, uic, critical_point, urut, id]);
       return result.rows
     }catch(err){
       throw err
@@ -126,12 +132,14 @@ class Checklist{
         instruksi,
         contoh_file,
         peraturan,
-        uic
+        uic,
+        critical_point,
+        urut
       } = body;
 
-      const q = `INSERT INTO checklist_ref (title, header, komponen_id, subkomponen_id, subsubkomponen_id, standardisasi, matrix_title, file1, file2, instruksi, contoh_file, peraturan, uic) 
-                  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *`;
-      const result = await pool.query(q, [title, header, komponen_id, subkomponen_id, subsubkomponen_id, standardisasi, matrix_title, file1, file2, instruksi, contoh_file, peraturan, uic]);
+      const q = `INSERT INTO checklist_ref (title, header, komponen_id, subkomponen_id, subsubkomponen_id, standardisasi, matrix_title, file1, file2, instruksi, contoh_file, peraturan, uic, critical_point, urut) 
+                  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *`;
+      const result = await pool.query(q, [title, header, komponen_id, subkomponen_id, subsubkomponen_id, standardisasi, matrix_title, file1, file2, instruksi, contoh_file, peraturan, uic, critical_point, urut]);
       return result.rows
     } catch (err) {
       throw err

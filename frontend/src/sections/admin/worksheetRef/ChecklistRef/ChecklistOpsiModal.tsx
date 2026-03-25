@@ -166,6 +166,7 @@ export default function ChecklistOpsiModal({
         rekomendasi: addValue.rekomendasi
       });
       await getChecklist();
+      handleResetAdd();
       modalClose();
     } catch (err: any) {
       if(err.response){
@@ -281,7 +282,8 @@ export default function ChecklistOpsiModal({
                         <MenuItem key={0} sx={{fontSize:14}} value={0}>0</MenuItem>
                         <MenuItem key={1} sx={{fontSize:14}} value={5}>5</MenuItem>
                         <MenuItem key={2} sx={{fontSize:14}} value={7}>7</MenuItem>
-                        <MenuItem key={3} sx={{fontSize:14}} value={10}>10</MenuItem>
+                        <MenuItem key={3} sx={{fontSize:14}} value={8}>8</MenuItem>
+                        <MenuItem key={4} sx={{fontSize:14}} value={10}>10</MenuItem>
                       </Select>
                     </FormControl>
 
@@ -390,21 +392,25 @@ export default function ChecklistOpsiModal({
                 </Grid>
                 ))}
 
-                <Button 
-                  variant='contained' 
-                  color="pink"
-                  onClick={addState 
-                    ? () => {} 
-                    : () => openDialog
-                      ('Hapus Opsi',
-                        'Yakin hapus opsi ini?',
-                        'pink',
-                        'Hapus',
-                        () => handleSubmitDelete())
-                  }
-                >
-                  Hapus
-                </Button>
+                {
+                  addState ? null 
+                  :
+                    <Button 
+                      variant='contained' 
+                      color="pink"
+                      onClick={
+                        () => openDialog
+                          ('Hapus Opsi',
+                            'Yakin hapus opsi ini?',
+                            'pink',
+                            'Hapus',
+                            () => handleSubmitDelete())
+                      }
+                    >
+                      Hapus
+                    </Button>
+                }
+                
 
               </FormDataContainer>
 

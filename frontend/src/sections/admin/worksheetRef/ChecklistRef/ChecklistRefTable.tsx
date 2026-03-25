@@ -17,6 +17,7 @@ import useLoading from '../../../../hooks/display/useLoading';
 import useSnackbar from '../../../../hooks/display/useSnackbar';
 import useAxiosJWT from '../../../../hooks/useAxiosJWT';
 import useChecklist from './useChecklist';
+import useDialog from '../../../../hooks/display/useDialog';
 //----------------------------------------------------
 const TABLE_HEAD = [
   { id: 'id', label: 'Id', alignRight: false },
@@ -47,6 +48,8 @@ export default function ChecklistRefTable({tab, handleOpen, fileOpen,  setFile}:
   const {checklist, getChecklist} = useChecklist();
 
   const axiosJWT = useAxiosJWT();
+
+  const {openDialog} = useDialog();
 
   // const [order, setOrder] = useState<'asc' | 'desc'>('asc');
 
@@ -117,6 +120,21 @@ export default function ChecklistRefTable({tab, handleOpen, fileOpen,  setFile}:
     }
   };
 
+  const handleDelete = async (id: number) => {
+    try {
+      setIsLoading(true);
+      const response = await axiosJWT.post(`/deleteChecklist`, {id: id});
+      openSnackbar(`${response.data.message}`, "success");
+      await getChecklist();
+      setIsLoading(false); 
+    } catch (err: any) {
+      setIsLoading(false); 
+      openSnackbar(`${err.response.data.message}`, "error");
+    } finally {
+      setIsLoading(false); 
+    }
+  };
+
 
   return (
     <>
@@ -140,9 +158,9 @@ export default function ChecklistRefTable({tab, handleOpen, fileOpen,  setFile}:
               </TableRow>
             </TableHead>
             <TableBody>
-              {useMemo(() => filteredChecklist?.map((row, index) => 
+              {useMemo(() => filteredChecklist?.map((row) => 
                 <TableRow hover key={row.id} tabIndex={-1}>
-                  <TableCell align="justify">{index+1}</TableCell>
+                  <TableCell align="justify">{row.urut}</TableCell>
 
                   <TableCell align="center" sx={{fontSize:12}}>{row.title}</TableCell>
 
@@ -237,7 +255,21 @@ export default function ChecklistRefTable({tab, handleOpen, fileOpen,  setFile}:
                       </Tooltip>
                       <Tooltip title='delete'>
                         <span>
-                          <StyledButton aria-label="delete" disabled variant='contained' size='small' color='white'>
+                          <StyledButton 
+                            aria-label="delete" 
+                            variant='contained' 
+                            size='small' 
+                            color='pink'
+                            onClick={ () =>
+                              openDialog(
+                                'Hapus checklist',
+                                'Yakin hapus checklist ini?', 
+                                'pink', 
+                                'Hapus', 
+                                () => handleDelete(row.id)
+                              )
+                            }
+                          >
                             <Iconify icon="solar:trash-bin-trash-bold"/>
                           </StyledButton>
                         </span>

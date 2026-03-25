@@ -105,8 +105,10 @@ class WorksheetJunction{
                   FROM worksheet_junction
                   LEFT JOIN checklist_ref 
                   ON worksheet_junction.checklist_id = checklist_ref.id
+                    AND checklist_ref.deleted IS NULL
                   LEFT JOIN opsi_ref
                   ON worksheet_junction.checklist_id = opsi_ref.checklist_id
+                    AND opsi_ref.deleted IS NULL
                   WHERE worksheet_id = $1
                   GROUP BY worksheet_junction.junction_id, checklist_ref.id
                   ORDER BY worksheet_junction.checklist_id

@@ -69,8 +69,9 @@ const getChecklistWithOpsi = async (req: Request, res: Response, next: NextFunct
 
 const editChecklist = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const {peraturan} = req.payload;
     const{ komponen_id, subkomponen_id } = req.body;
-    const isValidSubKomponen = await sanitizeSubKomponen(komponen_id, subkomponen_id);
+    const isValidSubKomponen = await sanitizeSubKomponen(komponen_id, subkomponen_id, peraturan);
     if(!isValidSubKomponen){
       return next(new ErrorDetail(400, 'Invalid subkomponen'));
     };
@@ -152,9 +153,9 @@ const deleteChecklist = async (req: Request, res: Response, next: NextFunction) 
 const editOpsiById = async (req: Request, res: Response, next: NextFunction) => {
   try{
     const {id, title, value, checklistId, positiveFallback, negativeFallback, rekomendasi} = req.body;
-    const validValue = [0, 5, 7, 10];
+    const validValue = [0, 5, 7, 8, 10];
     if(validValue.includes(value) === false){
-      return next(new ErrorDetail(400, 'Nilai dari opsi harus 0, 5, 7, atau 10'));
+      return next(new ErrorDetail(400, 'Nilai dari opsi harus 0, 5, 7, 8, atau 10'));
     };
     const result = await checklist.editOpsiById(id, title, value, checklistId, positiveFallback, negativeFallback, rekomendasi);
 
@@ -177,6 +178,10 @@ const getAllOpsi = async (req: Request, res: Response, next: NextFunction) => {
 const createOpsi = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const {checklistId, title, value, positiveFallback, negativeFallback, rekomendasi} = req.body;
+    const validValue = [0, 5, 7, 8, 10];
+    if(validValue.includes(value) === false){
+      return next(new ErrorDetail(400, 'Nilai dari opsi harus 0, 5, 7, 8, atau 10'));
+    };
     const result = await checklist.createOpsi(checklistId, title, value, positiveFallback, negativeFallback, rekomendasi);
 
     return res.status(200).json({sucess: true, message: 'Opsi created successfully', rows: result});
