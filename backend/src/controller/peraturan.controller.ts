@@ -36,6 +36,7 @@
   try {
     const {nomor, hal, tahun} = req.body;
     const result = await peraturan.add(nomor, hal, tahun);
+    await peraturan.edit(result.id, result.nomor, result.hal, result.tahun);
 
     return res.status(200).json({sucess: true, message: 'create peraturan success', rows: result})
   } catch (err) {

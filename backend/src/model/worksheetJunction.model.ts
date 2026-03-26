@@ -28,7 +28,8 @@ export interface WorksheetJunctionType{
   period: string,
   last_update: string | null,
   updated_by: string | null,
-  excluded: number
+  excluded: number,
+  link_file: string | null
 };
 
 export interface OpsiType{
@@ -56,6 +57,7 @@ export interface WsJunctionJoinChecklistType{
   last_update: string | null,
   updated_by: string | null,
   excluded: number,
+  link_file: string | null,
   id: number,
   title: string | null, 
   header: string | null,
@@ -89,6 +91,7 @@ export interface WsJunctionWithKomponenType{
   last_update: string | null,
   updated_by: string | null,
   excluded: number,
+  link_file: string | null,
   checklist: ChecklistType[],
   komponen: KomponenType[],
   subkomponen: SubKomponenType[],
@@ -220,6 +223,16 @@ class WorksheetJunction{
       const updateTime = new Date(Date.now()).toISOString();
       const q = "UPDATE worksheet_junction SET kanwil_note = $1, last_update = $2, updated_by = $3 WHERE junction_id = $4 AND worksheet_id = $5 RETURNING *";
       const result = await pool.query(q, [kanwilNote, updateTime, userName, junctionID, worksheetId]);
+      return result?.rows[0]
+    }catch(err){
+      throw err
+    }
+  }
+
+  async editWsJunctionLinkFile(junctionID: number, worksheetId: string, linkFile: string, userName: string){
+    try{
+      const q = "UPDATE worksheet_junction SET link_file = $1, last_update = CURRENT_TIMESTAMP, updated_by = $2 WHERE junction_id = $3 AND worksheet_id = $4 RETURNING *";
+      const result = await pool.query(q, [linkFile, userName, junctionID, worksheetId]);
       return result?.rows[0]
     }catch(err){
       throw err

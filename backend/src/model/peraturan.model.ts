@@ -48,8 +48,9 @@
  
    async edit(id: number, nomor: string, hal: string, tahun: number){
      try{
-       const q = "UPDATE peraturan_ref SET nomor = $1, hal = $2, tahun = $3 WHERE id = $4 RETURNING *";
-       const result = await pool.query(q, [nomor, hal, tahun, id]);
+       const file = `peraturan${id}.pdf`
+       const q = "UPDATE peraturan_ref SET nomor = $1, hal = $2, tahun = $3, file = $4 WHERE id = $5 RETURNING *";
+       const result = await pool.query(q, [nomor, hal, tahun, file, id]);
        return result.rows[0]
      }catch(err){
        throw err;

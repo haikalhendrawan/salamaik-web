@@ -127,6 +127,25 @@ class WorksheetEvent{
     }
   }
 
+  async updateLinkFile(socket: Socket, data: any, callback: any) {
+    try {
+      const ip = socket.handshake.address;
+
+      const {name, username} = socket.data.payload;
+      const {worksheetId, junctionId, linkFile} = data; 
+      const result = await wsJunction.editWsJunctionLinkFile( junctionId, worksheetId, linkFile, name);
+
+      nonBlockingCall(activity.createActivity(username, 87, ip, `worksheetId: ${worksheetId}, junctionId: ${junctionId}, linkFile: ${linkFile}`));
+
+      socket.broadcast.emit('linkFileHasUpdated', {worksheetId, junctionId, linkFile});
+
+      return callback({success: true, rows: result, message: 'Link file has been updated'});
+    } catch (err: any) {
+      logger.error(err);
+      return socketError(callback, err.message)
+    }
+  }
+
   async deleteWsJunctionFile(socket: Socket, data: any, callback: any){
     try{
       const ip = socket.handshake.address;
@@ -159,5 +178,6 @@ export default function worksheetEventListener(socket: Socket) {
   socket.on("updateKanwilScore", (data, callback) => wsEvent.updateKanwilScore(socket, data, callback));
   socket.on("updateKPPNScore", (data, callback) => wsEvent.updateKPPNScore(socket, data, callback));
   socket.on("updateKanwilNote", (data, callback) => wsEvent.updateKanwilNote(socket, data, callback));
+  socket.on("updateLinkFile", (data, callback) => wsEvent.updateLinkFile(socket, data, callback));
   socket.on("deleteWsJunctionFile", (data, callback) => wsEvent.deleteWsJunctionFile(socket, data, callback));
 };

@@ -277,7 +277,20 @@ const editWsJunctionKanwilNote = async(req: Request, res: Response, next: NextFu
     const username = req.payload.username;
 
     const {worksheetId, junctionId, kanwilNote} = req.body; 
-    const result = await wsJunction.editWsJunctionKanwilNote(worksheetId, junctionId, kanwilNote, username);
+    const result = await wsJunction.editWsJunctionKanwilNote(junctionId, worksheetId, kanwilNote, username);
+
+    return res.status(200).json({sucess: true, message: 'Edit worksheet junction success', rows: result})
+  }catch(err){
+    next(err);
+  }
+};
+
+const editWsJunctionLinkFile = async(req: Request, res: Response, next: NextFunction) => {
+  try{
+    const username = req.payload.username;
+
+    const {junctionId, worksheetId, linkFile} = req.body; 
+    const result = await wsJunction.editWsJunctionLinkFile(junctionId, worksheetId, linkFile, username);
 
     return res.status(200).json({sucess: true, message: 'Edit worksheet junction success', rows: result})
   }catch(err){
@@ -366,6 +379,7 @@ export {
   editWsJunctionKPPNScore,
   editWsJunctionKanwilScore,
   editWsJunctionKanwilNote,
+  editWsJunctionLinkFile,
   editWsJunctionFile,
   editWsJunctionExclude,
   deleteWsJunctionByWorksheetId,
