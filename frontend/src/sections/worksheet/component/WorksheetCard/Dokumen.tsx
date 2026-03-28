@@ -280,6 +280,25 @@ export default function Dokumen({openInstruction, wsJunction, wsDetail}: Dokumen
               :
                 null
             }
+
+            <Tooltip title='Add link'>
+              <span>
+                <StyledButton 
+                  variant='contained' 
+                  component='label' 
+                  aria-label="delete" 
+                  size='small' 
+                  color={wsJunction?.link_file ? 'primary' : 'white'} 
+                  disabled={isPastDue}
+                  onClick={() => {}}
+                >
+                  <Iconify 
+                    icon="solar:link-bold-duotone"
+                    color={wsJunction?.link_file ? 'white' : theme.palette.grey[500]}
+                  />
+                </StyledButton>
+              </span>
+            </Tooltip>
            
           </Stack>
         </Stack>

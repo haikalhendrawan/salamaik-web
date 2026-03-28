@@ -43,6 +43,7 @@ export interface WsJunctionType{
     peraturan: string | null,
     uic: string | null,
     standardisasi_id: number | null,
+    link_file: string | null,
     opsi: OpsiType[] | [] | null
 }
 

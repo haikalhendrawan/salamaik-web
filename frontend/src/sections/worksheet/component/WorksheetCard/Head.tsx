@@ -103,7 +103,7 @@ export default function Head(props: HeadPropInterface) {  // bagian atas dari ca
         {
           isAdmin
           ?
-            <Tooltip title={isExcluded?'Excluded':'Not excluded'}>
+            <Tooltip title={isExcluded?'Batal Exclude':'Exclude'}>
               <span>
                 <StyledButton 
                   aria-label="edit" 
