@@ -139,7 +139,7 @@ class WorksheetEvent{
 
       socket.broadcast.emit('linkFileHasUpdated', {worksheetId, junctionId, linkFile});
 
-      return callback({success: true, rows: result, message: 'Link file has been updated'});
+      return callback({success: true, rows: result, message: 'Link Bukti Dukung has been updated'});
     } catch (err: any) {
       logger.error(err);
       return socketError(callback, err.message)

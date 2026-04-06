@@ -35,10 +35,11 @@ interface DokumenProps{
   openInstruction: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
   wsJunction: WsJunctionType | null,
   wsDetail: WorksheetType | null,
+  openLinkFile: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
 }
 
 // ----------------------------------------------------------------------------
-export default function Dokumen({openInstruction, wsJunction, wsDetail}: DokumenProps){
+export default function Dokumen({openInstruction, wsJunction, wsDetail, openLinkFile}: DokumenProps){
   const [isMounted, setIsMounted] = useState(true);
 
   const theme = useTheme();
@@ -290,7 +291,7 @@ export default function Dokumen({openInstruction, wsJunction, wsDetail}: Dokumen
                   size='small' 
                   color={wsJunction?.link_file ? 'primary' : 'white'} 
                   disabled={isPastDue}
-                  onClick={() => {}}
+                  onClick={(e) => openLinkFile(e)}
                 >
                   <Iconify 
                     icon="solar:link-bold-duotone"

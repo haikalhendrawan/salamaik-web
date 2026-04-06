@@ -20,6 +20,7 @@ import Catatan from "./Catatan";
 import CommentPopover from "../CommentPopover";
 import { WsJunctionType, WorksheetType } from "../../types";
 import { debounce } from 'lodash';
+import LinkFilePopover from "../LinkFilePopover";
 // ------------------------------------------------------------
 interface WorksheetCardProps {
   modalOpen: () => void,
@@ -67,9 +68,13 @@ export default function WorksheetCard(props: WorksheetCardProps) {
 
   const [openComment, setOpenComment] = useState<boolean>(false);
 
+  const [openLinkFile, setOpenLinkFile] = useState<boolean>(false);
+
   const [anchorEl, setAnchorEl] = useState<EventTarget & HTMLButtonElement | null>(null);
 
   const [anchorElComment, setAnchorElComment] = useState<EventTarget & HTMLButtonElement | null>(null);
+
+  const [anchorElLinkFile, setAnchorElLinkFile] = useState<EventTarget & HTMLButtonElement | null>(null);
 
   const handleOpenInstruction = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     setOpenInstruction(true);
@@ -87,6 +92,16 @@ export default function WorksheetCard(props: WorksheetCardProps) {
 
   const handleCloseComment = useCallback(() => {
     setOpenComment(false);
+  }, []);
+
+  const hanldeOpenLinkFile = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    setOpenLinkFile(true);
+    setAnchorElLinkFile(event.currentTarget);
+  }, []);
+
+  const handleCloseLinkFile = useCallback(() => {
+    setOpenLinkFile(false);
+    setAnchorElLinkFile(null);
   }, []);
 
   useEffect(() => {
@@ -164,6 +179,7 @@ export default function WorksheetCard(props: WorksheetCardProps) {
                 openInstruction={handleOpenInstruction} 
                 wsJunction={props?.wsJunction} 
                 wsDetail={props?.wsDetail}
+                openLinkFile={hanldeOpenLinkFile}
               />
             </Grid>
 
@@ -198,6 +214,14 @@ export default function WorksheetCard(props: WorksheetCardProps) {
         anchorEl={anchorElComment}
         handleClose={handleCloseComment}
         wsJunctionId={props.wsJunction?.junction_id || 0}
+      />
+
+      <LinkFilePopover
+        open={openLinkFile}
+        anchorEl={anchorElLinkFile}
+        handleClose={handleCloseLinkFile}
+        wsJunction={props?.wsJunction}
+        wsDetail={props?.wsDetail}
       />
 
     </>
