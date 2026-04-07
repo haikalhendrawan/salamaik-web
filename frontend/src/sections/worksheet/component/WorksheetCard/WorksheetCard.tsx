@@ -207,6 +207,7 @@ export default function WorksheetCard(props: WorksheetCardProps) {
         handleClose={handleCloseInstruction}
         instruction={props.wsJunction?.instruksi || null}
         fileExample={props.wsJunction?.contoh_file || null}
+        criticalPoint={props.wsJunction?.critical_point || null}
       />
 
       <CommentPopover

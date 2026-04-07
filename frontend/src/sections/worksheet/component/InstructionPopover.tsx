@@ -22,11 +22,12 @@ interface InstructionPopperProps{
   anchorEl: EventTarget & HTMLButtonElement | null,
   handleClose: () => void,
   instruction: string | null,
-  fileExample: string | null
+  fileExample: string | null,
+  criticalPoint: string | null,
 };
 
 // ---------------------------------------------------------------------------------------------
-export default function InstructionPopover({open, anchorEl, handleClose, instruction, fileExample}: InstructionPopperProps){
+export default function InstructionPopover({open, anchorEl, handleClose, instruction, fileExample, criticalPoint}: InstructionPopperProps){
   const theme = useTheme();
 
   return(
@@ -51,6 +52,11 @@ export default function InstructionPopover({open, anchorEl, handleClose, instruc
                   <Stack direction='column' spacing={1}>
                     <Typography variant='body2' sx={{fontSize: 14}} fontWeight={'bold'}>Dokumen</Typography>
                     <Typography variant='body2' sx={{fontSize: 12}}>{fileExample}</Typography>
+                  </Stack>
+                  <br />
+                  <Stack direction='column' spacing={1}>
+                    <Typography variant='body2' sx={{fontSize: 14}} fontWeight={'bold'}>Critical Point</Typography>
+                    <Typography variant='body2' sx={{fontSize: 12}}>{criticalPoint}</Typography>
                   </Stack>
                 </Box>
 							</ClickAwayListener>

@@ -282,13 +282,13 @@ async function handlePrintExcel(data: SectionedMatrixType[], kppnName: string, p
   worksheet.columns = [
     { header: 'No.', key: 'nomor', width: 8 },
     { header: 'Komponen Supervisi', key: 'komponenSupervisi', width: 25 },
-    { header: 'Hasil Implementasi', key: 'hasilImplementasi', width: 35 },
-    { header: 'Permasalahan', key: 'permasalahan', width: 35 },
-    { header: 'Rekomendasi', key: 'rekomendasi', width: 35 },
-    { header: 'Peraturan', key: 'peraturan', width: 15 },
-    { header: 'UIC', key: 'uic', width: 15 },
-    { header: 'Tindak Lanjut', key: 'tindakLanjut', width: 35 },
-    { header: 'Status', key: 'status', width: 10 },
+    { header: 'Hasil Implementasi di Lapangan', key: 'hasilImplementasi', width: 35 },
+    { header: 'Permasalahan (Apabila Ada)', key: 'permasalahan', width: 35 },
+    { header: 'Rekomendasi Atas Permasalahan', key: 'rekomendasi', width: 35 },
+    { header: 'Peraturan Terkait', key: 'peraturan', width: 15 },
+    { header: 'PIC Subbag/Seksi', key: 'uic', width: 15 },
+    { header: 'Tindak Lanjut Atas Permasalahan', key: 'tindakLanjut', width: 35 },
+    { header: 'Status Penyelesaian Tindak Lanjut', key: 'status', width: 10 },
   ];
 
   // Add header row

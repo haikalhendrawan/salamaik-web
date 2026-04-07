@@ -13,6 +13,8 @@ import useSocket from "../../../hooks/useSocket";
 import useWsJunction from "../useWsJunction";
 import useSnackbar from "../../../hooks/display/useSnackbar";
 import useLoading from "../../../hooks/display/useLoading";
+import StyledButton from "../../../components/styledButton/StyledButton";
+import Iconify from "../../../components/iconify/Iconify";
 //-----------------------------------------------------------------------------------------------------------------
 const style = {
   p: 2,
@@ -82,7 +84,6 @@ export default function LinkFilePopover({open, anchorEl, handleClose, wsJunction
         setIsLoading(true);
         await getWsJunctionKanwil(wsJunction?.kppn_id || '');
         setIsLoading(false);
-        // lastSavedNoteRef.current = currentNote;
       }catch(err:any){
         openSnackbar(err?.message, 'error');
         setIsLoading(false);
@@ -97,6 +98,23 @@ export default function LinkFilePopover({open, anchorEl, handleClose, wsJunction
     setLinkFile(wsJunction?.link_file || '');
   }, [wsJunction]);
 
+  const openLinkFileInNewTab = () => {
+    const links = linkFile.split(/\s+/).filter(Boolean);
+
+    if (links.length > 1) {
+      openSnackbar("Link file invalid/terdapat lebih dari satu, silahkan buka secara manual", "error");
+      return;
+    }
+
+    let url = links[0];
+
+    if (!/^https?:\/\//i.test(url)) {
+      url = `https://${url}`;
+    }
+
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+
   return (
     <>
       <Popper 
@@ -107,7 +125,22 @@ export default function LinkFilePopover({open, anchorEl, handleClose, wsJunction
 							<ClickAwayListener onClickAway={handleClose}>
                 <Box>
                   <Stack direction='column' spacing={1}>
-                    <Typography variant='body3' fontSize={12} textAlign={'left'}>Link Bukti Dukung</Typography>
+                    <Stack direction='row' justifyContent={'space-between'} alignItems={'center'} spacing={1}>
+                      <Typography variant='body3' fontSize={12} textAlign={'left'}>Link Bukti Dukung</Typography>
+                      <StyledButton 
+                        aria-label="link" 
+                        variant='contained' 
+                        size='small' 
+                        color='secondary'
+                        onClick={openLinkFileInNewTab}
+                        title='buka link'
+                        disabled={!linkFile}
+                      >
+                        <Iconify icon="solar:eye-bold"/>
+                      </StyledButton>
+                    </Stack>
+
+                    
                     <StyledFormControl>
                       <TextField 
                         size='small' 

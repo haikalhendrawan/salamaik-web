@@ -44,7 +44,9 @@ export interface WsJunctionType{
     uic: string | null,
     standardisasi_id: number | null,
     link_file: string | null,
-    opsi: OpsiType[] | [] | null
+    opsi: OpsiType[] | [] | null,
+    urut: number | null,
+    critical_point: string | null
 }
 
 export interface WorksheetType{

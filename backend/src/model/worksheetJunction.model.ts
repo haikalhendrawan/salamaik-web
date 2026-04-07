@@ -73,7 +73,9 @@ export interface WsJunctionJoinChecklistType{
   peraturan: string | null,
   uic: string | null,
   standardisasi_id: number | null,
-  opsi: OpsiType[] | [] | null
+  opsi: OpsiType[] | [] | null,
+  urut: number | null,
+  critical_point: string | null
 };
 
 export interface WsJunctionWithKomponenType{
