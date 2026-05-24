@@ -46,6 +46,7 @@ export interface WsJunctionType{
     link_file: string | null,
     opsi: OpsiType[] | [] | null,
     urut: number | null,
+    urut_huruf: string | null,
     critical_point: string | null
 }
 

@@ -20,7 +20,7 @@ import { WsJunctionType, WorksheetType } from '../../types';
 import useWsJunction from '../../useWsJunction';
 // ------------------------------------------------------------
 interface HeadPropInterface{
-  num: number | undefined,
+  num: string | undefined,
   title:string,
   dateUpdated: string | null,
   updatedBy: string | null,

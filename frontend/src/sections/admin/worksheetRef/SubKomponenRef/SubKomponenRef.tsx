@@ -109,9 +109,9 @@ export default function SubKomponenRef({section, addState, resetAddState}: SubKo
               </TableRow>
             </TableHead>
             <TableBody>
-              {subKomponenRef?.map((row) => 
+              {subKomponenRef?.map((row, index) => 
                 <TableRow hover key={row.id} tabIndex={-1}>
-                  <TableCell align="justify">{row.id}</TableCell>
+                  <TableCell align="justify">{index+1}</TableCell>
 
                   <TableCell align="left">{row.title}</TableCell>
 

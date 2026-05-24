@@ -48,12 +48,13 @@ const SELECT_KPPN: {[key: string]: string} = {
  '142': 'Painan',
 };
 
+const KOMPONEN_ICON = ["solar:safe-2-bold-duotone", "solar:buildings-2-bold-duotone", "solar:wallet-money-bold", "solar:incognito-bold-duotone"];
 // ----------------------------------------------------------------------
 
 export default function WorksheetKanwil() {
   const { wsJunction, getWsJunctionKanwil, wsDetail, getWorksheet } = useWsJunction();
 
-  const { subKomponenRef } = useDictionary();
+  const { komponenRef, subKomponenRef } = useDictionary();
 
   const { modalOpen, modalClose } = usePreviewFileModal();
 
@@ -65,7 +66,7 @@ export default function WorksheetKanwil() {
   
   const id= params.get('id') || "";
 
-  const [tabValue, setTabValue] = useState(1); // ganti menu komponen supervisi
+  const [tabValue, setTabValue] = useState(komponenRef?.[0].id || 0);  // ganti menu komponen supervisi
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => { // setiap tab komponen berubah
     setTabValue(newValue);
@@ -159,10 +160,11 @@ export default function WorksheetKanwil() {
 
             <Stack direction="row" alignItems="center" justifyContent="center" mb={5}>
                 <Tabs value={tabValue} onChange={handleTabChange}> 
-                  <Tab icon={<Iconify icon="solar:safe-2-bold-duotone" />} label="Treasurer" value={1} key={1} />
-                  <Tab icon={<Iconify icon="solar:buildings-2-bold-duotone" />} label="Pengelola Fiskal, Representasi Kemenkeu di Daerah, dan Special Mission" value={2} key={2}/>
-                  <Tab icon={<Iconify icon="solar:wallet-money-bold" />} label="Financial Advisor" value={3} key={3}/>
-                  <Tab icon={<Iconify icon="solar:incognito-bold-duotone" />} label="Tata Kelola Internal" value={4} key={4}/>
+                  {
+                    komponenRef?.map((item, index) => (
+                      <Tab icon={<Iconify icon={KOMPONEN_ICON[index]} />} label={item.title} value={item.id} key={item.id} />
+                    ))
+                  }
                 </Tabs>
             </Stack>
 

@@ -109,7 +109,7 @@ export default function NavigationDrawer({tabValue, scrollToElement}: {tabValue:
             return (
               <Grid item xs={2} onClick={() => handleScrollAndClose(item.checklist_id, "card")} key={index}>
                 <StyledLabel color={getLabelColor(item, auth)}>
-                  { item?.checklist_id }
+                  { `${item?.urut}${item?.urut_huruf || ''}` }
                 </StyledLabel>
               </Grid>
             );

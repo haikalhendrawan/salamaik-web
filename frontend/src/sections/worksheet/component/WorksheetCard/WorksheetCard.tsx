@@ -128,7 +128,7 @@ export default function WorksheetCard(props: WorksheetCardProps) {
           <StyledCardHeader
             title={
               <Head
-                num={props?.wsJunction?.checklist_id}
+                num={`${props.wsJunction?.urut}${props.wsJunction?.urut_huruf || ''}`}
                 title={props?.wsJunction?.title || ""}
                 dateUpdated={props?.wsJunction?.last_update || null}
                 updatedBy={props?.wsJunction?.updated_by || null}
