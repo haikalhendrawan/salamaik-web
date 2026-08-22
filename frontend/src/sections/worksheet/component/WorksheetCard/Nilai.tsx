@@ -314,96 +314,117 @@ export default function Nilai({wsJunction, wsDetail, isExcluded}: NilaiPropsType
 
   return (
     <Stack direction='column' spacing={2}>
-      <Stack direction='column' spacing={1} display={isExcluded ? 'none' : 'flex'}>
+      <Stack direction='column' spacing={1}>
         <Typography variant='body3' fontSize={12} textAlign={'left'}>Nilai KPPN :</Typography>
-        <StyledFormControl>
-          {
-            wsJunction?.standardisasi === 1
-            ?
-              <Stack direction='row' spacing={2}>
-                <StyledNumberTextField  
-                  size='small'
-                  type="text"
-                  onChange={(e) => setStdScoreKPPN(e.target.value)}
-                  onBlur={(e) => handleChangeKPPNScoreStd(e)}
-                  disabled={isKanwil || isPastDue}
-                  value={stdScoreKPPN}
-                />
-                <Tooltip title='Ambil nilai standardisasi'>
-                  <span>
-                    <StyledButton 
-                      aria-label="edit" 
-                      variant='contained' 
-                      size='small' 
-                      color='warning'
+        {
+          !isExcluded ? 
+            (
+              <StyledFormControl>
+              {
+                wsJunction?.standardisasi === 1
+                ?
+                  <Stack direction='row' spacing={2}>
+                    <StyledNumberTextField  
+                      size='small'
+                      type="text"
+                      onChange={(e) => setStdScoreKPPN(e.target.value)}
+                      onBlur={(e) => handleChangeKPPNScoreStd(e)}
                       disabled={isKanwil || isPastDue}
-                      onClick={() => handleFetchStdScoreKPPN()}
-                    >
-                      <Iconify icon="solar:refresh-bold-duotone"/>
-                    </StyledButton>
-                  </span>
-                </Tooltip>
-              </Stack>
-            :
-              <StyledSelect
-                required 
-                name="kppnScore" 
-                value={wsJunction?.kppn_score !== null ? String(wsJunction?.kppn_score) : ''}
-                onChange={(e) => handleChangeKPPNScore(e.target.value as string)}
-                size='small' 
-                disabled={isKanwil || isPastDue}
-              >
-                {opsiSelection}
-                <StyledMenuItem key={null} value={''}>{null}</StyledMenuItem>
-              </StyledSelect>
-          }
-        </StyledFormControl>
+                      value={stdScoreKPPN}
+                    />
+                    <Tooltip title='Ambil nilai standardisasi'>
+                      <span>
+                        <StyledButton 
+                          aria-label="edit" 
+                          variant='contained' 
+                          size='small' 
+                          color='warning'
+                          disabled={isKanwil || isPastDue}
+                          onClick={() => handleFetchStdScoreKPPN()}
+                        >
+                          <Iconify icon="solar:refresh-bold-duotone"/>
+                        </StyledButton>
+                      </span>
+                    </Tooltip>
+                  </Stack>
+                :
+                  <StyledSelect
+                    required 
+                    name="kppnScore" 
+                    value={wsJunction?.kppn_score !== null ? String(wsJunction?.kppn_score) : ''}
+                    onChange={(e) => handleChangeKPPNScore(e.target.value as string)}
+                    size='small' 
+                    disabled={isKanwil || isPastDue}
+                  >
+                    {opsiSelection}
+                    <StyledMenuItem key={null} value={''}>{null}</StyledMenuItem>
+                  </StyledSelect>
+              }
+              </StyledFormControl>
+            ) 
+          : (
+              <>
+                <Typography variant='body3' fontSize={12} textAlign={'center'}>N/A</Typography>
+              </>
+            )
+        }
+
       </Stack>
       
-      <Stack direction='column' spacing={1} display={isExcluded ? 'none' : 'flex'}>
+      <Stack direction='column' spacing={1}>
         <Typography variant='body3' fontSize={12} textAlign={'left'}>Nilai Kanwil :</Typography>
-        <StyledFormControl>
-          {
-            wsJunction?.standardisasi === 1
-            ?
-              <Stack direction='row' spacing={2}>
-                <StyledNumberTextField  
-                  size='small'
-                  type="text"
-                  onChange={(e) => setStdScoreKanwil(e.target.value)}
-                  onBlur={(e) => handleChangeKanwilScoreStd(e)}
-                  disabled={!isKanwil || isPastDue}
-                  value={stdScoreKanwil}
-                />
-                <Tooltip title='Ambil nilai standardisasi'>
-                  <span>
-                    <StyledButton 
-                      aria-label="edit" 
-                      variant='contained' 
-                      size='small' 
-                      color='warning'
+        {
+          !isExcluded ? 
+            (
+              <StyledFormControl>
+              {
+                wsJunction?.standardisasi === 1
+                ?
+                  <Stack direction='row' spacing={2}>
+                    <StyledNumberTextField  
+                      size='small'
+                      type="text"
+                      onChange={(e) => setStdScoreKanwil(e.target.value)}
+                      onBlur={(e) => handleChangeKanwilScoreStd(e)}
                       disabled={!isKanwil || isPastDue}
-                      onClick={() => handleFetchStdScoreKanwil()}
-                    >
-                      <Iconify icon="solar:refresh-bold-duotone"/>
-                    </StyledButton>
-                  </span>
-                </Tooltip>
-              </Stack>
-            :
-              <StyledSelect 
-                required 
-                name="kanwilScore" 
-                value={wsJunction?.kanwil_score !== null ? String(wsJunction?.kanwil_score) : ''} 
-                onChange={(e: any) => handleChangeKanwilScore(e.target.value as string)}
-                size='small' 
-                disabled={!isKanwil || isPastDue}
-              >
-                {opsiSelection}
-                <StyledMenuItem key={null} value={''}>{null}</StyledMenuItem>
-              </StyledSelect>
-          }
-        </StyledFormControl>
+                      value={stdScoreKanwil}
+                    />
+                    <Tooltip title='Ambil nilai standardisasi'>
+                      <span>
+                        <StyledButton 
+                          aria-label="edit" 
+                          variant='contained' 
+                          size='small' 
+                          color='warning'
+                          disabled={!isKanwil || isPastDue}
+                          onClick={() => handleFetchStdScoreKanwil()}
+                        >
+                          <Iconify icon="solar:refresh-bold-duotone"/>
+                        </StyledButton>
+                      </span>
+                    </Tooltip>
+                  </Stack>
+                :
+                  <StyledSelect 
+                    required 
+                    name="kanwilScore" 
+                    value={wsJunction?.kanwil_score !== null ? String(wsJunction?.kanwil_score) : ''} 
+                    onChange={(e: any) => handleChangeKanwilScore(e.target.value as string)}
+                    size='small' 
+                    disabled={!isKanwil || isPastDue}
+                  >
+                    {opsiSelection}
+                    <StyledMenuItem key={null} value={''}>{null}</StyledMenuItem>
+                  </StyledSelect>
+              }
+              </StyledFormControl>
+            ) 
+          : (
+              <>
+                <Typography variant='body3' fontSize={12} textAlign={'center'}>N/A</Typography>
+              </>
+            )
+        }
       </Stack>
     </Stack>    
   );
