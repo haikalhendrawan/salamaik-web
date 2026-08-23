@@ -35,8 +35,12 @@ const StyledButton = styled(Button)(({  }) => ({
   minWidth: '30px',
   borderRadius: '12px',
 }));
+
+interface DasarHukumGrid {
+  changeSection: (section: number) => void
+};
 //------------------------------------------------------------
-export default function DasarHukumGrid() {
+export default function DasarHukumGrid({changeSection}: DasarHukumGrid) {
   const theme = useTheme();
 
   const axiosJWT = useAxiosJWT();
@@ -149,6 +153,21 @@ export default function DasarHukumGrid() {
                   </Tooltip>
                   <input accept="application/pdf" type='file' style={{display:'none'}} ref={fileInputRef} tabIndex={-1} onChange={handleFileChange}/>
                 </Stack>
+              </Grid>
+            </Grid>
+            <Grid container>
+              <Grid item md={6}>
+                <Typography variant='body2'>Peraturan</Typography>
+              </Grid>
+              <Grid item md={6}>
+                <Button 
+                  variant="contained" 
+                  size="small" 
+                  endIcon={<Iconify icon="solar:round-alt-arrow-right-bold" />}
+                  onClick={() => changeSection(7)}
+                  >
+                  Edit
+                </Button>
               </Grid>
             </Grid>
           </StatsContainer>

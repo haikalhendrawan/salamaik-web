@@ -50,6 +50,42 @@ interface SubSubKomponenRefType{
   alias?: string,
 };
 
+export interface KomponenSpmlRefType{
+  id: number,
+  title: string,
+  bobot: number,
+  alias?: string | null,
+  detail?: string | null,
+  peraturan?: number,
+};
+
+export interface SubKomponenSpmlRefType{
+  id: number,
+  komponen_spml_id: number,
+  title: string,
+  detail?: string | null,
+};
+
+export interface AspekSpmlRefType{
+  id: number,
+  urut: number,
+  urut_huruf?: string | null,
+  komponen_spml_id: number,
+  subkomponen_spml_id: number,
+  title: string,
+  detail?: string | null,
+};
+
+export interface ChecklistSpmlRefType{
+  id: number,
+  title?: string | null,
+  uraian: string,
+  dokumen?: string | null,
+  komponen_spml_id: number,
+  subkomponen_spml_id: number,
+  aspek_spml_id: number,
+};
+
 interface UnitType{
   id: string;
   name: string;
@@ -84,6 +120,10 @@ interface DictionaryContextType{
   subKomponenRef: SubKomponenRefType[] | null,
   subSubKomponenRef: SubSubKomponenRefType[] | null,
   peraturanRef: PeraturanRefType[] | null,
+  komponenSpmlRef: KomponenSpmlRefType[] | null,
+  subKomponenSpmlRef: SubKomponenSpmlRefType[] | null,
+  aspekSpmlRef: AspekSpmlRefType[] | null,
+  checklistSpmlRef: ChecklistSpmlRefType[] | null,
   getDictionary: () => void,
 };
 
@@ -101,6 +141,10 @@ const DictionaryContext = createContext<DictionaryContextType>({
   subKomponenRef: null,
   subSubKomponenRef: null,
   peraturanRef: null,
+  komponenSpmlRef: null,
+  subKomponenSpmlRef: null,
+  aspekSpmlRef: null,
+  checklistSpmlRef: null,
   getDictionary: () => {},
 });
 
@@ -128,6 +172,14 @@ const DictionaryProvider = ({children}: DictionaryProviderProps) => {
   const [subSubKomponenRef, setSubSubKomponenRef] = useState(null);
 
   const [peraturanRef, setPeraturanRef] = useState(null);
+
+  const [komponenSpmlRef, setKomponenSpmlRef] = useState(null);
+
+  const [subKomponenSpmlRef, setSubKomponenSpmlRef] = useState(null);
+
+  const [aspekSpmlRef, setAspekSpmlRef] = useState(null);
+
+  const [checklistSpmlRef, setChecklistSpmlRef] = useState(null);
 
   const getPeriod = async() => {
     try{
@@ -207,6 +259,42 @@ const DictionaryProvider = ({children}: DictionaryProviderProps) => {
     }
   };
 
+  const getKomponenSpml = async() => {
+    try {
+      const response = await axiosJWT.get("/spml/getAllKomponen");
+      setKomponenSpmlRef(response.data.rows);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const getSubKomponenSpml = async() => {
+    try {
+      const response = await axiosJWT.get("/spml/getAllSubKomponen");
+      setSubKomponenSpmlRef(response.data.rows);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const getAspekSpml = async() => {
+    try {
+      const response = await axiosJWT.get("/spml/getAllAspek");
+      setAspekSpmlRef(response.data.rows);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const getChecklistSpml = async() => {
+    try {
+      const response = await axiosJWT.get("/spml/getAllChecklist");
+      setChecklistSpmlRef(response.data.rows);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const getDictionary = async() => {
     getPeriod();
     getKPPN();
@@ -215,6 +303,10 @@ const DictionaryProvider = ({children}: DictionaryProviderProps) => {
     getSubKomponen();
     getSubSubKomponen();
     getPeraturan();
+    getKomponenSpml();
+    getSubKomponenSpml();
+    getAspekSpml();
+    getChecklistSpml();
   };
 
   useEffect(() => {
@@ -231,6 +323,10 @@ const DictionaryProvider = ({children}: DictionaryProviderProps) => {
       subKomponenRef,
       subSubKomponenRef,
       peraturanRef,
+      komponenSpmlRef,
+      subKomponenSpmlRef,
+      aspekSpmlRef,
+      checklistSpmlRef,
       getDictionary
     }}>
       {children}

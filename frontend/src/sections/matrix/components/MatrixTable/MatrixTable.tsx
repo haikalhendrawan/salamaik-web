@@ -35,8 +35,6 @@ export default function MatrixTable({matrix, matrixStatus, getMatrix, worksheetI
   worksheetDetail: WorksheetType | null}) {
   const theme = useTheme();
 
-  const [selectedKomponen, setSelectedKomponen] = useState<string | null>('1');
-
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
   const [open, setOpen] = useState<boolean>(false);
@@ -53,7 +51,9 @@ export default function MatrixTable({matrix, matrixStatus, getMatrix, worksheetI
 
   const kppnId = new URLSearchParams(useLocation().search).get("id");
 
-  const {subKomponenRef} = useDictionary();
+  const {subKomponenRef, komponenRef} = useDictionary();
+
+  const [selectedKomponen, setSelectedKomponen] = useState<string | null>(String(komponenRef?.[0]?.id) || '1');
 
   const isAdminKanwil = auth?.role === 4 || auth?.role === 99;
 

@@ -26,6 +26,10 @@ import SubSubKomponenRef from '../../sections/admin/worksheetRef/SubSubKomponenR
 import BatchRef from '../../sections/admin/worksheetRef/BatchRef';
 import PeriodRefSection from '../../sections/admin/worksheetRef/PeriodRef';
 import PeraturanRef from '../../sections/admin/worksheetRef/PeraturanRef';
+import ChecklistSpmlRef from '../../sections/admin/worksheetRef/ChecklistSpmlRef';
+import KomponenSpmlRef from '../../sections/admin/worksheetRef/KomponenSpmlRef';
+import SubKomponenSpmlRef from '../../sections/admin/worksheetRef/SubKomponenSpmlRef';
+import AspekSpmlRef from '../../sections/admin/worksheetRef/AspekSpmlRef';
 import { ChecklistProvider } from '../../sections/admin/worksheetRef/ChecklistRef/useChecklist';
 import { BatchProvider } from '../../sections/admin/worksheetRef/BatchRef/useBatch';
 import { DialogProvider } from '../../hooks/display/useDialog';
@@ -61,6 +65,10 @@ export default function WorksheetRefPage() {
     </BatchProvider>,
     <PeriodRefSection section={section} addState={addState} resetAddState={resetAddState} />,
     <PeraturanRef section={section} addState={addState} resetAddState={resetAddState} />,
+    <ChecklistSpmlRef section={section} addState={addState} resetAddState={resetAddState} />,
+    <KomponenSpmlRef section={section} addState={addState} resetAddState={resetAddState} />,
+    <SubKomponenSpmlRef section={section} addState={addState} resetAddState={resetAddState} />,
+    <AspekSpmlRef section={section} addState={addState} resetAddState={resetAddState} />,
   ];
 
   const SECTION_NAME: string[] = [
@@ -71,7 +79,11 @@ export default function WorksheetRefPage() {
     'Sub Sub Komponen',
     'Kertas Kerja',
     'Periode',
-    'Peraturan'
+    'Peraturan',
+    'Checklist SPML',
+    'Komponen SPML',
+    'Sub Komponen SPML',
+    'Aspek SPML',
   ];
 
 

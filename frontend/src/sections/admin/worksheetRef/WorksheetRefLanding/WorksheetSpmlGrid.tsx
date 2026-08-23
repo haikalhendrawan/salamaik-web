@@ -19,31 +19,31 @@ const StatsContainer = styled(Box)(({theme}) => ({
   justifyContent:'start', 
 }));
 
-interface WorksheetGridProps {
+interface WorksheetSpmlGridProps {
   changeSection: (section: number) => void;
 };
 //------------------------------------------------------------
-export default function WorksheetGrid({changeSection}: WorksheetGridProps) {
+export default function WorksheetSpmlGrid({changeSection}: WorksheetSpmlGridProps) {
   
   return(
     <div>
     <Grid container spacing={2} direction='row' alignItems='start' justifyContent='center' sx={{height:'40%', p:3, pb:0}}>
       <Grid item xs={6} sm={4} md={4}>
-        <Typography variant='h6'>Kertas Kerja</Typography>
-        <Typography variant='body3'>Atur referensi Kertas Kerja seperti jenis pertanyaan, dokumen, kriteria nilai, dll.</Typography>
+        <Typography variant='h6'>Kertas Kerja SPML</Typography>
+        <Typography variant='body3'>Atur referensi Kertas Kerja SPML.</Typography>
       </Grid>
       <Grid item xs={6} sm={8} md={8} >
         <StatsContainer>
           <Grid container>
             <Grid item md={6}>
-              <Typography variant='body2'>Checklist kertas kerja</Typography>
+              <Typography variant='body2'>Checklist kertas kerja SPML</Typography>
             </Grid>
             <Grid item md={6}>
               <Button 
                 variant="contained" 
                 size="small" 
                 endIcon={<Iconify icon="solar:round-alt-arrow-right-bold" />}
-                onClick={() => changeSection(1)}
+                onClick={() => changeSection(8)}
                 >
                 Edit
               </Button>
@@ -51,14 +51,14 @@ export default function WorksheetGrid({changeSection}: WorksheetGridProps) {
           </Grid>
           <Grid container>
             <Grid item md={6}>
-              <Typography variant='body2'>Komponen</Typography>
+              <Typography variant='body2'>Komponen SPML</Typography>
             </Grid>
             <Grid item md={6}>
               <Button 
                 variant="contained" 
                 size="small" 
                 endIcon={<Iconify icon="solar:round-alt-arrow-right-bold" />}
-                onClick={() => changeSection(2)}
+                onClick={() => changeSection(9)}
               >
                 Edit
               </Button>
@@ -66,14 +66,14 @@ export default function WorksheetGrid({changeSection}: WorksheetGridProps) {
           </Grid>
           <Grid container>
             <Grid item md={6}>
-              <Typography variant='body2'>Sub komponen</Typography>
+              <Typography variant='body2'>Sub komponen SPML</Typography>
             </Grid>
             <Grid item md={6}>
               <Button 
                 variant="contained" 
                 size="small" 
                 endIcon={<Iconify icon="solar:round-alt-arrow-right-bold" />}
-                onClick={() => changeSection(3)}
+                onClick={() => changeSection(10)}
               >
                 Edit
               </Button>
@@ -81,14 +81,14 @@ export default function WorksheetGrid({changeSection}: WorksheetGridProps) {
           </Grid>
           <Grid container>
             <Grid item md={6}>
-              <Typography variant='body2'>Sub Sub Komponen</Typography>
+              <Typography variant='body2'>Aspek SPML</Typography>
             </Grid>
             <Grid item md={6}>
              <Button 
                 variant="contained" 
                 size="small" 
                 endIcon={<Iconify icon="solar:round-alt-arrow-right-bold" />}
-                onClick={() => changeSection(4)}
+                onClick={() => changeSection(11)}
               >
                 Edit
               </Button>

@@ -8,6 +8,7 @@ import { useTheme } from '@mui/material/styles';
 import DasarHukumGrid from './DasarHukumGrid';
 import WorksheetGrid from './WorksheetGrid';
 import PeriodGrid from './PeriodGrid';
+import WorksheetSpmlGrid from './WorksheetSpmlGrid';
 //---------------------------------------------------- 
 interface WorksheetRefLandingProps {
   changeSection: (section: number) => void;
@@ -22,9 +23,11 @@ export default function WorksheetRefLanding({changeSection}: WorksheetRefLanding
       <Slide direction="right" in mountOnEnter unmountOnExit>
         <Card sx={{minHeight:480, display:'flex', flexDirection:'column', gap:theme.spacing(1)}}>
 
-          <DasarHukumGrid />
+          <DasarHukumGrid changeSection={changeSection}/>
 
           <WorksheetGrid changeSection={changeSection}/>
+
+          <WorksheetSpmlGrid changeSection={changeSection}/>
          
           <PeriodGrid changeSection={changeSection}/>
         
