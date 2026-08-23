@@ -16,6 +16,18 @@ const navSupervisi = [
     title: 'Kertas Kerja',
     path: '/worksheet',
     icon: icon('solar--clipboard-list-bold-duotone'),
+    menu: [
+      {
+        title: 'PB',
+        path: '/worksheet/pb',
+        icon: icon('dot-mark'),
+      },
+      {
+        title: 'SPML',
+        path: '/worksheet/spml',
+        icon: icon('dot-mark'),
+      },
+    ]
   },
   {
     title: 'Matriks',

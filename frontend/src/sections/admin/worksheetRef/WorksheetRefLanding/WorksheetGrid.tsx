@@ -29,7 +29,7 @@ export default function WorksheetGrid({changeSection}: WorksheetGridProps) {
     <div>
     <Grid container spacing={2} direction='row' alignItems='start' justifyContent='center' sx={{height:'40%', p:3, pb:0}}>
       <Grid item xs={6} sm={4} md={4}>
-        <Typography variant='h6'>Kertas Kerja</Typography>
+        <Typography variant='h6'>Kertas Kerja PB</Typography>
         <Typography variant='body3'>Atur referensi Kertas Kerja seperti jenis pertanyaan, dokumen, kriteria nilai, dll.</Typography>
       </Grid>
       <Grid item xs={6} sm={8} md={8} >

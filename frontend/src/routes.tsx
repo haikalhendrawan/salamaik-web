@@ -20,6 +20,8 @@ import WorksheetPage from "./pages/WorksheetPage";
 import ProfilePage from "./pages/ProfilePage";
 import WorksheetLanding from "./sections/worksheet/WorksheetLanding";
 import WorksheetKanwil from "./sections/worksheet/WorksheetKanwil";
+import WorksheetSPMLPage from "./pages/WorksheetSPMLPage";
+import WorksheetSPMLWorkspace from "./sections/worksheetSPML/WorksheetSPMLWorkspace";
 import Page404 from "./pages/guard/Page404";
 import MatrixPage from "./pages/MatrixPage";
 import FollowUpPage from "./pages/FollowUpPage";
@@ -61,24 +63,17 @@ export default function Router() {
         <Route path='profile' element={<ProfilePage />} />
         <Route path='standard' element={<StandardizationPage />} />
         <Route path="worksheet" element={<WorksheetPage />}>
-          <Route index element={<WorksheetLanding />} />
-          <Route path="kppn" element={<WorksheetKanwil />} />
+          <Route path='pb' element={<WorksheetPage />}>
+            <Route index element={<WorksheetLanding />} />
+            <Route path="kppn" element={<WorksheetKanwil />} />
+          </Route>
+          <Route path='spml' element={<WorksheetSPMLPage />}>
+            <Route index element={<WorksheetSPMLWorkspace />} />
+          </Route>
         </Route>
         <Route path="history" element={<HistoryPage />} />
       </Route>
     </Route>
-
-    {/* <Route element={<PersistLogin/>}>
-      <Route path="/worksheet">
-        <Route element={<RequireAuthLayout allowedRoles={[0, 1, 2, 3, 4, 99]} />}>
-          <Route index element={<WorksheetLanding />} />
-        </Route>
-        <Route path="kppn" element={<RequireAuthLayout allowedRoles={[0, 1, 2, 3, 4, 99]} />}>
-          <Route index element={<WorksheetKPPN />} />
-        </Route>
-      </Route>
-    </Route> */}
-    
 
     <Route element={<PersistLogin/>}>
       <Route path="/matrix" >

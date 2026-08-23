@@ -87,7 +87,7 @@ export default function WorksheetLanding() {
                     header={item?.alias}
                     lastUpdate="Last Update: Apr 12, 2022"
                     image={KPPN_PICTURE[index]}
-                    link={`/worksheet/kppn?id=${item?.id}`}
+                    link={`/worksheet/pb/kppn?id=${item?.id}`}
                     percentKanwil={percentKanwil}
                     percentKPPN={percentKPPN}
                     kppnId={item?.id}
