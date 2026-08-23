@@ -35,6 +35,7 @@ import activityRoute from './routes/activityRoute';
 import commentRoute from './routes/commentRoute';
 import infoRoute from './routes/infoRoute';
 import peraturanRoute from './routes/peraturanRoute';
+import spmlRefRoute from './routes/spmlRefRoute';
 //middleware
 import errorHandler from './middleware/errorHandler';
 import rateLimiter from './middleware/rateLimiter';
@@ -60,6 +61,7 @@ app.use(profileRoute);
 app.use(userRoute);
 app.use(komponenRoute);
 app.use(checklistRoute);
+app.use(spmlRefRoute);
 app.use(standardizationRoute);
 app.use(WorksheetRoute);
 app.use(WsJunctionRoute);
