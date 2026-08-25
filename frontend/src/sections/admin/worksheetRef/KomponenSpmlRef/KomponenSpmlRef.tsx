@@ -20,6 +20,7 @@ import useDictionary, { KomponenSpmlRefType } from '../../../../hooks/useDiction
 // ---------------------------------------------------
 const TABLE_HEAD = [
   { id: 'no', label: 'No', alignRight: false },
+  { id: 'urut', label: 'Urut', alignRight: false },
   { id: 'title', label: 'Nama Komponen', alignRight: false },
   { id: 'alias', label: 'Alias', alignRight: false },
   { id: 'bobot', label: 'Bobot', alignRight: false },
@@ -97,6 +98,7 @@ export default function KomponenSpmlRef({ section, addState, resetAddState }: Ko
               {komponenSpmlRef?.map((row, index) =>
                 <TableRow hover key={row.id} tabIndex={-1}>
                   <TableCell align="left">{index + 1}</TableCell>
+                  <TableCell align="left">{row.urut || '-'}</TableCell>
                   <TableCell align="left">{row.title}</TableCell>
                   <TableCell align="left">
                     {row.alias && <Label color="info">{row.alias}</Label>}
@@ -180,7 +182,7 @@ function KomponenSpmlRefModal({ modalOpen, modalClose, addState, editID, data }:
   const { getDictionary } = useDictionary();
   const axiosJWT = useAxiosJWT();
 
-  const emptyForm = { id: 0, title: '', bobot: 0, alias: '' };
+  const emptyForm: KomponenSpmlRefType = { id: 0, urut: '', title: '', bobot: 0, alias: '' };
 
   const [addValue, setAddValue] = useState<KomponenSpmlRefType>(emptyForm);
   const [editValue, setEditValue] = useState<KomponenSpmlRefType>(emptyForm);
@@ -197,13 +199,13 @@ function KomponenSpmlRefModal({ modalOpen, modalClose, addState, editID, data }:
 
   const handleResetEdit = () => {
     const row = data.find((r) => r.id === editID);
-    if (row) setEditValue({ id: row.id, title: row.title, bobot: row.bobot, alias: row.alias ?? '' });
+    if (row) setEditValue({ id: row.id, urut: row.urut ?? '', title: row.title, bobot: row.bobot, alias: row.alias ?? '' });
   };
 
   const handleAdd = async () => {
     try {
       if (addValue.bobot < 0 || addValue.bobot > 100) return openSnackbar('Bobot harus antara 0–100', 'error');
-      await axiosJWT.post('/spmlRef/createKomponen', { title: addValue.title, bobot: addValue.bobot, alias: addValue.alias });
+      await axiosJWT.post('/spmlRef/createKomponen', { urut: addValue.urut, title: addValue.title, bobot: addValue.bobot, alias: addValue.alias });
       openSnackbar('Komponen SPML berhasil ditambahkan', 'success');
       getDictionary();
       modalClose();
@@ -216,7 +218,7 @@ function KomponenSpmlRefModal({ modalOpen, modalClose, addState, editID, data }:
   const handleEdit = async () => {
     try {
       if (editValue.bobot < 0 || editValue.bobot > 100) return openSnackbar('Bobot harus antara 0–100', 'error');
-      await axiosJWT.post('/spmlRef/editKomponen', { id: editValue.id, title: editValue.title, bobot: editValue.bobot, alias: editValue.alias });
+      await axiosJWT.post('/spmlRef/editKomponen', { id: editValue.id, urut: editValue.urut, title: editValue.title, bobot: editValue.bobot, alias: editValue.alias });
       openSnackbar('Komponen SPML berhasil diubah', 'success');
       getDictionary();
       modalClose();
@@ -228,7 +230,7 @@ function KomponenSpmlRefModal({ modalOpen, modalClose, addState, editID, data }:
   useEffect(() => {
     if (data && editID) {
       const row = data.find((r) => r.id === editID);
-      if (row) setEditValue({ id: row.id, title: row.title, bobot: row.bobot, alias: row.alias ?? '' });
+      if (row) setEditValue({ id: row.id, urut: row.urut ?? '', title: row.title, bobot: row.bobot, alias: row.alias ?? '' });
     }
   }, [data, editID]);
 
@@ -241,6 +243,12 @@ function KomponenSpmlRefModal({ modalOpen, modalClose, addState, editID, data }:
             <FormDataContainer>
               <Stack direction="row" spacing={2} sx={{ width: '100%' }}>
                 <Stack direction="column" spacing={3} sx={{ width: '45%' }}>
+                  <FormControl>
+                    <StyledTextField name="urut" label="Urut (opsional)" helperText="mis: I, II, III"
+                      value={addState ? addValue.urut ?? '' : editValue.urut ?? ''}
+                      onChange={addState ? handleChangeAdd : handleChangeEdit}
+                    />
+                  </FormControl>
                   <FormControl>
                     <StyledTextField name="title" label="Nama Komponen" multiline minRows={2}
                       value={addState ? addValue.title : editValue.title}

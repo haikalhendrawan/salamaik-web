@@ -89,11 +89,6 @@ export default function KPPNSelectionCard({header, image, link, percentKanwil, p
                     <Iconify icon="vscode-icons:file-type-excel"/>
                   </IconButton>
                 </Tooltip> 
-                {/* <Tooltip title={lastUpdate}>
-                  {lastUpdate?
-                  <IconButton disableRipple><Iconify icon={"solar:check-circle-bold"}  sx={{borderRadius:'50%', color: 'rgb(0, 167, 111)' }} /></IconButton>
-                  :<IconButton disableRipple sx={{display:'none'}}><Iconify icon={"solar:check-circle-bold"} sx={{borderRadius:'50%'}} /></IconButton>}
-                </Tooltip>  */}
               </Grid>                      
             </Box>
           </Grid>

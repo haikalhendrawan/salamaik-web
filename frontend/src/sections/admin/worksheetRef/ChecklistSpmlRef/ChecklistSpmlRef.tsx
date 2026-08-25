@@ -16,6 +16,7 @@ import useAxiosJWT from '../../../../hooks/useAxiosJWT';
 import useSnackbar from '../../../../hooks/display/useSnackbar';
 import useDialog from '../../../../hooks/display/useDialog';
 import useDictionary, { ChecklistSpmlRefType } from '../../../../hooks/useDictionary';
+import formatOrderedTitle from '../../../../utils/formatOrderedTitle';
 // ---------------------------------------------------
 const TABLE_HEAD = [
   { id: 'no', label: 'No', alignRight: false },
@@ -243,7 +244,9 @@ function ChecklistSpmlRefModal({ modalOpen, modalClose, addState, editID }: Chec
                       onChange={addState ? handleChangeAdd : handleChangeEdit}
                     >
                       {komponenSpmlRef?.map((item) => (
-                        <MenuItem key={item.id} sx={{ fontSize: 14 }} value={item.id}>{item.title}</MenuItem>
+                        <MenuItem key={item.id} sx={{ fontSize: 14 }} value={item.id}>
+                          {formatOrderedTitle(item.urut, item.title)}
+                        </MenuItem>
                       ))}
                     </Select>
                   </FormControl>
@@ -256,7 +259,9 @@ function ChecklistSpmlRefModal({ modalOpen, modalClose, addState, editID }: Chec
                       disabled={!currentVal.komponen_spml_id}
                     >
                       {filteredSubKomponen(currentVal.komponen_spml_id).map((item) => (
-                        <MenuItem key={item.id} sx={{ fontSize: 14 }} value={item.id}>{item.title}</MenuItem>
+                        <MenuItem key={item.id} sx={{ fontSize: 14 }} value={item.id}>
+                          {formatOrderedTitle(item.urut, item.title)}
+                        </MenuItem>
                       ))}
                     </Select>
                   </FormControl>

@@ -5,6 +5,7 @@ import {
   SubKomponenSpmlRefType,
 } from '../../hooks/useDictionary';
 import { WsSPMLJunctionType } from '../worksheetSPML/types';
+import formatOrderedTitle from '../../utils/formatOrderedTitle';
 
 type ScoreType = 'kanwil' | 'kppn';
 
@@ -83,7 +84,7 @@ function createScoreSheet(
     const komponenRows = rows.filter((item) => item.komponen_spml_id === komponen.id);
     if (komponenRows.length === 0) return;
 
-    addMergedSectionRow(sheet, komponen.title, 'FFE8EEF7');
+    addMergedSectionRow(sheet, formatOrderedTitle(komponen.urut, komponen.title), 'FFE8EEF7');
 
     subKomponenRef
       ?.filter((item) => item.komponen_spml_id === komponen.id)
@@ -93,7 +94,11 @@ function createScoreSheet(
         );
         if (subKomponenRows.length === 0) return;
 
-        addMergedSectionRow(sheet, subKomponen.title, 'FFF4F6F8');
+        addMergedSectionRow(
+          sheet,
+          formatOrderedTitle(subKomponen.urut, subKomponen.title),
+          'FFF4F6F8'
+        );
 
         aspekRef
           ?.filter((item) => item.subkomponen_spml_id === subKomponen.id)
@@ -181,6 +186,8 @@ function setDocumentCell(row: ExcelJS.Row, junction: WsSPMLJunctionType) {
   const cell = row.getCell(5);
   const urls: string[] = [];
   const apiUrl = import.meta.env.VITE_API_URL.replace(/\/+$/, '');
+
+  cell.border = BORDER;
 
   if (junction.file_1) {
     urls.push(`${apiUrl}/worksheet/${junction.file_1}`);

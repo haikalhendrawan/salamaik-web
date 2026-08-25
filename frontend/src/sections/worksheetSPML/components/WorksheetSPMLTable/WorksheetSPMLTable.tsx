@@ -8,6 +8,7 @@ import ScoreSelect from './components/ScoreSelect';
 import {useAuth} from '../../../../hooks/useAuth';
 import FileActions from './components/FileActions';
 import { WsSPMLJunctionType } from '../../types';
+import formatOrderedTitle from '../../../../utils/formatOrderedTitle';
 
 //-----------------------------------------------------------------------------------------------------------------
 const TABLE_HEAD = [
@@ -73,6 +74,7 @@ export default function WorksheetSPMLTable({wsSPMLJunction}: WorksheetSPMLTable)
       return (
         <Fragment key={row.id}>
           <TableRow
+            id={`spml-checklist-${checklist0.junction_id}`}
             style={{ display: 'table-row' }}
           >
             <StyledTableCell
@@ -102,6 +104,7 @@ export default function WorksheetSPMLTable({wsSPMLJunction}: WorksheetSPMLTable)
             otherChecklist.map((item) => (
               <TableRow
                 key={item.id}
+                id={`spml-checklist-${item.junction_id}`}
                 style={{ display: 'table-row' }}
               >
                 <StyledTableCell>
@@ -143,7 +146,7 @@ export default function WorksheetSPMLTable({wsSPMLJunction}: WorksheetSPMLTable)
               }}
               color='secondary'
             >
-              {row.title}
+              {formatOrderedTitle(row.urut, row.title)}
             </TableCell>
           </TableRow>
           {getAspekSPMLRow(aspekSPML)}
@@ -170,7 +173,7 @@ export default function WorksheetSPMLTable({wsSPMLJunction}: WorksheetSPMLTable)
                 fontWeight: 'bold',
               }}
             >
-              {row.title}
+              {formatOrderedTitle(row.urut, row.title)}
             </TableCell>
           </TableRow>
           {getSubKomponenSPMLRow(subKomponenSPML)}

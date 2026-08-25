@@ -16,9 +16,11 @@ import useAxiosJWT from '../../../../hooks/useAxiosJWT';
 import useSnackbar from '../../../../hooks/display/useSnackbar';
 import useDialog from '../../../../hooks/display/useDialog';
 import useDictionary, { SubKomponenSpmlRefType } from '../../../../hooks/useDictionary';
+import formatOrderedTitle from '../../../../utils/formatOrderedTitle';
 // ---------------------------------------------------
 const TABLE_HEAD = [
   { id: 'no', label: 'No', alignRight: false },
+  { id: 'urut', label: 'Urut', alignRight: false },
   { id: 'title', label: 'Nama Sub Komponen', alignRight: false },
   { id: 'komponen', label: 'Komponen', alignRight: false },
   { id: 'action', label: 'Action', alignRight: false },
@@ -79,9 +81,13 @@ export default function SubKomponenSpmlRef({ section, addState, resetAddState }:
               {subKomponenSpmlRef?.map((row, index) =>
                 <TableRow hover key={row.id} tabIndex={-1}>
                   <TableCell align="left">{index + 1}</TableCell>
+                  <TableCell align="left">{row.urut || '-'}</TableCell>
                   <TableCell align="left">{row.title}</TableCell>
                   <TableCell align="left">
-                    {komponenSpmlRef?.find((k) => k.id === row.komponen_spml_id)?.title}
+                    {(() => {
+                      const komponen = komponenSpmlRef?.find((k) => k.id === row.komponen_spml_id);
+                      return komponen ? formatOrderedTitle(komponen.urut, komponen.title) : '';
+                    })()}
                   </TableCell>
                   <TableCell align="left">
                     <Stack direction="row" spacing={1}>
@@ -147,7 +153,7 @@ function SubKomponenSpmlRefModal({ modalOpen, modalClose, addState, editID }: Su
   const { openSnackbar } = useSnackbar();
   const axiosJWT = useAxiosJWT();
 
-  const emptyForm = { id: 0, komponen_spml_id: 0, title: '' };
+  const emptyForm: SubKomponenSpmlRefType = { id: 0, urut: '', komponen_spml_id: 0, title: '' };
   const [addValue, setAddValue] = useState<SubKomponenSpmlRefType>(emptyForm);
   const [editValue, setEditValue] = useState<SubKomponenSpmlRefType>(emptyForm);
 
@@ -161,12 +167,12 @@ function SubKomponenSpmlRefModal({ modalOpen, modalClose, addState, editID }: Su
   const handleResetAdd = () => setAddValue(emptyForm);
   const handleResetEdit = () => {
     const row = subKomponenSpmlRef?.find((r) => r.id === editID);
-    if (row) setEditValue({ id: row.id, title: row.title, komponen_spml_id: row.komponen_spml_id });
+    if (row) setEditValue({ id: row.id, urut: row.urut ?? '', title: row.title, komponen_spml_id: row.komponen_spml_id });
   };
 
   const handleAdd = async () => {
     try {
-      await axiosJWT.post('/spmlRef/createSubKomponen', { title: addValue.title, komponen_spml_id: Number(addValue.komponen_spml_id) });
+      await axiosJWT.post('/spmlRef/createSubKomponen', { urut: addValue.urut, title: addValue.title, komponen_spml_id: Number(addValue.komponen_spml_id) });
       openSnackbar('SubKomponen SPML berhasil ditambahkan', 'success');
       getDictionary(); modalClose(); handleResetAdd();
     } catch { openSnackbar('Gagal menambahkan subkomponen SPML', 'error'); }
@@ -174,7 +180,7 @@ function SubKomponenSpmlRefModal({ modalOpen, modalClose, addState, editID }: Su
 
   const handleEdit = async () => {
     try {
-      await axiosJWT.post('/spmlRef/editSubKomponen', { id: editValue.id, title: editValue.title, komponen_spml_id: Number(editValue.komponen_spml_id) });
+      await axiosJWT.post('/spmlRef/editSubKomponen', { id: editValue.id, urut: editValue.urut, title: editValue.title, komponen_spml_id: Number(editValue.komponen_spml_id) });
       openSnackbar('SubKomponen SPML berhasil diubah', 'success');
       getDictionary(); modalClose();
     } catch { openSnackbar('Gagal mengubah subkomponen SPML', 'error'); }
@@ -183,7 +189,7 @@ function SubKomponenSpmlRefModal({ modalOpen, modalClose, addState, editID }: Su
   useEffect(() => {
     if (subKomponenSpmlRef && editID) {
       const row = subKomponenSpmlRef.find((r) => r.id === editID);
-      if (row) setEditValue({ id: row.id, title: row.title, komponen_spml_id: row.komponen_spml_id });
+      if (row) setEditValue({ id: row.id, urut: row.urut ?? '', title: row.title, komponen_spml_id: row.komponen_spml_id });
     }
   }, [subKomponenSpmlRef, editID]);
 
@@ -196,6 +202,12 @@ function SubKomponenSpmlRefModal({ modalOpen, modalClose, addState, editID }: Su
             <FormDataContainer>
               <Stack direction="row" spacing={2} sx={{ width: '100%' }}>
                 <Stack direction="column" spacing={3} sx={{ width: '45%' }}>
+                  <FormControl>
+                    <StyledTextField name="urut" label="Urut (opsional)" helperText="mis: A, B, C"
+                      value={addState ? addValue.urut ?? '' : editValue.urut ?? ''}
+                      onChange={addState ? handleChangeAdd : handleChangeEdit}
+                    />
+                  </FormControl>
                   <FormControl>
                     <StyledTextField name="title" label="Nama Sub Komponen" multiline minRows={2}
                       value={addState ? addValue.title : editValue.title}
@@ -212,7 +224,9 @@ function SubKomponenSpmlRefModal({ modalOpen, modalClose, addState, editID }: Su
                       onChange={addState ? handleChangeAdd : handleChangeEdit}
                     >
                       {komponenSpmlRef?.map((item) => (
-                        <MenuItem key={item.id} sx={{ fontSize: 14 }} value={item.id}>{item.title}</MenuItem>
+                        <MenuItem key={item.id} sx={{ fontSize: 14 }} value={item.id}>
+                          {formatOrderedTitle(item.urut, item.title)}
+                        </MenuItem>
                       ))}
                     </Select>
                   </FormControl>

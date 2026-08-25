@@ -57,6 +57,7 @@ export interface KomponenSpmlRefType{
   alias?: string | null,
   detail?: string | null,
   peraturan?: number,
+  urut?: string | null,
 };
 
 export interface SubKomponenSpmlRefType{
@@ -64,6 +65,7 @@ export interface SubKomponenSpmlRefType{
   komponen_spml_id: number,
   title: string,
   detail?: string | null,
+  urut?: string | null,
 };
 
 export interface AspekSpmlRefType{

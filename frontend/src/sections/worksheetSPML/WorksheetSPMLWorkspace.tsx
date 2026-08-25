@@ -3,7 +3,7 @@
  * © Kanwil DJPb Sumbar 2024
  */
 
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { Typography, Card, CardHeader, Stack, IconButton} from '@mui/material';
 import { Helmet } from 'react-helmet-async';
 import Iconify from '../../components/iconify';
@@ -13,6 +13,7 @@ import WorksheetSPMLTable from './components/WorksheetSPMLTable';
 import useWsSPMLJunction from './useWsSPMLJunction';
 import PreviewFileModal from './components/PreviewFileModal';
 import WorksheetSPMLToolbar from './components/WorksheetSPMLToolbar';
+import NavigationDrawerSPML from './components/NavigationDrawerSPML';
 //-----------------------------------------------------------------------------------------------------------------
 const SELECT_KPPN: {[key: string]: string} = {
   '010': 'Padang',
@@ -39,6 +40,12 @@ export default function WorksheetSPMLWorkspace() {
   const { wsSPMLJunction, wsDetail, getWsSPMLJunctionKanwil, getWorksheet } = useWsSPMLJunction();
 
   const isPastDue = new Date().getTime() > new Date(wsDetail?.close_period || '').getTime();
+
+  const scrollToChecklist = useCallback((junctionId: number) => {
+    document
+      .getElementById(`spml-checklist-${junctionId}`)
+      ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, []);
 
   useEffect(() => {
     getWorksheet(id);
@@ -85,6 +92,10 @@ export default function WorksheetSPMLWorkspace() {
 
       </Card>
       <PreviewFileModal isDisabled={isPastDue} kppn={id} />
+      <NavigationDrawerSPML
+        wsSPMLJunction={wsSPMLJunction}
+        scrollToChecklist={scrollToChecklist}
+      />
     </>
   )
 }

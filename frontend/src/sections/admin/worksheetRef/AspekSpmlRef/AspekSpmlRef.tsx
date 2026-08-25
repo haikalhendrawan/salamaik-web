@@ -17,6 +17,7 @@ import useAxiosJWT from '../../../../hooks/useAxiosJWT';
 import useSnackbar from '../../../../hooks/display/useSnackbar';
 import useDialog from '../../../../hooks/display/useDialog';
 import useDictionary, { AspekSpmlRefType } from '../../../../hooks/useDictionary';
+import formatOrderedTitle from '../../../../utils/formatOrderedTitle';
 // ---------------------------------------------------
 const TABLE_HEAD = [
   { id: 'urut', label: 'Urut', alignRight: false },
@@ -83,10 +84,16 @@ export default function AspekSpmlRef({ section, addState, resetAddState }: Aspek
                   <TableCell align="left">{row.urut}{row.urut_huruf ? `.${row.urut_huruf}` : ''}</TableCell>
                   <TableCell align="left">{row.title}</TableCell>
                   <TableCell align="left">
-                    {subKomponenSpmlRef?.find((s) => s.id === row.subkomponen_spml_id)?.title}
+                    {(() => {
+                      const subKomponen = subKomponenSpmlRef?.find((s) => s.id === row.subkomponen_spml_id);
+                      return subKomponen ? formatOrderedTitle(subKomponen.urut, subKomponen.title) : '';
+                    })()}
                   </TableCell>
                   <TableCell align="left">
-                    {komponenSpmlRef?.find((k) => k.id === row.komponen_spml_id)?.title}
+                    {(() => {
+                      const komponen = komponenSpmlRef?.find((k) => k.id === row.komponen_spml_id);
+                      return komponen ? formatOrderedTitle(komponen.urut, komponen.title) : '';
+                    })()}
                   </TableCell>
                   <TableCell align="left">
                     <Stack direction="row" spacing={1}>
@@ -252,7 +259,9 @@ function AspekSpmlRefModal({ modalOpen, modalClose, addState, editID }: AspekSpm
                       onChange={addState ? handleChangeAdd : handleChangeEdit}
                     >
                       {komponenSpmlRef?.map((item) => (
-                        <MenuItem key={item.id} sx={{ fontSize: 14 }} value={item.id}>{item.title}</MenuItem>
+                        <MenuItem key={item.id} sx={{ fontSize: 14 }} value={item.id}>
+                          {formatOrderedTitle(item.urut, item.title)}
+                        </MenuItem>
                       ))}
                     </Select>
                   </FormControl>
@@ -265,7 +274,9 @@ function AspekSpmlRefModal({ modalOpen, modalClose, addState, editID }: AspekSpm
                       disabled={!currentKomponenId}
                     >
                       {filteredSubKomponen(currentKomponenId).map((item) => (
-                        <MenuItem key={item.id} sx={{ fontSize: 14 }} value={item.id}>{item.title}</MenuItem>
+                        <MenuItem key={item.id} sx={{ fontSize: 14 }} value={item.id}>
+                          {formatOrderedTitle(item.urut, item.title)}
+                        </MenuItem>
                       ))}
                     </Select>
                   </FormControl>

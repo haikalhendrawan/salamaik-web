@@ -128,7 +128,7 @@ export default function WorksheetSPMLToolbar({ wsSPMLJunction, kppnName }: Works
             <Typography variant="body2">:</Typography>
           </Grid>
           <Grid item xs={7} sm={8} md={9}>
-            <Tooltip title="Export Excel (segera tersedia)">
+            <Tooltip title="Export Excel">
               <IconButton
                 aria-label="Export worksheet SPML ke Excel"
                 onClick={handleExportExcel}
