@@ -22,7 +22,7 @@ export const getAllKomponenSpml = async (req: Request, res: Response, next: Next
 
 export const createKomponenSpml = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { title, bobot, alias, detail } = req.body;
+    const { title, bobot, alias, detail, urut } = req.body;
     const { peraturan } = req.payload ?? {};
 
     if (!title) {
@@ -31,6 +31,9 @@ export const createKomponenSpml = async (req: Request, res: Response, next: Next
     if (bobot !== undefined && bobot !== null && (isNaN(bobot) || bobot < 0 || bobot > 100)) {
       throw new ErrorDetail(400, 'Nilai bobot tidak valid (0-100)');
     }
+    if (urut !== undefined && urut !== null && typeof urut !== 'string') {
+      throw new ErrorDetail(400, 'Urut komponen SPML harus berupa teks');
+    }
 
     const result = await komponenSpml.createKomponenSpml({
       title,
@@ -38,6 +41,7 @@ export const createKomponenSpml = async (req: Request, res: Response, next: Next
       alias: alias ?? null,
       detail: detail ?? null,
       peraturan: peraturan ?? 2,
+      urut: typeof urut === 'string' && urut.trim() ? urut.trim() : null,
     });
 
     return res.status(200).json({ success: true, message: 'Komponen SPML created successfully', rows: result });
@@ -48,7 +52,7 @@ export const createKomponenSpml = async (req: Request, res: Response, next: Next
 
 export const editKomponenSpml = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { id, title, bobot, alias, detail } = req.body;
+    const { id, title, bobot, alias, detail, urut } = req.body;
     if (!id) {
       throw new ErrorDetail(400, 'ID komponen SPML wajib diisi');
     }
@@ -58,8 +62,11 @@ export const editKomponenSpml = async (req: Request, res: Response, next: NextFu
     if (bobot !== undefined && bobot !== null && (isNaN(bobot) || bobot < 0 || bobot > 100)) {
       throw new ErrorDetail(400, 'Nilai bobot tidak valid (0-100)');
     }
+    if (urut !== undefined && urut !== null && typeof urut !== 'string') {
+      throw new ErrorDetail(400, 'Urut komponen SPML harus berupa teks');
+    }
 
-    const result = await komponenSpml.editKomponenSpml({ id: Number(id), title, bobot, alias, detail });
+    const result = await komponenSpml.editKomponenSpml({ id: Number(id), title, bobot, alias, detail, urut: typeof urut === 'string' && urut.trim() ? urut.trim() : null });
     return res.status(200).json({ success: true, message: 'Komponen SPML updated successfully', rows: result });
   } catch (err) {
     next(err);
@@ -94,15 +101,19 @@ export const getAllSubKomponenSpml = async (req: Request, res: Response, next: N
 
 export const createSubKomponenSpml = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { komponen_spml_id, title, detail } = req.body;
+    const { komponen_spml_id, title, detail, urut } = req.body;
     if (!komponen_spml_id || !title) {
       throw new ErrorDetail(400, 'Komponen SPML ID dan Judul subkomponen wajib diisi');
+    }
+    if (urut !== undefined && urut !== null && typeof urut !== 'string') {
+      throw new ErrorDetail(400, 'Urut subkomponen SPML harus berupa teks');
     }
 
     const result = await subKomponenSpml.createSubKomponenSpml({
       komponen_spml_id: Number(komponen_spml_id),
       title,
       detail: detail ?? null,
+      urut: typeof urut === 'string' && urut.trim() ? urut.trim() : null,
     });
 
     return res.status(200).json({ success: true, message: 'Subkomponen SPML created successfully', rows: result });
@@ -113,9 +124,12 @@ export const createSubKomponenSpml = async (req: Request, res: Response, next: N
 
 export const editSubKomponenSpml = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { id, komponen_spml_id, title, detail } = req.body;
+    const { id, komponen_spml_id, title, detail, urut } = req.body;
     if (!id || !komponen_spml_id || !title) {
       throw new ErrorDetail(400, 'ID, Komponen SPML ID, dan Judul wajib diisi');
+    }
+    if (urut !== undefined && urut !== null && typeof urut !== 'string') {
+      throw new ErrorDetail(400, 'Urut subkomponen SPML harus berupa teks');
     }
 
     const result = await subKomponenSpml.editSubKomponenSpml({
@@ -123,6 +137,7 @@ export const editSubKomponenSpml = async (req: Request, res: Response, next: Nex
       komponen_spml_id: Number(komponen_spml_id),
       title,
       detail,
+      urut: typeof urut === 'string' && urut.trim() ? urut.trim() : null,
     });
 
     return res.status(200).json({ success: true, message: 'Subkomponen SPML updated successfully', rows: result });

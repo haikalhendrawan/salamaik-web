@@ -14,6 +14,7 @@ export interface KomponenSpmlType {
   detail: string | null;
   peraturan: number;
   deleted?: Date | string | null;
+  urut: string | null;
 }
 
 export interface SubKomponenSpmlType {
@@ -22,6 +23,7 @@ export interface SubKomponenSpmlType {
   title: string;
   detail: string | null;
   deleted?: Date | string | null;
+  urut: string | null;
 }
 
 export interface AspekSpmlType {
@@ -69,10 +71,10 @@ class KomponenSpml {
 
   async createKomponenSpml(body: Omit<KomponenSpmlType, 'id'>) {
     try {
-      const { title, bobot, alias, detail, peraturan } = body;
-      const q = `INSERT INTO komponen_spml_ref (title, bobot, alias, detail, peraturan) 
-                 VALUES ($1, $2, $3, $4, $5) RETURNING *`;
-      const result = await pool.query(q, [title, bobot ?? 0, alias ?? null, detail ?? null, peraturan ?? 2]);
+      const { title, bobot, alias, detail, peraturan, urut } = body;
+      const q = `INSERT INTO komponen_spml_ref (title, bobot, alias, detail, peraturan, urut) 
+                 VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`;
+      const result = await pool.query(q, [title, bobot ?? 0, alias ?? null, detail ?? null, peraturan ?? 2, urut ?? null]);
       return result.rows;
     } catch (err) {
       throw err;
@@ -81,11 +83,11 @@ class KomponenSpml {
 
   async editKomponenSpml(body: Partial<KomponenSpmlType> & { id: number }) {
     try {
-      const { id, title, bobot, alias, detail } = body;
+      const { id, title, bobot, alias, detail, urut } = body;
       const q = `UPDATE komponen_spml_ref 
-                 SET title = $1, bobot = $2, alias = $3, detail = $4 
-                 WHERE id = $5 RETURNING *`;
-      const result = await pool.query(q, [title, bobot, alias, detail, id]);
+                 SET title = $1, bobot = $2, alias = $3, detail = $4, urut = $5 
+                 WHERE id = $6 RETURNING *`;
+      const result = await pool.query(q, [title, bobot, alias, detail, urut ?? null, id]);
       return result.rows;
     } catch (err) {
       throw err;
@@ -122,10 +124,10 @@ class SubKomponenSpml {
 
   async createSubKomponenSpml(body: Omit<SubKomponenSpmlType, 'id'>) {
     try {
-      const { komponen_spml_id, title, detail } = body;
-      const q = `INSERT INTO subkomponen_spml_ref (komponen_spml_id, title, detail) 
-                 VALUES ($1, $2, $3) RETURNING *`;
-      const result = await pool.query(q, [komponen_spml_id, title, detail ?? null]);
+      const { komponen_spml_id, title, detail, urut } = body;
+      const q = `INSERT INTO subkomponen_spml_ref (komponen_spml_id, title, detail, urut) 
+                 VALUES ($1, $2, $3, $4) RETURNING *`;
+      const result = await pool.query(q, [komponen_spml_id, title, detail ?? null, urut ?? null]);
       return result.rows;
     } catch (err) {
       throw err;
@@ -134,11 +136,11 @@ class SubKomponenSpml {
 
   async editSubKomponenSpml(body: Partial<SubKomponenSpmlType> & { id: number }) {
     try {
-      const { id, komponen_spml_id, title, detail } = body;
+      const { id, komponen_spml_id, title, detail, urut } = body;
       const q = `UPDATE subkomponen_spml_ref 
-                 SET komponen_spml_id = $1, title = $2, detail = $3 
-                 WHERE id = $4 RETURNING *`;
-      const result = await pool.query(q, [komponen_spml_id, title, detail, id]);
+                 SET komponen_spml_id = $1, title = $2, detail = $3, urut = $4 
+                 WHERE id = $5 RETURNING *`;
+      const result = await pool.query(q, [komponen_spml_id, title, detail, urut ?? null, id]);
       return result.rows;
     } catch (err) {
       throw err;
