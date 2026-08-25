@@ -215,7 +215,7 @@ const aspekSpml = new AspekSpml();
 // 4. CHECKLIST SPML CLASS
 // =============================================================================
 class ChecklistSpml {
-  async getAllChecklistSpml(poolTrx?: PoolClient) {
+  async getAllChecklistSpml(poolTrx?: PoolClient): Promise<ChecklistSpmlType[]> {
     const poolInstance = poolTrx ?? pool;
     try {
       const q = `SELECT checklist_spml_ref.* FROM checklist_spml_ref 

@@ -6,10 +6,13 @@
 import {Request, Response, NextFunction} from 'express';
 import worksheet, { WorksheetType } from '../model/worksheet.model';
 import checklist, { ChecklistType } from '../model/checklist.model';
+import { checklistSpml, komponenSpml } from '../model/spmlRef.model';
 import wsJunction from '../model/worksheetJunction.model';
+import wsSPMLJunction from '../model/wsSPMLJunction.model';
 import pool from '../config/db';
 import dayjs from 'dayjs';
 import ErrorDetail from '../model/error.model';
+import { PoolClient } from 'pg';
 // ------------------------------------------------------
 const getAllWorksheet = async(req: Request, res: Response, next: NextFunction) => {
   try {
@@ -74,16 +77,22 @@ const assignWorksheet = async(req: Request, res: Response, next: NextFunction) =
   const client = await pool.connect();
   const {peraturan} = req.payload;
   try {
-    await client.query('BEGIN');
-    const { worksheetId, kppnId, period } = req.body;
-    const allChecklist: ChecklistType[]  = await checklist.getAllChecklist(peraturan, client);
+    let result: any = [];
+    let mapChecklist: any = [];
 
-    const mapChecklist = Promise.all (allChecklist.map(async(item) => {
-        const isExcluded = item.standardisasi;
-        await wsJunction.addWsJunction(worksheetId, item.id, kppnId, period, isExcluded, client);
-    }));
-    
-    const result = await worksheet.editWorksheetStatus(worksheetId, client);
+    await client.query('BEGIN');
+
+    if(peraturan === 1){ // PER 1 2023
+      const assignPB = await assignWorksheetPB(client, peraturan, req.body);
+      result = assignPB.result;
+      mapChecklist = assignPB.mapChecklist;
+    }else{
+      const assignPB = await assignWorksheetPB(client, peraturan, req.body);
+      result = assignPB.result;
+      mapChecklist = assignPB.mapChecklist;
+      await assignWorksheetSPML(client, peraturan, req.body);
+    }
+
     await client.query('COMMIT');
 
     return res.status(200).json({sucess: true, message: 'Assign worksheet success', rows: result, detail: mapChecklist})
@@ -155,4 +164,45 @@ function validateDates (startDateStr: string, closeDateStr: string, openFollowUp
   }
 
   return { success: true };
+};
+
+async function assignWorksheetPB (client: PoolClient, peraturan: number, body: any) {
+  try {
+    const { worksheetId, kppnId, period } = body;
+    const allChecklist: ChecklistType[]  = await checklist.getAllChecklist(peraturan, client);
+
+    const mapChecklist = await Promise.all (allChecklist.map(async(item) => {
+        const isExcluded = item.standardisasi;
+        await wsJunction.addWsJunction(worksheetId, item.id, kppnId, period, isExcluded, client);
+    }));
+    
+    const result = await worksheet.editWorksheetStatus(worksheetId, client);
+
+    return {
+      result,
+      mapChecklist,
+    }
+  } catch (err) {
+    throw err;
+  }
+};
+
+async function assignWorksheetSPML (client: PoolClient, peraturan: number, body: any) {
+  try {
+    const { worksheetId, kppnId, period } = body;
+    const allChecklistSpml  = await checklistSpml.getAllChecklistSpml();
+
+    const mapChecklist = await Promise.all (allChecklistSpml.map(async(item) => {
+      await wsSPMLJunction.addWsSPMLJunction(worksheetId, item.id, kppnId, 0, client);
+    }));
+    
+    const result = await worksheet.editWorksheetStatus(worksheetId, client);
+
+    return {
+      result,
+      mapChecklist,
+    }
+  } catch (err) {
+    throw err;
+  }
 };

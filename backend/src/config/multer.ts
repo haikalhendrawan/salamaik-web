@@ -163,6 +163,27 @@ const uploadWsJunctionFile = multer({
 export {uploadWsJunctionFile}
 
 // ----------------------------------------------------------------------------------------------------------
+// SPML Worksheet File Upload
+const wsSPMLJunctionFileStorage = multer.diskStorage({
+  destination: (_req, _file, callback) => {
+    callback(null, `${__dirname}/../uploads/worksheet`);
+  },
+  filename: (req, file, callback) => {
+    const fileExt = sanitizeMimeType(file.mimetype);
+    const { worksheetId, checklistSpmlId, kppnId } = req.body;
+    callback(null, `spml_ch${checklistSpmlId}_kppn${kppnId}_${worksheetId}_${Date.now()}.${fileExt}`);
+  },
+});
+
+const uploadWsSPMLJunctionFile = multer({
+  storage: wsSPMLJunctionFileStorage,
+  limits: wsJunctionFileLimit,
+  fileFilter: wsJunctionFileFilter,
+}).single("wsSPMLJunctionFile");
+
+export { uploadWsSPMLJunctionFile };
+
+// ----------------------------------------------------------------------------------------------------------
 // Gallery File Upload
 const galleryStorage= multer.diskStorage(
   { 
