@@ -47,7 +47,7 @@ export default function SubKomponenSpmlRef({ section, addState, resetAddState }:
 
   const handleDelete = async (id: number) => {
     try {
-      const response = await axiosJWT.get(`/spml/deleteSubKomponen/${id}`);
+      const response = await axiosJWT.get(`/spmlRef/deleteSubKomponen/${id}`);
       openSnackbar(response.data.message, 'success');
       getDictionary();
     } catch {
@@ -166,7 +166,7 @@ function SubKomponenSpmlRefModal({ modalOpen, modalClose, addState, editID }: Su
 
   const handleAdd = async () => {
     try {
-      await axiosJWT.post('/spml/createSubKomponen', { title: addValue.title, komponen_spml_id: Number(addValue.komponen_spml_id) });
+      await axiosJWT.post('/spmlRef/createSubKomponen', { title: addValue.title, komponen_spml_id: Number(addValue.komponen_spml_id) });
       openSnackbar('SubKomponen SPML berhasil ditambahkan', 'success');
       getDictionary(); modalClose(); handleResetAdd();
     } catch { openSnackbar('Gagal menambahkan subkomponen SPML', 'error'); }
@@ -174,7 +174,7 @@ function SubKomponenSpmlRefModal({ modalOpen, modalClose, addState, editID }: Su
 
   const handleEdit = async () => {
     try {
-      await axiosJWT.post('/spml/editSubKomponen', { id: editValue.id, title: editValue.title, komponen_spml_id: Number(editValue.komponen_spml_id) });
+      await axiosJWT.post('/spmlRef/editSubKomponen', { id: editValue.id, title: editValue.title, komponen_spml_id: Number(editValue.komponen_spml_id) });
       openSnackbar('SubKomponen SPML berhasil diubah', 'success');
       getDictionary(); modalClose();
     } catch { openSnackbar('Gagal mengubah subkomponen SPML', 'error'); }

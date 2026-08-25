@@ -49,7 +49,7 @@ export default function AspekSpmlRef({ section, addState, resetAddState }: Aspek
 
   const handleDelete = async (id: number) => {
     try {
-      const response = await axiosJWT.get(`/spml/deleteAspek/${id}`);
+      const response = await axiosJWT.get(`/spmlRef/deleteAspek/${id}`);
       openSnackbar(response.data.message, 'success');
       getDictionary();
     } catch {
@@ -180,7 +180,7 @@ function AspekSpmlRefModal({ modalOpen, modalClose, addState, editID }: AspekSpm
 
   const handleAdd = async () => {
     try {
-      await axiosJWT.post('/spml/createAspek', {
+      await axiosJWT.post('/spmlRef/createAspek', {
         urut: addValue.urut, urut_huruf: addValue.urut_huruf,
         komponen_spml_id: addValue.komponen_spml_id,
         subkomponen_spml_id: addValue.subkomponen_spml_id,
@@ -193,7 +193,7 @@ function AspekSpmlRefModal({ modalOpen, modalClose, addState, editID }: AspekSpm
 
   const handleEdit = async () => {
     try {
-      await axiosJWT.post('/spml/editAspek', {
+      await axiosJWT.post('/spmlRef/editAspek', {
         id: editValue.id, urut: editValue.urut, urut_huruf: editValue.urut_huruf,
         komponen_spml_id: editValue.komponen_spml_id,
         subkomponen_spml_id: editValue.subkomponen_spml_id,

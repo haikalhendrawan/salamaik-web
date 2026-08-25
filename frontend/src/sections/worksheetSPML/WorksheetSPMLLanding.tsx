@@ -5,14 +5,13 @@
 
 import {useState, useEffect} from "react";
 import { Helmet } from 'react-helmet-async';
-import useWsJunction from "./useWsJunction";
 import {useAuth} from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import useAxiosJWT from "../../hooks/useAxiosJWT";
 // @mui
 import { Grid, Container, Typography } from '@mui/material';
 // sections
-import KPPNSelectionCard from "./component/KPPNSelectionCard";
+import KPPNSelectionCard from "./components/KPPNSelectionCard";
 import { KPPNScoreProgressResponseType } from "../home/types";
 import useSnackbar from "../../hooks/display/useSnackbar";
 import useLoading from "../../hooks/display/useLoading";
@@ -20,9 +19,7 @@ import useLoading from "../../hooks/display/useLoading";
 const KPPN_PICTURE = ['kppn-padang.png', 'kppn-bukittinggi.jpg', 'kppn-solok.jpg', 'kppn-lubuk-sikaping.jpg', 'kppn-sijunjung.jpg', 'kppn-painan.jpg' ];
 
 // ----------------------------------------------------------------------
-export default function WorksheetLanding() {
-  const { setWsJunction} = useWsJunction();
-
+export default function WorksheetSPMLLanding() {
   const {auth} = useAuth();
 
   const [wsDetail, setWsDetail] = useState<KPPNScoreProgressResponseType[] | null>(null);
@@ -53,7 +50,6 @@ export default function WorksheetLanding() {
   };
 
   useEffect(() => {
-    setWsJunction([]);
     getScoreProgress();
   }, []);
 
@@ -69,7 +65,7 @@ export default function WorksheetLanding() {
 
       <Container>
         <Typography variant="h4" sx={{ mb: 5 }}>
-          Kertas Kerja PB
+          Kertas Kerja SPML
         </Typography>
         <Grid container spacing={4}>
           {
@@ -85,7 +81,7 @@ export default function WorksheetLanding() {
                     header={item?.alias}
                     lastUpdate="Last Update: Apr 12, 2022"
                     image={KPPN_PICTURE[index]}
-                    link={`/worksheet/pb/kppn?id=${item?.id}`}
+                    link={`/worksheet/spml/kppn?id=${item?.id}`}
                     percentKanwil={percentKanwil}
                     percentKPPN={percentKPPN}
                     kppnId={item?.id}

@@ -4,9 +4,9 @@
  */
 
 import { Outlet } from 'react-router-dom';
-import { PreviewFileModalProvider } from '../sections/worksheet/usePreviewFileModal';
+import { PreviewFileModalProvider } from '../sections/worksheetSPML/usePreviewFileModal';
 //sections
-import {WsJunctionProvider} from '../sections/worksheet/useWsJunction';
+import { WsSPMLJunctionProvider } from '../sections/worksheetSPML/useWsSPMLJunction';
 // -----------------------------------------------------------------------
 
 
@@ -15,11 +15,11 @@ import {WsJunctionProvider} from '../sections/worksheet/useWsJunction';
 export default function WorksheetSPMLPage() {
   return (
     <>
-      <WsJunctionProvider>
+      <WsSPMLJunctionProvider>
         <PreviewFileModalProvider>
           <Outlet />
         </PreviewFileModalProvider>
-      </WsJunctionProvider>
+      </WsSPMLJunctionProvider>
     </>
   );
-};
+}

@@ -6,13 +6,14 @@
 import { useMemo, useState, useEffect } from "react";
 import { useTheme } from "@mui/material/styles";
 import { Stack, Popper, Paper, Grow, ClickAwayListener, Box, FormControl, TextField, Typography, Button, Tooltip } from "@mui/material";
-import { WsJunctionType, WorksheetType } from "../types";
 import styled from "@mui/material/styles/styled";
 import useSocket from "../../../hooks/useSocket";
-import useWsJunction from "../useWsJunction";
+import useWsSPMLJunction from "../useWsSPMLJunction";
 import useSnackbar from "../../../hooks/display/useSnackbar";
 import useLoading from "../../../hooks/display/useLoading";
 import Iconify from "../../../components/iconify/Iconify";
+import { WsSPMLJunctionType } from "../types";
+import { WorksheetType } from "../../worksheet/types";
 //-----------------------------------------------------------------------------------------------------------------
 const style = {
   p: 2,
@@ -29,7 +30,7 @@ interface LinkFilePopoverProps {
   open: boolean,
   anchorEl: EventTarget & HTMLButtonElement | null,
   handleClose: () => void,
-  wsJunction: WsJunctionType | null,
+  wsJunction: WsSPMLJunctionType,
   wsDetail: WorksheetType | null,
 }
 
@@ -51,33 +52,37 @@ export default function LinkFilePopover({ open, anchorEl, handleClose, wsJunctio
 
   const theme = useTheme();
   const { socket } = useSocket();
-  const { getWsJunctionKanwil } = useWsJunction();
+  const { getWsSPMLJunctionKanwil } = useWsSPMLJunction();
   const { openSnackbar } = useSnackbar();
   const { setIsLoading } = useLoading();
 
   const isPastDue = useMemo(() => new Date().getTime() > new Date(wsDetail?.close_period || "").getTime(), [wsDetail]);
 
   const handleEditLinkFile = () => {
-    if (socket?.connected === false) {
+    const normalizedLink = linkFile.trim();
+    if (!normalizedLink || normalizedLink.length > 2048) {
+      openSnackbar("Link wajib diisi dan maksimal 2048 karakter", "error");
+      return;
+    }
+    if (!socket?.connected) {
       return openSnackbar("websocket failed, check your connection", "error");
     }
 
-    socket?.emit("updateLinkFile", {
+    setIsLoading(true);
+    socket.emit("updateSPMLLinkFile", {
       worksheetId: wsJunction?.worksheet_id,
       junctionId: wsJunction?.junction_id,
-      linkFile,
+      linkFile: normalizedLink,
     },
       async (response: SocketResponse) => {
         try {
-          if (response?.success) {
-            openSnackbar(response?.message || "Success", "success");
-            setIsEditing(false);
-          } else {
-            openSnackbar("Failed to update link file", "error");
+          if (!response?.success) {
+            openSnackbar(response?.message || "Failed to update link file", "error");
+            return;
           }
-
-          setIsLoading(true);
-          await getWsJunctionKanwil(wsJunction?.kppn_id || '');
+          await getWsSPMLJunctionKanwil(wsJunction.kppn_id ?? '');
+          openSnackbar(response?.message || "Success", "success");
+          setIsEditing(false);
         } catch (err: unknown) {
           openSnackbar(err instanceof Error ? err.message : 'Unknown error', 'error');
         } finally {
@@ -87,27 +92,26 @@ export default function LinkFilePopover({ open, anchorEl, handleClose, wsJunctio
   };
 
   const handleDeleteLinkFile = () => {
-    if (socket?.connected === false) {
+    if (!socket?.connected) {
       return openSnackbar("websocket failed, check your connection", "error");
     }
 
-    socket?.emit("updateLinkFile", {
+    setIsLoading(true);
+    socket.emit("updateSPMLLinkFile", {
       worksheetId: wsJunction?.worksheet_id,
       junctionId: wsJunction?.junction_id,
       linkFile: "",
     },
       async (response: SocketResponse) => {
         try {
-          if (response?.success) {
-            openSnackbar("Link file deleted successfully", "success");
-          } else {
-            openSnackbar("Failed to delete link file", "error");
+          if (!response?.success) {
+            openSnackbar(response?.message || "Failed to delete link file", "error");
+            return;
           }
-
+          await getWsSPMLJunctionKanwil(wsJunction.kppn_id ?? '');
           setLinkFile('');
           setIsEditing(false);
-          setIsLoading(true);
-          await getWsJunctionKanwil(wsJunction?.kppn_id || '');
+          openSnackbar("Link file deleted successfully", "success");
         } catch (err: unknown) {
           openSnackbar(err instanceof Error ? err.message : 'Unknown error', 'error');
         } finally {
@@ -130,6 +134,11 @@ export default function LinkFilePopover({ open, anchorEl, handleClose, wsJunctio
     }
 
     let url = links[0];
+
+    if (!url) {
+      openSnackbar("Link file kosong", "error");
+      return;
+    }
 
     if (!/^https?:\/\//i.test(url)) {
       url = `https://${url}`;
@@ -180,7 +189,7 @@ export default function LinkFilePopover({ open, anchorEl, handleClose, wsJunctio
                                   aria-label="edit-link"
                                   variant='contained'
                                   size='small'
-                                  color='warning'
+                                  color='secondary'
                                   onClick={() => setIsEditing(true)}
                                   startIcon={<Iconify icon="solar:pen-bold" />}
                                 >

@@ -60,7 +60,7 @@ export default function KomponenSpmlRef({ section, addState, resetAddState }: Ko
 
   const handleDelete = async (id: number) => {
     try {
-      const response = await axiosJWT.get(`/spml/deleteKomponen/${id}`);
+      const response = await axiosJWT.get(`/spmlRef/deleteKomponen/${id}`);
       openSnackbar(response.data.message, 'success');
       getDictionary();
     } catch (err) {
@@ -203,7 +203,7 @@ function KomponenSpmlRefModal({ modalOpen, modalClose, addState, editID, data }:
   const handleAdd = async () => {
     try {
       if (addValue.bobot < 0 || addValue.bobot > 100) return openSnackbar('Bobot harus antara 0–100', 'error');
-      await axiosJWT.post('/spml/createKomponen', { title: addValue.title, bobot: addValue.bobot, alias: addValue.alias });
+      await axiosJWT.post('/spmlRef/createKomponen', { title: addValue.title, bobot: addValue.bobot, alias: addValue.alias });
       openSnackbar('Komponen SPML berhasil ditambahkan', 'success');
       getDictionary();
       modalClose();
@@ -216,7 +216,7 @@ function KomponenSpmlRefModal({ modalOpen, modalClose, addState, editID, data }:
   const handleEdit = async () => {
     try {
       if (editValue.bobot < 0 || editValue.bobot > 100) return openSnackbar('Bobot harus antara 0–100', 'error');
-      await axiosJWT.post('/spml/editKomponen', { id: editValue.id, title: editValue.title, bobot: editValue.bobot, alias: editValue.alias });
+      await axiosJWT.post('/spmlRef/editKomponen', { id: editValue.id, title: editValue.title, bobot: editValue.bobot, alias: editValue.alias });
       openSnackbar('Komponen SPML berhasil diubah', 'success');
       getDictionary();
       modalClose();

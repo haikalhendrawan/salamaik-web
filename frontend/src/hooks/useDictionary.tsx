@@ -261,7 +261,7 @@ const DictionaryProvider = ({children}: DictionaryProviderProps) => {
 
   const getKomponenSpml = async() => {
     try {
-      const response = await axiosJWT.get("/spml/getAllKomponen");
+      const response = await axiosJWT.get("/spmlRef/getAllKomponen");
       setKomponenSpmlRef(response.data.rows);
     } catch (err) {
       console.log(err);
@@ -270,7 +270,7 @@ const DictionaryProvider = ({children}: DictionaryProviderProps) => {
 
   const getSubKomponenSpml = async() => {
     try {
-      const response = await axiosJWT.get("/spml/getAllSubKomponen");
+      const response = await axiosJWT.get("/spmlRef/getAllSubKomponen");
       setSubKomponenSpmlRef(response.data.rows);
     } catch (err) {
       console.log(err);
@@ -279,7 +279,7 @@ const DictionaryProvider = ({children}: DictionaryProviderProps) => {
 
   const getAspekSpml = async() => {
     try {
-      const response = await axiosJWT.get("/spml/getAllAspek");
+      const response = await axiosJWT.get("/spmlRef/getAllAspek");
       setAspekSpmlRef(response.data.rows);
     } catch (err) {
       console.log(err);
@@ -288,7 +288,7 @@ const DictionaryProvider = ({children}: DictionaryProviderProps) => {
 
   const getChecklistSpml = async() => {
     try {
-      const response = await axiosJWT.get("/spml/getAllChecklist");
+      const response = await axiosJWT.get("/spmlRef/getAllChecklist");
       setChecklistSpmlRef(response.data.rows);
     } catch (err) {
       console.log(err);

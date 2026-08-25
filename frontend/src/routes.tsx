@@ -21,6 +21,7 @@ import ProfilePage from "./pages/ProfilePage";
 import WorksheetLanding from "./sections/worksheet/WorksheetLanding";
 import WorksheetKanwil from "./sections/worksheet/WorksheetKanwil";
 import WorksheetSPMLPage from "./pages/WorksheetSPMLPage";
+import WorksheetSPMLLanding from "./sections/worksheetSPML/WorksheetSPMLLanding";
 import WorksheetSPMLWorkspace from "./sections/worksheetSPML/WorksheetSPMLWorkspace";
 import Page404 from "./pages/guard/Page404";
 import MatrixPage from "./pages/MatrixPage";
@@ -68,7 +69,8 @@ export default function Router() {
             <Route path="kppn" element={<WorksheetKanwil />} />
           </Route>
           <Route path='spml' element={<WorksheetSPMLPage />}>
-            <Route index element={<WorksheetSPMLWorkspace />} />
+            <Route index element={<WorksheetSPMLLanding />} />
+            <Route path="kppn" element={<WorksheetSPMLWorkspace />} />
           </Route>
         </Route>
         <Route path="history" element={<HistoryPage />} />

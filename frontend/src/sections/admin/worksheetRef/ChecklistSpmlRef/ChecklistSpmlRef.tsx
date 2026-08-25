@@ -48,7 +48,7 @@ export default function ChecklistSpmlRef({ section, addState, resetAddState }: C
 
   const handleDelete = async (id: number) => {
     try {
-      const response = await axiosJWT.post('/spml/deleteChecklist', { id });
+      const response = await axiosJWT.post('/spmlRef/deleteChecklist', { id });
       openSnackbar(response.data.message, 'success');
       getDictionary();
     } catch {
@@ -179,7 +179,7 @@ function ChecklistSpmlRefModal({ modalOpen, modalClose, addState, editID }: Chec
 
   const handleAdd = async () => {
     try {
-      await axiosJWT.post('/spml/createChecklist', {
+      await axiosJWT.post('/spmlRef/createChecklist', {
         uraian: addValue.uraian, dokumen: addValue.dokumen,
         komponen_spml_id: addValue.komponen_spml_id,
         subkomponen_spml_id: addValue.subkomponen_spml_id,
@@ -192,7 +192,7 @@ function ChecklistSpmlRefModal({ modalOpen, modalClose, addState, editID }: Chec
 
   const handleEdit = async () => {
     try {
-      await axiosJWT.post('/spml/editChecklist', {
+      await axiosJWT.post('/spmlRef/editChecklist', {
         id: editValue.id, uraian: editValue.uraian, dokumen: editValue.dokumen,
         komponen_spml_id: editValue.komponen_spml_id,
         subkomponen_spml_id: editValue.subkomponen_spml_id,
