@@ -127,6 +127,10 @@ const editWsSPMLJunctionFile = async (
         throw new ErrorDetail(403, "Not authorized to update this SPML worksheet");
       }
 
+      if (junction.file_1) {
+        throw new ErrorDetail(409, "Hapus file SPML yang lama sebelum mengunggah file baru");
+      }
+
       const fileName = req.file.filename;
       const result = await wsSPMLJunction.editWsSPMLJunctionFile(
         parsedJunctionId,
@@ -136,12 +140,7 @@ const editWsSPMLJunctionFile = async (
       );
 
       if (result.length === 0) {
-        throw new ErrorDetail(404, "SPML worksheet junction not found");
-      }
-
-      if (junction.file_1 && junction.file_1 !== fileName) {
-        const previousFilePath = path.join(__dirname, "../uploads/worksheet", path.basename(junction.file_1));
-        await fs.promises.unlink(previousFilePath).catch(() => undefined);
+        throw new ErrorDetail(409, "Hapus file SPML yang lama sebelum mengunggah file baru");
       }
 
       io.emit("spmlFileHasUpdated", {

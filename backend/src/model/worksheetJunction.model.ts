@@ -29,7 +29,8 @@ export interface WorksheetJunctionType{
   last_update: string | null,
   updated_by: string | null,
   excluded: number,
-  link_file: string | null
+  link_file: string | null,
+  comment_count: number,
 };
 
 export interface OpsiType{
@@ -75,7 +76,8 @@ export interface WsJunctionJoinChecklistType{
   standardisasi_id: number | null,
   opsi: OpsiType[] | [] | null,
   urut: number | null,
-  critical_point: string | null
+  critical_point: string | null,
+  comment_count: number,
 };
 
 export interface WsJunctionWithKomponenType{
@@ -106,7 +108,12 @@ class WorksheetJunction{
   async getWsJunctionByWorksheetId(worksheetId: string, poolTrx?: PoolClient): Promise<WsJunctionJoinChecklistType[]>{
     const poolInstance = poolTrx ?? pool;
     try{
-      const q = ` SELECT worksheet_junction.*, checklist_ref.*, json_agg(opsi_ref.* ORDER BY opsi_ref.checklist_id ASC, value DESC) AS opsi
+      const q = ` SELECT worksheet_junction.*, checklist_ref.*,
+                         (SELECT COUNT(*)::int
+                          FROM comment_data
+                          WHERE comment_data.ws_junction_id = worksheet_junction.junction_id
+                            AND comment_data.active = 1) AS comment_count,
+                         json_agg(opsi_ref.* ORDER BY opsi_ref.checklist_id ASC, value DESC) AS opsi
                   FROM worksheet_junction
                   LEFT JOIN checklist_ref 
                   ON worksheet_junction.checklist_id = checklist_ref.id

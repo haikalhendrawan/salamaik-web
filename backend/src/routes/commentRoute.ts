@@ -11,7 +11,9 @@ import logActivity from '../middleware/logActivity';
 const router = Router();
 
 router.get('/getByWsJunctionId/:wsJunctionId',  authenticate, commentController.getByWsJunctionId);
+router.get('/getByWsSPMLJunctionId/:wsSPMLJunctionId', authenticate, commentController.getByWsSPMLJunctionId);
 router.post('/add', authenticate, logActivity(92), commentController.add);
+router.post('/addSPML', authenticate, logActivity(92), commentController.addSPML);
 router.post('/deleteById', authenticate, logActivity(93), commentController.deleteById);
 
 export default router

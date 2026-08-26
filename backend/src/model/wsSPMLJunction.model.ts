@@ -31,6 +31,7 @@ export interface WsSPMLJunctionType{
   updated_by: string | null,
   excluded: number,
   link_file: string | null,
+  comment_count: number,
 };
 
 export interface WsSPMLJunctionJoinChecklistSPMLType
@@ -52,7 +53,11 @@ class WsSPMLJunction {
   ): Promise<WsSPMLJunctionJoinChecklistSPMLType[]> {
     const poolInstance = poolTrx ?? pool;
     try {
-      const q = `SELECT worksheet_spml_junction.*, checklist_spml_ref.*
+      const q = `SELECT worksheet_spml_junction.*, checklist_spml_ref.*,
+                        (SELECT COUNT(*)::int
+                         FROM comment_data
+                         WHERE comment_data.ws_spml_junction_id = worksheet_spml_junction.junction_id
+                           AND comment_data.active = 1) AS comment_count
                  FROM worksheet_spml_junction
                  LEFT JOIN checklist_spml_ref
                    ON worksheet_spml_junction.checklist_spml_id = checklist_spml_ref.id
@@ -70,7 +75,11 @@ class WsSPMLJunction {
     junctionId: number
   ): Promise<WsSPMLJunctionJoinChecklistSPMLType | undefined> {
     try {
-      const q = `SELECT worksheet_spml_junction.*, checklist_spml_ref.*
+      const q = `SELECT worksheet_spml_junction.*, checklist_spml_ref.*,
+                        (SELECT COUNT(*)::int
+                         FROM comment_data
+                         WHERE comment_data.ws_spml_junction_id = worksheet_spml_junction.junction_id
+                           AND comment_data.active = 1) AS comment_count
                  FROM worksheet_spml_junction
                  LEFT JOIN checklist_spml_ref
                    ON worksheet_spml_junction.checklist_spml_id = checklist_spml_ref.id
@@ -88,6 +97,10 @@ class WsSPMLJunction {
   ): Promise<WsSPMLJunctionWithDetailType[]> {
     try {
       const q = `SELECT worksheet_spml_junction.*,
+                        (SELECT COUNT(*)::int
+                         FROM comment_data
+                         WHERE comment_data.ws_spml_junction_id = worksheet_spml_junction.junction_id
+                           AND comment_data.active = 1) AS comment_count,
                         json_agg(checklist_spml_ref.* ORDER BY checklist_spml_ref.id ASC) AS checklist,
                         json_agg(komponen_spml_ref.* ORDER BY komponen_spml_ref.id ASC) AS komponen,
                         json_agg(subkomponen_spml_ref.* ORDER BY subkomponen_spml_ref.id ASC) AS subkomponen,
@@ -210,7 +223,7 @@ class WsSPMLJunction {
     try {
       const q = `UPDATE worksheet_spml_junction
                  SET file_1 = $1, last_update = CURRENT_TIMESTAMP, updated_by = $2
-                 WHERE junction_id = $3 AND worksheet_id = $4
+                 WHERE junction_id = $3 AND worksheet_id = $4 AND file_1 IS NULL
                  RETURNING *`;
       const result = await pool.query(q, [fileName, userName, junctionId, worksheetId]);
       return result.rows;
