@@ -49,11 +49,12 @@ interface CommentPopperProps{
   open: boolean,
   anchorEl: EventTarget & HTMLButtonElement | null,
   handleClose: () => void,
-  wsJunctionId: number
+  wsJunctionId: number,
+  onCommentCountChange?: (count: number) => void
 };
 
 // ---------------------------------------------------------------------------------------------
-export default function CommentPopover({open, anchorEl, handleClose, wsJunctionId}: CommentPopperProps){
+export default function CommentPopover({open, anchorEl, handleClose, wsJunctionId, onCommentCountChange}: CommentPopperProps){
   const theme = useTheme();
 
   const axiosJWT = useAxiosJWT();
@@ -68,6 +69,7 @@ export default function CommentPopover({open, anchorEl, handleClose, wsJunctionI
     try{
       const response = await axiosJWT.get(`/comment/getByWsJunctionId/${wsJunctionId}`);
       setComments(response.data.rows);
+      onCommentCountChange?.(response.data.rows.length);
       setLoading(false);
     }catch(err: any){
       if(err.response){

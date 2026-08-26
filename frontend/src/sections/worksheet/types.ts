@@ -48,6 +48,7 @@ export interface WsJunctionType{
     urut: number | null,
     urut_huruf: string | null,
     critical_point: string | null
+    comment_count: number,
 }
 
 export interface WorksheetType{

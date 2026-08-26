@@ -76,6 +76,8 @@ export default function WorksheetCard(props: WorksheetCardProps) {
 
   const [anchorElLinkFile, setAnchorElLinkFile] = useState<EventTarget & HTMLButtonElement | null>(null);
 
+  const [commentCount, setCommentCount] = useState(Number(props.wsJunction?.comment_count) || 0);
+
   const handleOpenInstruction = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     setOpenInstruction(true);
     setAnchorEl(event.currentTarget);
@@ -114,6 +116,10 @@ export default function WorksheetCard(props: WorksheetCardProps) {
     };
   }, []);
 
+  useEffect(() => {
+    setCommentCount(Number(props.wsJunction?.comment_count) || 0);
+  }, [props.wsJunction?.comment_count]);
+
   const isExcluded = props?.wsJunction?.excluded ===1;
   const disableStyle = {opacity: 0.6, pointerEvents: 'none'};
 
@@ -135,6 +141,7 @@ export default function WorksheetCard(props: WorksheetCardProps) {
                 wsJunction={props?.wsJunction}
                 wsDetail={props?.wsDetail} 
                 openComment={handleOpenComment}
+                commentCount={commentCount}
               />
             }
           />
@@ -215,6 +222,7 @@ export default function WorksheetCard(props: WorksheetCardProps) {
         anchorEl={anchorElComment}
         handleClose={handleCloseComment}
         wsJunctionId={props.wsJunction?.junction_id || 0}
+        onCommentCountChange={setCommentCount}
       />
 
       <LinkFilePopover

@@ -91,14 +91,16 @@ export default function FileActions({ checklist }: FileActionsProps) {
             </span>
           </Tooltip>
         )}
-        <Tooltip title={checklist.file_1 ? 'Ganti file' : 'Upload file'}>
-          <span>
-            <StyledButton component="label" aria-label="Upload dokumen dukung" color="white" size="small" variant="contained" disabled={isPastDue}>
-              <Iconify color={theme.palette.grey[500]} icon="solar:add-circle-bold" />
-              <VisuallyHiddenInput type="file" accept="image/jpeg,image/png,.pdf,.zip,.rar" onChange={handleChangeFile} />
-            </StyledButton>
-          </span>
-        </Tooltip>
+        {!checklist.file_1 && (
+          <Tooltip title="Upload file">
+            <span>
+              <StyledButton component="label" aria-label="Upload dokumen dukung" color="white" size="small" variant="contained" disabled={isPastDue}>
+                <Iconify color={theme.palette.grey[500]} icon="solar:add-circle-bold" />
+                <VisuallyHiddenInput type="file" accept="image/jpeg,image/png,.pdf,.zip,.rar" onChange={handleChangeFile} />
+              </StyledButton>
+            </span>
+          </Tooltip>
+        )}
         <Tooltip title={checklist.link_file ? 'Lihat atau edit link' : 'Tambah link'}>
           <span>
             <StyledButton aria-label="Kelola link dokumen dukung" color={checklist.link_file ? 'primary' : 'white'} size="small" variant="contained" onClick={(event) => setLinkAnchor(event.currentTarget)}>

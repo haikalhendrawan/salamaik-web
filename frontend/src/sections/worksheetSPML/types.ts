@@ -10,6 +10,7 @@ export interface WsSPMLJunctionType {
   updated_by: string | null;
   excluded: number;
   link_file: string | null;
+  comment_count: number;
   id: number;
   title: string | null;
   uraian: string;

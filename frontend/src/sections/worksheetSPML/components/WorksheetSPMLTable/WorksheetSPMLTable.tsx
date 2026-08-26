@@ -9,7 +9,7 @@ import {useAuth} from '../../../../hooks/useAuth';
 import FileActions from './components/FileActions';
 import { WsSPMLJunctionType } from '../../types';
 import formatOrderedTitle from '../../../../utils/formatOrderedTitle';
-
+import CommentAction from './components/CommentAction';
 //-----------------------------------------------------------------------------------------------------------------
 const TABLE_HEAD = [
   { id: 'no', label: 'No', alignRight: false },
@@ -18,6 +18,7 @@ const TABLE_HEAD = [
   { id: 'nilai', label: 'Nilai KPPN', alignRight: false },
   { id: 'nilai_k', label: 'Nilai Kanwil', alignRight: false },
   { id: 'dokumen', label: 'Dokumen Dukung', alignRight: false },
+  {id: 'comment', label: 'Comment', alignRight: false},
 ];
 
 const StyledTableCell = styled(TableCell)(({theme}) => ({
@@ -99,6 +100,12 @@ export default function WorksheetSPMLTable({wsSPMLJunction}: WorksheetSPMLTable)
             <StyledTableCell>
               <FileActions checklist={checklist0} />
             </StyledTableCell>
+            <StyledTableCell>
+              <CommentAction
+                wsSPMLJunctionId={checklist0.junction_id}
+                initialCommentCount={Number(checklist0.comment_count) || 0}
+              />
+            </StyledTableCell>
           </TableRow>
           {
             otherChecklist.map((item) => (
@@ -119,6 +126,12 @@ export default function WorksheetSPMLTable({wsSPMLJunction}: WorksheetSPMLTable)
                 <StyledTableCell>
                   <FileActions checklist={item} />
                 </StyledTableCell>
+                <StyledTableCell>
+                  <CommentAction
+                    wsSPMLJunctionId={item.junction_id}
+                    initialCommentCount={Number(item.comment_count) || 0}
+                  />
+                </StyledTableCell>
               </TableRow>
             ))
           }
@@ -137,7 +150,7 @@ export default function WorksheetSPMLTable({wsSPMLJunction}: WorksheetSPMLTable)
           >
             <TableCell
               align="left"
-              colSpan={6}
+              colSpan={7}
               sx={{
                 backgroundColor: theme.palette.text.main,
                 color: theme.palette.text.main,
@@ -165,7 +178,7 @@ export default function WorksheetSPMLTable({wsSPMLJunction}: WorksheetSPMLTable)
           >
             <TableCell
               align="left"
-              colSpan={6}
+              colSpan={7}
               sx={{
                 backgroundColor: theme.palette.background.default,
                 color: theme.palette.text.primary,

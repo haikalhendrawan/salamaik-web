@@ -8,6 +8,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
+import Badge from '@mui/material/Badge';
 import Iconify from "../../../../components/iconify";
 import styled  from '@mui/material/styles/styled';
 import { parseISO, format } from 'date-fns';
@@ -27,6 +28,7 @@ interface HeadPropInterface{
   wsJunction: WsJunctionType | null,
   wsDetail: WorksheetType | null,
   openComment: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
+  commentCount: number,
 };
 
 const StyledIconButton = styled(IconButton)(({}) => ({
@@ -130,7 +132,14 @@ export default function Head(props: HeadPropInterface) {  // bagian atas dari ca
               onClick={props.openComment} 
               disableRipple
             >
-              <Iconify icon={"solar:chat-round-dots-bold"} />
+              <Badge 
+                badgeContent={props.commentCount} 
+                color="primary" 
+                max={99} 
+                invisible={props.commentCount === 0}
+              >
+                <Iconify icon={"solar:chat-round-dots-bold"} />
+              </Badge>
             </StyledChatButton >
           </Tooltip>
       </SubStack>
