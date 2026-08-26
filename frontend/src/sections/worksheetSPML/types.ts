@@ -20,3 +20,17 @@ export interface WsSPMLJunctionType {
   aspek_spml_id: number;
   deleted?: Date | string | null;
 }
+
+export interface SPMLScoreDetail {
+  jumlahChecklist: number;
+  jumlahNA: number;
+  jumlahChecklistPembagi: number;
+  totalSkorKonversi: number;
+}
+
+export interface SPMLScoreType {
+  nilaiKPPN: number;
+  nilaiKanwil: number;
+  detailKPPN: SPMLScoreDetail;
+  detailKanwil: SPMLScoreDetail;
+}

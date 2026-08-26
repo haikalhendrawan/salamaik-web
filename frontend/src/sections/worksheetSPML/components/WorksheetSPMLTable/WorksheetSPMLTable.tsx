@@ -1,5 +1,14 @@
 import { Fragment, useMemo } from 'react';
-import { Table, TableSortLabel, TableHead, TableContainer, TableBody, TableRow, TableCell } from '@mui/material';
+import {
+  Table,
+  TableSortLabel,
+  TableHead,
+  TableContainer,
+  TableBody,
+  TableFooter,
+  TableRow,
+  TableCell,
+} from '@mui/material';
 import useDictionary from '../../../../hooks/useDictionary';
 import { AspekSpmlRefType, SubKomponenSpmlRefType } from '../../../../hooks/useDictionary';
 import { useTheme, styled } from '@mui/material';
@@ -7,9 +16,10 @@ import formatNumberedList from '../../../../utils/formatNumberedList';
 import ScoreSelect from './components/ScoreSelect';
 import {useAuth} from '../../../../hooks/useAuth';
 import FileActions from './components/FileActions';
-import { WsSPMLJunctionType } from '../../types';
+import { SPMLScoreType, WsSPMLJunctionType } from '../../types';
 import formatOrderedTitle from '../../../../utils/formatOrderedTitle';
 import CommentAction from './components/CommentAction';
+import ScoreFooterCell from './components/ScoreFooterCell';
 //-----------------------------------------------------------------------------------------------------------------
 const TABLE_HEAD = [
   { id: 'no', label: 'No', alignRight: false },
@@ -28,12 +38,17 @@ const StyledTableCell = styled(TableCell)(({theme}) => ({
 }));
 
 interface WorksheetSPMLTable{
-  wsSPMLJunction: WsSPMLJunctionType[]
+  wsSPMLJunction: WsSPMLJunctionType[];
+  spmlScore: SPMLScoreType | null;
+  isScoreLoading: boolean;
 }
-
 //-----------------------------------------------------------------------------------------------------------------
 
-export default function WorksheetSPMLTable({wsSPMLJunction}: WorksheetSPMLTable) {
+export default function WorksheetSPMLTable({
+  wsSPMLJunction,
+  spmlScore,
+  isScoreLoading,
+}: WorksheetSPMLTable) {
   const {komponenSpmlRef, subKomponenSpmlRef, aspekSpmlRef } = useDictionary();
 
   const tableHead = useMemo(() =>
@@ -204,6 +219,50 @@ export default function WorksheetSPMLTable({wsSPMLJunction}: WorksheetSPMLTable)
           <TableBody>
             {komponenSPMLRow()}
           </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TableCell
+                colSpan={3}
+                sx={{ fontWeight: 'bold', color: 'text.primary', backgroundColor: 'background.default' }}
+              >
+                Total Nilai
+              </TableCell>
+              <ScoreFooterCell
+                value={spmlScore?.detailKPPN.totalSkorKonversi}
+                detail={spmlScore?.detailKPPN}
+                loading={isScoreLoading}
+                label="KPPN"
+              />
+              <ScoreFooterCell
+                value={spmlScore?.detailKanwil.totalSkorKonversi}
+                detail={spmlScore?.detailKanwil}
+                loading={isScoreLoading}
+                label="Kanwil"
+              />
+              <TableCell colSpan={2} sx={{ backgroundColor: 'background.default' }} />
+            </TableRow>
+            <TableRow>
+              <TableCell
+                colSpan={3}
+                sx={{ fontWeight: 'bold', color: 'text.primary', backgroundColor: 'background.default' }}
+              >
+                Nilai Kertas Kerja SPML
+              </TableCell>
+              <ScoreFooterCell
+                value={spmlScore?.nilaiKPPN}
+                detail={spmlScore?.detailKPPN}
+                loading={isScoreLoading}
+                label="KPPN"
+              />
+              <ScoreFooterCell
+                value={spmlScore?.nilaiKanwil}
+                detail={spmlScore?.detailKanwil}
+                loading={isScoreLoading}
+                label="Kanwil"
+              />
+              <TableCell colSpan={2} sx={{ backgroundColor: 'background.default' }} />
+            </TableRow>
+          </TableFooter>
         </Table>
       </TableContainer>
     </>

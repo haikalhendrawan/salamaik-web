@@ -14,6 +14,8 @@ import useWsSPMLJunction from './useWsSPMLJunction';
 import PreviewFileModal from './components/PreviewFileModal';
 import WorksheetSPMLToolbar from './components/WorksheetSPMLToolbar';
 import NavigationDrawerSPML from './components/NavigationDrawerSPML';
+import useSocket from '../../hooks/useSocket';
+import { debounce } from 'lodash';
 //-----------------------------------------------------------------------------------------------------------------
 const SELECT_KPPN: {[key: string]: string} = {
   '010': 'Padang',
@@ -27,6 +29,7 @@ const SELECT_KPPN: {[key: string]: string} = {
 //-----------------------------------------------------------------------------------------------------------------
 export default function WorksheetSPMLWorkspace() {
   const {auth} = useAuth();
+  const { socket } = useSocket();
 
   const navigate = useNavigate();
 
@@ -37,7 +40,17 @@ export default function WorksheetSPMLWorkspace() {
   const selectedKppnId = id || auth?.kppn || '';
   const selectedKppnName = SELECT_KPPN[selectedKppnId] || selectedKppnId;
 
-  const { wsSPMLJunction, wsDetail, getWsSPMLJunctionKanwil, getWorksheet } = useWsSPMLJunction();
+  const {
+    wsSPMLJunction,
+    wsDetail,
+    spmlScore,
+    isScoreLoading,
+    getWsSPMLJunctionKanwil,
+    getWorksheet,
+    resetSPMLScore,
+  } = useWsSPMLJunction();
+
+  const activeWorksheetId = wsSPMLJunction[0]?.worksheet_id;
 
   const isPastDue = new Date().getTime() > new Date(wsDetail?.close_period || '').getTime();
 
@@ -48,11 +61,33 @@ export default function WorksheetSPMLWorkspace() {
   }, []);
 
   useEffect(() => {
-    getWorksheet(id);
-    getWsSPMLJunctionKanwil(id);
-    // Fetch once when the workspace is opened; context request functions are not memoized.
+    resetSPMLScore();
+    getWorksheet(selectedKppnId);
+    getWsSPMLJunctionKanwil(selectedKppnId);
+    // Refresh when the selected KPPN changes; context request functions are not memoized.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [selectedKppnId]);
+
+  useEffect(() => {
+    if (!socket || !activeWorksheetId) return undefined;
+
+    const refreshActiveWorksheet = debounce((event: { worksheetId?: string }) => {
+      if (event?.worksheetId === activeWorksheetId) {
+        getWsSPMLJunctionKanwil(selectedKppnId);
+      }
+    }, 250);
+
+    socket.on('spmlKPPNScoreHasUpdated', refreshActiveWorksheet);
+    socket.on('spmlKanwilScoreHasUpdated', refreshActiveWorksheet);
+
+    return () => {
+      refreshActiveWorksheet.cancel();
+      socket.off('spmlKPPNScoreHasUpdated', refreshActiveWorksheet);
+      socket.off('spmlKanwilScoreHasUpdated', refreshActiveWorksheet);
+    };
+    // Request functions from the context are not memoized.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socket, activeWorksheetId, selectedKppnId]);
 
   return (
     <>
@@ -88,7 +123,11 @@ export default function WorksheetSPMLWorkspace() {
           }
         />
         
-        <WorksheetSPMLTable wsSPMLJunction={wsSPMLJunction}/>
+        <WorksheetSPMLTable
+          wsSPMLJunction={wsSPMLJunction}
+          spmlScore={spmlScore}
+          isScoreLoading={isScoreLoading}
+        />
 
       </Card>
       <PreviewFileModal isDisabled={isPastDue} kppn={id} />
