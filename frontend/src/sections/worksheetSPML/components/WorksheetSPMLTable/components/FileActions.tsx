@@ -10,7 +10,7 @@ import usePreviewFileModal from '../../../usePreviewFileModal';
 import useWsSPMLJunction from '../../../useWsSPMLJunction';
 import { WsSPMLJunctionType } from '../../../types';
 import LinkFilePopover from '../../LinkFilePopover';
-
+//-----------------------------------------------------------------------------------------------------------------
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
   clipPath: 'inset(50%)',
@@ -26,15 +26,17 @@ const VisuallyHiddenInput = styled('input')({
 interface FileActionsProps {
   checklist: WsSPMLJunctionType;
 }
-
+//-----------------------------------------------------------------------------------------------------------------
 export default function FileActions({ checklist }: FileActionsProps) {
   const theme = useTheme();
   const axiosJWT = useAxiosJWT();
   const { setIsLoading } = useLoading();
   const { openSnackbar } = useSnackbar();
-  const { wsDetail, getWsSPMLJunctionKanwil } = useWsSPMLJunction();
+  const { wsDetail, getWsSPMLJunctionKanwil, isJunctionSyncing } = useWsSPMLJunction();
   const { modalOpen, changeFile, selectId, handleSetIsExampleFile } = usePreviewFileModal();
   const [linkAnchor, setLinkAnchor] = useState<HTMLButtonElement | null>(null);
+  const isFileSyncing = isJunctionSyncing(checklist.junction_id, ['file-upload', 'file-delete']);
+  const isLinkSyncing = isJunctionSyncing(checklist.junction_id, ['link']);
 
   const isPastDue = useMemo(
     () => new Date().getTime() > new Date(wsDetail?.close_period || '').getTime(),
@@ -85,7 +87,7 @@ export default function FileActions({ checklist }: FileActionsProps) {
         {checklist.file_1 && (
           <Tooltip title="Lihat file">
             <span>
-              <StyledButton color="secondary" size="small" variant="contained" onClick={handleOpenFile}>
+              <StyledButton color="secondary" size="small" variant="contained" onClick={handleOpenFile} disabled={isFileSyncing}>
                 <Iconify icon="solar:file-bold-duotone" />
               </StyledButton>
             </span>
@@ -94,7 +96,7 @@ export default function FileActions({ checklist }: FileActionsProps) {
         {!checklist.file_1 && (
           <Tooltip title="Upload file">
             <span>
-              <StyledButton component="label" aria-label="Upload dokumen dukung" color="white" size="small" variant="contained" disabled={isPastDue}>
+              <StyledButton component="label" aria-label="Upload dokumen dukung" color="white" size="small" variant="contained" disabled={isPastDue || isFileSyncing}>
                 <Iconify color={theme.palette.grey[500]} icon="solar:add-circle-bold" />
                 <VisuallyHiddenInput type="file" accept="image/jpeg,image/png,.pdf,.zip,.rar" onChange={handleChangeFile} />
               </StyledButton>
@@ -103,7 +105,7 @@ export default function FileActions({ checklist }: FileActionsProps) {
         )}
         <Tooltip title={checklist.link_file ? 'Lihat atau edit link' : 'Tambah link'}>
           <span>
-            <StyledButton aria-label="Kelola link dokumen dukung" color={checklist.link_file ? 'primary' : 'white'} size="small" variant="contained" onClick={(event) => setLinkAnchor(event.currentTarget)}>
+            <StyledButton aria-label="Kelola link dokumen dukung" color={checklist.link_file ? 'primary' : 'white'} size="small" variant="contained" onClick={(event) => setLinkAnchor(event.currentTarget)} disabled={isLinkSyncing}>
               <Iconify color={checklist.link_file ? theme.palette.common.white : theme.palette.grey[500]} icon="solar:link-bold-duotone" />
             </StyledButton>
           </span>

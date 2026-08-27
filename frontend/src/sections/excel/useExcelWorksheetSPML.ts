@@ -4,8 +4,9 @@ import {
   KomponenSpmlRefType,
   SubKomponenSpmlRefType,
 } from '../../hooks/useDictionary';
-import { WsSPMLJunctionType } from '../worksheetSPML/types';
+import { SPMLScoreType, WsSPMLJunctionType } from '../worksheetSPML/types';
 import formatOrderedTitle from '../../utils/formatOrderedTitle';
+import { formatNumberedListText } from '../../utils/formatNumberedList';
 
 type ScoreType = 'kanwil' | 'kppn';
 
@@ -15,6 +16,7 @@ interface ExcelWorksheetSPMLParams {
   komponenRef: KomponenSpmlRefType[] | null;
   subKomponenRef: SubKomponenSpmlRefType[] | null;
   aspekRef: AspekSpmlRefType[] | null;
+  spmlScore: SPMLScoreType | null;
 }
 
 const BORDER: Partial<ExcelJS.Borders> = {
@@ -30,14 +32,33 @@ export default function useExcelWorksheetSPML({
   komponenRef,
   subKomponenRef,
   aspekRef,
+  spmlScore,
 }: ExcelWorksheetSPMLParams) {
   const generate = async () => {
     const workbook = new ExcelJS.Workbook();
     workbook.creator = 'Salamaik Web';
     workbook.created = new Date();
 
-    createScoreSheet(workbook, 'Nilai Kanwil', 'kanwil', rows, komponenRef, subKomponenRef, aspekRef);
-    createScoreSheet(workbook, 'Nilai KPPN', 'kppn', rows, komponenRef, subKomponenRef, aspekRef);
+    createScoreSheet(
+      workbook,
+      'Nilai Kanwil',
+      'kanwil',
+      rows,
+      komponenRef,
+      subKomponenRef,
+      aspekRef,
+      spmlScore
+    );
+    createScoreSheet(
+      workbook,
+      'Nilai KPPN',
+      'kppn',
+      rows,
+      komponenRef,
+      subKomponenRef,
+      aspekRef,
+      spmlScore
+    );
 
     const buffer = await workbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], {
@@ -65,7 +86,8 @@ function createScoreSheet(
   rows: WsSPMLJunctionType[],
   komponenRef: KomponenSpmlRefType[] | null,
   subKomponenRef: SubKomponenSpmlRefType[] | null,
-  aspekRef: AspekSpmlRefType[] | null
+  aspekRef: AspekSpmlRefType[] | null,
+  spmlScore: SPMLScoreType | null
 ) {
   const sheet = workbook.addWorksheet(sheetName, {
     views: [{ state: 'frozen', ySplit: 1 }],
@@ -74,9 +96,11 @@ function createScoreSheet(
   sheet.columns = [
     { key: 'no', header: 'No', width: 8 },
     { key: 'aspek', header: 'Aspek', width: 35 },
-    { key: 'kegiatan', header: 'Kegiatan', width: 75 },
+    { key: 'uraian', header: 'Uraian Kegiatan', width: 60 },
+    { key: 'buktiDukung', header: 'Bukti Dukung Kegiatan', width: 50 },
+    { key: 'linkBuktiDukung', header: 'Link Bukti Dukung Kegiatan', width: 55 },
     { key: 'nilai', header: 'Nilai', width: 12 },
-    { key: 'dokumen', header: 'Dokumen', width: 65 },
+    { key: 'nilaiKonversi', header: 'Nilai Konversi', width: 16 },
   ];
   styleHeader(sheet.getRow(1));
 
@@ -84,7 +108,7 @@ function createScoreSheet(
     const komponenRows = rows.filter((item) => item.komponen_spml_id === komponen.id);
     if (komponenRows.length === 0) return;
 
-    addMergedSectionRow(sheet, formatOrderedTitle(komponen.urut, komponen.title), 'FFE8EEF7');
+    addMergedSectionRow(sheet, formatOrderedTitle(komponen.urut, komponen.title), 'FFE0E0E0');
 
     subKomponenRef
       ?.filter((item) => item.komponen_spml_id === komponen.id)
@@ -97,7 +121,7 @@ function createScoreSheet(
         addMergedSectionRow(
           sheet,
           formatOrderedTitle(subKomponen.urut, subKomponen.title),
-          'FFF4F6F8'
+          'FFF5F5F5'
         );
 
         aspekRef
@@ -129,6 +153,23 @@ function createScoreSheet(
       });
   });
 
+  const totalScore = scoreType === 'kanwil'
+    ? spmlScore?.detailKanwil.totalSkorKonversi
+    : spmlScore?.detailKPPN.totalSkorKonversi;
+  const worksheetScore = scoreType === 'kanwil'
+    ? spmlScore?.nilaiKanwil
+    : spmlScore?.nilaiKPPN;
+
+  addFooterRow(sheet, 'Total Nilai', totalScore, 'FFE0E0E0', 'FF212121', '0');
+  addFooterRow(
+    sheet,
+    'Rata-Rata Total Nilai',
+    worksheetScore,
+    'FF616161',
+    'FFFFFFFF',
+    '0.00'
+  );
+
   return sheet;
 }
 
@@ -136,7 +177,7 @@ function styleHeader(row: ExcelJS.Row) {
   row.height = 28;
   row.eachCell({ includeEmpty: true }, (cell) => {
     cell.font = { bold: true, color: { argb: 'FFFFFFFF' }, name: 'Aptos' };
-    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF2065D1' } };
+    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF616161' } };
     cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
     cell.border = BORDER;
   });
@@ -144,13 +185,14 @@ function styleHeader(row: ExcelJS.Row) {
 
 function addMergedSectionRow(sheet: ExcelJS.Worksheet, title: string, color: string) {
   const row = sheet.addRow([title]);
-  sheet.mergeCells(`A${row.number}:E${row.number}`);
+  sheet.mergeCells(`A${row.number}:G${row.number}`);
   row.height = 22;
 
-  row.eachCell({ includeEmpty: true }, (cell) => {
+  for (let columnNumber = 1; columnNumber <= 7; columnNumber += 1) {
+    const cell = row.getCell(columnNumber);
     cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: color } };
     cell.border = BORDER;
-  });
+  }
 
   const titleCell = sheet.getCell(`A${row.number}`);
   titleCell.font = { bold: true, name: 'Aptos' };
@@ -163,26 +205,30 @@ function addChecklistRow(
   scoreType: ScoreType
 ) {
   const score = scoreType === 'kanwil' ? junction.kanwil_score : junction.kppn_score;
+  const displayScore = junction.excluded === 1 ? 'N/A' : score ?? '';
+  const convertedScore = junction.excluded === 1 ? 'N/A' : score == null ? '' : score * 10;
+  const formattedDescription = formatNumberedListText(junction.uraian);
   const row = sheet.addRow({
-    kegiatan: junction.uraian,
-    nilai: junction.excluded === 1 ? 'N/A' : score ?? '',
+    uraian: formattedDescription,
+    buktiDukung: junction.dokumen || '',
+    nilai: displayScore,
+    nilaiKonversi: convertedScore,
   });
-  row.height = 55;
 
   row.eachCell({ includeEmpty: true }, (cell, columnNumber) => {
     cell.font = { name: 'Aptos', size: 10 };
     cell.border = BORDER;
     cell.alignment = {
       vertical: 'top',
-      horizontal: columnNumber === 4 ? 'center' : 'left',
+      horizontal: [1, 6, 7].includes(columnNumber) ? 'center' : 'left',
       wrapText: true,
     };
   });
 
-  setDocumentCell(row, junction);
+  setLinkEvidenceCell(row, junction);
 }
 
-function setDocumentCell(row: ExcelJS.Row, junction: WsSPMLJunctionType) {
+function setLinkEvidenceCell(row: ExcelJS.Row, junction: WsSPMLJunctionType) {
   const cell = row.getCell(5);
   const urls: string[] = [];
   const apiUrl = import.meta.env.VITE_API_URL.replace(/\/+$/, '');
@@ -198,8 +244,6 @@ function setDocumentCell(row: ExcelJS.Row, junction: WsSPMLJunctionType) {
   }
 
   const displayText = urls.map(formatUrlForDisplay).join('\n\n');
-  const displayedLines = displayText ? displayText.split('\n').length : 1;
-  row.height = Math.max(row.height || 55, displayedLines * 15);
   cell.alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
 
   if (urls.length === 1) {
@@ -212,6 +256,33 @@ function setDocumentCell(row: ExcelJS.Row, junction: WsSPMLJunctionType) {
     cell.value = { text: displayText, hyperlink: urls[0], tooltip: urls.join('\n\n') };
     cell.font = { name: 'Aptos', size: 10, color: { argb: 'FF0563C1' }, underline: true };
   }
+}
+
+function addFooterRow(
+  sheet: ExcelJS.Worksheet,
+  label: string,
+  value: number | undefined,
+  fillColor: string,
+  fontColor: string,
+  numberFormat: string
+) {
+  const row = sheet.addRow([label, '', '', '', '', '', value ?? null]);
+  sheet.mergeCells(`A${row.number}:F${row.number}`);
+  row.height = 24;
+
+  for (let columnNumber = 1; columnNumber <= 7; columnNumber += 1) {
+    const cell = row.getCell(columnNumber);
+    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: fillColor } };
+    cell.border = BORDER;
+    cell.font = { name: 'Aptos', bold: true, color: { argb: fontColor } };
+    cell.alignment = {
+      vertical: 'middle',
+      horizontal: 'center',
+      wrapText: true,
+    };
+  }
+
+  row.getCell(7).numFmt = numberFormat;
 }
 
 function formatUrlForDisplay(url: string) {

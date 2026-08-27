@@ -246,7 +246,7 @@ export default function WorksheetSPMLTable({
                 colSpan={3}
                 sx={{ fontWeight: 'bold', color: 'text.primary', backgroundColor: 'background.default' }}
               >
-                Nilai Kertas Kerja SPML
+                Rata-Rata Total Nilai
               </TableCell>
               <ScoreFooterCell
                 value={spmlScore?.nilaiKPPN}

@@ -23,6 +23,7 @@ export interface WsSPMLJunctionType {
 
 export interface SPMLScoreDetail {
   jumlahChecklist: number;
+  jumlahChecklistDiisi: number;
   jumlahNA: number;
   jumlahChecklistPembagi: number;
   totalSkorKonversi: number;
@@ -33,4 +34,38 @@ export interface SPMLScoreType {
   nilaiKanwil: number;
   detailKPPN: SPMLScoreDetail;
   detailKanwil: SPMLScoreDetail;
+}
+
+export interface AllKPPNSPMLScoreType extends SPMLScoreType {
+  worksheetSPMLId: string;
+  kppnId: string;
+  name: string;
+  alias: string;
+}
+
+export type SPMLChangeType =
+  | 'score'
+  | 'link'
+  | 'file-upload'
+  | 'file-delete'
+  | 'comment-add'
+  | 'comment-delete';
+
+export interface SPMLWorksheetChangedEvent {
+  worksheetId: string;
+  junctionId: number;
+  changeType: SPMLChangeType;
+  changedBy?: string;
+  timestamp: string;
+}
+
+export interface SPMLSyncTarget {
+  junctionId: number;
+  changeType: SPMLChangeType;
+}
+
+export interface WsSPMLRefreshOptions {
+  showOverlay?: boolean;
+  refreshScore?: boolean;
+  syncTargets?: SPMLSyncTarget[];
 }

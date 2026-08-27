@@ -21,10 +21,21 @@ interface KPPNSelectionCardProps{
   link: string;
   percentKanwil: number;
   percentKPPN: number;
+  completedKPPN: number;
+  totalChecklist: number;
   kppnId: string;
-};
+}
 // -----------------------------------------------------------------------
-export default function KPPNSelectionCard({header, image, link, percentKanwil, percentKPPN, kppnId}: KPPNSelectionCardProps){
+export default function KPPNSelectionCard({
+  header,
+  image,
+  link,
+  percentKanwil,
+  percentKPPN,
+  completedKPPN,
+  totalChecklist,
+  kppnId,
+}: KPPNSelectionCardProps){
   const [imageLoaded, setImageLoaded] = useState(false);
 
   const axiosJWT = useAxiosJWT();
@@ -39,8 +50,8 @@ export default function KPPNSelectionCard({header, image, link, percentKanwil, p
 
   const subheader = (
     <Stack direction='row' spacing={1}> 
-      <Typography variant='body3'>{percentKanwil?.toFixed(0)?.toString() + '% complete'}</Typography>
-      <Tooltip title={`Progress pengisian mandiri oleh KPPN: ${percentKPPN.toFixed()}%`}>
+      <Typography variant='body3'>{`${percentKanwil.toFixed(0)}% complete`}</Typography>
+      <Tooltip title={`Progress pengisian mandiri oleh KPPN: ${completedKPPN}/${totalChecklist} (${percentKPPN.toFixed(0)}%)`}>
         <Iconify icon={"solar:info-circle-bold-duotone"}  sx={{borderRadius:'50%', cursor: 'pointer'}} />
       </Tooltip> 
     </Stack>
@@ -63,7 +74,7 @@ export default function KPPNSelectionCard({header, image, link, percentKanwil, p
     } catch (error) {
       console.error("Error generating Excel:", error);
     }
-  };
+  }
   
 
   return(

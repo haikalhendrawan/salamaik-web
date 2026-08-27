@@ -6,10 +6,13 @@ import useLoading from '../../../hooks/display/useLoading';
 import useSnackbar from '../../../hooks/display/useSnackbar';
 import useExcelWorksheetSPML from '../../excel/useExcelWorksheetSPML';
 import { WsSPMLJunctionType } from '../types';
+import { format } from 'date-fns';
+import useWsSPMLJunction from '../useWsSPMLJunction';
 
 interface WorksheetSPMLToolbarProps {
   wsSPMLJunction: WsSPMLJunctionType[];
   kppnName: string;
+  lastRefreshedAt: Date | null;
 }
 
 interface ChecklistProgressProps {
@@ -36,16 +39,22 @@ function ChecklistProgress({ completed, total, value, tooltip }: ChecklistProgre
   );
 }
 
-export default function WorksheetSPMLToolbar({ wsSPMLJunction, kppnName }: WorksheetSPMLToolbarProps) {
+export default function WorksheetSPMLToolbar({
+  wsSPMLJunction,
+  kppnName,
+  lastRefreshedAt,
+}: WorksheetSPMLToolbarProps) {
   const { komponenSpmlRef, subKomponenSpmlRef, aspekSpmlRef } = useDictionary();
   const { setIsLoading } = useLoading();
   const { openSnackbar } = useSnackbar();
+  const { spmlScore } = useWsSPMLJunction();
   const excelWorksheet = useExcelWorksheetSPML({
     rows: wsSPMLJunction,
     kppnName,
     komponenRef: komponenSpmlRef,
     subKomponenRef: subKomponenSpmlRef,
     aspekRef: aspekSpmlRef,
+    spmlScore,
   });
 
   const progress = useMemo(() => {
@@ -85,7 +94,7 @@ export default function WorksheetSPMLToolbar({ wsSPMLJunction, kppnName }: Works
         mx: 4,
         mb: 3,
         py: 1,
-        width: { xs: 'calc(100% - 64px)', sm: '60%', md: '50%' },
+        width: { xs: 'calc(100% - 64px)', sm: '65%', md: '65%' },
         backgroundColor: 'transparent',
       }}
     >
@@ -119,6 +128,18 @@ export default function WorksheetSPMLToolbar({ wsSPMLJunction, kppnName }: Works
               value={progress.kanwil}
               tooltip={`${progress.completedKanwil}/${progress.total} checklist telah diisi oleh Kanwil`}
             />
+          </Grid>
+
+          <Grid item xs={4} sm={3} md={2}>
+            <Typography variant="body2">Refresh Terakhir</Typography>
+          </Grid>
+          <Grid item xs={1} sm={1}>
+            <Typography variant="body2">:</Typography>
+          </Grid>
+          <Grid item xs={7} sm={8} md={9}>
+            <Typography variant="body2" color="text.secondary">
+              {lastRefreshedAt ? format(lastRefreshedAt, 'dd/MM/yyyy HH:mm:ss') : '-'}
+            </Typography>
           </Grid>
 
           <Grid item xs={4} sm={3} md={2}>

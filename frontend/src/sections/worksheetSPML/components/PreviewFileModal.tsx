@@ -39,7 +39,7 @@ export default function PreviewFileModal({isDisabled, kppn}: {isDisabled: boolea
 
   const {openSnackbar} = useSnackbar();
 
-  const {getWsSPMLJunctionKanwil} = useWsSPMLJunction();
+  const {getWsSPMLJunctionKanwil, lastLiveChange} = useWsSPMLJunction();
 
   const currentFileURL = import.meta.env.VITE_API_URL;
 
@@ -102,6 +102,16 @@ export default function PreviewFileModal({isDisabled, kppn}: {isDisabled: boolea
       setRender(<Typography> Unknown file type </Typography>)
     }
   },[currentFileURL, file, fileExt, handleDownload]);
+
+  useEffect(() => {
+    if (
+      open &&
+      lastLiveChange?.changeType === 'file-delete' &&
+      lastLiveChange.junctionId === selectedId
+    ) {
+      modalClose();
+    }
+  }, [lastLiveChange, modalClose, open, selectedId]);
 
 
   // ----------------------------------------------------------------------------------------

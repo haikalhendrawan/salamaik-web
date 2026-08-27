@@ -4,15 +4,17 @@
  */
 
 import {useState, useEffect} from "react";
+import { isAxiosError } from "axios";
 import { Helmet } from 'react-helmet-async';
 import {useAuth} from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import useAxiosJWT from "../../hooks/useAxiosJWT";
+import useWsSPMLJunction from "./useWsSPMLJunction";
 // @mui
 import { Grid, Container, Typography } from '@mui/material';
 // sections
 import KPPNSelectionCard from "./components/KPPNSelectionCard";
-import { KPPNScoreProgressResponseType } from "../home/types";
+import { AllKPPNSPMLScoreType } from "./types";
 import useSnackbar from "../../hooks/display/useSnackbar";
 import useLoading from "../../hooks/display/useLoading";
 // ----------------------------------------------------------------------
@@ -22,7 +24,9 @@ const KPPN_PICTURE = ['kppn-padang.png', 'kppn-bukittinggi.jpg', 'kppn-solok.jpg
 export default function WorksheetSPMLLanding() {
   const {auth} = useAuth();
 
-  const [wsDetail, setWsDetail] = useState<KPPNScoreProgressResponseType[] | null>(null);
+  const { setWsSPMLJunction } = useWsSPMLJunction();
+
+  const [spmlScores, setSpmlScores] = useState<AllKPPNSPMLScoreType[]>([]);
 
   const axiosJWT = useAxiosJWT();
 
@@ -32,30 +36,42 @@ export default function WorksheetSPMLLanding() {
 
   const {setIsLoading} = useLoading();
 
-  const getScoreProgress = async() => {
-    try{
-      setIsLoading(true);
-      if(auth?.kppn?.length!==5){
-        return setIsLoading(false);
-      }
-      const response = await axiosJWT.get('/getWsJunctionScoreAndProgressAllKPPN');
-      setWsDetail(response.data.rows);
-      setIsLoading(false);
-    }catch(err:any){
-      setIsLoading(false);
-      openSnackbar(err?.response?.data?.message, 'error');
-    }finally{
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
-    getScoreProgress();
-  }, []);
+    setWsSPMLJunction([]);
 
-  if(auth?.kppn?.length !== 5 ){
-    navigate(`kppn?id=${auth?.kppn}`)
-  };
+    if (!auth?.kppn) return;
+    if (auth.kppn.length !== 5) {
+      setSpmlScores([]);
+      navigate(`kppn?id=${auth?.kppn}`)
+      return;
+    }
+    if (!auth.period) return;
+
+    let active = true;
+    const getScoreProgress = async () => {
+      try {
+        setIsLoading(true);
+        const response = await axiosJWT.get(`/scoringEngine/spml/period/${auth.period}`);
+        if (active) setSpmlScores(response.data.rows);
+      } catch (err: unknown) {
+        if (!active) return;
+        setSpmlScores([]);
+        const message = isAxiosError<{ message?: string }>(err)
+          ? err.response?.data?.message || err.message
+          : err instanceof Error ? err.message : 'Gagal mengambil skor SPML';
+        openSnackbar(message, 'error');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    getScoreProgress();
+    return () => {
+      active = false;
+    };
+    // Request/context functions are not memoized.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth?.kppn, auth?.period, navigate]);
 
   return (
     <>
@@ -69,22 +85,24 @@ export default function WorksheetSPMLLanding() {
         </Typography>
         <Grid container spacing={4}>
           {
-            wsDetail?.map((item, index) => {
-              const progressKanwil = item?.scoreProgressDetail?.totalProgressKanwil || 0;
-              const progressKPPN = item?.scoreProgressDetail?.totalProgressKPPN || 0;
-              const totalChecklist = item?.scoreProgressDetail?.totalChecklist || 0;
-              const percentKanwil = (progressKanwil / totalChecklist * 100) || 0;
-              const percentKPPN = (progressKPPN / totalChecklist * 100) || 0;
+            spmlScores.map((item, index) => {
+              const totalChecklist = item.detailKPPN.jumlahChecklist;
+              const progressKanwil = item.detailKanwil.jumlahChecklistDiisi;
+              const progressKPPN = item.detailKPPN.jumlahChecklistDiisi;
+              const percentKanwil = totalChecklist > 0 ? (progressKanwil / totalChecklist) * 100 : 0;
+              const percentKPPN = totalChecklist > 0 ? (progressKPPN / totalChecklist) * 100 : 0;
               return (
-                <Grid item xs={12} md={6} key={index}>
+                <Grid item xs={12} md={6} key={item.worksheetSPMLId}>
                   <KPPNSelectionCard
-                    header={item?.alias}
-                    lastUpdate="Last Update: Apr 12, 2022"
-                    image={KPPN_PICTURE[index]}
-                    link={`/worksheet/spml/kppn?id=${item?.id}`}
+                    header={item.alias}
+                    lastUpdate=""
+                    image={KPPN_PICTURE[index] || KPPN_PICTURE[0]}
+                    link={`/worksheet/spml/kppn?id=${item.kppnId}`}
                     percentKanwil={percentKanwil}
                     percentKPPN={percentKPPN}
-                    kppnId={item?.id}
+                    completedKPPN={progressKPPN}
+                    totalChecklist={totalChecklist}
+                    kppnId={item.kppnId}
                   />
                 </Grid>
               )

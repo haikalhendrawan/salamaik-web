@@ -21,6 +21,7 @@ import useSnackbar from '../../../hooks/display/useSnackbar';
 import StyledTextField from '../../../components/styledTextField/StyledTextField';
 import StyledButton from '../../../components/styledButton/StyledButton';
 import Iconify from '../../../components/iconify';
+import useWsSPMLJunction from '../useWsSPMLJunction';
 
 interface CommentType {
   id: number;
@@ -61,6 +62,7 @@ export default function CommentPopoverSPML({
   const { openSnackbar } = useSnackbar();
   const [loading, setLoading] = useState(true);
   const [comments, setComments] = useState<CommentType[]>([]);
+  const { lastLiveChange } = useWsSPMLJunction();
 
   const showError = useCallback((err: unknown) => {
     if (isAxiosError<{ message?: string }>(err)) {
@@ -94,6 +96,16 @@ export default function CommentPopoverSPML({
       setComments([]);
     }
   }, [getComments, open]);
+
+  useEffect(() => {
+    if (
+      open &&
+      lastLiveChange?.junctionId === wsSPMLJunctionId &&
+      (lastLiveChange.changeType === 'comment-add' || lastLiveChange.changeType === 'comment-delete')
+    ) {
+      getComments();
+    }
+  }, [getComments, lastLiveChange, open, wsSPMLJunctionId]);
 
   return (
     <Popper open={open} anchorEl={anchorEl} placement="bottom-end" transition sx={{ zIndex: 9999 }}>

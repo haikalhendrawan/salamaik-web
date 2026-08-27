@@ -53,13 +53,15 @@ export default function WorksheetLanding() {
   };
 
   useEffect(() => {
+    if(auth?.kppn?.length !== 5 ){
+      navigate(`kppn?id=${auth?.kppn}`)
+    };
+
     setWsJunction([]);
     getScoreProgress();
   }, []);
 
-  if(auth?.kppn?.length !== 5 ){
-    navigate(`kppn?id=${auth?.kppn}`)
-  };
+
 
   return (
     <>
