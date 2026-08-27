@@ -38,4 +38,26 @@ const getSPMLScore = async (req: Request, res: Response, next: NextFunction) => 
   }
 };
 
-export { getSPMLScore };
+const getAllKPPNSPMLScoresByPeriod = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const periodId = Number(req.params.periodId);
+    if (!Number.isInteger(periodId) || periodId <= 0) {
+      throw new ErrorDetail(400, "periodId must be a positive integer");
+    }
+
+    const result = await scoringEngine.calculateAllKPPNSPMLScores(periodId);
+    return res.status(200).json({
+      success: true,
+      message: "All KPPN SPML worksheet scores calculated successfully",
+      rows: result,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export { getSPMLScore, getAllKPPNSPMLScoresByPeriod };

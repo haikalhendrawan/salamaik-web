@@ -11,6 +11,10 @@ import { socketError } from "../model/error.model";
 import wsSPMLJunction from "../model/wsSPMLJunction.model";
 import logger from "../config/logger";
 import nonBlockingCall from "../utils/nonBlockingCall";
+import {
+  createSPMLChangedEvent,
+  getSPMLWorksheetRoom,
+} from "../utils/wsSPMLSocket.utils";
 
 type SocketCallback = (response: {
   success: boolean;
@@ -53,6 +57,36 @@ const canAccessJunction = (requesterKppn: string | undefined, junctionKppn: stri
   requesterKppn?.length === 5 || requesterKppn === junctionKppn;
 
 class WsSPMLJunctionEvent {
+  async joinWorksheet(socket: Socket, worksheetId: string, callback: SocketCallback) {
+    try {
+      if (typeof worksheetId !== "string" || !worksheetId.trim()) {
+        return socketError(callback, "SPML worksheet ID is required");
+      }
+
+      const junctions = await wsSPMLJunction.getWsSPMLJunctionByWorksheetId(worksheetId);
+      const junction = junctions[0];
+      if (!junction) {
+        return socketError(callback, "SPML worksheet not found");
+      }
+      if (!canAccessJunction(socket.data.payload.kppn, junction.kppn_id)) {
+        return socketError(callback, "Not authorized to access this SPML worksheet");
+      }
+
+      await socket.join(getSPMLWorksheetRoom(worksheetId));
+      return callback({ success: true, message: "Joined SPML worksheet room" });
+    } catch (err: unknown) {
+      logger.error(err);
+      return socketError(callback, err instanceof Error ? err.message : "Unknown error");
+    }
+  }
+
+  async leaveWorksheet(socket: Socket, worksheetId: string, callback?: SocketCallback) {
+    if (typeof worksheetId === "string" && worksheetId.trim()) {
+      await socket.leave(getSPMLWorksheetRoom(worksheetId));
+    }
+    callback?.({ success: true, message: "Left SPML worksheet room" });
+  }
+
   async updateKanwilScore(
     socket: Socket,
     data: KanwilScoreEventData,
@@ -70,6 +104,14 @@ class WsSPMLJunctionEvent {
         return socketError(callback, "SPML excluded must be 0 or 1");
       }
 
+      const junction = await wsSPMLJunction.getWsSPMLJunctionByJunctionId(junctionId);
+      if (!junction || junction.worksheet_id !== worksheetId) {
+        return socketError(callback, "SPML worksheet junction not found");
+      }
+      if (!canAccessJunction(socket.data.payload.kppn, junction.kppn_id)) {
+        return socketError(callback, "Not authorized to update this SPML worksheet");
+      }
+
       const result = await wsSPMLJunction.editWsSPMLJunctionKanwilScore(
         junctionId,
         worksheetId,
@@ -82,12 +124,17 @@ class WsSPMLJunctionEvent {
         return socketError(callback, "SPML worksheet junction not found");
       }
 
-      socket.broadcast.emit("spmlKanwilScoreHasUpdated", {
+      const room = getSPMLWorksheetRoom(worksheetId);
+      socket.to(room).emit("spmlKanwilScoreHasUpdated", {
         worksheetId,
         junctionId,
         kanwilScore,
         excluded,
       });
+      socket.to(room).emit(
+        "spmlWorksheetChanged",
+        createSPMLChangedEvent(worksheetId, junctionId, "score", username)
+      );
 
       nonBlockingCall(
         activity.createActivity(
@@ -122,6 +169,14 @@ class WsSPMLJunctionEvent {
         return socketError(callback, "SPML excluded must be 0 or 1");
       }
 
+      const junction = await wsSPMLJunction.getWsSPMLJunctionByJunctionId(junctionId);
+      if (!junction || junction.worksheet_id !== worksheetId) {
+        return socketError(callback, "SPML worksheet junction not found");
+      }
+      if (!canAccessJunction(socket.data.payload.kppn, junction.kppn_id)) {
+        return socketError(callback, "Not authorized to update this SPML worksheet");
+      }
+
       const result = await wsSPMLJunction.editWsSPMLJunctionKPPNScore(
         junctionId,
         worksheetId,
@@ -134,12 +189,17 @@ class WsSPMLJunctionEvent {
         return socketError(callback, "SPML worksheet junction not found");
       }
 
-      socket.broadcast.emit("spmlKPPNScoreHasUpdated", {
+      const room = getSPMLWorksheetRoom(worksheetId);
+      socket.to(room).emit("spmlKPPNScoreHasUpdated", {
         worksheetId,
         junctionId,
         kppnScore,
         excluded,
       });
+      socket.to(room).emit(
+        "spmlWorksheetChanged",
+        createSPMLChangedEvent(worksheetId, junctionId, "score", username)
+      );
 
       nonBlockingCall(
         activity.createActivity(
@@ -197,11 +257,16 @@ class WsSPMLJunctionEvent {
         return socketError(callback, "SPML worksheet junction not found");
       }
 
-      socket.broadcast.emit("spmlLinkFileHasUpdated", {
+      const room = getSPMLWorksheetRoom(worksheetId);
+      socket.to(room).emit("spmlLinkFileHasUpdated", {
         worksheetId,
         junctionId,
         linkFile: normalizedLinkFile,
       });
+      socket.to(room).emit(
+        "spmlWorksheetChanged",
+        createSPMLChangedEvent(worksheetId, junctionId, "link", username)
+      );
 
       nonBlockingCall(
         activity.createActivity(
@@ -257,10 +322,15 @@ class WsSPMLJunctionEvent {
         }
       }
 
-      socket.broadcast.emit("wsSPMLJunctionFileHasDeleted", {
+      const room = getSPMLWorksheetRoom(junction.worksheet_id);
+      socket.to(room).emit("wsSPMLJunctionFileHasDeleted", {
         junctionId,
         fileName: safeFileName,
       });
+      socket.to(room).emit(
+        "spmlWorksheetChanged",
+        createSPMLChangedEvent(junction.worksheet_id, junctionId, "file-delete", username)
+      );
 
       nonBlockingCall(
         activity.createActivity(
@@ -282,6 +352,12 @@ class WsSPMLJunctionEvent {
 const wsSPMLEvent = new WsSPMLJunctionEvent();
 
 export default function wsSPMLJunctionEventListener(socket: Socket) {
+  socket.on("joinSPMLWorksheet", (worksheetId, callback) =>
+    wsSPMLEvent.joinWorksheet(socket, worksheetId, callback)
+  );
+  socket.on("leaveSPMLWorksheet", (worksheetId, callback) =>
+    wsSPMLEvent.leaveWorksheet(socket, worksheetId, callback)
+  );
   socket.on("updateSPMLKanwilScore", (data, callback) =>
     wsSPMLEvent.updateKanwilScore(socket, data, callback)
   );

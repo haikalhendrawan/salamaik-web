@@ -1,4 +1,7 @@
-import { calculateSPMLScoreFromRows } from "../../src/model/scoringEngine.model";
+import {
+  calculateAllKPPNSPMLScoresFromRows,
+  calculateSPMLScoreFromRows,
+} from "../../src/model/scoringEngine.model";
 
 describe("calculateSPMLScoreFromRows", () => {
   it("returns 100 when every non-NA checklist has score 10", () => {
@@ -33,6 +36,7 @@ describe("calculateSPMLScoreFromRows", () => {
     expect(result.nilaiKPPN).toBe(100);
     expect(result.detailKPPN).toEqual({
       jumlahChecklist: 2,
+      jumlahChecklistDiisi: 2,
       jumlahNA: 1,
       jumlahChecklistPembagi: 1,
       totalSkorKonversi: 100,
@@ -49,6 +53,8 @@ describe("calculateSPMLScoreFromRows", () => {
     expect(result.nilaiKPPN).toBe(50);
     expect(result.nilaiKanwil).toBe(50);
     expect(result.detailKPPN.jumlahChecklistPembagi).toBe(2);
+    expect(result.detailKPPN.jumlahChecklistDiisi).toBe(1);
+    expect(result.detailKanwil.jumlahChecklistDiisi).toBe(1);
   });
 
   it("returns zero when every checklist is NA", () => {
@@ -60,5 +66,73 @@ describe("calculateSPMLScoreFromRows", () => {
     expect(result.nilaiKPPN).toBe(0);
     expect(result.nilaiKanwil).toBe(0);
     expect(result.detailKPPN.jumlahChecklistPembagi).toBe(0);
+  });
+});
+
+describe("calculateAllKPPNSPMLScoresFromRows", () => {
+  it("groups ordered junction rows by worksheet and calculates each KPPN score", () => {
+    const result = calculateAllKPPNSPMLScoresFromRows([
+      {
+        worksheet_spml_id: "worksheet-010",
+        kppn_id: "010",
+        name: "KPPN Padang",
+        alias: "Padang",
+        kppn_score: 10,
+        kanwil_score: 0,
+        excluded: 0,
+      },
+      {
+        worksheet_spml_id: "worksheet-010",
+        kppn_id: "010",
+        name: "KPPN Padang",
+        alias: "Padang",
+        kppn_score: 0,
+        kanwil_score: 10,
+        excluded: 0,
+      },
+      {
+        worksheet_spml_id: "worksheet-011",
+        kppn_id: "011",
+        name: "KPPN Bukittinggi",
+        alias: "Bukittinggi",
+        kppn_score: 10,
+        kanwil_score: 10,
+        excluded: 0,
+      },
+      {
+        worksheet_spml_id: "worksheet-011",
+        kppn_id: "011",
+        name: "KPPN Bukittinggi",
+        alias: "Bukittinggi",
+        kppn_score: 0,
+        kanwil_score: 0,
+        excluded: 1,
+      },
+    ]);
+
+    expect(result).toHaveLength(2);
+    expect(result[0]).toMatchObject({
+      worksheetSPMLId: "worksheet-010",
+      kppnId: "010",
+      nilaiKPPN: 50,
+      nilaiKanwil: 50,
+    });
+    expect(result[1]).toMatchObject({
+      worksheetSPMLId: "worksheet-011",
+      kppnId: "011",
+      nilaiKPPN: 100,
+      nilaiKanwil: 100,
+      detailKPPN: {
+        jumlahChecklist: 2,
+        jumlahChecklistDiisi: 2,
+        jumlahNA: 1,
+        jumlahChecklistPembagi: 1,
+        totalSkorKonversi: 100,
+      },
+    });
+  });
+
+  it("returns an empty array when the period has no SPML worksheet rows", () => {
+    expect(calculateAllKPPNSPMLScoresFromRows([])).toEqual([]);
   });
 });

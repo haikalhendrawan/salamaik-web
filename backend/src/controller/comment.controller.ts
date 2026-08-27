@@ -7,6 +7,8 @@ import { Request, Response, NextFunction } from 'express';
 import comment, { CommentType } from '../model/comment.model';
 import ErrorDetail from '../model/error.model';
 import wsSPMLJunction from '../model/wsSPMLJunction.model';
+import io from '../config/io';
+import { createSPMLChangedEvent, getSPMLWorksheetRoom } from '../utils/wsSPMLSocket.utils';
 
 const getByWsJunctionId = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -76,6 +78,10 @@ const addSPML = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     const result = await comment.addSPML(wsSPMLJunctionId, userId, commentBody);
+    io.to(getSPMLWorksheetRoom(junction.worksheet_id)).emit(
+      'spmlWorksheetChanged',
+      createSPMLChangedEvent(junction.worksheet_id, wsSPMLJunctionId, 'comment-add', req.payload?.username)
+    );
     return res.status(200).json({ success: true, message: 'Add SPML comment success', rows: result });
   } catch (err) {
     next(err);
@@ -98,6 +104,22 @@ const deleteById = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     const result = await comment.delete(id);
+    if (existingComment.ws_spml_junction_id) {
+      const junction = await wsSPMLJunction.getWsSPMLJunctionByJunctionId(
+        existingComment.ws_spml_junction_id
+      );
+      if (junction) {
+        io.to(getSPMLWorksheetRoom(junction.worksheet_id)).emit(
+          'spmlWorksheetChanged',
+          createSPMLChangedEvent(
+            junction.worksheet_id,
+            existingComment.ws_spml_junction_id,
+            'comment-delete',
+            req.payload?.username
+          )
+        );
+      }
+    }
     return res.status(200).json({ success: true, message: 'Delete comment success', rows: result });
   } catch (err) {
     next(err);

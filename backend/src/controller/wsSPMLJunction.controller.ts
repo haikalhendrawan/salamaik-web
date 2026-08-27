@@ -14,7 +14,7 @@ import worksheet from "../model/worksheet.model";
 import wsSPMLJunction, {
   WsSPMLJunctionJoinChecklistSPMLType,
 } from "../model/wsSPMLJunction.model";
-
+import { createSPMLChangedEvent, getSPMLWorksheetRoom } from "../utils/wsSPMLSocket.utils";
 //-----------------------------------------------------------------------------------------------------------------
 const getWsSPMLJunctionByWorksheetForKPPN = async (
   req: Request,
@@ -143,13 +143,18 @@ const editWsSPMLJunctionFile = async (
         throw new ErrorDetail(409, "Hapus file SPML yang lama sebelum mengunggah file baru");
       }
 
-      io.emit("spmlFileHasUpdated", {
+      const room = getSPMLWorksheetRoom(worksheetId);
+      io.to(room).emit("spmlFileHasUpdated", {
         worksheetId,
         junctionId: parsedJunctionId,
         checklistSpmlId: parsedChecklistSpmlId,
         kppnId,
         fileName,
       });
+      io.to(room).emit(
+        "spmlWorksheetChanged",
+        createSPMLChangedEvent(worksheetId, parsedJunctionId, "file-upload", req.payload.username)
+      );
 
       return res.status(200).json({
         success: true,

@@ -10,6 +10,13 @@ import authorize from "../middleware/authorize";
 
 const router = Router();
 
+router.get(
+  "/spml/period/:periodId",
+  authenticate,
+  authorize([99, 4, 3]),
+  scoringEngineController.getAllKPPNSPMLScoresByPeriod
+);
+
 router.get("/spml/:worksheetSPMLId", authenticate, authorize([99, 4, 3, 2, 1]), scoringEngineController.getSPMLScore);
 
 export default router;
