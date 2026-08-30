@@ -3,7 +3,7 @@
  * © Kanwil DJPb Sumbar 2024
  */
 
-import { useMemo, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useTheme } from "@mui/material/styles";
 import { Stack, Popper, Paper, Grow, ClickAwayListener, Box, FormControl, TextField, Typography, Button, Tooltip } from "@mui/material";
 import styled from "@mui/material/styles/styled";
@@ -13,7 +13,6 @@ import useSnackbar from "../../../hooks/display/useSnackbar";
 import useLoading from "../../../hooks/display/useLoading";
 import Iconify from "../../../components/iconify/Iconify";
 import { WsSPMLJunctionType } from "../types";
-import { WorksheetType } from "../../worksheet/types";
 //-----------------------------------------------------------------------------------------------------------------
 const style = {
   p: 2,
@@ -31,7 +30,7 @@ interface LinkFilePopoverProps {
   anchorEl: EventTarget & HTMLButtonElement | null,
   handleClose: () => void,
   wsJunction: WsSPMLJunctionType,
-  wsDetail: WorksheetType | null,
+  isPastDue: boolean,
 }
 
 interface SocketResponse {
@@ -46,7 +45,7 @@ const StyledFormControl = styled(FormControl)(({ theme }) => ({
   height: '100%',
 }));
 //-----------------------------------------------------------------------------------------------------------------
-export default function LinkFilePopover({ open, anchorEl, handleClose, wsJunction, wsDetail }: LinkFilePopoverProps) {
+export default function LinkFilePopover({ open, anchorEl, handleClose, wsJunction, isPastDue }: LinkFilePopoverProps) {
   const [linkFile, setLinkFile] = useState(wsJunction?.link_file || '');
   const [isEditing, setIsEditing] = useState(false);
 
@@ -56,9 +55,9 @@ export default function LinkFilePopover({ open, anchorEl, handleClose, wsJunctio
   const { openSnackbar } = useSnackbar();
   const { setIsLoading } = useLoading();
 
-  const isPastDue = useMemo(() => new Date().getTime() > new Date(wsDetail?.close_period || "").getTime(), [wsDetail]);
-
   const handleEditLinkFile = () => {
+    if (isPastDue) return;
+
     const normalizedLink = linkFile.trim();
     if (!normalizedLink || normalizedLink.length > 2048) {
       openSnackbar("Link wajib diisi dan maksimal 2048 karakter", "error");
@@ -92,6 +91,8 @@ export default function LinkFilePopover({ open, anchorEl, handleClose, wsJunctio
   };
 
   const handleDeleteLinkFile = () => {
+    if (isPastDue) return;
+
     if (!socket?.connected) {
       return openSnackbar("websocket failed, check your connection", "error");
     }

@@ -110,6 +110,7 @@ export default function WorksheetSPMLWorkspace() {
           wsSPMLJunction={wsSPMLJunction}
           spmlScore={spmlScore}
           isScoreLoading={isScoreLoading}
+          isPastDue={isPastDue}
         />
 
       </Card>

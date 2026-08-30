@@ -41,6 +41,7 @@ interface WorksheetSPMLTable{
   wsSPMLJunction: WsSPMLJunctionType[];
   spmlScore: SPMLScoreType | null;
   isScoreLoading: boolean;
+  isPastDue: boolean;
 }
 //-----------------------------------------------------------------------------------------------------------------
 
@@ -48,6 +49,7 @@ export default function WorksheetSPMLTable({
   wsSPMLJunction,
   spmlScore,
   isScoreLoading,
+  isPastDue,
 }: WorksheetSPMLTable) {
   const {komponenSpmlRef, subKomponenSpmlRef, aspekSpmlRef } = useDictionary();
 
@@ -107,18 +109,19 @@ export default function WorksheetSPMLTable({
               {formatNumberedList(checklist0.uraian)}
             </StyledTableCell>
             <StyledTableCell>
-              <ScoreSelect checklist={checklist0} scoreType="kppn" disabled={isKanwil} />
+              <ScoreSelect checklist={checklist0} scoreType="kppn" disabled={isKanwil || isPastDue} />
             </StyledTableCell>
             <StyledTableCell>
-              <ScoreSelect checklist={checklist0} scoreType="kanwil" disabled={!isKanwil} />
+              <ScoreSelect checklist={checklist0} scoreType="kanwil" disabled={!isKanwil || isPastDue} />
             </StyledTableCell>
             <StyledTableCell>
-              <FileActions checklist={checklist0} />
+              <FileActions checklist={checklist0} isPastDue={isPastDue} />
             </StyledTableCell>
             <StyledTableCell>
               <CommentAction
                 wsSPMLJunctionId={checklist0.junction_id}
                 initialCommentCount={Number(checklist0.comment_count) || 0}
+                isPastDue={isPastDue}
               />
             </StyledTableCell>
           </TableRow>
@@ -133,18 +136,19 @@ export default function WorksheetSPMLTable({
                   {formatNumberedList(item.uraian)}
                 </StyledTableCell>
                 <StyledTableCell>
-                  <ScoreSelect checklist={item} scoreType="kppn" disabled={isKanwil} />
+                  <ScoreSelect checklist={item} scoreType="kppn" disabled={isKanwil || isPastDue} />
                 </StyledTableCell>
                 <StyledTableCell>
-                  <ScoreSelect checklist={item} scoreType="kanwil" disabled={!isKanwil} />
+                  <ScoreSelect checklist={item} scoreType="kanwil" disabled={!isKanwil || isPastDue} />
                 </StyledTableCell>
                 <StyledTableCell>
-                  <FileActions checklist={item} />
+                  <FileActions checklist={item} isPastDue={isPastDue} />
                 </StyledTableCell>
                 <StyledTableCell>
                   <CommentAction
                     wsSPMLJunctionId={item.junction_id}
                     initialCommentCount={Number(item.comment_count) || 0}
+                    isPastDue={isPastDue}
                   />
                 </StyledTableCell>
               </TableRow>

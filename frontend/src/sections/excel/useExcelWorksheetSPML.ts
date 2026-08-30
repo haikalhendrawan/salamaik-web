@@ -41,7 +41,7 @@ export default function useExcelWorksheetSPML({
 
     createScoreSheet(
       workbook,
-      'Nilai Kanwil',
+      'Nilai Versi Kanwil',
       'kanwil',
       rows,
       komponenRef,
@@ -51,7 +51,7 @@ export default function useExcelWorksheetSPML({
     );
     createScoreSheet(
       workbook,
-      'Nilai KPPN',
+      'Nilai Versi KPPN',
       'kppn',
       rows,
       komponenRef,

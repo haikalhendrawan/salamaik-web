@@ -50,6 +50,10 @@ export default function PreviewFileModal({isDisabled, kppn}: {isDisabled: boolea
   }, [currentFileURL, file]);
 
   const deleteFile = () => {
+      if(isDisabled){
+        return
+      }
+
       if(isExampleFile){
         return
       }

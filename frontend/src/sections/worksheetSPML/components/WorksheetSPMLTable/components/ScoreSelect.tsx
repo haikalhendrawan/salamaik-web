@@ -41,6 +41,8 @@ export default function ScoreSelect({ checklist, scoreType, disabled }: ScoreSel
   const isLiveSyncing = isJunctionSyncing(checklist.junction_id, ['score']);
 
   const handleChange = (event: SelectChangeEvent<unknown>) => {
+    if (disabled) return;
+
     const selectedValue = event.target.value as string;
 
     if (selectedValue === '') {

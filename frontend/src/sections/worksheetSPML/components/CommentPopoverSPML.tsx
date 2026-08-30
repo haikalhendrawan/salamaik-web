@@ -40,6 +40,7 @@ interface CommentPopoverSPMLProps {
   handleClose: () => void;
   wsSPMLJunctionId: number;
   onCommentCountChange?: (count: number) => void;
+  isPastDue: boolean;
 }
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
@@ -56,6 +57,7 @@ export default function CommentPopoverSPML({
   handleClose,
   wsSPMLJunctionId,
   onCommentCountChange,
+  isPastDue,
 }: CommentPopoverSPMLProps) {
   const theme = useTheme();
   const axiosJWT = useAxiosJWT();
@@ -135,6 +137,7 @@ export default function CommentPopoverSPML({
                       comment={item}
                       refreshComments={getComments}
                       showError={showError}
+                      isPastDue={isPastDue}
                     />
                   ))
                 ) : (
@@ -147,6 +150,7 @@ export default function CommentPopoverSPML({
                   wsSPMLJunctionId={wsSPMLJunctionId}
                   refreshComments={getComments}
                   showError={showError}
+                  isPastDue={isPastDue}
                 />
               </Stack>
             </ClickAwayListener>
@@ -161,10 +165,12 @@ function NewComment({
   wsSPMLJunctionId,
   refreshComments,
   showError,
+  isPastDue,
 }: {
   wsSPMLJunctionId: number;
   refreshComments: () => Promise<void>;
   showError: (err: unknown) => void;
+  isPastDue: boolean;
 }) {
   const { auth } = useAuth();
   const axiosJWT = useAxiosJWT();
@@ -172,6 +178,8 @@ function NewComment({
   const [submitting, setSubmitting] = useState(false);
 
   const handleAdd = async () => {
+    if (isPastDue) return;
+
     const normalizedComment = commentBody.trim();
     if (!normalizedComment) return;
 
@@ -196,12 +204,13 @@ function NewComment({
       <Stack direction="row" width="100%" spacing={1}>
         <FormControl size="small" fullWidth>
           <StyledTextField
-            placeholder="Tulis komentar baru..."
+            placeholder={isPastDue ? 'Periode kertas kerja telah ditutup' : 'Tulis komentar baru...'}
             size="small"
             fontSize={12}
             multiline
             value={commentBody}
             inputProps={{ maxLength: 2000 }}
+            disabled={isPastDue}
             onChange={(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
               setCommentBody(event.target.value)
             }
@@ -213,7 +222,7 @@ function NewComment({
           size="small"
           sx={{ width: 40 }}
           onClick={handleAdd}
-          disabled={submitting || !commentBody.trim()}
+          disabled={isPastDue || submitting || !commentBody.trim()}
           aria-label="Kirim komentar SPML"
         >
           <Iconify icon="solar:plain-bold" />
@@ -227,10 +236,12 @@ function CommentItem({
   comment,
   refreshComments,
   showError,
+  isPastDue,
 }: {
   comment: CommentType;
   refreshComments: () => Promise<void>;
   showError: (err: unknown) => void;
+  isPastDue: boolean;
 }) {
   const { auth } = useAuth();
   const axiosJWT = useAxiosJWT();
@@ -238,6 +249,8 @@ function CommentItem({
 
   const handleDelete = async (event: React.MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
+    if (isPastDue) return;
+
     try {
       await axiosJWT.post('/comment/deleteById', { id: comment.id });
       await refreshComments();
@@ -263,7 +276,7 @@ function CommentItem({
             </Typography>
           </Stack>
         </StyledPaper>
-        {isCreator && (
+        {isCreator && !isPastDue && (
           <Stack direction="row" justifyContent="flex-end">
             <Link href="#" fontSize={12} mr={2} onClick={handleDelete}>
               Delete

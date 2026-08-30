@@ -6,9 +6,14 @@ import CommentPopoverSPML from '../../CommentPopoverSPML';
 interface CommentActionProps {
   wsSPMLJunctionId: number;
   initialCommentCount: number;
+  isPastDue: boolean;
 }
 
-export default function CommentAction({ wsSPMLJunctionId, initialCommentCount }: CommentActionProps) {
+export default function CommentAction({
+  wsSPMLJunctionId,
+  initialCommentCount,
+  isPastDue,
+}: CommentActionProps) {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [commentCount, setCommentCount] = useState(initialCommentCount);
 
@@ -18,7 +23,7 @@ export default function CommentAction({ wsSPMLJunctionId, initialCommentCount }:
 
   return (
     <>
-      <Tooltip title="Comment">
+      <Tooltip title={isPastDue ? 'Lihat komentar (periode telah ditutup)' : 'Comment'}>
         <IconButton
           aria-label="Buka komentar checklist SPML"
           onClick={(event) => setAnchorEl(event.currentTarget)}
@@ -39,6 +44,7 @@ export default function CommentAction({ wsSPMLJunctionId, initialCommentCount }:
         handleClose={() => setAnchorEl(null)}
         wsSPMLJunctionId={wsSPMLJunctionId}
         onCommentCountChange={setCommentCount}
+        isPastDue={isPastDue}
       />
     </>
   );

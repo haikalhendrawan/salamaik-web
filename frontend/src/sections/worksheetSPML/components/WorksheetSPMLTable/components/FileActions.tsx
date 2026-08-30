@@ -1,4 +1,4 @@
-import { ChangeEvent, useCallback, useMemo, useState } from 'react';
+import { ChangeEvent, useCallback, useState } from 'react';
 import { Stack, Tooltip, Typography } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
 import Iconify from '../../../../../components/iconify';
@@ -25,23 +25,19 @@ const VisuallyHiddenInput = styled('input')({
 
 interface FileActionsProps {
   checklist: WsSPMLJunctionType;
+  isPastDue: boolean;
 }
 //-----------------------------------------------------------------------------------------------------------------
-export default function FileActions({ checklist }: FileActionsProps) {
+export default function FileActions({ checklist, isPastDue }: FileActionsProps) {
   const theme = useTheme();
   const axiosJWT = useAxiosJWT();
   const { setIsLoading } = useLoading();
   const { openSnackbar } = useSnackbar();
-  const { wsDetail, getWsSPMLJunctionKanwil, isJunctionSyncing } = useWsSPMLJunction();
+  const { getWsSPMLJunctionKanwil, isJunctionSyncing } = useWsSPMLJunction();
   const { modalOpen, changeFile, selectId, handleSetIsExampleFile } = usePreviewFileModal();
   const [linkAnchor, setLinkAnchor] = useState<HTMLButtonElement | null>(null);
   const isFileSyncing = isJunctionSyncing(checklist.junction_id, ['file-upload', 'file-delete']);
   const isLinkSyncing = isJunctionSyncing(checklist.junction_id, ['link']);
-
-  const isPastDue = useMemo(
-    () => new Date().getTime() > new Date(wsDetail?.close_period || '').getTime(),
-    [wsDetail]
-  );
 
   const handleOpenFile = useCallback(() => {
     if (!checklist.file_1) return;
@@ -52,6 +48,11 @@ export default function FileActions({ checklist }: FileActionsProps) {
   }, [checklist, changeFile, handleSetIsExampleFile, modalOpen, selectId]);
 
   const handleChangeFile = async (event: ChangeEvent<HTMLInputElement>) => {
+    if (isPastDue) {
+      event.target.value = '';
+      return;
+    }
+
     const selectedFile = event.target.files?.[0];
     if (!selectedFile) return;
 
@@ -105,13 +106,13 @@ export default function FileActions({ checklist }: FileActionsProps) {
         )}
         <Tooltip title={checklist.link_file ? 'Lihat atau edit link' : 'Tambah link'}>
           <span>
-            <StyledButton aria-label="Kelola link dokumen dukung" color={checklist.link_file ? 'primary' : 'white'} size="small" variant="contained" onClick={(event) => setLinkAnchor(event.currentTarget)} disabled={isLinkSyncing}>
+            <StyledButton aria-label="Kelola link dokumen dukung" color={checklist.link_file ? 'primary' : 'white'} size="small" variant="contained" onClick={(event) => setLinkAnchor(event.currentTarget)} disabled={isLinkSyncing || (isPastDue && !checklist.link_file)}>
               <Iconify color={checklist.link_file ? theme.palette.common.white : theme.palette.grey[500]} icon="solar:link-bold-duotone" />
             </StyledButton>
           </span>
         </Tooltip>
       </Stack>
-      <LinkFilePopover open={Boolean(linkAnchor)} anchorEl={linkAnchor} handleClose={() => setLinkAnchor(null)} wsJunction={checklist} wsDetail={wsDetail} />
+      <LinkFilePopover open={Boolean(linkAnchor)} anchorEl={linkAnchor} handleClose={() => setLinkAnchor(null)} wsJunction={checklist} isPastDue={isPastDue} />
     </>
   );
 }
