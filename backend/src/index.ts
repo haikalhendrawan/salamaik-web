@@ -36,6 +36,7 @@ import commentRoute from './routes/commentRoute';
 import infoRoute from './routes/infoRoute';
 import peraturanRoute from './routes/peraturanRoute';
 import spmlRefRoute from './routes/spmlRefRoute';
+import ckRefRoute from './routes/ckRefRoute';
 import wsSPMLJunctionRoute from './routes/wsSPMLJunctionRoute';
 import scoringEngineRoute from './routes/scoringEngineRoute';
 //middleware
@@ -64,6 +65,7 @@ app.use(userRoute);
 app.use(komponenRoute);
 app.use(checklistRoute);
 app.use('/spmlRef',spmlRefRoute);
+app.use('/ckRef', ckRefRoute);
 app.use('/wsSPMLJunction', wsSPMLJunctionRoute);
 app.use('/scoringEngine', scoringEngineRoute);
 app.use(standardizationRoute);
