@@ -13,6 +13,9 @@
  * 5: batch
  * 6: periode
  * 7: peraturan
+ * 8-11: referensi SPML
+ * 12: komponen CK
+ * 13: checklist CK
  */
 
 import {useState} from'react';
@@ -30,6 +33,8 @@ import ChecklistSpmlRef from '../../sections/admin/worksheetRef/ChecklistSpmlRef
 import KomponenSpmlRef from '../../sections/admin/worksheetRef/KomponenSpmlRef';
 import SubKomponenSpmlRef from '../../sections/admin/worksheetRef/SubKomponenSpmlRef';
 import AspekSpmlRef from '../../sections/admin/worksheetRef/AspekSpmlRef';
+import KomponenCkRef from '../../sections/admin/worksheetRef/KomponenCkRef';
+import ChecklistCkRef from '../../sections/admin/worksheetRef/ChecklistCkRef';
 import { ChecklistProvider } from '../../sections/admin/worksheetRef/ChecklistRef/useChecklist';
 import { BatchProvider } from '../../sections/admin/worksheetRef/BatchRef/useBatch';
 import { DialogProvider } from '../../hooks/display/useDialog';
@@ -69,6 +74,8 @@ export default function WorksheetRefPage() {
     <KomponenSpmlRef section={section} addState={addState} resetAddState={resetAddState} />,
     <SubKomponenSpmlRef section={section} addState={addState} resetAddState={resetAddState} />,
     <AspekSpmlRef section={section} addState={addState} resetAddState={resetAddState} />,
+    <KomponenCkRef section={section} addState={addState} resetAddState={resetAddState} />,
+    <ChecklistCkRef section={section} addState={addState} resetAddState={resetAddState} />,
   ];
 
   const SECTION_NAME: string[] = [
@@ -84,6 +91,8 @@ export default function WorksheetRefPage() {
     'Komponen SPML',
     'Sub Komponen SPML',
     'Aspek SPML',
+    'Komponen CK',
+    'Checklist CK',
   ];
 
 
@@ -139,4 +148,4 @@ export default function WorksheetRefPage() {
       </Container>
     </>
   );
-};
+}

@@ -88,6 +88,38 @@ export interface ChecklistSpmlRefType{
   aspek_spml_id: number,
 };
 
+export interface KomponenCkRefType {
+  id: number;
+  peraturan: number;
+  urut: string;
+  title: string;
+  alias: string | null;
+  detail: string | null;
+}
+
+export interface ChecklistCkRefType {
+  id: number;
+  komponen_ck_id: number;
+  urut: number;
+  materi: string;
+  kriteria_penilaian: string;
+  bukti_dukung: string | null;
+  komponen_title: string;
+  komponen_urut: string;
+}
+
+export interface OpsiCkRefType {
+  id: number;
+  checklist_ck_id: number;
+  label: string;
+  description: string | null;
+  value: 0 | 5 | 10;
+  urut: number;
+  checklist_urut: number;
+  checklist_materi: string;
+  komponen_ck_id: number;
+}
+
 interface UnitType{
   id: string;
   name: string;
@@ -126,7 +158,11 @@ interface DictionaryContextType{
   subKomponenSpmlRef: SubKomponenSpmlRefType[] | null,
   aspekSpmlRef: AspekSpmlRefType[] | null,
   checklistSpmlRef: ChecklistSpmlRefType[] | null,
-  getDictionary: () => void,
+  komponenCkRef: KomponenCkRefType[] | null,
+  checklistCkRef: ChecklistCkRefType[] | null,
+  opsiCkRef: OpsiCkRefType[] | null,
+  getDictionary: () => Promise<void>,
+  getCkDictionary: () => Promise<void>,
 };
 
 type DictionaryProviderProps = {
@@ -147,7 +183,11 @@ const DictionaryContext = createContext<DictionaryContextType>({
   subKomponenSpmlRef: null,
   aspekSpmlRef: null,
   checklistSpmlRef: null,
-  getDictionary: () => {},
+  komponenCkRef: null,
+  checklistCkRef: null,
+  opsiCkRef: null,
+  getDictionary: async () => {},
+  getCkDictionary: async () => {},
 });
 
 const DictionaryProvider = ({children}: DictionaryProviderProps) => {
@@ -182,6 +222,12 @@ const DictionaryProvider = ({children}: DictionaryProviderProps) => {
   const [aspekSpmlRef, setAspekSpmlRef] = useState(null);
 
   const [checklistSpmlRef, setChecklistSpmlRef] = useState(null);
+
+  const [komponenCkRef, setKomponenCkRef] = useState<KomponenCkRefType[] | null>(null);
+
+  const [checklistCkRef, setChecklistCkRef] = useState<ChecklistCkRefType[] | null>(null);
+
+  const [opsiCkRef, setOpsiCkRef] = useState<OpsiCkRefType[] | null>(null);
 
   const getPeriod = async() => {
     try{
@@ -297,18 +343,36 @@ const DictionaryProvider = ({children}: DictionaryProviderProps) => {
     }
   };
 
-  const getDictionary = async() => {
-    getPeriod();
-    getKPPN();
-    getRole();
-    getKomponen();
-    getSubKomponen();
-    getSubSubKomponen();
-    getPeraturan();
-    getKomponenSpml();
-    getSubKomponenSpml();
-    getAspekSpml();
-    getChecklistSpml();
+  const getCkDictionary = async (): Promise<void> => {
+    try {
+      const [komponenResponse, checklistResponse, opsiResponse] = await Promise.all([
+        axiosJWT.get('/ckRef/getAllKomponen'),
+        axiosJWT.get('/ckRef/getAllChecklist'),
+        axiosJWT.get('/ckRef/getAllOpsi'),
+      ]);
+      setKomponenCkRef(komponenResponse.data.rows);
+      setChecklistCkRef(checklistResponse.data.rows);
+      setOpsiCkRef(opsiResponse.data.rows);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const getDictionary = async (): Promise<void> => {
+    await Promise.all([
+      getPeriod(),
+      getKPPN(),
+      getRole(),
+      getKomponen(),
+      getSubKomponen(),
+      getSubSubKomponen(),
+      getPeraturan(),
+      getKomponenSpml(),
+      getSubKomponenSpml(),
+      getAspekSpml(),
+      getChecklistSpml(),
+      getCkDictionary(),
+    ]);
   };
 
   useEffect(() => {
@@ -329,7 +393,11 @@ const DictionaryProvider = ({children}: DictionaryProviderProps) => {
       subKomponenSpmlRef,
       aspekSpmlRef,
       checklistSpmlRef,
-      getDictionary
+      komponenCkRef,
+      checklistCkRef,
+      opsiCkRef,
+      getDictionary,
+      getCkDictionary
     }}>
       {children}
     </DictionaryContext.Provider>

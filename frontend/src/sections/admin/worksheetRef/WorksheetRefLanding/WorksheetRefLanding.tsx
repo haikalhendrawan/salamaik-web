@@ -9,6 +9,7 @@ import DasarHukumGrid from './DasarHukumGrid';
 import WorksheetGrid from './WorksheetGrid';
 import PeriodGrid from './PeriodGrid';
 import WorksheetSpmlGrid from './WorksheetSpmlGrid';
+import WorksheetCkGrid from './WorksheetCkGrid';
 //---------------------------------------------------- 
 interface WorksheetRefLandingProps {
   changeSection: (section: number) => void;
@@ -28,6 +29,8 @@ export default function WorksheetRefLanding({changeSection}: WorksheetRefLanding
           <WorksheetGrid changeSection={changeSection}/>
 
           <WorksheetSpmlGrid changeSection={changeSection}/>
+
+          <WorksheetCkGrid changeSection={changeSection}/>
          
           <PeriodGrid changeSection={changeSection}/>
         
