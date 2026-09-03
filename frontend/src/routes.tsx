@@ -23,6 +23,9 @@ import WorksheetKanwil from "./sections/worksheet/WorksheetKanwil";
 import WorksheetSPMLPage from "./pages/WorksheetSPMLPage";
 import WorksheetSPMLLanding from "./sections/worksheetSPML/WorksheetSPMLLanding";
 import WorksheetSPMLWorkspace from "./sections/worksheetSPML/WorksheetSPMLWorkspace";
+import WorksheetCKPage from './pages/WorksheetCKPage';
+import WorksheetCKLanding from './sections/worksheetCK/WorksheetCKLanding';
+import WorksheetCKWorkspace from './sections/worksheetCK/WorksheetCKWorkspace';
 import Page404 from "./pages/guard/Page404";
 import MatrixPage from "./pages/MatrixPage";
 import FollowUpPage from "./pages/FollowUpPage";
@@ -71,6 +74,10 @@ export default function Router() {
           <Route path='spml' element={<WorksheetSPMLPage />}>
             <Route index element={<WorksheetSPMLLanding />} />
             <Route path="kppn" element={<WorksheetSPMLWorkspace />} />
+          </Route>
+          <Route path="ck" element={<WorksheetCKPage />}>
+            <Route index element={<WorksheetCKLanding />} />
+            <Route path="kppn" element={<WorksheetCKWorkspace />} />
           </Route>
         </Route>
         <Route path="history" element={<HistoryPage />} />

@@ -27,6 +27,11 @@ const navSupervisi = [
         path: '/worksheet/spml',
         icon: icon('dot-mark'),
       },
+      {
+        title: 'CK',
+        path: '/worksheet/ck',
+        icon: icon('dot-mark'),
+      },
     ]
   },
   {
