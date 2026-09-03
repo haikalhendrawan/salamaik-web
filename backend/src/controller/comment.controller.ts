@@ -7,8 +7,14 @@ import { Request, Response, NextFunction } from 'express';
 import comment, { CommentType } from '../model/comment.model';
 import ErrorDetail from '../model/error.model';
 import wsSPMLJunction from '../model/wsSPMLJunction.model';
+import wsCKJunction from '../model/wsCKJunction.model';
 import io from '../config/io';
 import { createSPMLChangedEvent, getSPMLWorksheetRoom } from '../utils/wsSPMLSocket.utils';
+import {
+  canAccessCKWorksheet,
+  createCKChangedEvent,
+  getCKWorksheetRoom,
+} from '../utils/wsCKSocket.utils';
 
 const getByWsJunctionId = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -88,6 +94,69 @@ const addSPML = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+const getByWsCKJunctionId = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const wsCKJunctionId = Number(req.params.wsCKJunctionId);
+    if (!Number.isInteger(wsCKJunctionId) || wsCKJunctionId <= 0) {
+      throw new ErrorDetail(400, 'ID junction CK tidak valid');
+    }
+
+    const junction = await wsCKJunction.getByJunctionId(wsCKJunctionId);
+    if (!junction) throw new ErrorDetail(404, 'CK worksheet junction not found');
+    if (!canAccessCKWorksheet(req.payload.role, req.payload.kppn, junction.kppn_id)) {
+      throw new ErrorDetail(403, 'Not authorized to access this CK worksheet');
+    }
+
+    const result: CommentType[] = await comment.getByWsCKJunctionId(wsCKJunctionId);
+    return res.status(200).json({
+      success: true,
+      message: 'Get CK comment success',
+      rows: result,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const addCK = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.payload?.id;
+    const wsCKJunctionId = Number(req.body.wsCKJunctionId);
+    const commentBody = typeof req.body.commentBody === 'string' ? req.body.commentBody.trim() : '';
+
+    if (!Number.isInteger(wsCKJunctionId) || wsCKJunctionId <= 0) {
+      throw new ErrorDetail(400, 'ID junction CK tidak valid');
+    }
+    if (!commentBody || commentBody.length > 2000) {
+      throw new ErrorDetail(400, 'Komentar wajib diisi dan maksimal 2000 karakter');
+    }
+
+    const junction = await wsCKJunction.getByJunctionId(wsCKJunctionId);
+    if (!junction) throw new ErrorDetail(404, 'CK worksheet junction not found');
+    if (!canAccessCKWorksheet(req.payload.role, req.payload.kppn, junction.kppn_id)) {
+      throw new ErrorDetail(403, 'Not authorized to access this CK worksheet');
+    }
+
+    const result = await comment.addCK(wsCKJunctionId, userId, commentBody);
+    io.to(getCKWorksheetRoom(junction.worksheet_id)).emit(
+      'ckWorksheetChanged',
+      createCKChangedEvent(
+        junction.worksheet_id,
+        wsCKJunctionId,
+        'comment-add',
+        req.payload?.username
+      )
+    );
+    return res.status(200).json({
+      success: true,
+      message: 'Add CK comment success',
+      rows: result,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 const deleteById = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const id = Number(req.body.id);
@@ -120,6 +189,20 @@ const deleteById = async (req: Request, res: Response, next: NextFunction) => {
         );
       }
     }
+    if (existingComment.ws_ck_junction_id) {
+      const junction = await wsCKJunction.getByJunctionId(existingComment.ws_ck_junction_id);
+      if (junction) {
+        io.to(getCKWorksheetRoom(junction.worksheet_id)).emit(
+          'ckWorksheetChanged',
+          createCKChangedEvent(
+            junction.worksheet_id,
+            existingComment.ws_ck_junction_id,
+            'comment-delete',
+            req.payload?.username
+          )
+        );
+      }
+    }
     return res.status(200).json({ success: true, message: 'Delete comment success', rows: result });
   } catch (err) {
     next(err);
@@ -129,7 +212,9 @@ const deleteById = async (req: Request, res: Response, next: NextFunction) => {
 export {
   getByWsJunctionId,
   getByWsSPMLJunctionId,
+  getByWsCKJunctionId,
   add,
   addSPML,
+  addCK,
   deleteById,
 };

@@ -10,6 +10,7 @@ export interface CommentType{
   id: number
   ws_junction_id: number | null
   ws_spml_junction_id: number | null
+  ws_ck_junction_id: number | null
   user_id: string
   comment: string
   created_at: string
@@ -54,6 +55,21 @@ class Comment {
   }
  }
 
+ async getByWsCKJunctionId(wsCKJunctionId: number, poolTrx?: PoolClient) {
+  const poolInstance = poolTrx ?? pool;
+  try {
+    const q = `SELECT comment_data.*, user_ref.name, user_ref.picture
+               FROM comment_data
+               LEFT JOIN user_ref ON comment_data.user_id = user_ref.id
+               WHERE comment_data.ws_ck_junction_id = $1 AND comment_data.active = 1
+               ORDER BY comment_data.created_at ASC, comment_data.id ASC`;
+    const result = await poolInstance.query(q, [wsCKJunctionId]);
+    return result.rows;
+  } catch (err) {
+    throw err;
+  }
+ }
+
  async add(wsJunctionId: string, userId: string, comment: string, poolTrx?: PoolClient) {
   const poolInstance = poolTrx ?? pool;
 
@@ -75,6 +91,18 @@ class Comment {
     const q = `INSERT INTO comment_data (ws_spml_junction_id, user_id, comment, active)
                VALUES ($1, $2, $3, $4) RETURNING *`;
     const result = await poolInstance.query(q, [wsSPMLJunctionId, userId, commentBody, 1]);
+    return result.rows[0];
+  } catch (err) {
+    throw err;
+  }
+ }
+
+ async addCK(wsCKJunctionId: number, userId: string, commentBody: string, poolTrx?: PoolClient) {
+  const poolInstance = poolTrx ?? pool;
+  try {
+    const q = `INSERT INTO comment_data (ws_ck_junction_id, user_id, comment, active)
+               VALUES ($1, $2, $3, $4) RETURNING *`;
+    const result = await poolInstance.query(q, [wsCKJunctionId, userId, commentBody, 1]);
     return result.rows[0];
   } catch (err) {
     throw err;

@@ -184,6 +184,32 @@ const uploadWsSPMLJunctionFile = multer({
 export { uploadWsSPMLJunctionFile };
 
 // ----------------------------------------------------------------------------------------------------------
+// CK Worksheet File Upload
+const wsCKJunctionFileStorage = multer.diskStorage({
+  destination: (_req, _file, callback) => {
+    callback(null, `${__dirname}/../uploads/worksheet`);
+  },
+  filename: (req, file, callback) => {
+    const fileExt = sanitizeMimeType(file.mimetype);
+    const checklistCkId = Number(req.body.checklistCkId) || 0;
+    const safeKppnId = String(req.body.kppnId ?? '').replace(/[^a-zA-Z0-9_-]/g, '');
+    const safeWorksheetId = String(req.body.worksheetId ?? '').replace(/[^a-zA-Z0-9_-]/g, '');
+    callback(
+      null,
+      `ck_ch${checklistCkId}_kppn${safeKppnId}_${safeWorksheetId}_${Date.now()}.${fileExt}`
+    );
+  },
+});
+
+const uploadWsCKJunctionFile = multer({
+  storage: wsCKJunctionFileStorage,
+  limits: wsJunctionFileLimit,
+  fileFilter: wsJunctionFileFilter,
+}).single('wsCKJunctionFile');
+
+export { uploadWsCKJunctionFile };
+
+// ----------------------------------------------------------------------------------------------------------
 // Gallery File Upload
 const galleryStorage= multer.diskStorage(
   { 

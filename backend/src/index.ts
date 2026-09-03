@@ -38,6 +38,7 @@ import peraturanRoute from './routes/peraturanRoute';
 import spmlRefRoute from './routes/spmlRefRoute';
 import ckRefRoute from './routes/ckRefRoute';
 import wsSPMLJunctionRoute from './routes/wsSPMLJunctionRoute';
+import wsCKJunctionRoute from './routes/wsCKJunctionRoute';
 import scoringEngineRoute from './routes/scoringEngineRoute';
 //middleware
 import errorHandler from './middleware/errorHandler';
@@ -67,6 +68,7 @@ app.use(checklistRoute);
 app.use('/spmlRef',spmlRefRoute);
 app.use('/ckRef', ckRefRoute);
 app.use('/wsSPMLJunction', wsSPMLJunctionRoute);
+app.use('/wsCKJunction', wsCKJunctionRoute);
 app.use('/scoringEngine', scoringEngineRoute);
 app.use(standardizationRoute);
 app.use(WorksheetRoute);

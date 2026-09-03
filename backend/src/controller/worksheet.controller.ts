@@ -9,6 +9,7 @@ import checklist, { ChecklistType } from '../model/checklist.model';
 import { checklistSpml, komponenSpml } from '../model/spmlRef.model';
 import wsJunction from '../model/worksheetJunction.model';
 import wsSPMLJunction from '../model/wsSPMLJunction.model';
+import wsCKJunction from '../model/wsCKJunction.model';
 import pool from '../config/db';
 import dayjs from 'dayjs';
 import ErrorDetail from '../model/error.model';
@@ -91,6 +92,7 @@ const assignWorksheet = async(req: Request, res: Response, next: NextFunction) =
       result = assignPB.result;
       mapChecklist = assignPB.mapChecklist;
       await assignWorksheetSPML(client, peraturan, req.body);
+      await assignWorksheetCK(client, peraturan, req.body);
     }
 
     await client.query('COMMIT');
@@ -206,3 +208,12 @@ async function assignWorksheetSPML (client: PoolClient, peraturan: number, body:
     throw err;
   }
 };
+
+async function assignWorksheetCK(client: PoolClient, peraturan: number, body: any) {
+  try {
+    const { worksheetId } = body;
+    return await wsCKJunction.assignWorksheet(worksheetId, peraturan, client);
+  } catch (err) {
+    throw err;
+  }
+}
