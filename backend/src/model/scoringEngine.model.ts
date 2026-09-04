@@ -13,6 +13,13 @@ interface SPMLScoreRow {
   excluded: number;
 }
 
+interface CKScoreRow {
+  kppn_id: string;
+  kppn_score: number | null;
+  kanwil_score: number | null;
+  excluded: number;
+}
+
 export interface AllKPPNSPMLScoreRow extends SPMLScoreRow {
   worksheet_spml_id: string;
   name: string;
@@ -37,6 +44,26 @@ export interface SPMLScoreResult {
 export interface SPMLScoreCalculation {
   kppnId: string;
   result: SPMLScoreResult;
+}
+
+export interface CKScoreDetail {
+  jumlahChecklist: number;
+  jumlahChecklistDiisi: number;
+  jumlahNA: number;
+  jumlahChecklistPembagi: number;
+  totalSkorKonversi: number;
+}
+
+export interface CKScoreResult {
+  nilaiKPPN: number;
+  nilaiKanwil: number;
+  detailKPPN: CKScoreDetail;
+  detailKanwil: CKScoreDetail;
+}
+
+export interface CKScoreCalculation {
+  kppnId: string;
+  result: CKScoreResult;
 }
 
 export interface AllKPPNSPMLScoreResult extends SPMLScoreResult {
@@ -116,6 +143,47 @@ export const calculateAllKPPNSPMLScoresFromRows = (
 };
 
 //-----------------------------------------------------------------------------------------------------------------
+export const calculateCKScoreFromRows = (
+  rows: Pick<CKScoreRow, "kppn_score" | "kanwil_score" | "excluded">[]
+): CKScoreResult => {
+  const jumlahChecklist = rows.length;
+  const jumlahNA = rows.filter((row) => row.excluded === 1).length;
+
+  const calculateScore = (scoreKey: "kppn_score" | "kanwil_score") => {
+    const jumlahChecklistDiisi = rows.filter(
+      (row) => row.excluded === 1 || row[scoreKey] !== null
+    ).length;
+    const totalSkorKonversi = rows.reduce(
+      (total, row) => total + (row.excluded === 1 ? 100 : (row[scoreKey] ?? 0) * 10),
+      0
+    );
+
+    return {
+      nilai: jumlahChecklist === 0
+        ? 0
+        : roundToFourDecimals(totalSkorKonversi / jumlahChecklist),
+      detail: {
+        jumlahChecklist,
+        jumlahChecklistDiisi,
+        jumlahNA,
+        jumlahChecklistPembagi: jumlahChecklist,
+        totalSkorKonversi,
+      },
+    };
+  };
+
+  const kppnCalculation = calculateScore("kppn_score");
+  const kanwilCalculation = calculateScore("kanwil_score");
+
+  return {
+    nilaiKPPN: kppnCalculation.nilai,
+    nilaiKanwil: kanwilCalculation.nilai,
+    detailKPPN: kppnCalculation.detail,
+    detailKanwil: kanwilCalculation.detail,
+  };
+};
+
+//-----------------------------------------------------------------------------------------------------------------
 class ScoringEngine {
   async calculateAllKPPNSPMLScores(
     periodId: number,
@@ -162,6 +230,30 @@ class ScoringEngine {
     return {
       kppnId: queryResult.rows[0].kppn_id,
       result: calculateSPMLScoreFromRows(queryResult.rows),
+    };
+  }
+
+  async calculateCKScore(
+    worksheetCKId: string,
+    poolTrx?: PoolClient
+  ): Promise<CKScoreCalculation | undefined> {
+    const poolInstance = poolTrx ?? pool;
+    const query = `SELECT worksheet_ref.kppn_id,
+                          worksheet_ck_junction.kppn_score,
+                          worksheet_ck_junction.kanwil_score,
+                          worksheet_ck_junction.excluded
+                   FROM worksheet_ck_junction
+                   INNER JOIN worksheet_ref
+                     ON worksheet_ref.id = worksheet_ck_junction.worksheet_id
+                   WHERE worksheet_ck_junction.worksheet_id = $1
+                   ORDER BY worksheet_ck_junction.junction_id ASC`;
+    const queryResult = await poolInstance.query<CKScoreRow>(query, [worksheetCKId]);
+
+    if (queryResult.rows.length === 0) return undefined;
+
+    return {
+      kppnId: queryResult.rows[0].kppn_id,
+      result: calculateCKScoreFromRows(queryResult.rows),
     };
   }
 }

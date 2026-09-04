@@ -1,5 +1,6 @@
 import {
   calculateAllKPPNSPMLScoresFromRows,
+  calculateCKScoreFromRows,
   calculateSPMLScoreFromRows,
 } from "../../src/model/scoringEngine.model";
 
@@ -134,5 +135,72 @@ describe("calculateAllKPPNSPMLScoresFromRows", () => {
 
   it("returns an empty array when the period has no SPML worksheet rows", () => {
     expect(calculateAllKPPNSPMLScoresFromRows([])).toEqual([]);
+  });
+});
+
+describe("calculateCKScoreFromRows", () => {
+  it("converts CK scores to scale 100 and averages every checklist", () => {
+    const result = calculateCKScoreFromRows([
+      { kppn_score: 10, kanwil_score: 5, excluded: 0 },
+      { kppn_score: 5, kanwil_score: 0, excluded: 0 },
+      { kppn_score: 0, kanwil_score: 10, excluded: 0 },
+    ]);
+
+    expect(result.nilaiKPPN).toBe(50);
+    expect(result.nilaiKanwil).toBe(50);
+    expect(result.detailKPPN.totalSkorKonversi).toBe(150);
+    expect(result.detailKPPN.jumlahChecklistPembagi).toBe(3);
+  });
+
+  it("counts NA as 100 and keeps it in the CK divisor", () => {
+    const result = calculateCKScoreFromRows([
+      { kppn_score: 0, kanwil_score: 0, excluded: 1 },
+      { kppn_score: 5, kanwil_score: 0, excluded: 0 },
+    ]);
+
+    expect(result.nilaiKPPN).toBe(75);
+    expect(result.nilaiKanwil).toBe(50);
+    expect(result.detailKPPN).toEqual({
+      jumlahChecklist: 2,
+      jumlahChecklistDiisi: 2,
+      jumlahNA: 1,
+      jumlahChecklistPembagi: 2,
+      totalSkorKonversi: 150,
+    });
+    expect(result.detailKanwil.totalSkorKonversi).toBe(100);
+  });
+
+  it("treats an unanswered CK checklist as zero but keeps it in the divisor", () => {
+    const result = calculateCKScoreFromRows([
+      { kppn_score: 10, kanwil_score: null, excluded: 0 },
+      { kppn_score: null, kanwil_score: 10, excluded: 0 },
+    ]);
+
+    expect(result.nilaiKPPN).toBe(50);
+    expect(result.nilaiKanwil).toBe(50);
+    expect(result.detailKPPN.jumlahChecklistDiisi).toBe(1);
+    expect(result.detailKanwil.jumlahChecklistDiisi).toBe(1);
+  });
+
+  it("rounds CK averages to four decimal places", () => {
+    const result = calculateCKScoreFromRows([
+      { kppn_score: 10, kanwil_score: 5, excluded: 0 },
+      { kppn_score: 5, kanwil_score: 5, excluded: 0 },
+      { kppn_score: 5, kanwil_score: 0, excluded: 0 },
+    ]);
+
+    expect(result.nilaiKPPN).toBe(66.6667);
+    expect(result.nilaiKanwil).toBe(33.3333);
+  });
+
+  it("returns 100 when every CK checklist is NA", () => {
+    const result = calculateCKScoreFromRows([
+      { kppn_score: 10, kanwil_score: 10, excluded: 1 },
+      { kppn_score: 10, kanwil_score: 10, excluded: 1 },
+    ]);
+
+    expect(result.nilaiKPPN).toBe(100);
+    expect(result.nilaiKanwil).toBe(100);
+    expect(result.detailKPPN.jumlahChecklistPembagi).toBe(2);
   });
 });

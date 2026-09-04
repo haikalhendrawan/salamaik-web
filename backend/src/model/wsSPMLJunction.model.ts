@@ -31,6 +31,7 @@ export interface WsSPMLJunctionType{
   updated_by: string | null,
   excluded: number,
   link_file: string | null,
+  kanwil_note: string | null,
   comment_count: number,
 };
 
@@ -191,6 +192,24 @@ class WsSPMLJunction {
                  RETURNING *`;
       const result = await pool.query(q, [kanwilScore, excluded, userName, junctionId, worksheetId]);
       return result.rows;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async editWsSPMLJunctionKanwilNote(
+    junctionId: number,
+    worksheetId: string,
+    kanwilNote: string | null,
+    userName: string
+  ): Promise<WsSPMLJunctionType | undefined> {
+    try {
+      const q = `UPDATE worksheet_spml_junction
+                 SET kanwil_note = $1, last_update = CURRENT_TIMESTAMP, updated_by = $2
+                 WHERE junction_id = $3 AND worksheet_id = $4
+                 RETURNING *`;
+      const result = await pool.query(q, [kanwilNote, userName, junctionId, worksheetId]);
+      return result.rows[0];
     } catch (err) {
       throw err;
     }

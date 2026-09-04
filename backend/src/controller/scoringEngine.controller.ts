@@ -60,4 +60,31 @@ const getAllKPPNSPMLScoresByPeriod = async (
   }
 };
 
-export { getSPMLScore, getAllKPPNSPMLScoresByPeriod };
+const getCKScore = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const worksheetCKId = req.params.worksheetCKId?.trim();
+
+    if (!worksheetCKId) {
+      throw new ErrorDetail(400, "worksheetCKId is required");
+    }
+
+    const calculation = await scoringEngine.calculateCKScore(worksheetCKId);
+    if (!calculation) {
+      throw new ErrorDetail(404, "CK worksheet not found");
+    }
+
+    if (!canAccessWorksheet(req.payload?.kppn, calculation.kppnId)) {
+      throw new ErrorDetail(403, "Not authorized to access this CK worksheet score");
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "CK worksheet score calculated successfully",
+      rows: calculation.result,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export { getSPMLScore, getAllKPPNSPMLScoresByPeriod, getCKScore };

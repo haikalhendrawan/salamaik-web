@@ -19,4 +19,11 @@ router.get(
 
 router.get("/spml/:worksheetSPMLId", authenticate, authorize([99, 4, 3, 2, 1]), scoringEngineController.getSPMLScore);
 
+router.get(
+  "/ck/:worksheetCKId",
+  authenticate,
+  authorize([99, 4, 3, 2, 1]),
+  scoringEngineController.getCKScore
+);
+
 export default router;

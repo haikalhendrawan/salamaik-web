@@ -36,6 +36,12 @@ interface KPPNScoreEventData {
   excluded: number;
 }
 
+interface KanwilNoteEventData {
+  worksheetId: string;
+  junctionId: number;
+  kanwilNote: string;
+}
+
 interface LinkFileEventData {
   worksheetId: string;
   junctionId: number;
@@ -52,6 +58,8 @@ const isValidSPMLScore = (score: number) =>
   Number.isFinite(score) && (score === 0 || score === 10);
 
 const isValidExcluded = (excluded: number) => excluded === 0 || excluded === 1;
+
+const KANWIL_ROLES = [99, 4, 3];
 
 const canAccessJunction = (requesterKppn: string | undefined, junctionKppn: string | null) =>
   requesterKppn?.length === 5 || requesterKppn === junctionKppn;
@@ -217,6 +225,75 @@ class WsSPMLJunctionEvent {
     }
   }
 
+  async updateKanwilNote(
+    socket: Socket,
+    data: KanwilNoteEventData,
+    callback: SocketCallback
+  ) {
+    try {
+      const { name, username, role } = socket.data.payload;
+      const { worksheetId, junctionId, kanwilNote } = data;
+
+      if (!KANWIL_ROLES.includes(role)) {
+        return socketError(callback, "Not authorized to update SPML Kanwil note");
+      }
+      if (
+        typeof worksheetId !== "string" ||
+        !worksheetId.trim() ||
+        !Number.isInteger(junctionId) ||
+        junctionId <= 0 ||
+        typeof kanwilNote !== "string" ||
+        kanwilNote.length > 5000
+      ) {
+        return socketError(callback, "Invalid SPML Kanwil note data");
+      }
+
+      const junction = await wsSPMLJunction.getWsSPMLJunctionByJunctionId(junctionId);
+      if (!junction || junction.worksheet_id !== worksheetId) {
+        return socketError(callback, "SPML worksheet junction not found");
+      }
+      if (!canAccessJunction(socket.data.payload.kppn, junction.kppn_id)) {
+        return socketError(callback, "Not authorized to update this SPML worksheet");
+      }
+
+      const normalizedNote = kanwilNote.trim() || null;
+      const result = await wsSPMLJunction.editWsSPMLJunctionKanwilNote(
+        junctionId,
+        worksheetId,
+        normalizedNote,
+        name
+      );
+      if (!result) {
+        return socketError(callback, "SPML worksheet junction not found");
+      }
+
+      const room = getSPMLWorksheetRoom(worksheetId);
+      socket.to(room).emit("spmlKanwilNoteHasUpdated", {
+        worksheetId,
+        junctionId,
+        kanwilNote: normalizedNote,
+      });
+      socket.to(room).emit(
+        "spmlWorksheetChanged",
+        createSPMLChangedEvent(worksheetId, junctionId, "note", username)
+      );
+
+      nonBlockingCall(
+        activity.createActivity(
+          username,
+          86,
+          socket.handshake.address,
+          `SPML worksheetId: ${worksheetId}, junctionId: ${junctionId}`
+        )
+      );
+
+      return callback({ success: true, rows: result, message: "Catatan Kanwil SPML has been updated" });
+    } catch (err: unknown) {
+      logger.error(err);
+      return socketError(callback, err instanceof Error ? err.message : "Unknown error");
+    }
+  }
+
   async updateLinkFile(
     socket: Socket,
     data: LinkFileEventData,
@@ -363,6 +440,9 @@ export default function wsSPMLJunctionEventListener(socket: Socket) {
   );
   socket.on("updateSPMLKPPNScore", (data, callback) =>
     wsSPMLEvent.updateKPPNScore(socket, data, callback)
+  );
+  socket.on("updateSPMLKanwilNote", (data, callback) =>
+    wsSPMLEvent.updateKanwilNote(socket, data, callback)
   );
   socket.on("updateSPMLLinkFile", (data, callback) =>
     wsSPMLEvent.updateLinkFile(socket, data, callback)

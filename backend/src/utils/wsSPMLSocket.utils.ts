@@ -1,5 +1,6 @@
 export type SPMLChangeType =
   | "score"
+  | "note"
   | "link"
   | "file-upload"
   | "file-delete"
