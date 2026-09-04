@@ -50,6 +50,21 @@ export interface CKProgressType {
   jumlahChecklistDiisiKanwil: number;
 }
 
+export interface CKScoreDetail {
+  jumlahChecklist: number;
+  jumlahChecklistDiisi: number;
+  jumlahNA: number;
+  jumlahChecklistPembagi: number;
+  totalSkorKonversi: number;
+}
+
+export interface CKScoreType {
+  nilaiKPPN: number;
+  nilaiKanwil: number;
+  detailKPPN: CKScoreDetail;
+  detailKanwil: CKScoreDetail;
+}
+
 export type CKChangeType =
   | 'score'
   | 'note'
@@ -74,5 +89,6 @@ export interface CKSyncTarget {
 
 export interface WsCKRefreshOptions {
   showOverlay?: boolean;
+  refreshScore?: boolean;
   syncTargets?: CKSyncTarget[];
 }

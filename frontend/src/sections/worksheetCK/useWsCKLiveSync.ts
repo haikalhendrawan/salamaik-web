@@ -23,6 +23,7 @@ export default function useWsCKLiveSync(worksheetId: string | undefined, kppnId:
       pendingChanges.clear();
       void refreshRef.current(kppnId, {
         showOverlay: false,
+        refreshScore: changes.some(({ changeType }) => changeType === 'score'),
         syncTargets: changes.map(({ junctionId, changeType }) => ({ junctionId, changeType })),
       });
     }, 250);

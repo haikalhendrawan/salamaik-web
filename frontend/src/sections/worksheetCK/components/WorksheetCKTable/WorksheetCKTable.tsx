@@ -13,10 +13,12 @@ import {
 import { styled } from '@mui/material/styles';
 import { useAuth } from '../../../../hooks/useAuth';
 import formatOrderedTitle from '../../../../utils/formatOrderedTitle';
-import { WsCKJunctionType } from '../../types';
+import { CKScoreType, WsCKJunctionType } from '../../types';
 import CommentActionCK from './components/CommentActionCK';
 import FileActionsCK from './components/FileActionsCK';
 import ScoreSelectCK from './components/ScoreSelectCK';
+import ScoreFooterCellCK from './components/ScoreFooterCellCK';
+import KanwilNoteCK from './components/KanwilNoteCK';
 
 const HEADERS = [
   'No',
@@ -25,6 +27,7 @@ const HEADERS = [
   'Dokumen',
   'Nilai KPPN',
   'Nilai Kanwil',
+  'Catatan Kanwil',
   'Comment',
 ];
 
@@ -39,14 +42,18 @@ const BodyCell = styled(TableCell)(({ theme }) => ({
   wordBreak: 'break-word',
 }));
 
-const COLUMN_WIDTHS = ['4%', '18%', '23%', '20%', '10%', '10%', '8%'];
+const COLUMN_WIDTHS = ['4%', '15%', '20%', '17%', '9%', '9%', '20%', '6%'];
 
 export default function WorksheetCKTable({
   rows,
   isPastDue,
+  ckScore,
+  isScoreLoading,
 }: {
   rows: WsCKJunctionType[];
   isPastDue: boolean;
+  ckScore: CKScoreType | null;
+  isScoreLoading: boolean;
 }) {
   const { auth } = useAuth();
   const isKanwil = auth?.kppn?.length === 5;
@@ -69,7 +76,7 @@ export default function WorksheetCKTable({
             {HEADERS.map((header, index) => (
               <TableCell
                 key={header}
-                align={[0, 4, 5, 6].includes(index) ? 'center' : 'left'}
+                align={[0, 4, 5, 7].includes(index) ? 'center' : 'left'}
                 sx={{
                   bgcolor: 'primary.main',
                   color: 'common.white',
@@ -91,7 +98,7 @@ export default function WorksheetCKTable({
               <Fragment key={component.komponen_ck_id}>
                 <TableRow>
                   <TableCell
-                    colSpan={7}
+                    colSpan={8}
                     sx={{ bgcolor: 'grey.200', color: 'text.primary', fontWeight: 700, fontSize: 12 }}
                   >
                     {formatOrderedTitle(component.komponen_urut, component.komponen_title)}
@@ -125,6 +132,9 @@ export default function WorksheetCKTable({
                     <BodyCell align="center">
                       <ScoreSelectCK checklist={row} scoreType="kanwil" disabled={!isKanwil || isPastDue} />
                     </BodyCell>
+                    <BodyCell>
+                      <KanwilNoteCK checklist={row} isPastDue={isPastDue} />
+                    </BodyCell>
                     <BodyCell align="center">
                       <CommentActionCK
                         junctionId={row.junction_id}
@@ -139,7 +149,7 @@ export default function WorksheetCKTable({
           })}
           {rows.length === 0 && (
             <TableRow>
-              <TableCell colSpan={7} align="center" sx={{ fontSize: 12 }}>
+              <TableCell colSpan={8} align="center" sx={{ fontSize: 12 }}>
                 Data worksheet CK belum tersedia.
               </TableCell>
             </TableRow>
@@ -148,11 +158,41 @@ export default function WorksheetCKTable({
         <TableFooter>
           <TableRow>
             <TableCell colSpan={4} align="center" sx={{ bgcolor: 'grey.200', fontWeight: 700, color: 'text.primary' }}>
+              Total Nilai
+            </TableCell>
+            <ScoreFooterCellCK
+              value={ckScore?.detailKPPN.totalSkorKonversi}
+              detail={ckScore?.detailKPPN}
+              loading={isScoreLoading}
+              label="KPPN"
+            />
+            <ScoreFooterCellCK
+              value={ckScore?.detailKanwil.totalSkorKonversi}
+              detail={ckScore?.detailKanwil}
+              loading={isScoreLoading}
+              label="Kanwil"
+            />
+            <TableCell colSpan={2} sx={{ bgcolor: 'grey.200' }} />
+          </TableRow>
+          <TableRow>
+            <TableCell colSpan={4} align="center" sx={{ bgcolor: 'grey.200', fontWeight: 700, color: 'text.primary' }}>
               Nilai Kertas Kerja CK
             </TableCell>
-            <TableCell align="center" sx={{ bgcolor: 'grey.200', fontWeight: 700, color: 'text.primary' }}>-</TableCell>
-            <TableCell align="center" sx={{ bgcolor: 'grey.200', fontWeight: 700, color: 'text.primary' }}>-</TableCell>
-            <TableCell sx={{ bgcolor: 'grey.200' }} />
+            <ScoreFooterCellCK
+              value={ckScore?.nilaiKPPN}
+              detail={ckScore?.detailKPPN}
+              loading={isScoreLoading}
+              label="KPPN"
+              decimals={2}
+            />
+            <ScoreFooterCellCK
+              value={ckScore?.nilaiKanwil}
+              detail={ckScore?.detailKanwil}
+              loading={isScoreLoading}
+              label="Kanwil"
+              decimals={2}
+            />
+            <TableCell colSpan={2} sx={{ bgcolor: 'grey.200' }} />
           </TableRow>
         </TableFooter>
       </Table>

@@ -36,7 +36,7 @@ export default function PreviewFileCKModal({ disabled }: { disabled: boolean }) 
           openSnackbar(response?.message || 'Gagal menghapus file CK', 'error');
           return;
         }
-        await getWsCKJunction(kppnId, { showOverlay: false });
+        await getWsCKJunction(kppnId, { showOverlay: false, refreshScore: false });
         closePreview();
         openSnackbar('File CK berhasil dihapus', 'success');
       }

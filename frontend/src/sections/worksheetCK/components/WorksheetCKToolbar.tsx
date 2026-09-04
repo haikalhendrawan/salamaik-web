@@ -6,6 +6,7 @@ import useLoading from '../../../hooks/display/useLoading';
 import useSnackbar from '../../../hooks/display/useSnackbar';
 import useExcelWorksheetCK from '../../excel/useExcelWorksheetCK';
 import { WsCKJunctionType } from '../types';
+import useWsCKJunction from '../useWsCKJunction';
 
 function Progress({ completed, total }: { completed: number; total: number }) {
   const value = total ? (completed / total) * 100 : 0;
@@ -32,7 +33,8 @@ export default function WorksheetCKToolbar({
 }) {
   const { setIsLoading } = useLoading();
   const { openSnackbar } = useSnackbar();
-  const excel = useExcelWorksheetCK({ rows, kppnName });
+  const { ckScore } = useWsCKJunction();
+  const excel = useExcelWorksheetCK({ rows, kppnName, ckScore });
   const progress = useMemo(() => ({
     total: rows.length,
     kppn: rows.filter((row) => row.kppn_score !== null || row.excluded === 1).length,

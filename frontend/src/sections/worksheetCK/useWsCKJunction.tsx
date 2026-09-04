@@ -7,6 +7,7 @@ import useLoading from '../../hooks/display/useLoading';
 import { WorksheetType } from '../worksheet/types';
 import {
   CKChangeType,
+  CKScoreType,
   CKSyncTarget,
   CKWorksheetChangedEvent,
   WsCKJunctionType,
@@ -16,11 +17,15 @@ import {
 interface WsCKJunctionContextType {
   wsCKJunction: WsCKJunctionType[];
   wsDetail: WorksheetType | null;
+  ckScore: CKScoreType | null;
+  isScoreLoading: boolean;
   lastLiveChange: CKWorksheetChangedEvent | null;
   lastRefreshedAt: Date | null;
   setWsCKJunction: React.Dispatch<React.SetStateAction<WsCKJunctionType[]>>;
   getWsCKJunction: (kppnId: string, options?: WsCKRefreshOptions) => Promise<void>;
   getWorksheet: (kppnId: string) => Promise<void>;
+  getCKScore: (worksheetCKId: string) => Promise<void>;
+  resetCKScore: () => void;
   setLastLiveChange: React.Dispatch<React.SetStateAction<CKWorksheetChangedEvent | null>>;
   isJunctionSyncing: (junctionId: number, changeTypes?: CKChangeType[]) => boolean;
 }
@@ -28,11 +33,15 @@ interface WsCKJunctionContextType {
 const WsCKJunctionContext = createContext<WsCKJunctionContextType>({
   wsCKJunction: [],
   wsDetail: null,
+  ckScore: null,
+  isScoreLoading: false,
   lastLiveChange: null,
   lastRefreshedAt: null,
   setWsCKJunction: () => {},
   getWsCKJunction: async () => {},
   getWorksheet: async () => {},
+  getCKScore: async () => {},
+  resetCKScore: () => {},
   setLastLiveChange: () => {},
   isJunctionSyncing: () => false,
 });
@@ -44,10 +53,14 @@ function WsCKJunctionProvider({ children }: { children: ReactNode }) {
   const { setIsLoading } = useLoading();
   const [wsCKJunction, setWsCKJunction] = useState<WsCKJunctionType[]>([]);
   const [wsDetail, setWsDetail] = useState<WorksheetType | null>(null);
+  const [ckScore, setCkScore] = useState<CKScoreType | null>(null);
+  const [isScoreLoading, setIsScoreLoading] = useState(false);
   const [lastLiveChange, setLastLiveChange] = useState<CKWorksheetChangedEvent | null>(null);
   const [lastRefreshedAt, setLastRefreshedAt] = useState<Date | null>(null);
   const [syncingJunctions, setSyncingJunctions] = useState<Record<number, CKChangeType[]>>({});
   const requestId = useRef(0);
+  const scoreRequestId = useRef(0);
+  const scoreRefreshPending = useRef(false);
   const syncCounts = useRef<Record<string, number>>({});
 
   const showError = (error: unknown) => {
@@ -57,6 +70,33 @@ function WsCKJunctionProvider({ children }: { children: ReactNode }) {
     }
     openSnackbar(error instanceof Error ? error.message : 'Unknown error', 'error');
   };
+
+  async function getCKScore(worksheetCKId: string) {
+    if (!worksheetCKId) return;
+
+    const currentRequest = ++scoreRequestId.current;
+    setIsScoreLoading(true);
+    try {
+      const response = await axiosJWT.get(
+        `/scoringEngine/ck/${encodeURIComponent(worksheetCKId)}`
+      );
+      if (currentRequest === scoreRequestId.current) {
+        setCkScore(response.data.rows);
+      }
+    } catch (error: unknown) {
+      if (currentRequest === scoreRequestId.current) showError(error);
+    } finally {
+      if (currentRequest === scoreRequestId.current) setIsScoreLoading(false);
+    }
+  }
+
+  function resetCKScore() {
+    scoreRequestId.current += 1;
+    scoreRefreshPending.current = false;
+    setCkScore(null);
+    setIsScoreLoading(false);
+    setLastRefreshedAt(null);
+  }
 
   const addSyncTargets = (targets: CKSyncTarget[]) => {
     if (!targets.length) return;
@@ -99,8 +139,9 @@ function WsCKJunctionProvider({ children }: { children: ReactNode }) {
   };
 
   async function getWsCKJunction(kppnId: string, options: WsCKRefreshOptions = {}) {
-    const { showOverlay = true, syncTargets = [] } = options;
+    const { showOverlay = true, refreshScore = true, syncTargets = [] } = options;
     const currentRequest = ++requestId.current;
+    if (refreshScore) scoreRefreshPending.current = true;
     if (showOverlay) setIsLoading(true);
     addSyncTargets(syncTargets);
     try {
@@ -109,8 +150,21 @@ function WsCKJunctionProvider({ children }: { children: ReactNode }) {
         ? `/wsCKJunction/getWsCKJunctionByWorksheetForKanwil?kppn=${encodeURIComponent(kppnId)}&time=${Date.now()}`
         : `/wsCKJunction/getWsCKJunctionByWorksheetForKPPN?time=${Date.now()}`;
       const response = await axiosJWT.get(endpoint);
+      const rows: WsCKJunctionType[] = response.data.rows;
       if (currentRequest === requestId.current) {
-        setWsCKJunction(response.data.rows);
+        setWsCKJunction(rows);
+      }
+      if (
+        currentRequest === requestId.current &&
+        scoreRefreshPending.current &&
+        rows[0]?.worksheet_id
+      ) {
+        await getCKScore(rows[0].worksheet_id);
+        if (currentRequest === requestId.current) scoreRefreshPending.current = false;
+      } else if (currentRequest === requestId.current && rows.length === 0) {
+        setCkScore(null);
+      }
+      if (currentRequest === requestId.current) {
         setLastRefreshedAt(new Date());
       }
     } catch (error: unknown) {
@@ -120,7 +174,7 @@ function WsCKJunctionProvider({ children }: { children: ReactNode }) {
       removeSyncTargets(syncTargets);
       if (showOverlay) setIsLoading(false);
     }
-  };
+  }
 
   async function getWorksheet(kppnId: string) {
     setIsLoading(true);
@@ -133,18 +187,22 @@ function WsCKJunctionProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }
 
   return (
     <WsCKJunctionContext.Provider
       value={{
         wsCKJunction,
         wsDetail,
+        ckScore,
+        isScoreLoading,
         lastLiveChange,
         lastRefreshedAt,
         setWsCKJunction,
         getWsCKJunction,
         getWorksheet,
+        getCKScore,
+        resetCKScore,
         setLastLiveChange,
         isJunctionSyncing,
       }}

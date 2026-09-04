@@ -47,6 +47,7 @@ export default function useExcelWorksheetSPML({
       komponenRef,
       subKomponenRef,
       aspekRef,
+      kppnName,
       spmlScore
     );
     createScoreSheet(
@@ -57,6 +58,7 @@ export default function useExcelWorksheetSPML({
       komponenRef,
       subKomponenRef,
       aspekRef,
+      kppnName,
       spmlScore
     );
 
@@ -87,6 +89,7 @@ function createScoreSheet(
   komponenRef: KomponenSpmlRefType[] | null,
   subKomponenRef: SubKomponenSpmlRefType[] | null,
   aspekRef: AspekSpmlRefType[] | null,
+  kppnName: string,
   spmlScore: SPMLScoreType | null
 ) {
   const sheet = workbook.addWorksheet(sheetName, {
@@ -103,6 +106,7 @@ function createScoreSheet(
     { key: 'nilaiKonversi', header: 'Nilai Konversi', width: 16 },
   ];
   styleHeader(sheet.getRow(1));
+  let checklistNumber = 0;
 
   komponenRef?.forEach((komponen) => {
     const komponenRows = rows.filter((item) => item.komponen_spml_id === komponen.id);
@@ -131,7 +135,16 @@ function createScoreSheet(
             if (aspekRows.length === 0) return;
 
             const startRow = sheet.rowCount + 1;
-            aspekRows.forEach((junction) => addChecklistRow(sheet, junction, scoreType));
+            aspekRows.forEach((junction) => {
+              checklistNumber += 1;
+              addChecklistRow(
+                sheet,
+                junction,
+                scoreType,
+                kppnName,
+                checklistNumber
+              );
+            });
             const endRow = sheet.rowCount;
 
             sheet.getCell(`A${startRow}`).value = aspek.urut;
@@ -202,7 +215,9 @@ function addMergedSectionRow(sheet: ExcelJS.Worksheet, title: string, color: str
 function addChecklistRow(
   sheet: ExcelJS.Worksheet,
   junction: WsSPMLJunctionType,
-  scoreType: ScoreType
+  scoreType: ScoreType,
+  kppnName: string,
+  checklistNumber: number
 ) {
   const score = scoreType === 'kanwil' ? junction.kanwil_score : junction.kppn_score;
   const displayScore = junction.excluded === 1 ? 'N/A' : score ?? '';
@@ -225,35 +240,53 @@ function addChecklistRow(
     };
   });
 
-  setLinkEvidenceCell(row, junction);
+  setLinkEvidenceCell(row, junction, kppnName, checklistNumber);
 }
 
-function setLinkEvidenceCell(row: ExcelJS.Row, junction: WsSPMLJunctionType) {
+function setLinkEvidenceCell(
+  row: ExcelJS.Row,
+  junction: WsSPMLJunctionType,
+  kppnName: string,
+  checklistNumber: number
+) {
   const cell = row.getCell(5);
-  const urls: string[] = [];
+  const links: { url: string; suffix: string }[] = [];
   const apiUrl = import.meta.env.VITE_API_URL.replace(/\/+$/, '');
+  const baseLabel = createEvidenceLabel(checklistNumber, kppnName);
 
   cell.border = BORDER;
 
   if (junction.file_1) {
-    urls.push(`${apiUrl}/worksheet/${junction.file_1}`);
+    links.push({
+      url: `${apiUrl}/worksheet/${junction.file_1}`,
+      suffix: 'File_Server',
+    });
   }
   if (junction.link_file?.trim()) {
     const externalLink = junction.link_file.trim();
-    urls.push(/^https?:\/\//i.test(externalLink) ? externalLink : `https://${externalLink}`);
+    links.push({
+      url: /^https?:\/\//i.test(externalLink) ? externalLink : `https://${externalLink}`,
+      suffix: 'Link_Eksternal',
+    });
   }
 
-  const displayText = urls.map(formatUrlForDisplay).join('\n\n');
+  const displayText = links.length === 1
+    ? baseLabel
+    : links.map((link) => `${baseLabel}_${link.suffix}`).join('\n\n');
   cell.alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
 
-  if (urls.length === 1) {
-    cell.value = { text: displayText, hyperlink: urls[0], tooltip: urls[0] };
+  if (links.length === 1) {
+    cell.value = { text: displayText, hyperlink: links[0].url, tooltip: links[0].url };
     cell.font = { name: 'Aptos', size: 10, color: { argb: 'FF0563C1' }, underline: true };
     return;
   }
 
-  if (urls.length > 1) {
-    cell.value = { text: displayText, hyperlink: urls[0], tooltip: urls.join('\n\n') };
+  if (links.length > 1) {
+    cell.value = {
+      text: displayText,
+      hyperlink: links[0].url,
+      tooltip: links.map((link) => link.url).join('\n\n'),
+    };
     cell.font = { name: 'Aptos', size: 10, color: { argb: 'FF0563C1' }, underline: true };
   }
 }
@@ -285,6 +318,13 @@ function addFooterRow(
   row.getCell(7).numFmt = numberFormat;
 }
 
-function formatUrlForDisplay(url: string) {
-  return url.match(/.{1,45}/g)?.join('\n') || url;
+function createEvidenceLabel(checklistNumber: number, kppnName: string) {
+  const normalizedKppnName = (kppnName || 'KPPN')
+    .trim()
+    .replace(/^KPPN[\s_-]+/i, '')
+    .replace(/[^a-zA-Z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '') || 'KPPN';
+  const formattedNumber = String(checklistNumber).padStart(2, '0');
+
+  return `SPML${formattedNumber}_KPPN_${normalizedKppnName}`;
 }

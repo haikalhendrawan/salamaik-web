@@ -10,6 +10,7 @@ export interface WsSPMLJunctionType {
   updated_by: string | null;
   excluded: number;
   link_file: string | null;
+  kanwil_note: string | null;
   comment_count: number;
   id: number;
   title: string | null;
@@ -45,6 +46,7 @@ export interface AllKPPNSPMLScoreType extends SPMLScoreType {
 
 export type SPMLChangeType =
   | 'score'
+  | 'note'
   | 'link'
   | 'file-upload'
   | 'file-delete'

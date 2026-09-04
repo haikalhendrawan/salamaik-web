@@ -20,6 +20,7 @@ import { SPMLScoreType, WsSPMLJunctionType } from '../../types';
 import formatOrderedTitle from '../../../../utils/formatOrderedTitle';
 import CommentAction from './components/CommentAction';
 import ScoreFooterCell from './components/ScoreFooterCell';
+import KanwilNote from './components/KanwilNote';
 //-----------------------------------------------------------------------------------------------------------------
 const TABLE_HEAD = [
   { id: 'no', label: 'No', alignRight: false },
@@ -28,6 +29,7 @@ const TABLE_HEAD = [
   { id: 'nilai', label: 'Nilai KPPN', alignRight: false },
   { id: 'nilai_k', label: 'Nilai Kanwil', alignRight: false },
   { id: 'dokumen', label: 'Dokumen Dukung', alignRight: false },
+  { id: 'catatan_kanwil', label: 'Catatan Kanwil', alignRight: false },
   {id: 'comment', label: 'Comment', alignRight: false},
 ];
 
@@ -57,7 +59,7 @@ export default function WorksheetSPMLTable({
     TABLE_HEAD.map((headCell) => (
       <TableCell
         key={headCell.id}
-        align={headCell.id === 'no' ? 'center' : 'left'}
+        align={['no', 'comment'].includes(headCell.id) ? 'center' : 'left'}
         sx={{
           backgroundColor: 'primary.main',
           color: 'common.white',
@@ -118,6 +120,9 @@ export default function WorksheetSPMLTable({
               <FileActions checklist={checklist0} isPastDue={isPastDue} />
             </StyledTableCell>
             <StyledTableCell>
+              <KanwilNote checklist={checklist0} isPastDue={isPastDue} />
+            </StyledTableCell>
+            <StyledTableCell sx={{ textAlign: 'center' }}>
               <CommentAction
                 wsSPMLJunctionId={checklist0.junction_id}
                 initialCommentCount={Number(checklist0.comment_count) || 0}
@@ -145,6 +150,9 @@ export default function WorksheetSPMLTable({
                   <FileActions checklist={item} isPastDue={isPastDue} />
                 </StyledTableCell>
                 <StyledTableCell>
+                  <KanwilNote checklist={item} isPastDue={isPastDue} />
+                </StyledTableCell>
+                <StyledTableCell sx={{ textAlign: 'center' }}>
                   <CommentAction
                     wsSPMLJunctionId={item.junction_id}
                     initialCommentCount={Number(item.comment_count) || 0}
@@ -169,7 +177,7 @@ export default function WorksheetSPMLTable({
           >
             <TableCell
               align="left"
-              colSpan={7}
+              colSpan={8}
               sx={{
                 backgroundColor: theme.palette.text.main,
                 color: theme.palette.text.main,
@@ -197,7 +205,7 @@ export default function WorksheetSPMLTable({
           >
             <TableCell
               align="left"
-              colSpan={7}
+              colSpan={8}
               sx={{
                 backgroundColor: theme.palette.background.default,
                 color: theme.palette.text.primary,
@@ -243,7 +251,7 @@ export default function WorksheetSPMLTable({
                 loading={isScoreLoading}
                 label="Kanwil"
               />
-              <TableCell colSpan={2} sx={{ backgroundColor: 'background.default' }} />
+              <TableCell colSpan={3} sx={{ backgroundColor: 'background.default' }} />
             </TableRow>
             <TableRow>
               <TableCell
@@ -264,7 +272,7 @@ export default function WorksheetSPMLTable({
                 loading={isScoreLoading}
                 label="Kanwil"
               />
-              <TableCell colSpan={2} sx={{ backgroundColor: 'background.default' }} />
+              <TableCell colSpan={3} sx={{ backgroundColor: 'background.default' }} />
             </TableRow>
           </TableFooter>
         </Table>

@@ -1,6 +1,6 @@
 import ExcelJS from 'exceljs';
 import formatOrderedTitle from '../../utils/formatOrderedTitle';
-import { WsCKJunctionType } from '../worksheetCK/types';
+import { CKScoreType, WsCKJunctionType } from '../worksheetCK/types';
 
 type ScoreOwner = 'kppn' | 'kanwil';
 
@@ -14,17 +14,19 @@ const BORDER: Partial<ExcelJS.Borders> = {
 export default function useExcelWorksheetCK({
   rows,
   kppnName,
+  ckScore,
 }: {
   rows: WsCKJunctionType[];
   kppnName: string;
+  ckScore: CKScoreType | null;
 }) {
   const generate = async () => {
     const workbook = new ExcelJS.Workbook();
     workbook.creator = 'Salamaik Web';
     workbook.created = new Date();
 
-    createSheet(workbook, 'Nilai Versi Kanwil', 'kanwil', rows, kppnName);
-    createSheet(workbook, 'Nilai Versi KPPN', 'kppn', rows, kppnName);
+    createSheet(workbook, 'Nilai Versi Kanwil', 'kanwil', rows, kppnName, ckScore);
+    createSheet(workbook, 'Nilai Versi KPPN', 'kppn', rows, kppnName, ckScore);
 
     const buffer = await workbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], {
@@ -48,7 +50,8 @@ function createSheet(
   name: string,
   owner: ScoreOwner,
   rows: WsCKJunctionType[],
-  kppnName: string
+  kppnName: string,
+  ckScore: CKScoreType | null
 ) {
   const sheet = workbook.addWorksheet(name, { views: [{ state: 'frozen', ySplit: 2 }] });
   sheet.columns = [
@@ -98,8 +101,10 @@ function createSheet(
     componentRows.forEach((junction) => addChecklistRow(sheet, junction, owner));
   });
 
-  addFooter(sheet, 'Total Nilai');
-  addFooter(sheet, 'Rata-Rata Total Nilai');
+  const detail = owner === 'kanwil' ? ckScore?.detailKanwil : ckScore?.detailKPPN;
+  const finalScore = owner === 'kanwil' ? ckScore?.nilaiKanwil : ckScore?.nilaiKPPN;
+  addFooter(sheet, 'Total Nilai', detail?.totalSkorKonversi);
+  addFooter(sheet, 'Rata-Rata Total Nilai', finalScore, '0.00');
   return sheet;
 }
 
@@ -196,8 +201,13 @@ function estimateRowHeight(row: ExcelJS.Row) {
   return Math.min(Math.max(lines * 13, 22), 240);
 }
 
-function addFooter(sheet: ExcelJS.Worksheet, label: string) {
-  const row = sheet.addRow([label, '', '', '', '', '', null]);
+function addFooter(
+  sheet: ExcelJS.Worksheet,
+  label: string,
+  value: number | undefined,
+  numberFormat?: string
+) {
+  const row = sheet.addRow([label, '', '', '', '', '', value ?? null]);
   sheet.mergeCells(`A${row.number}:F${row.number}`);
   for (let column = 1; column <= 7; column += 1) {
     const cell = row.getCell(column);
@@ -206,6 +216,7 @@ function addFooter(sheet: ExcelJS.Worksheet, label: string) {
     cell.font = { bold: true, name: 'Calibri', size: 11 };
     cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
   }
+  if (numberFormat) row.getCell(7).numFmt = numberFormat;
   row.height = 24;
 }
 

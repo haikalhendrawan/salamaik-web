@@ -89,7 +89,10 @@ export default function LinkFilePopoverCK({
             openSnackbar(response?.message || 'Gagal menyimpan link CK', 'error');
             return;
           }
-          await getWsCKJunction(checklist.kppn_id, { showOverlay: false });
+          await getWsCKJunction(checklist.kppn_id, {
+            showOverlay: false,
+            refreshScore: false,
+          });
           setValue(nextValue);
           setEditing(false);
           openSnackbar(nextValue ? 'Link berhasil disimpan' : 'Link berhasil dihapus', 'success');

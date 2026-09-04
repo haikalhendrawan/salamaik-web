@@ -54,7 +54,10 @@ export default function FileActionsCK({ checklist, disabled }: FileActionsCKProp
       await axiosJWT.post('/wsCKJunction/editWsCKJunctionFile', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      await getWsCKJunction(checklist.kppn_id, { showOverlay: false });
+      await getWsCKJunction(checklist.kppn_id, {
+        showOverlay: false,
+        refreshScore: false,
+      });
       openSnackbar('File CK berhasil diunggah', 'success');
     } catch (error: unknown) {
       openSnackbar(error instanceof Error ? error.message : 'Gagal mengunggah file CK', 'error');

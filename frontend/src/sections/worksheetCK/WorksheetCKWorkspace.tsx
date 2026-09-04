@@ -23,7 +23,17 @@ export default function WorksheetCKWorkspace() {
   const requestedId = params.get('id') || '';
   const selectedKppnId = requestedId || auth?.kppn || '';
   const selectedKppnName = KPPN_NAMES[selectedKppnId] || selectedKppnId;
-  const { wsCKJunction, wsDetail, lastRefreshedAt, setWsCKJunction, getWsCKJunction, getWorksheet } = useWsCKJunction();
+  const {
+    wsCKJunction,
+    wsDetail,
+    ckScore,
+    isScoreLoading,
+    lastRefreshedAt,
+    setWsCKJunction,
+    getWsCKJunction,
+    getWorksheet,
+    resetCKScore,
+  } = useWsCKJunction();
   const activeWorksheetId = wsCKJunction[0]?.worksheet_id;
   const closeTime = wsDetail?.close_period ? new Date(wsDetail.close_period).getTime() : Number.POSITIVE_INFINITY;
   const isPastDue = Date.now() > closeTime;
@@ -31,6 +41,7 @@ export default function WorksheetCKWorkspace() {
   useWsCKLiveSync(activeWorksheetId, selectedKppnId);
 
   useEffect(() => {
+    resetCKScore();
     setWsCKJunction([]);
     void getWorksheet(selectedKppnId);
     void getWsCKJunction(selectedKppnId);
@@ -54,7 +65,12 @@ export default function WorksheetCKWorkspace() {
       <WorksheetCKToolbar rows={wsCKJunction} kppnName={selectedKppnName} lastRefreshedAt={lastRefreshedAt} />
       <Card sx={{ mx: 4 }}>
         <CardHeader title={<Typography variant="h6" textAlign="center" sx={{ mb: 2 }}>Kertas Kerja Capaian Kinerja</Typography>} />
-        <WorksheetCKTable rows={wsCKJunction} isPastDue={isPastDue} />
+        <WorksheetCKTable
+          rows={wsCKJunction}
+          isPastDue={isPastDue}
+          ckScore={ckScore}
+          isScoreLoading={isScoreLoading}
+        />
       </Card>
       <PreviewFileCKModal disabled={isPastDue} />
       <NavigationDrawerCK rows={wsCKJunction} onNavigate={scrollToChecklist} />
