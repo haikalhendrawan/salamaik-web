@@ -5,14 +5,14 @@
 
 import {useState} from 'react';
 import { Link } from "react-router-dom";
+import { isAxiosError } from 'axios';
 import useAxiosJWT from '../../../hooks/useAxiosJWT';
-import useExcelWorksheet from '../../excel/useExcelWorksheet';
-import useExcelWorksheet2 from '../../excel/useExcelWorksheet2';
+import { generateExcelWorksheetSPML } from '../../excel/useExcelWorksheetSPML';
 // @mui
-import {Card, Box, CardHeader, Grow, Button,  Grid,  Skeleton, Stack, Typography, Tooltip, IconButton} from '@mui/material';
+import {Card, Box, CardHeader, Grow, Button, CircularProgress, Grid, Skeleton, Stack, Typography, Tooltip, IconButton} from '@mui/material';
 import Iconify from '../../../components/iconify';
 import useDictionary from '../../../hooks/useDictionary';
-import { useAuth } from '../../../hooks/useAuth';
+import useSnackbar from '../../../hooks/display/useSnackbar';
 // -----------------------------------------------------------------------
 interface KPPNSelectionCardProps{
   header: string;
@@ -24,6 +24,7 @@ interface KPPNSelectionCardProps{
   completedKPPN: number;
   totalChecklist: number;
   kppnId: string;
+  worksheetSPMLId: string;
 }
 // -----------------------------------------------------------------------
 export default function KPPNSelectionCard({
@@ -35,14 +36,16 @@ export default function KPPNSelectionCard({
   completedKPPN,
   totalChecklist,
   kppnId,
+  worksheetSPMLId,
 }: KPPNSelectionCardProps){
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   const axiosJWT = useAxiosJWT();
 
-  const {komponenRef, subKomponenRef} = useDictionary();
+  const {komponenSpmlRef, subKomponenSpmlRef, aspekSpmlRef} = useDictionary();
 
-  const {auth} = useAuth();
+  const {openSnackbar} = useSnackbar();
 
   const handleImageLoad = () => {
     setImageLoaded(true);
@@ -58,21 +61,41 @@ export default function KPPNSelectionCard({
   );
 
   async function handleGenerateExcel() {
+    if (!komponenSpmlRef || !subKomponenSpmlRef || !aspekSpmlRef) {
+      openSnackbar('Referensi worksheet SPML belum tersedia', 'error');
+      return;
+    }
+
     try {
-      const response = await axiosJWT.get(
-        `/getWsJunctionByWorksheetForKanwil?kppn=${kppnId}&time=${new Date().getTime()}`
-      );
-      const response2 = await axiosJWT.post(`/getWsJunctionScoreAndProgress`, {kppnId, period: auth?.period});
+      setIsExporting(true);
+      const [junctionResponse, scoreResponse] = await Promise.all([
+        axiosJWT.get(
+          `/wsSPMLJunction/getWsSPMLJunctionByWorksheetForKanwil?kppn=${encodeURIComponent(kppnId)}&time=${Date.now()}`
+        ),
+        axiosJWT.get(`/scoringEngine/spml/${encodeURIComponent(worksheetSPMLId)}`),
+      ]);
+      const rows = junctionResponse.data.rows;
+      if (!rows?.length) {
+        openSnackbar('Data worksheet SPML belum tersedia', 'error');
+        return;
+      }
 
-      const rows = response.data.rows;
-      const matrixScore = response2.data.rows;
-
-      const excelWorksheet = useExcelWorksheet(rows, matrixScore, komponenRef, subKomponenRef);
-      const excelWorksheet2 = useExcelWorksheet2(rows, header, komponenRef, subKomponenRef);
-      const peraturan1 = auth?.peraturan === 1;
-      peraturan1 ? await excelWorksheet.generate() :await excelWorksheet2.generate();
-    } catch (error) {
-      console.error("Error generating Excel:", error);
+      await generateExcelWorksheetSPML({
+        rows,
+        kppnName: header,
+        komponenRef: komponenSpmlRef,
+        subKomponenRef: subKomponenSpmlRef,
+        aspekRef: aspekSpmlRef,
+        spmlScore: scoreResponse.data.rows,
+      });
+      openSnackbar('Worksheet SPML berhasil diexport', 'success');
+    } catch (error: unknown) {
+      const message = isAxiosError<{ message?: string }>(error)
+        ? error.response?.data?.message || error.message
+        : error instanceof Error ? error.message : 'Gagal membuat file Excel SPML';
+      openSnackbar(message, 'error');
+    } finally {
+      setIsExporting(false);
     }
   }
   
@@ -96,9 +119,18 @@ export default function KPPNSelectionCard({
                   Open
                 </Button>
                 <Tooltip title="export excel">
-                  <IconButton onClick={handleGenerateExcel}>
-                    <Iconify icon="vscode-icons:file-type-excel"/>
-                  </IconButton>
+                  <span>
+                    <IconButton
+                      aria-label="Export worksheet SPML ke Excel"
+                      onClick={handleGenerateExcel}
+                      disabled={isExporting}
+                      sx={{ cursor: isExporting ? 'default' : 'pointer', '&:hover': { bgcolor: 'action.hover' } }}
+                    >
+                      {isExporting
+                        ? <CircularProgress size={22} />
+                        : <Iconify icon="vscode-icons:file-type-excel"/>}
+                    </IconButton>
+                  </span>
                 </Tooltip> 
               </Grid>                      
             </Box>

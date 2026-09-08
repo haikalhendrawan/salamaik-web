@@ -33,10 +33,15 @@ const TABLE_HEAD = [
   {id: 'comment', label: 'Comment', alignRight: false},
 ];
 
+const COLUMN_WIDTHS = ['4%', '13%', '28%', '7%', '7%', '15%', '20%', '6%'];
+
 const StyledTableCell = styled(TableCell)(({theme}) => ({
   fontSize: "12px",
   textAlign: "left",
-  color: theme.palette.text.secondary
+  color: theme.palette.text.secondary,
+  whiteSpace: 'normal',
+  overflowWrap: 'anywhere',
+  wordBreak: 'break-word',
 }));
 
 interface WorksheetSPMLTable{
@@ -224,7 +229,12 @@ export default function WorksheetSPMLTable({
   return (
     <>
       <TableContainer sx={{ maxHeight: 800 }}>
-        <Table stickyHeader>
+        <Table stickyHeader sx={{ width: '100%', tableLayout: 'fixed' }}>
+          <colgroup>
+            {COLUMN_WIDTHS.map((width, index) => (
+              <col key={TABLE_HEAD[index].id} style={{ width }} />
+            ))}
+          </colgroup>
           <TableHead>
             <TableRow>{tableHead}</TableRow>
           </TableHead>

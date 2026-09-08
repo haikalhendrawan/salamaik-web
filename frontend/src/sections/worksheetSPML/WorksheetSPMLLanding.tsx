@@ -103,6 +103,7 @@ export default function WorksheetSPMLLanding() {
                     completedKPPN={progressKPPN}
                     totalChecklist={totalChecklist}
                     kppnId={item.kppnId}
+                    worksheetSPMLId={item.worksheetSPMLId}
                   />
                 </Grid>
               )
@@ -113,5 +114,4 @@ export default function WorksheetSPMLLanding() {
     </>
   );
 }
-
 

@@ -67,6 +67,8 @@ export default function WorksheetCKLanding() {
                 completedKPPN={item.jumlahChecklistDiisiKPPN}
                 completedKanwil={item.jumlahChecklistDiisiKanwil}
                 total={item.jumlahChecklist}
+                kppnId={item.kppnId}
+                worksheetCKId={item.worksheetCKId}
               />
             </Grid>
           ))}

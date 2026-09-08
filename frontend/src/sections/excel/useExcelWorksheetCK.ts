@@ -2,8 +2,6 @@ import ExcelJS from 'exceljs';
 import formatOrderedTitle from '../../utils/formatOrderedTitle';
 import { CKScoreType, WsCKJunctionType } from '../worksheetCK/types';
 
-type ScoreOwner = 'kppn' | 'kanwil';
-
 const BORDER: Partial<ExcelJS.Borders> = {
   top: { style: 'thin' },
   left: { style: 'thin' },
@@ -11,85 +9,77 @@ const BORDER: Partial<ExcelJS.Borders> = {
   right: { style: 'thin' },
 };
 
-export default function useExcelWorksheetCK({
-  rows,
-  kppnName,
-  ckScore,
-}: {
+export interface ExcelWorksheetCKParams {
   rows: WsCKJunctionType[];
   kppnName: string;
   ckScore: CKScoreType | null;
-}) {
-  const generate = async () => {
-    const workbook = new ExcelJS.Workbook();
-    workbook.creator = 'Salamaik Web';
-    workbook.created = new Date();
+}
 
-    createSheet(workbook, 'Nilai Versi Kanwil', 'kanwil', rows, kppnName, ckScore);
-    createSheet(workbook, 'Nilai Versi KPPN', 'kppn', rows, kppnName, ckScore);
+export async function generateExcelWorksheetCK({
+  rows,
+  kppnName,
+  ckScore,
+}: ExcelWorksheetCKParams) {
+  const workbook = new ExcelJS.Workbook();
+  workbook.creator = 'Salamaik Web';
+  workbook.created = new Date();
 
-    const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], {
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `Worksheet_CK_${safeFileName(kppnName || 'KPPN')}_${Date.now()}.xlsx`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  };
+  createSheet(workbook, rows, kppnName, ckScore);
 
-  return { generate };
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `Worksheet_CK_${safeFileName(kppnName || 'KPPN')}_${Date.now()}.xlsx`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+export default function useExcelWorksheetCK(params: ExcelWorksheetCKParams) {
+  return { generate: () => generateExcelWorksheetCK(params) };
 }
 
 function createSheet(
   workbook: ExcelJS.Workbook,
-  name: string,
-  owner: ScoreOwner,
   rows: WsCKJunctionType[],
   kppnName: string,
   ckScore: CKScoreType | null
 ) {
-  const sheet = workbook.addWorksheet(name, { views: [{ state: 'frozen', ySplit: 2 }] });
+  const sheet = workbook.addWorksheet('Kertas Kerja CK', {
+    views: [{ state: 'frozen', ySplit: 2 }],
+  });
   sheet.columns = [
     { key: 'no', width: 7 },
     { key: 'materi', width: 31 },
     { key: 'kriteria', width: 35 },
     { key: 'bukti', width: 34 },
     { key: 'link', width: 34 },
-    { key: 'nilai', width: 15 },
-    { key: 'konversi', width: 17 },
+    { key: 'nilaiKPPN', width: 14 },
+    { key: 'konversiKPPN', width: 18 },
+    { key: 'catatanKanwil', width: 40 },
+    { key: 'separator', width: 3 },
+    { key: 'nilaiKanwil', width: 14 },
+    { key: 'konversiKanwil', width: 18 },
   ];
 
-  sheet.mergeCells('A1:A2');
-  sheet.mergeCells('B1:B2');
-  sheet.mergeCells('C1:C2');
-  sheet.mergeCells('D1:D2');
-  sheet.mergeCells('E1:E2');
-  sheet.mergeCells('F1:G1');
-  sheet.getCell('A1').value = 'No';
-  sheet.getCell('B1').value = 'Materi';
-  sheet.getCell('C1').value = 'Kriteria Penilaian';
-  sheet.getCell('D1').value = 'BUKTI DUKUNG KEGIATAN';
-  sheet.getCell('E1').value = 'LINK BUKTI DUKUNG KEGIATAN';
-  sheet.getCell('F1').value = `KPPN ${kppnName}`;
-  sheet.getCell('F2').value = 'Nilai\n*jika tidak mempunyai transaksi maka kolom diisi "N/A"';
-  sheet.getCell('G2').value = 'Nilai Konversi';
-  styleHeader(sheet, 1, 2);
+  addHeaderRows(sheet);
 
   const groups = new Map<number, WsCKJunctionType[]>();
   rows.forEach((row) => groups.set(row.komponen_ck_id, [...(groups.get(row.komponen_ck_id) || []), row]));
+  let checklistNumber = 0;
 
   groups.forEach((componentRows) => {
     const component = componentRows[0];
     const sectionRow = sheet.addRow([
       formatOrderedTitle(component.komponen_urut, component.komponen_title),
     ]);
-    sheet.mergeCells(`A${sectionRow.number}:G${sectionRow.number}`);
-    for (let column = 1; column <= 7; column += 1) {
+    sheet.mergeCells(`A${sectionRow.number}:K${sectionRow.number}`);
+    for (let column = 1; column <= 11; column += 1) {
       const cell = sectionRow.getCell(column);
       cell.border = BORDER;
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD9D9D9' } };
@@ -98,38 +88,105 @@ function createSheet(
     }
     sectionRow.height = 23;
 
-    componentRows.forEach((junction) => addChecklistRow(sheet, junction, owner));
+    componentRows.forEach((junction) => {
+      checklistNumber += 1;
+      addChecklistRow(sheet, junction, kppnName, checklistNumber);
+    });
   });
 
-  const detail = owner === 'kanwil' ? ckScore?.detailKanwil : ckScore?.detailKPPN;
-  const finalScore = owner === 'kanwil' ? ckScore?.nilaiKanwil : ckScore?.nilaiKPPN;
-  addFooter(sheet, 'Total Nilai', detail?.totalSkorKonversi);
-  addFooter(sheet, 'Rata-Rata Total Nilai', finalScore, '0.00');
+  addFooter(
+    sheet,
+    'Total Nilai',
+    ckScore?.detailKPPN.totalSkorKonversi,
+    ckScore?.detailKanwil.totalSkorKonversi,
+    '0'
+  );
+  addFooter(
+    sheet,
+    'Rata-Rata Total Nilai',
+    ckScore?.nilaiKPPN,
+    ckScore?.nilaiKanwil,
+    '0.00'
+  );
   return sheet;
 }
 
-function styleHeader(sheet: ExcelJS.Worksheet, startRow: number, endRow: number) {
-  for (let rowNumber = startRow; rowNumber <= endRow; rowNumber += 1) {
-    const row = sheet.getRow(rowNumber);
-    row.height = rowNumber === 2 ? 48 : 26;
-    for (let column = 1; column <= 7; column += 1) {
+function addHeaderRows(sheet: ExcelJS.Worksheet) {
+  const firstHeaderRow = sheet.addRow([
+    'No',
+    'Materi',
+    'Kriteria Penilaian',
+    'Bukti Dukung Kegiatan',
+    'Link Bukti Dukung',
+    'Berdasarkan Self Assessment KPPN',
+    '',
+    'Catatan Hasil Reviu Kanwil',
+    '',
+    'Berdasarkan Penilaian Kanwil DJPb',
+    '',
+  ]);
+  const secondHeaderRow = sheet.addRow([
+    '',
+    '',
+    '',
+    '',
+    '',
+    'Nilai',
+    'Nilai Konversi',
+    '',
+    '',
+    'Nilai',
+    'Nilai Konversi',
+  ]);
+
+  ['A', 'B', 'C', 'D', 'E', 'H', 'I'].forEach((column) => {
+    sheet.mergeCells(`${column}1:${column}2`);
+  });
+  sheet.mergeCells('F1:G1');
+  sheet.mergeCells('J1:K1');
+
+  [firstHeaderRow, secondHeaderRow].forEach((row) => {
+    row.height = 28;
+    for (let column = 1; column <= 11; column += 1) {
       const cell = row.getCell(column);
+      const isKPPNOrNote = column >= 6 && column <= 8;
+      const isKanwil = column >= 10;
+      const isSeparator = column === 9;
+      const fillColor = isKPPNOrNote
+        ? 'FFFFE699'
+        : isKanwil
+          ? 'FFC6E0B4'
+          : isSeparator
+            ? 'FFFFFFFF'
+            : 'FFBFBFBF';
+      const fontColor = isSeparator ? 'FF212121' : 'FF000000';
+
       cell.border = BORDER;
-      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFBFBFBF' } };
-      cell.font = { bold: true, name: 'Calibri', size: 11 };
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: fillColor } };
+      cell.font = { bold: true, color: { argb: fontColor }, name: 'Calibri', size: 11 };
       cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
     }
-  }
+  });
 }
 
 function addChecklistRow(
   sheet: ExcelJS.Worksheet,
   junction: WsCKJunctionType,
-  owner: ScoreOwner
+  kppnName: string,
+  checklistNumber: number
 ) {
-  const score = owner === 'kanwil' ? junction.kanwil_score : junction.kppn_score;
-  const displayedScore = junction.excluded === 1 ? 'N/A' : score ?? '';
-  const convertedScore = junction.excluded === 1 ? 'N/A' : score == null ? '' : score * 10;
+  const displayedKPPNScore = junction.excluded === 1 ? 'N/A' : junction.kppn_score ?? '';
+  const convertedKPPNScore = junction.excluded === 1
+    ? 'N/A'
+    : junction.kppn_score == null
+      ? ''
+      : junction.kppn_score * 10;
+  const displayedKanwilScore = junction.excluded === 1 ? 'N/A' : junction.kanwil_score ?? '';
+  const convertedKanwilScore = junction.excluded === 1
+    ? 'N/A'
+    : junction.kanwil_score == null
+      ? ''
+      : junction.kanwil_score * 10;
   const criteria = [
     junction.kriteria_penilaian,
     ...(junction.opsi || [])
@@ -146,47 +203,74 @@ function addChecklistRow(
     criteria,
     junction.bukti_dukung || '',
     '',
-    displayedScore,
-    convertedScore,
+    displayedKPPNScore,
+    convertedKPPNScore,
+    junction.kanwil_note || '',
+    '',
+    displayedKanwilScore,
+    convertedKanwilScore,
   ]);
 
-  for (let column = 1; column <= 7; column += 1) {
+  for (let column = 1; column <= 11; column += 1) {
     const cell = row.getCell(column);
     cell.border = BORDER;
     cell.font = { name: 'Calibri', size: 10 };
     cell.alignment = {
       vertical: 'top',
-      horizontal: [1, 6, 7].includes(column) ? 'center' : 'left',
+      horizontal: [1, 6, 7, 9, 10, 11].includes(column) ? 'center' : 'left',
       wrapText: true,
     };
   }
-  setEvidenceLinks(row, junction);
+  setEvidenceLinks(row, junction, kppnName, checklistNumber);
   row.height = estimateRowHeight(row);
 }
 
-function setEvidenceLinks(row: ExcelJS.Row, junction: WsCKJunctionType) {
-  const urls: string[] = [];
+function setEvidenceLinks(
+  row: ExcelJS.Row,
+  junction: WsCKJunctionType,
+  kppnName: string,
+  checklistNumber: number
+) {
+  const links: { url: string; suffix: string }[] = [];
   const apiUrl = import.meta.env.VITE_API_URL.replace(/\/+$/, '');
-  if (junction.file_1) urls.push(`${apiUrl}/worksheet/${junction.file_1}`);
+  const baseLabel = createEvidenceLabel(checklistNumber, kppnName);
+
+  if (junction.file_1) {
+    links.push({
+      url: `${apiUrl}/worksheet/${junction.file_1}`,
+      suffix: 'File_Server',
+    });
+  }
   if (junction.link_file?.trim()) {
     const external = junction.link_file.trim();
-    urls.push(/^https?:\/\//i.test(external) ? external : `https://${external}`);
+    links.push({
+      url: /^https?:\/\//i.test(external) ? external : `https://${external}`,
+      suffix: 'Link_Eksternal',
+    });
   }
 
   const cell = row.getCell(5);
-  const text = urls.map((url) => url.match(/.{1,45}/g)?.join('\n') || url).join('\n\n');
-  if (urls.length === 1) {
-    cell.value = { text, hyperlink: urls[0], tooltip: urls[0] };
-  } else if (urls.length > 1) {
-    cell.value = { text, hyperlink: urls[0], tooltip: urls.join('\n\n') };
+  const displayText = links.length === 1
+    ? baseLabel
+    : links.map((link) => `${baseLabel}_${link.suffix}`).join('\n\n');
+  if (links.length === 1) {
+    cell.value = { text: displayText, hyperlink: links[0].url, tooltip: links[0].url };
+  } else if (links.length > 1) {
+    cell.value = {
+      text: displayText,
+      hyperlink: links[0].url,
+      tooltip: links.map((link) => link.url).join('\n\n'),
+    };
   } else {
     cell.value = '';
   }
-  if (urls.length) cell.font = { name: 'Calibri', size: 10, color: { argb: 'FF0563C1' }, underline: true };
+  if (links.length) {
+    cell.font = { name: 'Calibri', size: 10, color: { argb: 'FF0563C1' }, underline: true };
+  }
 }
 
 function estimateRowHeight(row: ExcelJS.Row) {
-  const widths = [7, 31, 35, 34, 34, 15, 17];
+  const widths = [7, 31, 35, 34, 34, 14, 18, 40, 3, 14, 18];
   let lines = 1;
   row.eachCell({ includeEmpty: true }, (cell, columnNumber) => {
     const raw = typeof cell.value === 'object' && cell.value && 'text' in cell.value
@@ -204,20 +288,48 @@ function estimateRowHeight(row: ExcelJS.Row) {
 function addFooter(
   sheet: ExcelJS.Worksheet,
   label: string,
-  value: number | undefined,
+  kppnValue: number | undefined,
+  kanwilValue: number | undefined,
   numberFormat?: string
 ) {
-  const row = sheet.addRow([label, '', '', '', '', '', value ?? null]);
+  const row = sheet.addRow([
+    label,
+    '',
+    '',
+    '',
+    '',
+    '',
+    kppnValue ?? null,
+    '',
+    '',
+    '',
+    kanwilValue ?? null,
+  ]);
   sheet.mergeCells(`A${row.number}:F${row.number}`);
-  for (let column = 1; column <= 7; column += 1) {
+  for (let column = 1; column <= 11; column += 1) {
     const cell = row.getCell(column);
     cell.border = BORDER;
     cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFBFBFBF' } };
     cell.font = { bold: true, name: 'Calibri', size: 11 };
     cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
   }
-  if (numberFormat) row.getCell(7).numFmt = numberFormat;
+  if (numberFormat) {
+    row.getCell(7).numFmt = numberFormat;
+    row.getCell(11).numFmt = numberFormat;
+  }
   row.height = 24;
+}
+
+function createEvidenceLabel(checklistNumber: number, kppnName: string) {
+  const normalizedKppnName = (kppnName || 'KPPN')
+    .trim()
+    .replace(/^KPPN[\s_-]*/i, '')
+    .replace(/[_-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim() || 'KPPN';
+  const formattedNumber = String(checklistNumber).padStart(2, '0');
+
+  return `CK${formattedNumber}_KPPN ${normalizedKppnName}`;
 }
 
 function safeFileName(value: string) {

@@ -120,6 +120,8 @@ export interface OpsiCkRefType {
   komponen_ck_id: number;
 }
 
+export type KPPNTipe = 'A1' | 'A2' | 'Kh' | 'K1' | 'K2' | 'K3';
+
 interface UnitType{
   id: string;
   name: string;
@@ -129,6 +131,8 @@ interface UnitType{
   info: string;
   col_order: number;
   level: number;
+  tipe: KPPNTipe | null;
+  provinsi: 0 | 1;
 };
 
 interface UnitRefType{
