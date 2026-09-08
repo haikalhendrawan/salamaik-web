@@ -4,18 +4,7 @@
  */
 
 import {Request, Response, NextFunction} from 'express';
-import unit from '../model/unit.model';
-// -------------------------------------------------
-interface UnitType{
-  id: string;
-  name: string;
-  alias: string;
-  kk_name: string;
-  kk_nip: string;
-  info: string;
-  col_order: number;
-  level: number;
-};
+import unit, {UnitType} from '../model/unit.model';
 // ------------------------------------------------------
 const getAllUnit = async (req: Request, res: Response, next: NextFunction) => {
   try {

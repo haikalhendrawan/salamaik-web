@@ -11,6 +11,20 @@ import authorize from "../middleware/authorize";
 const router = Router();
 
 router.get(
+  "/akk/average/:periodId/:peraturanId",
+  authenticate,
+  authorize([99, 4, 3]),
+  scoringEngineController.getAverageAKKScore
+);
+
+router.get(
+  "/akk/:kppnId/:periodId/:peraturanId",
+  authenticate,
+  authorize([99, 4, 3, 2, 1]),
+  scoringEngineController.getAKKScore
+);
+
+router.get(
   "/spml/period/:periodId",
   authenticate,
   authorize([99, 4, 3]),
@@ -24,6 +38,13 @@ router.get(
   authenticate,
   authorize([99, 4, 3, 2, 1]),
   scoringEngineController.getCKScore
+);
+
+router.get(
+  "/pb/:worksheetPBId",
+  authenticate,
+  authorize([99, 4, 3, 2, 1]),
+  scoringEngineController.getPBScore
 );
 
 export default router;

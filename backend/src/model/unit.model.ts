@@ -9,6 +9,8 @@ import jwt, {JwtPayload, VerifyErrors} from "jsonwebtoken";
 import ErrorDetail  from "./error.model";
 import "dotenv/config"; 
 // -------------------------------------------------
+export type KPPNTipe = 'A1' | 'A2' | 'Kh' | 'K1' | 'K2' | 'K3';
+
 export interface UnitType{
   id: string;
   name: string;
@@ -18,6 +20,8 @@ export interface UnitType{
   info: string;
   col_order: number;
   level: number;
+  tipe: KPPNTipe | null;
+  provinsi: 0 | 1;
 };
 // ------------------------------------------------------
 class Unit{
