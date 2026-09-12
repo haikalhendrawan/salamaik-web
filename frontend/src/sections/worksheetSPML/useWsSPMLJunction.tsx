@@ -11,6 +11,7 @@ import {
   SPMLWorksheetChangedEvent,
   WsSPMLJunctionType,
   WsSPMLRefreshOptions,
+  WsSPMLWorksheetRequestOptions,
 } from "./types";
 import useLoading from "../../hooks/display/useLoading";
 //-----------------------------------------------------------------------------------------------------------------
@@ -24,7 +25,7 @@ interface WsSPMLJunctionContextType {
   setWsSPMLJunction: React.Dispatch<React.SetStateAction<WsSPMLJunctionType[]>>;
   getWsSPMLJunctionKanwil: (kppnId: string, options?: WsSPMLRefreshOptions) => Promise<void>;
   getWsSPMLJunctionKPPN: (options?: WsSPMLRefreshOptions) => Promise<void>;
-  getWorksheet: (kppnId: string) => Promise<void>;
+  getWorksheet: (kppnId: string, options?: WsSPMLWorksheetRequestOptions) => Promise<void>;
   getSPMLScore: (worksheetSPMLId: string) => Promise<void>;
   resetSPMLScore: () => void;
   setLastLiveChange: React.Dispatch<React.SetStateAction<SPMLWorksheetChangedEvent | null>>;
@@ -170,9 +171,10 @@ const WsSPMLJunctionProvider = ({ children }: WsSPMLJunctionProviderProps) => {
         scoreRefreshPending.current &&
         rows[0]?.worksheet_id
       ) {
-        await getSPMLScore(rows[0].worksheet_id);
-        if (requestId === junctionRequestId.current) scoreRefreshPending.current = false;
+        scoreRefreshPending.current = false;
+        void getSPMLScore(rows[0].worksheet_id);
       } else if (requestId === junctionRequestId.current && rows.length === 0) {
+        scoreRefreshPending.current = false;
         setSpmlScore(null);
       }
       if (requestId === junctionRequestId.current) setLastRefreshedAt(new Date());
@@ -202,9 +204,10 @@ const WsSPMLJunctionProvider = ({ children }: WsSPMLJunctionProviderProps) => {
         scoreRefreshPending.current &&
         rows[0]?.worksheet_id
       ) {
-        await getSPMLScore(rows[0].worksheet_id);
-        if (requestId === junctionRequestId.current) scoreRefreshPending.current = false;
+        scoreRefreshPending.current = false;
+        void getSPMLScore(rows[0].worksheet_id);
       } else if (requestId === junctionRequestId.current && rows.length === 0) {
+        scoreRefreshPending.current = false;
         setSpmlScore(null);
       }
       if (requestId === junctionRequestId.current) setLastRefreshedAt(new Date());
@@ -226,8 +229,12 @@ const WsSPMLJunctionProvider = ({ children }: WsSPMLJunctionProviderProps) => {
     await getWsSPMLJunctionKPPN(options);
   }
 
-  async function getWorksheet(kppnId: string) {
-    setIsLoading(true);
+  async function getWorksheet(
+    kppnId: string,
+    options: WsSPMLWorksheetRequestOptions = {}
+  ) {
+    const { showOverlay = true } = options;
+    if (showOverlay) setIsLoading(true);
     try {
       const response = await axiosJWT.get(`/getWorksheetByPeriodAndKPPN/${kppnId}`);
       setWsDetail(response.data.rows);
@@ -235,7 +242,7 @@ const WsSPMLJunctionProvider = ({ children }: WsSPMLJunctionProviderProps) => {
       setWsDetail(null);
       showRequestError(err);
     } finally {
-      setIsLoading(false);
+      if (showOverlay) setIsLoading(false);
     }
   }
 

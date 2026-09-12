@@ -146,9 +146,9 @@ export default function MatrixKPPN() {
               />
             </Grid>
 
-            <Grid item xs={12}>
+            {/* <Grid item xs={12}>
               <RekapitulasiNilaiTable matrixScore={matrixScore} kppnName={kppnName}/>
-            </Grid>
+            </Grid> */}
           </Grid>
           
           

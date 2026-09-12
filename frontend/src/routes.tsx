@@ -18,6 +18,7 @@ import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import RegisterPage from "./pages/auth/RegisterPage";
 import WorksheetPage from "./pages/WorksheetPage";
 import ProfilePage from "./pages/ProfilePage";
+import NilaiPage from "./pages/NilaiPage";
 import WorksheetLanding from "./sections/worksheet/WorksheetLanding";
 import WorksheetKanwil from "./sections/worksheet/WorksheetKanwil";
 import WorksheetSPMLPage from "./pages/WorksheetSPMLPage";
@@ -81,6 +82,9 @@ export default function Router() {
           </Route>
         </Route>
         <Route path="history" element={<HistoryPage />} />
+      </Route>
+      <Route path="/" element={<RequireAuthLayout allowedRoles={[1, 2, 3, 4, 99]} />}>
+        <Route path='nilai' element={<NilaiPage />} />
       </Route>
     </Route>
 

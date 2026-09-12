@@ -44,6 +44,11 @@ const navSupervisi = [
     path: '/followUp',
     icon: icon('solar--rocket-2-bold-duotone'),
   },
+  {
+    title: 'Nilai',
+    path: '/nilai',
+    icon: icon('solar--diploma-verified-bold-duotone'),
+  },
 ];
 
 const navMonitoring = [

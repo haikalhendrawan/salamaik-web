@@ -3,7 +3,7 @@
  * © Kanwil DJPb Sumbar 2024
  */
 
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Typography, Card, CardHeader, Stack, IconButton} from '@mui/material';
 import { Helmet } from 'react-helmet-async';
 import Iconify from '../../components/iconify';
@@ -27,6 +27,9 @@ const SELECT_KPPN: {[key: string]: string} = {
 
 //-----------------------------------------------------------------------------------------------------------------
 export default function WorksheetSPMLWorkspace() {
+  const [isInitialTableLoading, setIsInitialTableLoading] = useState(true);
+  const [isWorksheetDetailLoading, setIsWorksheetDetailLoading] = useState(true);
+
   const {auth} = useAuth();
 
   const navigate = useNavigate();
@@ -44,16 +47,36 @@ export default function WorksheetSPMLWorkspace() {
     spmlScore,
     isScoreLoading,
     lastRefreshedAt,
+    setWsSPMLJunction,
     getWsSPMLJunctionKanwil,
     getWorksheet,
     resetSPMLScore,
   } = useWsSPMLJunction();
 
-  const activeWorksheetId = wsSPMLJunction[0]?.worksheet_id;
+  const activeWorksheetId = isInitialTableLoading
+    ? undefined
+    : wsSPMLJunction[0]?.worksheet_id;
+
+  const initialLoadActionsRef = useRef({
+    getWorksheet,
+    getWsSPMLJunctionKanwil,
+    resetSPMLScore,
+    setWsSPMLJunction,
+  });
+
+  useEffect(() => {
+    initialLoadActionsRef.current = {
+      getWorksheet,
+      getWsSPMLJunctionKanwil,
+      resetSPMLScore,
+      setWsSPMLJunction,
+    };
+  }, [getWorksheet, getWsSPMLJunctionKanwil, resetSPMLScore, setWsSPMLJunction]);
 
   useWsSPMLLiveSync(activeWorksheetId, selectedKppnId);
 
   const isPastDue = new Date().getTime() > new Date(wsDetail?.close_period || '').getTime();
+  const areActionsDisabled = isWorksheetDetailLoading || !wsDetail || isPastDue;
 
   const scrollToChecklist = useCallback((junctionId: number) => {
     document
@@ -62,10 +85,23 @@ export default function WorksheetSPMLWorkspace() {
   }, []);
 
   useEffect(() => {
-    resetSPMLScore();
-    getWorksheet(selectedKppnId);
-    getWsSPMLJunctionKanwil(selectedKppnId);
+    let isActive = true;
+    const actions = initialLoadActionsRef.current;
+    setIsInitialTableLoading(true);
+    setIsWorksheetDetailLoading(true);
+    actions.setWsSPMLJunction([]);
+    actions.resetSPMLScore();
 
+    actions.getWorksheet(selectedKppnId, { showOverlay: false }).finally(() => {
+      if (isActive) setIsWorksheetDetailLoading(false);
+    });
+    actions.getWsSPMLJunctionKanwil(selectedKppnId, { showOverlay: false }).finally(() => {
+      if (isActive) setIsInitialTableLoading(false);
+    });
+
+    return () => {
+      isActive = false;
+    };
   }, [selectedKppnId]);
 
   return (
@@ -110,11 +146,12 @@ export default function WorksheetSPMLWorkspace() {
           wsSPMLJunction={wsSPMLJunction}
           spmlScore={spmlScore}
           isScoreLoading={isScoreLoading}
-          isPastDue={isPastDue}
+          isInitialLoading={isInitialTableLoading}
+          isPastDue={areActionsDisabled}
         />
 
       </Card>
-      <PreviewFileModal isDisabled={isPastDue} kppn={id} />
+      <PreviewFileModal isDisabled={areActionsDisabled} kppn={id} />
       <NavigationDrawerSPML
         wsSPMLJunction={wsSPMLJunction}
         scrollToChecklist={scrollToChecklist}

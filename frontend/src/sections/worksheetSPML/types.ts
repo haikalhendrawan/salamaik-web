@@ -71,3 +71,7 @@ export interface WsSPMLRefreshOptions {
   refreshScore?: boolean;
   syncTargets?: SPMLSyncTarget[];
 }
+
+export interface WsSPMLWorksheetRequestOptions {
+  showOverlay?: boolean;
+}

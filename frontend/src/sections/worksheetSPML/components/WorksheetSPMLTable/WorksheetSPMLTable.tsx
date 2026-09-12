@@ -10,17 +10,14 @@ import {
   TableCell,
 } from '@mui/material';
 import useDictionary from '../../../../hooks/useDictionary';
-import { AspekSpmlRefType, SubKomponenSpmlRefType } from '../../../../hooks/useDictionary';
-import { useTheme, styled } from '@mui/material';
-import formatNumberedList from '../../../../utils/formatNumberedList';
-import ScoreSelect from './components/ScoreSelect';
+import { useTheme } from '@mui/material';
 import {useAuth} from '../../../../hooks/useAuth';
-import FileActions from './components/FileActions';
 import { SPMLScoreType, WsSPMLJunctionType } from '../../types';
 import formatOrderedTitle from '../../../../utils/formatOrderedTitle';
-import CommentAction from './components/CommentAction';
 import ScoreFooterCell from './components/ScoreFooterCell';
-import KanwilNote from './components/KanwilNote';
+import SPMLChecklistRow from './components/SPMLChecklistRow';
+import WorksheetSPMLTableSkeleton from './components/WorksheetSPMLTableSkeleton';
+import useSPMLTableViewModel from './useSPMLTableViewModel';
 //-----------------------------------------------------------------------------------------------------------------
 const TABLE_HEAD = [
   { id: 'no', label: 'No', alignRight: false },
@@ -35,19 +32,11 @@ const TABLE_HEAD = [
 
 const COLUMN_WIDTHS = ['4%', '13%', '28%', '7%', '7%', '15%', '20%', '6%'];
 
-const StyledTableCell = styled(TableCell)(({theme}) => ({
-  fontSize: "12px",
-  textAlign: "left",
-  color: theme.palette.text.secondary,
-  whiteSpace: 'normal',
-  overflowWrap: 'anywhere',
-  wordBreak: 'break-word',
-}));
-
 interface WorksheetSPMLTable{
   wsSPMLJunction: WsSPMLJunctionType[];
   spmlScore: SPMLScoreType | null;
   isScoreLoading: boolean;
+  isInitialLoading: boolean;
   isPastDue: boolean;
 }
 //-----------------------------------------------------------------------------------------------------------------
@@ -56,9 +45,16 @@ export default function WorksheetSPMLTable({
   wsSPMLJunction,
   spmlScore,
   isScoreLoading,
+  isInitialLoading,
   isPastDue,
 }: WorksheetSPMLTable) {
   const {komponenSpmlRef, subKomponenSpmlRef, aspekSpmlRef } = useDictionary();
+  const hierarchy = useSPMLTableViewModel(
+    komponenSpmlRef,
+    subKomponenSpmlRef,
+    aspekSpmlRef,
+    wsSPMLJunction
+  );
 
   const tableHead = useMemo(() =>
     TABLE_HEAD.map((headCell) => (
@@ -86,100 +82,25 @@ export default function WorksheetSPMLTable({
 
   const isKanwil = auth?.kppn?.length === 5;
 
-  const getAspekSPMLRow = (aspekSpml: AspekSpmlRefType[]) =>
-    aspekSpml.map((row) => {
-      const checklist = wsSPMLJunction?.filter((item) => item.aspek_spml_id === row.id) || [];
-      const checklist0 = checklist[0];
-      const otherChecklist = checklist.length > 1 ? checklist.slice(1) : [];
-
-      if (!checklist0) {
-        return null;
-      }
-
-      return (
-        <Fragment key={row.id}>
-          <TableRow
-            id={`spml-checklist-${checklist0.junction_id}`}
-            style={{ display: 'table-row' }}
-          >
-            <StyledTableCell
-              rowSpan={checklist.length}
-            >
-              {row.urut}
-            </StyledTableCell>
-            <StyledTableCell
-              rowSpan={checklist.length}
-            >
-              {row.title}
-            </StyledTableCell>
-            <StyledTableCell>
-              {formatNumberedList(checklist0.uraian)}
-            </StyledTableCell>
-            <StyledTableCell>
-              <ScoreSelect checklist={checklist0} scoreType="kppn" disabled={isKanwil || isPastDue} />
-            </StyledTableCell>
-            <StyledTableCell>
-              <ScoreSelect checklist={checklist0} scoreType="kanwil" disabled={!isKanwil || isPastDue} />
-            </StyledTableCell>
-            <StyledTableCell>
-              <FileActions checklist={checklist0} isPastDue={isPastDue} />
-            </StyledTableCell>
-            <StyledTableCell>
-              <KanwilNote checklist={checklist0} isPastDue={isPastDue} />
-            </StyledTableCell>
-            <StyledTableCell sx={{ textAlign: 'center' }}>
-              <CommentAction
-                wsSPMLJunctionId={checklist0.junction_id}
-                initialCommentCount={Number(checklist0.comment_count) || 0}
-                isPastDue={isPastDue}
-              />
-            </StyledTableCell>
-          </TableRow>
-          {
-            otherChecklist.map((item) => (
-              <TableRow
-                key={item.id}
-                id={`spml-checklist-${item.junction_id}`}
-                style={{ display: 'table-row' }}
-              >
-                <StyledTableCell>
-                  {formatNumberedList(item.uraian)}
-                </StyledTableCell>
-                <StyledTableCell>
-                  <ScoreSelect checklist={item} scoreType="kppn" disabled={isKanwil || isPastDue} />
-                </StyledTableCell>
-                <StyledTableCell>
-                  <ScoreSelect checklist={item} scoreType="kanwil" disabled={!isKanwil || isPastDue} />
-                </StyledTableCell>
-                <StyledTableCell>
-                  <FileActions checklist={item} isPastDue={isPastDue} />
-                </StyledTableCell>
-                <StyledTableCell>
-                  <KanwilNote checklist={item} isPastDue={isPastDue} />
-                </StyledTableCell>
-                <StyledTableCell sx={{ textAlign: 'center' }}>
-                  <CommentAction
-                    wsSPMLJunctionId={item.junction_id}
-                    initialCommentCount={Number(item.comment_count) || 0}
-                    isPastDue={isPastDue}
-                  />
-                </StyledTableCell>
-              </TableRow>
-            ))
-          }
-        </Fragment>
-      )
-  });
-
-  const getSubKomponenSPMLRow = (subKomponen: SubKomponenSpmlRefType[]) => 
-    subKomponen?.map((row) => {
-      const aspekSPML = aspekSpmlRef?.filter((item) => item.subkomponen_spml_id=== row.id) || [];
-
-      return (
-        <Fragment key={row.id}>
-          <TableRow
-            style={{ display: 'table-row' }}
-          >
+  const tableRows = useMemo(() => hierarchy.map(({ komponen, subKomponen }) => (
+    <Fragment key={komponen.id}>
+      <TableRow>
+        <TableCell
+          align="left"
+          colSpan={8}
+          sx={{
+            backgroundColor: theme.palette.background.default,
+            color: theme.palette.text.primary,
+            fontSize: '12px',
+            fontWeight: 'bold',
+          }}
+        >
+          {formatOrderedTitle(komponen.urut, komponen.title)}
+        </TableCell>
+      </TableRow>
+      {subKomponen.map(({ subKomponen: subKomponenItem, aspek }) => (
+        <Fragment key={subKomponenItem.id}>
+          <TableRow>
             <TableCell
               align="left"
               colSpan={8}
@@ -189,42 +110,29 @@ export default function WorksheetSPMLTable({
                 fontSize: '12px',
                 fontWeight: 'bold',
               }}
-              color='secondary'
+              color="secondary"
             >
-              {formatOrderedTitle(row.urut, row.title)}
+              {formatOrderedTitle(subKomponenItem.urut, subKomponenItem.title)}
             </TableCell>
           </TableRow>
-          {getAspekSPMLRow(aspekSPML)}
+          {aspek.map(({ aspek: aspekItem, checklist }) => (
+            <Fragment key={aspekItem.id}>
+              {checklist.map((item, index) => (
+                <SPMLChecklistRow
+                  key={item.junction_id}
+                  checklist={item}
+                  aspek={index === 0 ? aspekItem : undefined}
+                  aspekRowSpan={index === 0 ? checklist.length : undefined}
+                  isKanwil={isKanwil}
+                  isPastDue={isPastDue}
+                />
+              ))}
+            </Fragment>
+          ))}
         </Fragment>
-      )
-  });
-
-  const komponenSPMLRow = () =>
-    komponenSpmlRef?.map((row) => {
-      const subKomponenSPML = subKomponenSpmlRef?.filter((item) => item.komponen_spml_id === row.id) || [];
-
-      return (
-        <Fragment key={row.id}>
-          <TableRow
-            style={{ display: 'table-row' }}
-          >
-            <TableCell
-              align="left"
-              colSpan={8}
-              sx={{
-                backgroundColor: theme.palette.background.default,
-                color: theme.palette.text.primary,
-                fontSize: '12px',
-                fontWeight: 'bold',
-              }}
-            >
-              {formatOrderedTitle(row.urut, row.title)}
-            </TableCell>
-          </TableRow>
-          {getSubKomponenSPMLRow(subKomponenSPML)}
-        </Fragment>
-      )
-  });
+      ))}
+    </Fragment>
+  )), [hierarchy, isKanwil, isPastDue, theme.palette.background.default, theme.palette.text.main, theme.palette.text.primary]);
 
   return (
     <>
@@ -239,7 +147,17 @@ export default function WorksheetSPMLTable({
             <TableRow>{tableHead}</TableRow>
           </TableHead>
           <TableBody>
-            {komponenSPMLRow()}
+            {isInitialLoading ? (
+              <WorksheetSPMLTableSkeleton />
+            ) : wsSPMLJunction.length > 0 ? (
+              tableRows
+            ) : (
+              <TableRow>
+                <TableCell colSpan={8} align="center" sx={{ py: 6, color: 'text.secondary' }}>
+                  Checklist SPML belum tersedia
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
           <TableFooter>
             <TableRow>
@@ -252,13 +170,13 @@ export default function WorksheetSPMLTable({
               <ScoreFooterCell
                 value={spmlScore?.detailKPPN.totalSkorKonversi}
                 detail={spmlScore?.detailKPPN}
-                loading={isScoreLoading}
+                loading={isInitialLoading || isScoreLoading}
                 label="KPPN"
               />
               <ScoreFooterCell
                 value={spmlScore?.detailKanwil.totalSkorKonversi}
                 detail={spmlScore?.detailKanwil}
-                loading={isScoreLoading}
+                loading={isInitialLoading || isScoreLoading}
                 label="Kanwil"
               />
               <TableCell colSpan={3} sx={{ backgroundColor: 'background.default' }} />
@@ -273,13 +191,13 @@ export default function WorksheetSPMLTable({
               <ScoreFooterCell
                 value={spmlScore?.nilaiKPPN}
                 detail={spmlScore?.detailKPPN}
-                loading={isScoreLoading}
+                loading={isInitialLoading || isScoreLoading}
                 label="KPPN"
               />
               <ScoreFooterCell
                 value={spmlScore?.nilaiKanwil}
                 detail={spmlScore?.detailKanwil}
-                loading={isScoreLoading}
+                loading={isInitialLoading || isScoreLoading}
                 label="Kanwil"
               />
               <TableCell colSpan={3} sx={{ backgroundColor: 'background.default' }} />
