@@ -15,6 +15,10 @@ import {
   createSPMLChangedEvent,
   getSPMLWorksheetRoom,
 } from "../utils/wsSPMLSocket.utils";
+import {
+  createAKKScoreChangedEvent,
+  getAKKWorksheetRoom,
+} from "../utils/akkSocket.utils";
 
 type SocketCallback = (response: {
   success: boolean;
@@ -143,6 +147,10 @@ class WsSPMLJunctionEvent {
         "spmlWorksheetChanged",
         createSPMLChangedEvent(worksheetId, junctionId, "score", username)
       );
+      socket.to(getAKKWorksheetRoom(worksheetId)).emit(
+        "akkScoreChanged",
+        createAKKScoreChangedEvent(worksheetId, "spml", username)
+      );
 
       nonBlockingCall(
         activity.createActivity(
@@ -207,6 +215,10 @@ class WsSPMLJunctionEvent {
       socket.to(room).emit(
         "spmlWorksheetChanged",
         createSPMLChangedEvent(worksheetId, junctionId, "score", username)
+      );
+      socket.to(getAKKWorksheetRoom(worksheetId)).emit(
+        "akkScoreChanged",
+        createAKKScoreChangedEvent(worksheetId, "spml", username)
       );
 
       nonBlockingCall(

@@ -165,9 +165,21 @@ export interface AKKScoreResult {
 
 export interface AKKScoreCalculation {
   kppnId: string;
+  kppnName: string;
+  kppnAlias: string;
   periodId: number;
+  periodName: string;
   worksheetId: string;
   result: AKKScoreResult;
+}
+
+interface AKKWorksheetRow {
+  id: string;
+  kppn_id: string;
+  kppn_name: string;
+  kppn_alias: string;
+  period_id: number;
+  period_name: string;
 }
 
 export type AKKCategory = "A1_PROVINSI" | "A1_NON_PROVINSI" | "A2";
@@ -831,42 +843,59 @@ class ScoringEngine {
     poolTrx?: PoolClient
   ): Promise<AKKScoreCalculation | undefined> {
     const poolInstance = poolTrx ?? pool;
-    const worksheetQuery = `SELECT id
+    const worksheetQuery = `SELECT worksheet_ref.id,
+                                   worksheet_ref.kppn_id,
+                                   kppn_ref.name AS kppn_name,
+                                   kppn_ref.alias AS kppn_alias,
+                                   period_ref.id AS period_id,
+                                   period_ref.name AS period_name
                             FROM worksheet_ref
-                            WHERE kppn_id = $1
-                              AND period = $2
+                            INNER JOIN kppn_ref
+                              ON kppn_ref.id = worksheet_ref.kppn_id
+                            INNER JOIN period_ref
+                              ON period_ref.id = worksheet_ref.period
+                            WHERE worksheet_ref.kppn_id = $1
+                              AND worksheet_ref.period = $2
                             LIMIT 1`;
-    const worksheetResult = await poolInstance.query<{ id: string }>(
+    const worksheetResult = await poolInstance.query<AKKWorksheetRow>(
       worksheetQuery,
       [kppnId, periodId]
     );
 
     if (worksheetResult.rows.length === 0) return undefined;
 
-    const worksheetId = worksheetResult.rows[0].id;
-    const pbCalculation = await this.calculatePBScore(worksheetId, peraturan, poolTrx);
-
-    if (!pbCalculation) {
-      throw new ErrorDetail(
-        409,
-        "AKK score cannot be calculated because PB worksheet assignment is incomplete"
-      );
-    }
+    const worksheet = worksheetResult.rows[0];
+    const worksheetId = worksheet.id;
 
     if (peraturan === 1) {
+      const pbCalculation = await this.calculatePBScore(worksheetId, peraturan, poolTrx);
+      if (!pbCalculation) {
+        throw new ErrorDetail(
+          409,
+          "AKK score cannot be calculated because PB worksheet assignment is incomplete"
+        );
+      }
+
       return {
         kppnId,
+        kppnName: worksheet.kppn_name,
+        kppnAlias: worksheet.kppn_alias,
         periodId,
+        periodName: worksheet.period_name,
         worksheetId,
         result: calculateAKKScoreFromWorksheetScores(peraturan, pbCalculation.result),
       };
     }
 
-    const ckCalculation = await this.calculateCKScore(worksheetId, poolTrx);
-    const spmlCalculation = await this.calculateSPMLScore(worksheetId, poolTrx);
+    const [pbCalculation, ckCalculation, spmlCalculation] = await Promise.all([
+      this.calculatePBScore(worksheetId, peraturan, poolTrx),
+      this.calculateCKScore(worksheetId, poolTrx),
+      this.calculateSPMLScore(worksheetId, poolTrx),
+    ]);
 
-    if (!ckCalculation || !spmlCalculation) {
+    if (!pbCalculation || !ckCalculation || !spmlCalculation) {
       const missingWorksheets = [
+        !pbCalculation ? "PB" : null,
         !ckCalculation ? "CK" : null,
         !spmlCalculation ? "SPML" : null,
       ].filter(Boolean).join(" and ");
@@ -879,7 +908,10 @@ class ScoringEngine {
 
     return {
       kppnId,
+      kppnName: worksheet.kppn_name,
+      kppnAlias: worksheet.kppn_alias,
       periodId,
+      periodName: worksheet.period_name,
       worksheetId,
       result: calculateAKKScoreFromWorksheetScores(
         peraturan,

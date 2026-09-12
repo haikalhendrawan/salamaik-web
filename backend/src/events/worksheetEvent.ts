@@ -13,6 +13,10 @@ import logger from '../config/logger';
 import { validateScore } from '../utils/worksheetJunction.utils';
 import nonBlockingCall from '../utils/nonBlockingCall';
 import activity from '../model/activity.model';
+import {
+  createAKKScoreChangedEvent,
+  getAKKWorksheetRoom,
+} from '../utils/akkSocket.utils';
 // ---------------------------------------------------------------------------------------------------
 
 class WorksheetEvent{
@@ -69,6 +73,10 @@ class WorksheetEvent{
       const result = await wsJunction.editWsJunctionKanwilScore( junctionId, worksheetId, kanwilScore, name);
 
       socket.broadcast.emit('kanwilScoreHasUpdated', {worksheetId, junctionId, kanwilScore});
+      socket.to(getAKKWorksheetRoom(worksheetId)).emit(
+        'akkScoreChanged',
+        createAKKScoreChangedEvent(worksheetId, 'pb', username)
+      );
 
       nonBlockingCall(activity.createActivity(username, 85, ip, `junctionId: ${junctionId}, kanwilScore: ${kanwilScore}`));
 
@@ -98,6 +106,10 @@ class WorksheetEvent{
       const result = await wsJunction.editWsJunctionKPPNScore( junctionId, worksheetId, kppnScore, name);
 
       socket.broadcast.emit('KPPNScoreHasUpdated', {worksheetId, junctionId, kppnScore});
+      socket.to(getAKKWorksheetRoom(worksheetId)).emit(
+        'akkScoreChanged',
+        createAKKScoreChangedEvent(worksheetId, 'pb', username)
+      );
 
       nonBlockingCall(activity.createActivity(username, 91, ip, `junctionId: ${junctionId}, kppnScore: ${kppnScore}`));
 

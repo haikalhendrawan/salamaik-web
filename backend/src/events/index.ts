@@ -8,12 +8,14 @@ import disconnectEventListener from "./disconnect";
 import worksheetEventListener from "./worksheetEvent";
 import wsSPMLJunctionEventListener from "./wsSPMLJunctionEvent";
 import wsCKJunctionEventListener from './wsCKJunctionEvent';
+import scoringEngineEventListener from './scoringEngineEvent';
 
 const connectEvent = (socket: Socket) => {
   console.log("client is connected", socket.id);
   worksheetEventListener(socket);
   wsSPMLJunctionEventListener(socket);
   wsCKJunctionEventListener(socket);
+  scoringEngineEventListener(socket);
   disconnectEventListener(socket);
 };
 

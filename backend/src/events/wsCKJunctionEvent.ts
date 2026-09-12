@@ -20,6 +20,10 @@ import {
   KANWIL_ROLES,
   KPPN_SCORE_ROLES,
 } from '../utils/wsCKSocket.utils';
+import {
+  createAKKScoreChangedEvent,
+  getAKKWorksheetRoom,
+} from '../utils/akkSocket.utils';
 
 type SocketCallback = (response: {
   success: boolean;
@@ -177,6 +181,10 @@ class WsCKJunctionEvent {
       socket.to(room).emit(
         'ckWorksheetChanged',
         createCKChangedEvent(worksheetId, junctionId, 'score', socket.data.payload.username)
+      );
+      socket.to(getAKKWorksheetRoom(worksheetId)).emit(
+        'akkScoreChanged',
+        createAKKScoreChangedEvent(worksheetId, 'ck', socket.data.payload.username)
       );
 
       nonBlockingCall(
