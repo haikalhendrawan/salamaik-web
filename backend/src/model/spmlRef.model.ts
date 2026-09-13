@@ -45,6 +45,11 @@ export interface ChecklistSpmlType {
   komponen_spml_id: number;
   subkomponen_spml_id: number;
   aspek_spml_id: number;
+  positive_fallback: string | null;
+  negative_fallback: string | null;
+  rekomendasi: string | null;
+  peraturan: string | null;
+  uic: string | null;
   deleted?: Date | string | null;
 }
 
@@ -234,10 +239,10 @@ class ChecklistSpml {
 
   async createChecklistSpml(body: Omit<ChecklistSpmlType, 'id'>) {
     try {
-      const { title, uraian, dokumen, komponen_spml_id, subkomponen_spml_id, aspek_spml_id } = body;
-      const q = `INSERT INTO checklist_spml_ref (title, uraian, dokumen, komponen_spml_id, subkomponen_spml_id, aspek_spml_id) 
-                 VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`;
-      const result = await pool.query(q, [title ?? null, uraian, dokumen ?? null, komponen_spml_id, subkomponen_spml_id, aspek_spml_id]);
+      const { title, uraian, dokumen, komponen_spml_id, subkomponen_spml_id, aspek_spml_id, positive_fallback, negative_fallback, rekomendasi, peraturan, uic } = body;
+      const q = `INSERT INTO checklist_spml_ref (title, uraian, dokumen, komponen_spml_id, subkomponen_spml_id, aspek_spml_id, positive_fallback, negative_fallback, rekomendasi, peraturan, uic)
+                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`;
+      const result = await pool.query(q, [title ?? null, uraian, dokumen ?? null, komponen_spml_id, subkomponen_spml_id, aspek_spml_id, positive_fallback, negative_fallback, rekomendasi, peraturan, uic]);
       return result.rows;
     } catch (err) {
       throw err;
@@ -246,11 +251,12 @@ class ChecklistSpml {
 
   async editChecklistSpml(body: Partial<ChecklistSpmlType> & { id: number }) {
     try {
-      const { id, title, uraian, dokumen, komponen_spml_id, subkomponen_spml_id, aspek_spml_id } = body;
+      const { id, title, uraian, dokumen, komponen_spml_id, subkomponen_spml_id, aspek_spml_id, positive_fallback, negative_fallback, rekomendasi, peraturan, uic } = body;
       const q = `UPDATE checklist_spml_ref 
-                 SET title = $1, uraian = $2, dokumen = $3, komponen_spml_id = $4, subkomponen_spml_id = $5, aspek_spml_id = $6 
-                 WHERE id = $7 RETURNING *`;
-      const result = await pool.query(q, [title, uraian, dokumen, komponen_spml_id, subkomponen_spml_id, aspek_spml_id, id]);
+                 SET title = $1, uraian = $2, dokumen = $3, komponen_spml_id = $4, subkomponen_spml_id = $5, aspek_spml_id = $6,
+                     positive_fallback = $7, negative_fallback = $8, rekomendasi = $9, peraturan = $10, uic = $11
+                 WHERE id = $12 RETURNING *`;
+      const result = await pool.query(q, [title, uraian, dokumen, komponen_spml_id, subkomponen_spml_id, aspek_spml_id, positive_fallback, negative_fallback, rekomendasi, peraturan, uic, id]);
       return result.rows;
     } catch (err) {
       throw err;

@@ -24,6 +24,7 @@ import {
   createAKKScoreChangedEvent,
   getAKKWorksheetRoom,
 } from '../utils/akkSocket.utils';
+import { assertWorksheetMutationAllowed } from '../utils/worksheetPhase.utils';
 
 type SocketCallback = (response: {
   success: boolean;
@@ -83,7 +84,14 @@ class WsCKJunctionEvent {
     if (!junction || junction.worksheet_id !== worksheetId) return undefined;
 
     const { role, kppn } = socket.data.payload;
-    return canAccessCKWorksheet(role, kppn, junction.kppn_id) ? junction : undefined;
+    if (!canAccessCKWorksheet(role, kppn, junction.kppn_id)) return undefined;
+    await assertWorksheetMutationAllowed({
+      worksheetId,
+      peraturan: Number(socket.data.payload.peraturan),
+      kanwilScore: junction.kanwil_score,
+      excluded: junction.excluded,
+    });
+    return junction;
   }
 
   async joinWorksheet(socket: Socket, worksheetId: string, callback: SocketCallback) {

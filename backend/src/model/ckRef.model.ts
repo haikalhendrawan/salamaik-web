@@ -28,6 +28,8 @@ export interface ChecklistCkType {
   materi: string;
   kriteria_penilaian: string;
   bukti_dukung: string | null;
+  peraturan: string | null;
+  uic: string | null;
   deleted: TimestampValue | null;
   created_at: TimestampValue;
   updated_at: TimestampValue;
@@ -47,6 +49,9 @@ export interface OpsiCkType {
   description: string | null;
   value: CkScoreValue;
   urut: number;
+  positive_fallback: string | null;
+  negative_fallback: string | null;
+  rekomendasi: string | null;
   deleted: TimestampValue | null;
   created_at: TimestampValue;
   updated_at: TimestampValue;
@@ -69,14 +74,14 @@ export type UpdateKomponenCkInput = Omit<CreateKomponenCkInput, 'peraturan'> & {
 
 export type CreateChecklistCkInput = Pick<
   ChecklistCkType,
-  'komponen_ck_id' | 'urut' | 'materi' | 'kriteria_penilaian' | 'bukti_dukung'
+  'komponen_ck_id' | 'urut' | 'materi' | 'kriteria_penilaian' | 'bukti_dukung' | 'peraturan' | 'uic'
 >;
 
 export type UpdateChecklistCkInput = CreateChecklistCkInput & { id: number };
 
 export type CreateOpsiCkInput = Pick<
   OpsiCkType,
-  'checklist_ck_id' | 'label' | 'description' | 'value' | 'urut'
+  'checklist_ck_id' | 'label' | 'description' | 'value' | 'urut' | 'positive_fallback' | 'negative_fallback' | 'rekomendasi'
 >;
 
 export type UpdateOpsiCkInput = CreateOpsiCkInput & { id: number };
@@ -312,8 +317,8 @@ class ChecklistCk {
 
       const result = await client.query<ChecklistCkType>(
         `INSERT INTO checklist_ck_ref
-          (komponen_ck_id, urut, materi, kriteria_penilaian, bukti_dukung)
-         VALUES ($1, $2, $3, $4, $5)
+          (komponen_ck_id, urut, materi, kriteria_penilaian, bukti_dukung, peraturan, uic)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)
          RETURNING *`,
         [
           body.komponen_ck_id,
@@ -321,6 +326,8 @@ class ChecklistCk {
           body.materi,
           body.kriteria_penilaian,
           body.bukti_dukung,
+          body.peraturan,
+          body.uic,
         ]
       );
       return result.rows[0];
@@ -353,8 +360,10 @@ class ChecklistCk {
                 materi = $3,
                 kriteria_penilaian = $4,
                 bukti_dukung = $5,
+                peraturan = $6,
+                uic = $7,
                 updated_at = CURRENT_TIMESTAMP
-          WHERE id = $6
+          WHERE id = $8
             AND deleted IS NULL
           RETURNING *`,
         [
@@ -363,6 +372,8 @@ class ChecklistCk {
           body.materi,
           body.kriteria_penilaian,
           body.bukti_dukung,
+          body.peraturan,
+          body.uic,
           body.id,
         ]
       );
@@ -517,10 +528,10 @@ class OpsiCk {
 
       const result = await client.query<OpsiCkType>(
         `INSERT INTO opsi_ck_ref
-          (checklist_ck_id, label, description, value, urut)
-         VALUES ($1, $2, $3, $4, $5)
+          (checklist_ck_id, label, description, value, urut, positive_fallback, negative_fallback, rekomendasi)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
          RETURNING *`,
-        [body.checklist_ck_id, body.label, body.description, body.value, body.urut]
+        [body.checklist_ck_id, body.label, body.description, body.value, body.urut, body.positive_fallback, body.negative_fallback, body.rekomendasi]
       );
       return result.rows[0];
     });
@@ -547,8 +558,11 @@ class OpsiCk {
                 description = $3,
                 value = $4,
                 urut = $5,
+                positive_fallback = $6,
+                negative_fallback = $7,
+                rekomendasi = $8,
                 updated_at = CURRENT_TIMESTAMP
-          WHERE id = $6
+          WHERE id = $9
             AND deleted IS NULL
           RETURNING *`,
         [
@@ -557,6 +571,9 @@ class OpsiCk {
           body.description,
           body.value,
           body.urut,
+          body.positive_fallback,
+          body.negative_fallback,
+          body.rekomendasi,
           body.id,
         ]
       );

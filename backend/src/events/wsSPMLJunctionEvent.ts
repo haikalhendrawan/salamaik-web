@@ -19,6 +19,7 @@ import {
   createAKKScoreChangedEvent,
   getAKKWorksheetRoom,
 } from "../utils/akkSocket.utils";
+import { assertWorksheetMutationAllowed } from "../utils/worksheetPhase.utils";
 
 type SocketCallback = (response: {
   success: boolean;
@@ -120,6 +121,7 @@ class WsSPMLJunctionEvent {
       if (!junction || junction.worksheet_id !== worksheetId) {
         return socketError(callback, "SPML worksheet junction not found");
       }
+      await assertWorksheetMutationAllowed({ worksheetId, peraturan: Number(socket.data.payload.peraturan), kanwilScore: junction.kanwil_score, excluded: junction.excluded });
       if (!canAccessJunction(socket.data.payload.kppn, junction.kppn_id)) {
         return socketError(callback, "Not authorized to update this SPML worksheet");
       }
@@ -189,6 +191,7 @@ class WsSPMLJunctionEvent {
       if (!junction || junction.worksheet_id !== worksheetId) {
         return socketError(callback, "SPML worksheet junction not found");
       }
+      await assertWorksheetMutationAllowed({ worksheetId, peraturan: Number(socket.data.payload.peraturan), kanwilScore: junction.kanwil_score, excluded: junction.excluded });
       if (!canAccessJunction(socket.data.payload.kppn, junction.kppn_id)) {
         return socketError(callback, "Not authorized to update this SPML worksheet");
       }
@@ -264,6 +267,7 @@ class WsSPMLJunctionEvent {
       if (!junction || junction.worksheet_id !== worksheetId) {
         return socketError(callback, "SPML worksheet junction not found");
       }
+      await assertWorksheetMutationAllowed({ worksheetId, peraturan: Number(socket.data.payload.peraturan), kanwilScore: junction.kanwil_score, excluded: junction.excluded });
       if (!canAccessJunction(socket.data.payload.kppn, junction.kppn_id)) {
         return socketError(callback, "Not authorized to update this SPML worksheet");
       }
@@ -330,6 +334,7 @@ class WsSPMLJunctionEvent {
       if (!junction || junction.worksheet_id !== worksheetId) {
         return socketError(callback, "SPML worksheet junction not found");
       }
+      await assertWorksheetMutationAllowed({ worksheetId, peraturan: Number(socket.data.payload.peraturan), kanwilScore: junction.kanwil_score, excluded: junction.excluded });
 
       if (!canAccessJunction(socket.data.payload.kppn, junction.kppn_id)) {
         return socketError(callback, "Not authorized to update this SPML worksheet");
@@ -395,6 +400,7 @@ class WsSPMLJunctionEvent {
       if (!junction || !junction.file_1 || junction.file_1 !== safeFileName) {
         return socketError(callback, "SPML file not found");
       }
+      await assertWorksheetMutationAllowed({ worksheetId: junction.worksheet_id, peraturan: Number(socket.data.payload.peraturan), kanwilScore: junction.kanwil_score, excluded: junction.excluded });
 
       if (!canAccessJunction(socket.data.payload.kppn, junction.kppn_id)) {
         return socketError(callback, "Not authorized to update this SPML worksheet");

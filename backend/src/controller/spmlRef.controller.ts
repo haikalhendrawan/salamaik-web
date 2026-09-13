@@ -245,7 +245,7 @@ export const getAllChecklistSpml = async (req: Request, res: Response, next: Nex
 
 export const createChecklistSpml = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { title, uraian, dokumen, komponen_spml_id, subkomponen_spml_id, aspek_spml_id } = req.body;
+    const { title, uraian, dokumen, komponen_spml_id, subkomponen_spml_id, aspek_spml_id, positive_fallback, negative_fallback, rekomendasi, peraturan, uic } = req.body;
     if (!uraian || !komponen_spml_id || !subkomponen_spml_id || !aspek_spml_id) {
       throw new ErrorDetail(400, 'Uraian, Komponen SPML ID, SubKomponen SPML ID, dan Aspek SPML ID wajib diisi');
     }
@@ -257,6 +257,11 @@ export const createChecklistSpml = async (req: Request, res: Response, next: Nex
       komponen_spml_id: Number(komponen_spml_id),
       subkomponen_spml_id: Number(subkomponen_spml_id),
       aspek_spml_id: Number(aspek_spml_id),
+      positive_fallback: positive_fallback ?? null,
+      negative_fallback: negative_fallback ?? null,
+      rekomendasi: rekomendasi ?? null,
+      peraturan: peraturan ?? null,
+      uic: uic ?? null,
     });
 
     return res.status(200).json({ success: true, message: 'Checklist SPML created successfully', rows: result });
@@ -267,7 +272,7 @@ export const createChecklistSpml = async (req: Request, res: Response, next: Nex
 
 export const editChecklistSpml = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { id, title, uraian, dokumen, komponen_spml_id, subkomponen_spml_id, aspek_spml_id } = req.body;
+    const { id, title, uraian, dokumen, komponen_spml_id, subkomponen_spml_id, aspek_spml_id, positive_fallback, negative_fallback, rekomendasi, peraturan, uic } = req.body;
     if (!id || !uraian || !komponen_spml_id || !subkomponen_spml_id || !aspek_spml_id) {
       throw new ErrorDetail(400, 'ID, Uraian, Komponen SPML ID, SubKomponen SPML ID, dan Aspek SPML ID wajib diisi');
     }
@@ -280,6 +285,11 @@ export const editChecklistSpml = async (req: Request, res: Response, next: NextF
       komponen_spml_id: Number(komponen_spml_id),
       subkomponen_spml_id: Number(subkomponen_spml_id),
       aspek_spml_id: Number(aspek_spml_id),
+      positive_fallback: positive_fallback ?? null,
+      negative_fallback: negative_fallback ?? null,
+      rekomendasi: rekomendasi ?? null,
+      peraturan: peraturan ?? null,
+      uic: uic ?? null,
     });
 
     return res.status(200).json({ success: true, message: 'Checklist SPML updated successfully', rows: result });

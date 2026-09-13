@@ -50,9 +50,29 @@ const getMatrixWithWsDetailById = async(req: Request, res: Response, next: NextF
   }
 }
 
+const getRegulation2Matrix = async(req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { kppnId, periodId } = req.params;
+    const { role, kppn, peraturan } = req.payload;
+    const period = Number(periodId);
+    if (!Number.isInteger(period) || period <= 0) throw new ErrorDetail(400, 'Period ID tidak valid');
+    if (Number(peraturan) !== 2) throw new ErrorDetail(400, 'Endpoint matrix ini khusus peraturan 2');
+    if (![3, 4, 99].includes(role) && kppn !== kppnId) throw new ErrorDetail(401, 'Not authorized');
+
+    const worksheets = await worksheet.getWorksheetByPeriodAndKPPN(period, kppnId);
+    if (worksheets.length === 0) throw new ErrorDetail(404, 'Worksheet not found');
+    const worksheetDetail = worksheets[0];
+    const rows = await matrix.getRegulation2Findings(worksheetDetail.id);
+    return res.status(200).json({ success: true, message: 'Get matrix peraturan 2 success', rows: { matrix: rows, worksheet: worksheetDetail } });
+  } catch (err) {
+    next(err);
+  }
+}
+
 const createMatrix = async(req: Request, res: Response, next: NextFunction) => {
   const connection = await pool.connect();
   try{
+    if (Number(req.payload.peraturan) === 2) throw new ErrorDetail(400, 'Matriks peraturan 2 dibuat otomatis dari temuan aktif');
     await connection.query('BEGIN');
     const {kppnId} = req.body;
     const {period} = req.payload;
@@ -154,6 +174,7 @@ const createMatrix = async(req: Request, res: Response, next: NextFunction) => {
 const reAssignMatrix = async(req: Request, res: Response, next: NextFunction) => {
   const connection = await pool.connect();
   try{
+    if (Number(req.payload.peraturan) === 2) throw new ErrorDetail(400, 'Matriks peraturan 2 tidak memerlukan repost');
     await connection.query('BEGIN');
     const {kppnId} = req.body;
     const {period} = req.payload;
@@ -242,6 +263,7 @@ const reAssignMatrix = async(req: Request, res: Response, next: NextFunction) =>
 
 const updateMatrix = async(req: Request, res: Response, next: NextFunction) => {
   try{
+    if (Number(req.payload.peraturan) === 2) throw new ErrorDetail(400, 'Matriks peraturan 2 bersifat read-only');
     // const {id, hasilImplementasi, permasalahan, rekomendasi, peraturan, uic, tindakLanjut, isFinding} = req.body;
     const result = await matrix.updateMatrix(req.body);
 
@@ -255,6 +277,7 @@ const deleteMatrix = async(req: Request, res: Response, next: NextFunction) => {
   const connection = await pool.connect();
 
   try{
+    if (Number(req.payload.peraturan) === 2) throw new ErrorDetail(400, 'Matriks peraturan 2 tidak disimpan pada database');
     await connection.query('BEGIN');
     const {worksheetId} = req.body;
 
@@ -282,6 +305,7 @@ const deleteMatrix = async(req: Request, res: Response, next: NextFunction) => {
 export {
   getMatrixByWorksheetId,
   getMatrixWithWsDetailById,
+  getRegulation2Matrix,
   createMatrix,
   updateMatrix,
   reAssignMatrix,

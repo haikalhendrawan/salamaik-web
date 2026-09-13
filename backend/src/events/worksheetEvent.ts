@@ -17,6 +17,7 @@ import {
   createAKKScoreChangedEvent,
   getAKKWorksheetRoom,
 } from '../utils/akkSocket.utils';
+import { assertWorksheetMutationAllowed } from '../utils/worksheetPhase.utils';
 // ---------------------------------------------------------------------------------------------------
 
 class WorksheetEvent{
@@ -62,6 +63,8 @@ class WorksheetEvent{
       const {worksheetId, junctionId, kanwilScore} = data;
 
       const wsJunctionDetail = await wsJunction.getWsJunctionByJunctionId(junctionId);
+      if (!wsJunctionDetail || wsJunctionDetail.worksheet_id !== worksheetId) return socketError(callback, 'Worksheet junction not found');
+      await assertWorksheetMutationAllowed({ worksheetId, peraturan: Number(socket.data.payload.peraturan), kanwilScore: wsJunctionDetail.kanwil_score, excluded: wsJunctionDetail.excluded });
       const availableOpsi = wsJunctionDetail?.opsi;
       const isStandardisasi = wsJunctionDetail?.standardisasi===1? true : false;
       const isValidScore = validateScore(kanwilScore, availableOpsi, isStandardisasi);
@@ -95,6 +98,8 @@ class WorksheetEvent{
       const {worksheetId, junctionId, kppnScore} = data;
 
       const wsJunctionDetail = await wsJunction.getWsJunctionByJunctionId(junctionId);
+      if (!wsJunctionDetail || wsJunctionDetail.worksheet_id !== worksheetId) return socketError(callback, 'Worksheet junction not found');
+      await assertWorksheetMutationAllowed({ worksheetId, peraturan: Number(socket.data.payload.peraturan), kanwilScore: wsJunctionDetail.kanwil_score, excluded: wsJunctionDetail.excluded });
       const availableOpsi = wsJunctionDetail?.opsi;
       const isStandardisasi = wsJunctionDetail?.standardisasi===1? true : false;
       const isValidScore = validateScore(kppnScore, availableOpsi, isStandardisasi);
@@ -126,6 +131,9 @@ class WorksheetEvent{
 
       const {name, username} = socket.data.payload;
       const {worksheetId, junctionId, kanwilNote} = data; 
+      const junction = await wsJunction.getWsJunctionByJunctionId(junctionId);
+      if (!junction || junction.worksheet_id !== worksheetId) return socketError(callback, 'Worksheet junction not found');
+      await assertWorksheetMutationAllowed({ worksheetId, peraturan: Number(socket.data.payload.peraturan), kanwilScore: junction.kanwil_score, excluded: junction.excluded });
       const result = await wsJunction.editWsJunctionKanwilNote( junctionId, worksheetId, kanwilNote, name);
 
       socket.broadcast.emit('kanwilNoteHasUpdated', {worksheetId, junctionId, kanwilNote});
@@ -145,6 +153,9 @@ class WorksheetEvent{
 
       const {name, username} = socket.data.payload;
       const {worksheetId, junctionId, linkFile} = data; 
+      const junction = await wsJunction.getWsJunctionByJunctionId(junctionId);
+      if (!junction || junction.worksheet_id !== worksheetId) return socketError(callback, 'Worksheet junction not found');
+      await assertWorksheetMutationAllowed({ worksheetId, peraturan: Number(socket.data.payload.peraturan), kanwilScore: junction.kanwil_score, excluded: junction.excluded });
       const result = await wsJunction.editWsJunctionLinkFile( junctionId, worksheetId, linkFile, name);
 
       nonBlockingCall(activity.createActivity(username, 87, ip, `worksheetId: ${worksheetId}, junctionId: ${junctionId}, linkFile: ${linkFile}`));
@@ -164,6 +175,9 @@ class WorksheetEvent{
 
       const {name, username} = socket.data.payload;
       const {id, fileName, option} = data;
+      const junction = await wsJunction.getWsJunctionByJunctionId(id);
+      if (!junction) return socketError(callback, 'Worksheet junction not found');
+      await assertWorksheetMutationAllowed({ worksheetId: junction.worksheet_id, peraturan: Number(socket.data.payload.peraturan), kanwilScore: junction.kanwil_score, excluded: junction.excluded });
 
       const result = await wsJunction.deleteWsJunctionFile(id, option, name);
       

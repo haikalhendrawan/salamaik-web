@@ -182,7 +182,7 @@ export const createChecklistCk = async (
   next: NextFunction
 ) => {
   try {
-    const { komponen_ck_id, urut, materi, kriteria_penilaian, bukti_dukung } =
+    const { komponen_ck_id, urut, materi, kriteria_penilaian, bukti_dukung, peraturan: peraturanText, uic } =
       req.body ?? {};
     const peraturan = getRequestPeraturan(req);
     const result = await checklistCk.create(
@@ -195,6 +195,8 @@ export const createChecklistCk = async (
           'Kriteria penilaian CK'
         ),
         bukti_dukung: parseOptionalText(bukti_dukung, 'Bukti dukung CK'),
+        peraturan: parseOptionalText(peraturanText, 'Peraturan CK'),
+        uic: parseOptionalText(uic, 'UIC CK'),
       },
       peraturan
     );
@@ -215,7 +217,7 @@ export const editChecklistCk = async (
   next: NextFunction
 ) => {
   try {
-    const { id, komponen_ck_id, urut, materi, kriteria_penilaian, bukti_dukung } =
+    const { id, komponen_ck_id, urut, materi, kriteria_penilaian, bukti_dukung, peraturan: peraturanText, uic } =
       req.body ?? {};
     const peraturan = getRequestPeraturan(req);
     const result = await checklistCk.edit(
@@ -229,6 +231,8 @@ export const editChecklistCk = async (
           'Kriteria penilaian CK'
         ),
         bukti_dukung: parseOptionalText(bukti_dukung, 'Bukti dukung CK'),
+        peraturan: parseOptionalText(peraturanText, 'Peraturan CK'),
+        uic: parseOptionalText(uic, 'UIC CK'),
       },
       peraturan
     );
@@ -294,7 +298,7 @@ export const createOpsiCk = async (
   next: NextFunction
 ) => {
   try {
-    const { checklist_ck_id, label, description, value, urut } = req.body ?? {};
+    const { checklist_ck_id, label, description, value, urut, positive_fallback, negative_fallback, rekomendasi } = req.body ?? {};
     const peraturan = getRequestPeraturan(req);
     const result = await opsiCk.create(
       {
@@ -303,6 +307,9 @@ export const createOpsiCk = async (
         description: parseOptionalText(description, 'Deskripsi opsi CK'),
         value: parseScoreValue(value),
         urut: parsePositiveInteger(urut, 'Urut opsi CK'),
+        positive_fallback: parseOptionalText(positive_fallback, 'Hasil implementasi CK'),
+        negative_fallback: parseOptionalText(negative_fallback, 'Permasalahan CK'),
+        rekomendasi: parseOptionalText(rekomendasi, 'Rekomendasi CK'),
       },
       peraturan
     );
@@ -323,7 +330,7 @@ export const editOpsiCk = async (
   next: NextFunction
 ) => {
   try {
-    const { id, checklist_ck_id, label, description, value, urut } = req.body ?? {};
+    const { id, checklist_ck_id, label, description, value, urut, positive_fallback, negative_fallback, rekomendasi } = req.body ?? {};
     const peraturan = getRequestPeraturan(req);
     const result = await opsiCk.edit(
       {
@@ -333,6 +340,9 @@ export const editOpsiCk = async (
         description: parseOptionalText(description, 'Deskripsi opsi CK'),
         value: parseScoreValue(value),
         urut: parsePositiveInteger(urut, 'Urut opsi CK'),
+        positive_fallback: parseOptionalText(positive_fallback, 'Hasil implementasi CK'),
+        negative_fallback: parseOptionalText(negative_fallback, 'Permasalahan CK'),
+        rekomendasi: parseOptionalText(rekomendasi, 'Rekomendasi CK'),
       },
       peraturan
     );

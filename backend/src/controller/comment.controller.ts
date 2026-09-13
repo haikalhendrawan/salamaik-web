@@ -8,6 +8,7 @@ import comment, { CommentType } from '../model/comment.model';
 import ErrorDetail from '../model/error.model';
 import wsSPMLJunction from '../model/wsSPMLJunction.model';
 import wsCKJunction from '../model/wsCKJunction.model';
+import wsJunction from '../model/worksheetJunction.model';
 import io from '../config/io';
 import { createSPMLChangedEvent, getSPMLWorksheetRoom } from '../utils/wsSPMLSocket.utils';
 import {
@@ -15,6 +16,7 @@ import {
   createCKChangedEvent,
   getCKWorksheetRoom,
 } from '../utils/wsCKSocket.utils';
+import { assertWorksheetMutationAllowed } from '../utils/worksheetPhase.utils';
 
 const getByWsJunctionId = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -30,6 +32,9 @@ const add = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.payload;
     const { wsJunctionId, commentBody } = req.body;
+    const junction = await wsJunction.getWsJunctionByJunctionId(Number(wsJunctionId));
+    if (!junction) throw new ErrorDetail(404, 'Worksheet junction not found');
+    await assertWorksheetMutationAllowed({ worksheetId: junction.worksheet_id, peraturan: Number(req.payload.peraturan), kanwilScore: junction.kanwil_score, excluded: junction.excluded });
     const result = await comment.add(wsJunctionId, id, commentBody);
     return res.status(200).json({ success: true, message: 'Add comment success', rows: result });
   } catch (err) {
@@ -54,7 +59,6 @@ const getByWsSPMLJunctionId = async (req: Request, res: Response, next: NextFunc
     if (!canAccessSPMLJunction(req.payload?.kppn, junction.kppn_id)) {
       throw new ErrorDetail(403, 'Not authorized to access this SPML worksheet');
     }
-
     const result: CommentType[] = await comment.getByWsSPMLJunctionId(wsSPMLJunctionId);
     return res.status(200).json({ success: true, message: 'Get SPML comment success', rows: result });
   } catch (err) {
@@ -82,6 +86,7 @@ const addSPML = async (req: Request, res: Response, next: NextFunction) => {
     if (!canAccessSPMLJunction(req.payload?.kppn, junction.kppn_id)) {
       throw new ErrorDetail(403, 'Not authorized to access this SPML worksheet');
     }
+    await assertWorksheetMutationAllowed({ worksheetId: junction.worksheet_id, peraturan: Number(req.payload.peraturan), kanwilScore: junction.kanwil_score, excluded: junction.excluded });
 
     const result = await comment.addSPML(wsSPMLJunctionId, userId, commentBody);
     io.to(getSPMLWorksheetRoom(junction.worksheet_id)).emit(
@@ -106,7 +111,6 @@ const getByWsCKJunctionId = async (req: Request, res: Response, next: NextFuncti
     if (!canAccessCKWorksheet(req.payload.role, req.payload.kppn, junction.kppn_id)) {
       throw new ErrorDetail(403, 'Not authorized to access this CK worksheet');
     }
-
     const result: CommentType[] = await comment.getByWsCKJunctionId(wsCKJunctionId);
     return res.status(200).json({
       success: true,
@@ -136,6 +140,7 @@ const addCK = async (req: Request, res: Response, next: NextFunction) => {
     if (!canAccessCKWorksheet(req.payload.role, req.payload.kppn, junction.kppn_id)) {
       throw new ErrorDetail(403, 'Not authorized to access this CK worksheet');
     }
+    await assertWorksheetMutationAllowed({ worksheetId: junction.worksheet_id, peraturan: Number(req.payload.peraturan), kanwilScore: junction.kanwil_score, excluded: junction.excluded });
 
     const result = await comment.addCK(wsCKJunctionId, userId, commentBody);
     io.to(getCKWorksheetRoom(junction.worksheet_id)).emit(
@@ -170,6 +175,19 @@ const deleteById = async (req: Request, res: Response, next: NextFunction) => {
     }
     if (existingComment.user_id !== req.payload?.id) {
       throw new ErrorDetail(403, 'Comment hanya dapat dihapus oleh pembuatnya');
+    }
+
+    if (existingComment.ws_junction_id) {
+      const junction = await wsJunction.getWsJunctionByJunctionId(existingComment.ws_junction_id);
+      if (junction) await assertWorksheetMutationAllowed({ worksheetId: junction.worksheet_id, peraturan: Number(req.payload.peraturan), kanwilScore: junction.kanwil_score, excluded: junction.excluded });
+    }
+    if (existingComment.ws_spml_junction_id) {
+      const junction = await wsSPMLJunction.getWsSPMLJunctionByJunctionId(existingComment.ws_spml_junction_id);
+      if (junction) await assertWorksheetMutationAllowed({ worksheetId: junction.worksheet_id, peraturan: Number(req.payload.peraturan), kanwilScore: junction.kanwil_score, excluded: junction.excluded });
+    }
+    if (existingComment.ws_ck_junction_id) {
+      const junction = await wsCKJunction.getByJunctionId(existingComment.ws_ck_junction_id);
+      if (junction) await assertWorksheetMutationAllowed({ worksheetId: junction.worksheet_id, peraturan: Number(req.payload.peraturan), kanwilScore: junction.kanwil_score, excluded: junction.excluded });
     }
 
     const result = await comment.delete(id);

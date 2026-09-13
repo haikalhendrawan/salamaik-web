@@ -13,6 +13,7 @@ const router = Router();
 
 router.get('/getMatrixByWorksheetId/:id', authenticate, authorize([99, 4, 3, 2, 1]), logActivity(32), matrixController.getMatrixByWorksheetId);
 router.get('/getMatrixWithWsDetailById/:kppnId', authenticate, authorize([99, 4, 3, 2, 1]), logActivity(33), matrixController.getMatrixWithWsDetailById);
+router.get('/matrix/peraturan-2/:kppnId/:periodId', authenticate, authorize([99, 4, 3, 2, 1]), logActivity(33), matrixController.getRegulation2Matrix);
 router.post('/createMatrix', authenticate, authorize([99, 4]), logActivity(34), matrixController.createMatrix);
 router.post('/updateMatrix', authenticate, authorize([99, 4, 3]), logActivity(36), matrixController.updateMatrix);
 router.post('/reAssignMatrix', authenticate, authorize([99, 4, 3]), logActivity(35), matrixController.reAssignMatrix);

@@ -65,8 +65,74 @@ export interface MatrixWithWsJunctionType{
   opsi: OpsiType[]
 };
 
+export type Regulation2WorksheetType = 'PB' | 'SPML' | 'CK';
+
+export interface Regulation2MatrixRow {
+  worksheet_type: Regulation2WorksheetType;
+  junction_id: number;
+  checklist_id: number;
+  nomor_kertas_kerja: string;
+  komponen_supervisi: string;
+  hasil_implementasi: string | null;
+  permasalahan: string | null;
+  rekomendasi: string | null;
+  peraturan: string | null;
+  uic: string | null;
+  tindak_lanjut: string | null;
+  status_penyelesaian: string | null;
+  kanwil_score: number | null;
+  kanwil_note: string | null;
+}
+
 // --------------------------------------------------
 class Matrix{
+  async getRegulation2Findings(worksheetId: string): Promise<Regulation2MatrixRow[]> {
+    const result = await pool.query<Regulation2MatrixRow>(
+      `WITH pb AS (
+         SELECT 'PB'::text AS worksheet_type, junction.junction_id, checklist.id AS checklist_id,
+                COALESCE(checklist.urut::text, checklist.id::text) AS nomor_kertas_kerja,
+                CONCAT_WS(' - ', komponen.title, subkomponen.title) AS komponen_supervisi,
+                COALESCE(selected_option.positive_fallback, checklist.matrix_title, checklist.title) AS hasil_implementasi,
+                COALESCE(NULLIF(junction.kanwil_note, ''), selected_option.negative_fallback, minimum_option.negative_fallback) AS permasalahan,
+                COALESCE(selected_option.rekomendasi, minimum_option.rekomendasi) AS rekomendasi,
+                checklist.peraturan, checklist.uic, NULL::text AS tindak_lanjut,
+                NULL::text AS status_penyelesaian, junction.kanwil_score, junction.kanwil_note
+           FROM worksheet_junction junction
+           JOIN checklist_ref checklist ON checklist.id = junction.checklist_id
+           LEFT JOIN komponen_ref komponen ON komponen.id = checklist.komponen_id
+           LEFT JOIN subkomponen_ref subkomponen ON subkomponen.id = checklist.subkomponen_id
+           LEFT JOIN LATERAL (SELECT opsi.* FROM opsi_ref opsi WHERE opsi.checklist_id = checklist.id AND opsi.deleted IS NULL AND opsi.value = junction.kanwil_score LIMIT 1) selected_option ON TRUE
+           LEFT JOIN LATERAL (SELECT opsi.* FROM opsi_ref opsi WHERE opsi.checklist_id = checklist.id AND opsi.deleted IS NULL ORDER BY opsi.value ASC LIMIT 1) minimum_option ON TRUE
+          WHERE junction.worksheet_id = $1 AND junction.excluded <> 1 AND (junction.kanwil_score IS NULL OR junction.kanwil_score < 10)
+       ), ck AS (
+         SELECT 'CK'::text, junction.junction_id, checklist.id, checklist.urut::text,
+                CONCAT_WS(' - ', komponen.title, checklist.materi),
+                COALESCE(selected_option.positive_fallback, checklist.kriteria_penilaian),
+                COALESCE(NULLIF(junction.kanwil_note, ''), selected_option.negative_fallback, minimum_option.negative_fallback),
+                COALESCE(selected_option.rekomendasi, minimum_option.rekomendasi), checklist.peraturan, checklist.uic,
+                NULL::text, NULL::text, junction.kanwil_score, junction.kanwil_note
+           FROM worksheet_ck_junction junction
+           JOIN checklist_ck_ref checklist ON checklist.id = junction.checklist_ck_id
+           JOIN komponen_ck_ref komponen ON komponen.id = checklist.komponen_ck_id
+           LEFT JOIN LATERAL (SELECT opsi.* FROM opsi_ck_ref opsi WHERE opsi.checklist_ck_id = checklist.id AND opsi.deleted IS NULL AND opsi.value = junction.kanwil_score LIMIT 1) selected_option ON TRUE
+           LEFT JOIN LATERAL (SELECT opsi.* FROM opsi_ck_ref opsi WHERE opsi.checklist_ck_id = checklist.id AND opsi.deleted IS NULL ORDER BY opsi.value ASC LIMIT 1) minimum_option ON TRUE
+          WHERE junction.worksheet_id = $1 AND junction.excluded <> 1 AND (junction.kanwil_score IS NULL OR junction.kanwil_score < 10)
+       ), spml AS (
+         SELECT 'SPML'::text, junction.junction_id, checklist.id, COALESCE(checklist.title, checklist.id::text),
+                CONCAT_WS(' - ', komponen.title, subkomponen.title, aspek.title), COALESCE(checklist.positive_fallback, checklist.uraian),
+                COALESCE(NULLIF(junction.kanwil_note, ''), checklist.negative_fallback), checklist.rekomendasi,
+                checklist.peraturan, checklist.uic, NULL::text, NULL::text, junction.kanwil_score, junction.kanwil_note
+           FROM worksheet_spml_junction junction
+           JOIN checklist_spml_ref checklist ON checklist.id = junction.checklist_spml_id
+           LEFT JOIN komponen_spml_ref komponen ON komponen.id = checklist.komponen_spml_id
+           LEFT JOIN subkomponen_spml_ref subkomponen ON subkomponen.id = checklist.subkomponen_spml_id
+           LEFT JOIN aspek_spml_ref aspek ON aspek.id = checklist.aspek_spml_id
+          WHERE junction.worksheet_id = $1 AND junction.excluded <> 1 AND (junction.kanwil_score IS NULL OR junction.kanwil_score < 10)
+       ) SELECT * FROM pb UNION ALL SELECT * FROM spml UNION ALL SELECT * FROM ck`,
+      [worksheetId]
+    );
+    return result.rows;
+  }
 
   async addMatrix(body: MatrixBodyType, poolTrx?: PoolClient){
     const poolInstance = poolTrx??pool;

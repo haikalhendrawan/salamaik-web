@@ -19,6 +19,7 @@ import { sanitizeMimeType } from '../utils/mimeTypeSanitizer';
 import { validateScore } from '../utils/worksheetJunction.utils';
 import { getScoreForMatrix } from '../utils/getScorePembinaan';
 import {UnitType} from '../model/unit.model';
+import { assertWorksheetMutationAllowed, createWorksheetReadState } from '../utils/worksheetPhase.utils';
 // ------------------------------------------------------------------
 interface ScorePerKomponenType{
   komponenId: number,
@@ -48,8 +49,8 @@ const getWsJunctionByWorksheetForKPPN = async(req: Request, res: Response, next:
     };
 
     const result: WsJunctionJoinChecklistType[] = await wsJunction.getWsJunctionByWorksheetId(worksheetId);
-
-    return res.status(200).json({sucess: true, message: 'Get worksheet junction success', rows: result})
+    const state = createWorksheetReadState(result, worksheetData[0], Number(req.payload.peraturan), req.payload.role);
+    return res.status(200).json({sucess: true, message: 'Get worksheet junction success', ...state})
   }catch(err){
     next(err);
   }
@@ -73,7 +74,8 @@ const getWsJunctionByWorksheetForKanwil = async(req: Request, res: Response, nex
       throw new ErrorDetail(404, 'Worksheet not assigned');
     };
     
-    return res.status(200).json({sucess: true, message: 'Get worksheet junction success', rows: result})
+    const state = createWorksheetReadState(result, worksheetData[0], Number(req.payload.peraturan), req.payload.role);
+    return res.status(200).json({sucess: true, message: 'Get worksheet junction success', ...state})
   }catch(err){
     next(err);
   }
@@ -127,8 +129,9 @@ const getByPeriodAndKPPN = async(req: Request, res: Response, next: NextFunction
 
 const getWsJunctionScoreAndProgress = async(req: Request, res: Response, next: NextFunction) => {
   try{
-    const {kppn} = req.payload;
-    const {kppnId, period, peraturan} = req.body;
+    const {kppn, peraturan: payloadPeraturan} = req.payload;
+    const {kppnId, period, peraturan: requestPeraturan} = req.body;
+    const peraturan = requestPeraturan ?? payloadPeraturan;
 
     const allowedKPPN = kppn?.length===5?kppnId:kppn;
 
@@ -231,6 +234,8 @@ const editWsJunctionKPPNScore = async(req: Request, res: Response, next: NextFun
     const {worksheetId, junctionId, kppnScore} = req.body;
 
     const wsJunctionDetail = await wsJunction.getWsJunctionByJunctionId(junctionId);
+    if (!wsJunctionDetail || wsJunctionDetail.worksheet_id !== worksheetId) throw new ErrorDetail(404, 'Worksheet junction not found');
+    await assertWorksheetMutationAllowed({ worksheetId, peraturan: Number(req.payload.peraturan), kanwilScore: wsJunctionDetail.kanwil_score, excluded: wsJunctionDetail.excluded });
     const availableOpsi = wsJunctionDetail?.opsi;
     const isStandardisasi = wsJunctionDetail?.standardisasi===1? true : false;
     const isValidScore = validateScore(kppnScore, availableOpsi, isStandardisasi);
@@ -255,6 +260,8 @@ const editWsJunctionKanwilScore = async(req: Request, res: Response, next: NextF
     const {worksheetId, junctionId, kanwilScore} = req.body;
 
     const wsJunctionDetail = await wsJunction.getWsJunctionByJunctionId(junctionId);
+    if (!wsJunctionDetail || wsJunctionDetail.worksheet_id !== worksheetId) throw new ErrorDetail(404, 'Worksheet junction not found');
+    await assertWorksheetMutationAllowed({ worksheetId, peraturan: Number(req.payload.peraturan), kanwilScore: wsJunctionDetail.kanwil_score, excluded: wsJunctionDetail.excluded });
     const availableOpsi = wsJunctionDetail?.opsi;
     const isStandardisasi = wsJunctionDetail?.standardisasi===1? true : false;
     const isValidScore = validateScore(kanwilScore, availableOpsi, isStandardisasi);
@@ -277,6 +284,9 @@ const editWsJunctionKanwilNote = async(req: Request, res: Response, next: NextFu
     const username = req.payload.username;
 
     const {worksheetId, junctionId, kanwilNote} = req.body; 
+    const junction = await wsJunction.getWsJunctionByJunctionId(junctionId);
+    if (!junction || junction.worksheet_id !== worksheetId) throw new ErrorDetail(404, 'Worksheet junction not found');
+    await assertWorksheetMutationAllowed({ worksheetId, peraturan: Number(req.payload.peraturan), kanwilScore: junction.kanwil_score, excluded: junction.excluded });
     const result = await wsJunction.editWsJunctionKanwilNote(junctionId, worksheetId, kanwilNote, username);
 
     return res.status(200).json({sucess: true, message: 'Edit worksheet junction success', rows: result})
@@ -290,6 +300,9 @@ const editWsJunctionLinkFile = async(req: Request, res: Response, next: NextFunc
     const username = req.payload.username;
 
     const {junctionId, worksheetId, linkFile} = req.body; 
+    const junction = await wsJunction.getWsJunctionByJunctionId(junctionId);
+    if (!junction || junction.worksheet_id !== worksheetId) throw new ErrorDetail(404, 'Worksheet junction not found');
+    await assertWorksheetMutationAllowed({ worksheetId, peraturan: Number(req.payload.peraturan), kanwilScore: junction.kanwil_score, excluded: junction.excluded });
     const result = await wsJunction.editWsJunctionLinkFile(junctionId, worksheetId, linkFile, username);
 
     return res.status(200).json({sucess: true, message: 'Edit worksheet junction success', rows: result})
@@ -313,6 +326,9 @@ const editWsJunctionFile = async(req: Request, res: Response, next: NextFunction
     try{
       const {name} = req.payload;
       const {worksheetId, junctionId, checklistId, kppnId, option} = req.body; 
+      const junction = await wsJunction.getWsJunctionByJunctionId(Number(junctionId));
+      if (!junction || junction.worksheet_id !== worksheetId) throw new ErrorDetail(404, 'Worksheet junction not found');
+      await assertWorksheetMutationAllowed({ worksheetId, peraturan: Number(req.payload.peraturan), kanwilScore: junction.kanwil_score, excluded: junction.excluded });
       const fileExt = sanitizeMimeType(req.file.mimetype);
       const fileName = `ch${checklistId}_file${option}_kppn${kppnId}_${worksheetId}.${fileExt}`;
 
@@ -330,6 +346,9 @@ const editWsJunctionFile = async(req: Request, res: Response, next: NextFunction
 const editWsJunctionExclude = async(req: Request, res: Response, next: NextFunction) => {
   try{
     const {junctionId, exclude} = req.body;
+    const junction = await wsJunction.getWsJunctionByJunctionId(Number(junctionId));
+    if (!junction) throw new ErrorDetail(404, 'Worksheet junction not found');
+    await assertWorksheetMutationAllowed({ worksheetId: junction.worksheet_id, peraturan: Number(req.payload.peraturan), kanwilScore: junction.kanwil_score, excluded: junction.excluded });
     const result = await wsJunction.editWsJunctionExclude(junctionId, exclude);
 
     return res.status(200).json({sucess: true, message: 'Edit worksheet junction success', rows: result})
@@ -343,6 +362,9 @@ const deleteWsJunctionFile = async(req: Request, res: Response, next: NextFuncti
     const {username} = req.payload;
 
     const {id, fileName, option} = req.body;
+    const junction = await wsJunction.getWsJunctionByJunctionId(Number(id));
+    if (!junction) throw new ErrorDetail(404, 'Worksheet junction not found');
+    await assertWorksheetMutationAllowed({ worksheetId: junction.worksheet_id, peraturan: Number(req.payload.peraturan), kanwilScore: junction.kanwil_score, excluded: junction.excluded });
     const result = await wsJunction.deleteWsJunctionFile(id, option, username);
 
     const filePath = path.join(__dirname,`../uploads/worksheet/`, fileName);

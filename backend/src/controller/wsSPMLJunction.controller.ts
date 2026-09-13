@@ -15,6 +15,7 @@ import wsSPMLJunction, {
   WsSPMLJunctionJoinChecklistSPMLType,
 } from "../model/wsSPMLJunction.model";
 import { createSPMLChangedEvent, getSPMLWorksheetRoom } from "../utils/wsSPMLSocket.utils";
+import { assertWorksheetMutationAllowed, createWorksheetReadState } from "../utils/worksheetPhase.utils";
 //-----------------------------------------------------------------------------------------------------------------
 const getWsSPMLJunctionByWorksheetForKPPN = async (
   req: Request,
@@ -36,11 +37,12 @@ const getWsSPMLJunctionByWorksheetForKPPN = async (
     if (result.length === 0) {
       throw new ErrorDetail(404, "SPML worksheet not assigned");
     }
+    const state = createWorksheetReadState(result, worksheetData[0], Number(req.payload.peraturan), req.payload.role);
 
     return res.status(200).json({
       success: true,
       message: "Get SPML worksheet junction success",
-      rows: result,
+      ...state,
     });
   } catch (err) {
     next(err);
@@ -73,11 +75,12 @@ const getWsSPMLJunctionByWorksheetForKanwil = async (
     if (result.length === 0) {
       throw new ErrorDetail(404, "SPML worksheet not assigned");
     }
+    const state = createWorksheetReadState(result, worksheetData[0], Number(req.payload.peraturan), req.payload.role);
 
     return res.status(200).json({
       success: true,
       message: "Get SPML worksheet junction success",
-      rows: result,
+      ...state,
     });
   } catch (err) {
     next(err);
@@ -126,6 +129,7 @@ const editWsSPMLJunctionFile = async (
       if (requesterKppn?.length !== 5 && requesterKppn !== junction.kppn_id) {
         throw new ErrorDetail(403, "Not authorized to update this SPML worksheet");
       }
+      await assertWorksheetMutationAllowed({ worksheetId, peraturan: Number(req.payload.peraturan), kanwilScore: junction.kanwil_score, excluded: junction.excluded });
 
       if (junction.file_1) {
         throw new ErrorDetail(409, "Hapus file SPML yang lama sebelum mengunggah file baru");

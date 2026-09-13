@@ -17,6 +17,7 @@ import {
   createCKChangedEvent,
   getCKWorksheetRoom,
 } from '../utils/wsCKSocket.utils';
+import { assertWorksheetMutationAllowed, createWorksheetReadState } from '../utils/worksheetPhase.utils';
 
 const getWsCKJunctionByWorksheetForKPPN = async (
   req: Request,
@@ -33,10 +34,11 @@ const getWsCKJunctionByWorksheetForKPPN = async (
     const result = await wsCKJunction.getByWorksheetId(worksheetId);
     if (result.length === 0) throw new ErrorDetail(404, 'CK worksheet not assigned');
 
+    const state = createWorksheetReadState(result, worksheetData[0], Number(req.payload.peraturan), req.payload.role);
     return res.status(200).json({
       success: true,
       message: 'Get CK worksheet junction success',
-      rows: result,
+      ...state,
     });
   } catch (error) {
     next(error);
@@ -62,10 +64,11 @@ const getWsCKJunctionByWorksheetForKanwil = async (
     const result = await wsCKJunction.getByWorksheetId(worksheetId);
     if (result.length === 0) throw new ErrorDetail(404, 'CK worksheet not assigned');
 
+    const state = createWorksheetReadState(result, worksheetData[0], Number(req.payload.peraturan), req.payload.role);
     return res.status(200).json({
       success: true,
       message: 'Get CK worksheet junction success',
-      rows: result,
+      ...state,
     });
   } catch (error) {
     next(error);
@@ -115,6 +118,7 @@ const editWsCKJunctionFile = async (
       if (!canAccessCKWorksheet(req.payload.role, req.payload.kppn, junction.kppn_id)) {
         throw new ErrorDetail(403, 'Not authorized to update this CK worksheet');
       }
+      await assertWorksheetMutationAllowed({ worksheetId, peraturan: Number(req.payload.peraturan), kanwilScore: junction.kanwil_score, excluded: junction.excluded });
       if (junction.file_1) {
         throw new ErrorDetail(409, 'Hapus file CK yang lama sebelum mengunggah file baru');
       }
