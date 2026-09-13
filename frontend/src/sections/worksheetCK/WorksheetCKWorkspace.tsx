@@ -62,7 +62,15 @@ export default function WorksheetCKWorkspace() {
         </IconButton>
         <Typography variant="h4">{`KPPN ${selectedKppnName}`}</Typography>
       </Stack>
-      <WorksheetCKToolbar rows={wsCKJunction} kppnName={selectedKppnName} lastRefreshedAt={lastRefreshedAt} />
+      <WorksheetCKToolbar
+        rows={wsCKJunction}
+        kppnName={selectedKppnName}
+        lastRefreshedAt={lastRefreshedAt}
+        onSync={() => getWsCKJunction(selectedKppnId, {
+          showOverlay: false,
+          refreshScore: true,
+        })}
+      />
       <Card sx={{ mx: 4 }}>
         <CardHeader title={<Typography variant="h6" textAlign="center" sx={{ mb: 2 }}>Kertas Kerja Capaian Kinerja</Typography>} />
         <WorksheetCKTable

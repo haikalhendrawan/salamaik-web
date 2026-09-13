@@ -7,6 +7,7 @@ import {useState} from "react";
 import {Card, Typography, Grid, CardContent, Stack, IconButton, Slide} from '@mui/material';
 import {useTheme} from '@mui/material/styles';
 import Iconify from "../../../components/iconify";
+import { useAuth } from "../../../hooks/useAuth";
 // ----------------------------------------------
 interface ScorePembinaanProps {
   header: string,
@@ -19,7 +20,11 @@ interface ScorePembinaanProps {
 export default function ScorePembinaan({header, selfScore, kanwilScore}: ScorePembinaanProps){
   const theme = useTheme();
 
-  const [value, setValue] = useState<number>(0);
+  const {auth} = useAuth();
+
+  const isKanwil = [3, 4, 99].includes(auth?.role || 0);
+
+  const [value, setValue] = useState<number>(isKanwil ? 1 : 0);
 
   return(
     <Card sx={{height:'200px', borderRadius:'16px'}}>

@@ -1,5 +1,10 @@
 import ExcelJS from 'exceljs';
-import { AKKComponentDetail, AKKScoreResponse, AKKSideDetail } from './types';
+import {
+  AKKComponentDetail,
+  AKKScoreResponse,
+  AKKSideDetail,
+  PBScoreDetail,
+} from './types';
 
 type ExcelPenilaianParams = {
   data: AKKScoreResponse;
@@ -26,6 +31,11 @@ export default function useExcelPenilaian(params: ExcelPenilaianParams) {
 }
 
 export async function generateExcelPenilaian({ data }: ExcelPenilaianParams) {
+  if (data.peraturan === 1) {
+    await generateExcelPenilaianPeraturan1(data);
+    return;
+  }
+
   const workbook = new ExcelJS.Workbook();
   workbook.creator = 'Salamaik Web';
   workbook.created = new Date();
@@ -87,6 +97,138 @@ export async function generateExcelPenilaian({ data }: ExcelPenilaianParams) {
   const link = document.createElement('a');
   link.href = url;
   link.download = `Penilaian_AKK_${safeFileName(data.kppnAlias || data.kppnName)}_${safeFileName(data.periodName)}_${Date.now()}.xlsx`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+async function generateExcelPenilaianPeraturan1(data: AKKScoreResponse) {
+  const workbook = new ExcelJS.Workbook();
+  workbook.creator = 'Salamaik Web';
+  workbook.created = new Date();
+  workbook.subject = `Rekapitulasi Penilaian ${data.kppnName} - ${data.periodName}`;
+
+  const worksheet = workbook.addWorksheet('REKAP PB', {
+    views: [{ showGridLines: false }],
+    pageSetup: {
+      orientation: 'landscape',
+      fitToPage: true,
+      fitToWidth: 1,
+      fitToHeight: 0,
+      paperSize: 9,
+    },
+  });
+  worksheet.columns = [
+    { width: 7 },
+    { width: 38 },
+    { width: 16 },
+    { width: 18 },
+    { width: 18 },
+    { width: 15 },
+    { width: 18 },
+  ];
+
+  const title = worksheet.addRow([
+    `REKAPITULASI PENILAIAN KINERJA ${(data.kppnAlias || data.kppnName).toUpperCase()}`,
+  ]);
+  worksheet.mergeCells(`A${title.number}:G${title.number}`);
+  title.height = 26;
+  stylePBRow(title, COLORS.header, true);
+
+  addPBSection(
+    worksheet,
+    'Berdasarkan Self Assessment KPPN',
+    data.detailPBKPPN,
+    data.nilaiKPPN,
+    COLORS.selfAssessment
+  );
+  worksheet.addRow([]).height = 8;
+  addPBSection(
+    worksheet,
+    'Berdasarkan Penilaian Kanwil',
+    data.detailPBKanwil,
+    data.nilaiKanwil,
+    COLORS.kanwil
+  );
+
+  worksheet.pageSetup.printArea = `A1:G${worksheet.lastRow?.number || 1}`;
+  await downloadWorkbook(
+    workbook,
+    `Penilaian_AKK_${safeFileName(data.kppnAlias || data.kppnName)}_${safeFileName(data.periodName)}_${Date.now()}.xlsx`
+  );
+}
+
+function addPBSection(
+  worksheet: ExcelJS.Worksheet,
+  title: string,
+  detail: PBScoreDetail,
+  finalScore: number,
+  fillColor: string
+) {
+  const section = worksheet.addRow([title]);
+  worksheet.mergeCells(`A${section.number}:G${section.number}`);
+  section.height = 23;
+  stylePBRow(section, fillColor, true);
+
+  const header = worksheet.addRow([
+    'No',
+    'Nama Komponen',
+    'Total Nilai',
+    'Bilangan Pembagi',
+    'Rata-Rata Nilai',
+    'Bobot Nilai',
+    'Nilai Tertimbang',
+  ]);
+  header.height = 30;
+  stylePBRow(header, COLORS.header, true);
+
+  detail.detailKomponen.forEach((component, index) => {
+    const row = worksheet.addRow([
+      index + 1,
+      component.komponenTitle,
+      component.totalSkorKonversi,
+      component.jumlahChecklistPembagi,
+      component.nilaiRataRata,
+      component.komponenBobot / 100,
+      component.nilaiTerbobot,
+    ]);
+    row.height = 23;
+    stylePBRow(row, fillColor, false);
+    [3, 5, 7].forEach((column) => { row.getCell(column).numFmt = '0.00'; });
+    row.getCell(6).numFmt = '0.00%';
+  });
+
+  const footer = worksheet.addRow(['Nilai Akhir', '', '', '', '', '', finalScore]);
+  worksheet.mergeCells(`A${footer.number}:F${footer.number}`);
+  footer.height = 24;
+  stylePBRow(footer, COLORS.kanwil, true);
+  footer.getCell(7).numFmt = '0.00';
+}
+
+function stylePBRow(row: ExcelJS.Row, fillColor: string, bold: boolean) {
+  for (let column = 1; column <= 7; column += 1) {
+    const cell = row.getCell(column);
+    cell.border = BORDER;
+    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: fillColor } };
+    cell.font = { name: 'Calibri', size: 11, bold, color: { argb: COLORS.text } };
+    cell.alignment = {
+      horizontal: column === 2 && !bold ? 'left' : 'center',
+      vertical: 'middle',
+      wrapText: true,
+    };
+  }
+}
+
+async function downloadWorkbook(workbook: ExcelJS.Workbook, fileName: string) {
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = fileName;
   document.body.appendChild(link);
   link.click();
   link.remove();

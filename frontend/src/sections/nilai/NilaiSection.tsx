@@ -1,5 +1,5 @@
 import { Helmet } from 'react-helmet-async';
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import type { SyntheticEvent } from 'react';
 import { Alert, Button, Container, Skeleton, Stack, Typography } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -8,26 +8,39 @@ import useDictionary from '../../hooks/useDictionary';
 import useSnackbar from '../../hooks/display/useSnackbar';
 import SelectionTab from '../matrix/components/SelectionTab';
 import TabelPenilaian from './components/TabelPenilaian';
+import TabelNilaiAKKPenyumbangLHPS from './components/TabelNilaiAKKPenyumbangLHPS';
 import ScorePembinaan from '../home/components/ScorePembinaan';
 import useNilaiAKK from './useNilaiAKK';
 import useNilaiAKKLiveSync from './useNilaiAKKLiveSync';
+import useNilaiAKKPenyumbangLHPS from './useNilaiAKKPenyumbangLHPS';
+import useNilaiAKKPenyumbangLHPSLiveSync from './useNilaiAKKPenyumbangLHPSLiveSync';
+import { AKKScoreChangedEvent } from './types';
 //-----------------------------------------------------------------------------------------------------------------
 
 export default function NilaiSection() {
   const { auth } = useAuth();
+
   const { kppnRef } = useDictionary();
+
   const { openSnackbar } = useSnackbar();
+
   const location = useLocation();
+
   const navigate = useNavigate();
 
   const isKanwil = [3, 4, 99].includes(auth?.role ?? -1);
+
   const queryKppnId = new URLSearchParams(location.search).get('id');
+
   const kppnUnits = useMemo(
     () => kppnRef?.list.filter((item) => item.level === 0) || [],
     [kppnRef]
   );
+
   const defaultKppnId = kppnUnits[0]?.id || '010';
+
   const selectedKppnId = isKanwil ? queryKppnId || defaultKppnId : auth?.kppn || '';
+
   const {
     data,
     error,
@@ -38,7 +51,33 @@ export default function NilaiSection() {
     clearRefreshError,
   } = useNilaiAKK(selectedKppnId, auth?.period, auth?.peraturan);
 
-  useNilaiAKKLiveSync(data?.worksheetId, refresh);
+  const {
+    data: contributorData,
+    error: contributorError,
+    refreshError: contributorRefreshError,
+    isLoading: isContributorLoading,
+    isRefreshing: isContributorRefreshing,
+    refresh: refreshContributor,
+    clearRefreshError: clearContributorRefreshError,
+  } = useNilaiAKKPenyumbangLHPS(auth?.period, auth?.peraturan, isKanwil);
+
+  const contributorWorksheetIds = useMemo(
+    () => contributorData?.kelompok.flatMap((group) => (
+      group.kppn.map((unit) => unit.worksheetId)
+    )) || [],
+    [contributorData]
+  );
+
+  const refreshKanwilScores = useCallback(async (event?: AKKScoreChangedEvent) => {
+    const requests: Promise<void>[] = [refreshContributor({ silent: true })];
+    if (!event || event.worksheetId === data?.worksheetId) {
+      requests.push(refresh({ silent: true }));
+    }
+    await Promise.all(requests);
+  }, [data?.worksheetId, refresh, refreshContributor]);
+
+  useNilaiAKKLiveSync(isKanwil ? undefined : data?.worksheetId, refresh);
+  useNilaiAKKPenyumbangLHPSLiveSync(contributorWorksheetIds, refreshKanwilScores);
 
   useEffect(() => {
     if (!isKanwil || kppnUnits.length === 0) return;
@@ -51,6 +90,16 @@ export default function NilaiSection() {
     openSnackbar(refreshError, 'error');
     clearRefreshError();
   }, [clearRefreshError, openSnackbar, refreshError]);
+
+  useEffect(() => {
+    if (!contributorRefreshError) return;
+    openSnackbar(contributorRefreshError, 'error');
+    clearContributorRefreshError();
+  }, [
+    clearContributorRefreshError,
+    contributorRefreshError,
+    openSnackbar,
+  ]);
 
   const handleTabChange = (_: SyntheticEvent, newValue: string) => {
     navigate(`?id=${newValue}`);
@@ -93,7 +142,7 @@ export default function NilaiSection() {
 
         {data && (
           <>
-            <Stack direction="column" width={{ xs: '100%', md: '50%' }}>
+            <Stack direction="column" width={{ xs: '100%', md: '50%' }} marginBottom={4}>
               <ScorePembinaan
                 header={`Nilai Aspek Kinerja ${scoreTitleKppnName}`}
                 selfScore={data.nilaiKPPN}
@@ -101,11 +150,50 @@ export default function NilaiSection() {
               />
             </Stack>
 
-            <Stack>
+            <Stack marginBottom={4}>
               <TabelPenilaian data={data} isRefreshing={isRefreshing} />
             </Stack>
           </>
         )}
+
+        {
+          isKanwil && (
+            <Stack marginBottom={4}>
+              {isContributorLoading && !contributorData && (
+                <Skeleton
+                  variant="rounded"
+                  width="100%"
+                  height={360}
+                  sx={{ mt: 3 }}
+                  aria-label="Memuat nilai AKK penyumbang LHPS"
+                />
+              )}
+
+              {!isContributorLoading && contributorError && (
+                <Alert
+                  severity={contributorError.status === 404 ? 'warning' : 'error'}
+                  sx={{ mt: 3 }}
+                  action={
+                    <Button color="inherit" size="small" onClick={() => void refreshContributor()}>
+                      Coba Lagi
+                    </Button>
+                  }
+                >
+                  {contributorError.message}
+                </Alert>
+              )}
+
+              {contributorData && (
+                <TabelNilaiAKKPenyumbangLHPS
+                  data={contributorData}
+                  isRefreshing={isContributorRefreshing}
+                />
+              )}
+            </Stack>
+          )
+        }
+
+
       </Container>
     </>
   );

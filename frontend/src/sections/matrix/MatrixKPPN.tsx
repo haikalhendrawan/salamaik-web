@@ -15,12 +15,12 @@ import useAxiosJWT from '../../hooks/useAxiosJWT';
 import useLoading from '../../hooks/display/useLoading';
 import useSnackbar from '../../hooks/display/useSnackbar';
 // sections
-import ScorePembinaan from '../home/components/ScorePembinaan';
 import ProgressPembinaan from '../home/components/ProgressPembinaan';
-import RekapitulasiNilaiTable from './components/RekapitulasiNilaiTable';
+import WorksheetPeriod from './components/WorksheetPeriod';
 import MatrixGateway from './components/MatrixGateway';
 import SelectionTab from './components/SelectionTab';
 import { MatrixScoreAndProgressType } from './types';
+import {WorksheetType }from '../worksheet/types';
 // --------------------------------------------------------------
 
 
@@ -52,6 +52,8 @@ export default function MatrixKPPN() {
 
   const [matrixScore, setMatrixScore] = useState<MatrixScoreAndProgressType | null>(null);
 
+  const [worksheet, setWorksheet] = useState<WorksheetType | null>(null);
+
   const [tabValue, setTabValue] = useState(defaultTab); // ganti menu komponen supervisi
 
   const kppnName = kppnRef?.list.filter((item) => item.id === kppnId)[0]?.alias || ''
@@ -82,6 +84,26 @@ export default function MatrixKPPN() {
     }
   };
 
+  const getWorksheet = async() => {
+    try{
+      if(!kppnId){
+        return null
+      };
+
+      const response = await axiosJWT.get(`/getWorksheetByPeriodAndKPPN/${kppnId}`);
+      setWorksheet(response.data.rows);
+    }catch(err: any){
+      setWorksheet(null);
+      if(err.response){
+        openSnackbar(err.response.data.message, "error");
+      }else{
+        openSnackbar('network error', "error");
+      }
+    }finally{
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     if(!kppnId){
       navigate(`?id=${defaultTab}`);
@@ -96,6 +118,7 @@ export default function MatrixKPPN() {
     };
 
     getMatrixScoreAndProgress();
+    getWorksheet();
   }, [location.search, tabValue]);
 
 
@@ -123,10 +146,10 @@ export default function MatrixKPPN() {
           <Grid container spacing={4}>
             <Grid item xs={5}>
               <Stack direction='column' spacing={2}>
-                <ScorePembinaan
-                  header={`Nlai Kinerja ${kppnName}`}
-                  selfScore={matrixScore?.scoreByKPPN || 0}
-                  kanwilScore={matrixScore?.scoreByKanwil || 0} 
+                <WorksheetPeriod
+                  header={`Periode Pengisian Kertas Kerja`}
+                  open={worksheet?.open_period || ''}
+                  close={worksheet?.close_period || ''}
                 />
                 <ProgressPembinaan 
                   header={`Progress Kertas Kerja`}

@@ -1,6 +1,15 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { format } from 'date-fns';
-import { Box, Grid, IconButton, LinearProgress, Tooltip, Typography } from '@mui/material';
+import {
+  Box,
+  CircularProgress,
+  Grid,
+  IconButton,
+  LinearProgress,
+  Stack,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import Iconify from '../../../components/iconify';
 import useLoading from '../../../hooks/display/useLoading';
 import useSnackbar from '../../../hooks/display/useSnackbar';
@@ -26,14 +35,17 @@ export default function WorksheetCKToolbar({
   rows,
   kppnName,
   lastRefreshedAt,
+  onSync,
 }: {
   rows: WsCKJunctionType[];
   kppnName: string;
   lastRefreshedAt: Date | null;
+  onSync: () => Promise<void>;
 }) {
   const { setIsLoading } = useLoading();
   const { openSnackbar } = useSnackbar();
   const { ckScore } = useWsCKJunction();
+  const [isSyncing, setIsSyncing] = useState(false);
   const excel = useExcelWorksheetCK({ rows, kppnName, ckScore });
   const progress = useMemo(() => ({
     total: rows.length,
@@ -54,12 +66,54 @@ export default function WorksheetCKToolbar({
     }
   };
 
+  const handleSync = async () => {
+    if (isSyncing) return;
+
+    setIsSyncing(true);
+    try {
+      await onSync();
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
   const toolbarRows = [
     { label: 'Progress KPPN', content: <Progress completed={progress.kppn} total={progress.total} /> },
     { label: 'Progress Kanwil', content: <Progress completed={progress.kanwil} total={progress.total} /> },
     {
       label: 'Refresh Terakhir',
-      content: <Typography variant="body2" color="text.secondary">{lastRefreshedAt ? format(lastRefreshedAt, 'dd/MM/yyyy HH:mm:ss') : '-'}</Typography>,
+      content: (
+        <Stack direction="row" spacing={1} alignItems="center">
+          <Typography variant="body2" color="text.secondary">
+            {lastRefreshedAt ? format(lastRefreshedAt, 'dd/MM/yyyy HH:mm:ss') : '-'}
+          </Typography>
+          <Tooltip title={isSyncing ? 'Sedang menyinkronkan' : 'Sinkronkan kertas kerja'}>
+            <span>
+              <IconButton
+                size="small"
+                aria-label="Sinkronkan worksheet CK"
+                onClick={handleSync}
+                disabled={isSyncing}
+                sx={{
+                  bgcolor: 'warning.main',
+                  color: 'warning.contrastText',
+                  '&:hover': { bgcolor: 'warning.dark' },
+                  '&.Mui-disabled': {
+                    bgcolor: 'warning.light',
+                    color: 'warning.contrastText',
+                  },
+                }}
+              >
+                {isSyncing ? (
+                  <CircularProgress size={18} color="inherit" />
+                ) : (
+                  <Iconify icon="solar:refresh-bold" width={18} />
+                )}
+              </IconButton>
+            </span>
+          </Tooltip>
+        </Stack>
+      ),
     },
     {
       label: 'Export',

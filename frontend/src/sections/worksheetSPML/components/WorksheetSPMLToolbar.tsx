@@ -1,5 +1,14 @@
-import { useMemo } from 'react';
-import { Box, Grid, IconButton, LinearProgress, Tooltip, Typography } from '@mui/material';
+import { useMemo, useState } from 'react';
+import {
+  Box,
+  CircularProgress,
+  Grid,
+  IconButton,
+  LinearProgress,
+  Stack,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import Iconify from '../../../components/iconify';
 import useDictionary from '../../../hooks/useDictionary';
 import useLoading from '../../../hooks/display/useLoading';
@@ -13,6 +22,7 @@ interface WorksheetSPMLToolbarProps {
   wsSPMLJunction: WsSPMLJunctionType[];
   kppnName: string;
   lastRefreshedAt: Date | null;
+  onSync: () => Promise<void>;
 }
 
 interface ChecklistProgressProps {
@@ -43,11 +53,13 @@ export default function WorksheetSPMLToolbar({
   wsSPMLJunction,
   kppnName,
   lastRefreshedAt,
+  onSync,
 }: WorksheetSPMLToolbarProps) {
   const { komponenSpmlRef, subKomponenSpmlRef, aspekSpmlRef } = useDictionary();
   const { setIsLoading } = useLoading();
   const { openSnackbar } = useSnackbar();
   const { spmlScore } = useWsSPMLJunction();
+  const [isSyncing, setIsSyncing] = useState(false);
   const excelWorksheet = useExcelWorksheetSPML({
     rows: wsSPMLJunction,
     kppnName,
@@ -85,6 +97,17 @@ export default function WorksheetSPMLToolbar({
       openSnackbar(err instanceof Error ? err.message : 'Gagal membuat file Excel SPML', 'error');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleSync = async () => {
+    if (isSyncing) return;
+
+    setIsSyncing(true);
+    try {
+      await onSync();
+    } finally {
+      setIsSyncing(false);
     }
   };
 
@@ -137,9 +160,36 @@ export default function WorksheetSPMLToolbar({
             <Typography variant="body2">:</Typography>
           </Grid>
           <Grid item xs={7} sm={8} md={9}>
-            <Typography variant="body2" color="text.secondary">
-              {lastRefreshedAt ? format(lastRefreshedAt, 'dd/MM/yyyy HH:mm:ss') : '-'}
-            </Typography>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <Typography variant="body2" color="text.secondary">
+                {lastRefreshedAt ? format(lastRefreshedAt, 'dd/MM/yyyy HH:mm:ss') : '-'}
+              </Typography>
+              <Tooltip title={isSyncing ? 'Sedang menyinkronkan' : 'Sinkronkan kertas kerja'}>
+                <span>
+                  <IconButton
+                    size="small"
+                    aria-label="Sinkronkan worksheet SPML"
+                    onClick={handleSync}
+                    disabled={isSyncing}
+                    sx={{
+                      bgcolor: 'warning.main',
+                      color: 'warning.contrastText',
+                      '&:hover': { bgcolor: 'warning.dark' },
+                      '&.Mui-disabled': {
+                        bgcolor: 'warning.light',
+                        color: 'warning.contrastText',
+                      },
+                    }}
+                  >
+                    {isSyncing ? (
+                      <CircularProgress size={18} color="inherit" />
+                    ) : (
+                      <Iconify icon="solar:refresh-bold" width={18} />
+                    )}
+                  </IconButton>
+                </span>
+              </Tooltip>
+            </Stack>
           </Grid>
 
           <Grid item xs={4} sm={3} md={2}>

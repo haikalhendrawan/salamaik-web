@@ -129,6 +129,10 @@ export default function WorksheetSPMLWorkspace() {
         wsSPMLJunction={wsSPMLJunction}
         kppnName={selectedKppnName}
         lastRefreshedAt={lastRefreshedAt}
+        onSync={() => getWsSPMLJunctionKanwil(selectedKppnId, {
+          showOverlay: false,
+          refreshScore: true,
+        })}
       />
 
       <Card

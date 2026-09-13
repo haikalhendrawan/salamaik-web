@@ -20,6 +20,7 @@ import Iconify from '../../../components/iconify';
 import useSnackbar from '../../../hooks/display/useSnackbar';
 import useExcelPenilaian from '../useExcelPenilaian';
 import { AKKComponentDetail, AKKScoreResponse, AKKSideDetail } from '../types';
+import TabelPenilaianPeraturan1 from './TabelPenilaianPeraturan1';
 
 type TabelPenilaianProps = {
   data: AKKScoreResponse;
@@ -27,13 +28,13 @@ type TabelPenilaianProps = {
 };
 
 const formatScore = (value: number) =>
-  new Intl.NumberFormat('id-ID', {
+  new Intl.NumberFormat('en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(value);
 
 const formatWeight = (value: number) =>
-  `${new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(value)}%`;
+  `${new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(value)}%`;
 
 const componentTitle = (title: string, detail: AKKComponentDetail | null) =>
   detail ? `${title} (${formatWeight(detail.bobot)})` : `${title} (Tidak berlaku)`;
@@ -111,7 +112,20 @@ function ScoreComponentCells({ detail }: { detail: AKKComponentDetail | null }) 
   );
 }
 
-export default function TabelPenilaian({ data, isRefreshing = false }: TabelPenilaianProps) {
+export default function TabelPenilaian(props: TabelPenilaianProps) {
+  if (props.data.peraturan === 1) {
+    return (
+      <TabelPenilaianPeraturan1
+        data={props.data}
+        isRefreshing={props.isRefreshing ?? false}
+      />
+    );
+  }
+
+  return <TabelPenilaianPeraturan2 {...props} />;
+}
+
+function TabelPenilaianPeraturan2({ data, isRefreshing = false }: TabelPenilaianProps) {
   const theme = useTheme();
   const { openSnackbar } = useSnackbar();
   const [isExporting, setIsExporting] = useState(false);
@@ -146,7 +160,7 @@ export default function TabelPenilaian({ data, isRefreshing = false }: TabelPeni
 
   return (
     <Grow in>
-      <Card sx={{ mt: 3, mb: 1 }}>
+      <Card>
         <CardHeader
           title={
             <Stack direction="row" spacing={1} alignItems="center">
@@ -165,7 +179,7 @@ export default function TabelPenilaian({ data, isRefreshing = false }: TabelPeni
               </Tooltip>
             </Stack>
           }
-          subheader={`Detail penilaian per kertas kerja · ${data.periodName}`}
+          subheader={`Detail penilaian per kertas kerja`}
         />
 
         <TableContainer sx={{ pt: 4 }}>
