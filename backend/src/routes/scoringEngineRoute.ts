@@ -18,6 +18,13 @@ router.get(
 );
 
 router.get(
+  "/akk/lhps/:periodId/:peraturanId",
+  authenticate,
+  authorize([99, 4, 3]),
+  scoringEngineController.getAKKContributorLHPS
+);
+
+router.get(
   "/akk/:kppnId/:periodId/:peraturanId",
   authenticate,
   authorize([99, 4, 3, 2, 1]),

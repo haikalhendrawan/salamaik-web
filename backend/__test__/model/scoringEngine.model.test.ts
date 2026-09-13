@@ -1,10 +1,12 @@
 import {
   calculateAllKPPNSPMLScoresFromRows,
+  calculateAKKContributorLHPSFromUnits,
   calculateAKKScoreFromWorksheetScores,
   calculateAverageAKKScoreFromUnits,
   calculateCKScoreFromRows,
   calculatePBScoreFromRows,
   calculateSPMLScoreFromRows,
+  PBScoreResult,
 } from "../../src/model/scoringEngine.model";
 
 describe("calculateAKKScoreFromWorksheetScores", () => {
@@ -170,6 +172,146 @@ describe("calculateAverageAKKScoreFromUnits", () => {
     expect(() => calculateAverageAKKScoreFromUnits(2, [
       createUnitScore("010", "A1", 2, 100, 100),
     ])).toThrow("invalid provinsi value");
+  });
+});
+
+describe("calculateAKKContributorLHPSFromUnits", () => {
+  const createUnit = (
+    kppnId: string,
+    tipe: "A1" | "A2" | null,
+    provinsi: number,
+    nilaiPB: number,
+    nilaiSPML: number,
+    nilaiCK: number
+  ) => {
+    const pbScore: PBScoreResult = {
+      peraturan: 2,
+      nilaiKPPN: nilaiPB,
+      nilaiKanwil: nilaiPB,
+      detailKPPN: createPBDetail(),
+      detailKanwil: createPBDetail(),
+    };
+
+    return {
+      worksheetId: `worksheet-${kppnId}`,
+      kppnId,
+      name: `KPPN ${kppnId}`,
+      alias: kppnId,
+      tipe,
+      provinsi,
+      periodName: "2026",
+      result: calculateAKKScoreFromWorksheetScores(
+      2,
+      { nilaiKPPN: nilaiPB, nilaiKanwil: nilaiPB },
+      { nilaiKPPN: nilaiCK, nilaiKanwil: nilaiCK },
+      { nilaiKPPN: nilaiSPML, nilaiKanwil: nilaiSPML }
+      ),
+      pbScore,
+    };
+  };
+
+  const createPBDetail = (withComponent = false) => ({
+    jumlahChecklist: 1,
+    jumlahChecklistDiisi: 1,
+    jumlahNA: 0,
+    jumlahChecklistPembagi: 1,
+    totalSkorKonversi: 10,
+    detailKomponen: withComponent ? [{
+      komponenId: 1,
+      komponenTitle: "Komponen 1",
+      komponenBobot: 100,
+      jumlahChecklist: 1,
+      jumlahNA: 0,
+      jumlahChecklistPembagi: 1,
+      totalSkorKonversi: 10,
+      nilaiRataRata: 10,
+      nilaiTerbobot: 10,
+    }] : [],
+  });
+
+  it("builds the LHPS table details and weighted category totals", () => {
+    const result = calculateAKKContributorLHPSFromUnits(2, [
+      createUnit("010", "A1", 1, 100, 100, 100),
+      createUnit("011", "A1", 0, 100, 98, 100),
+      createUnit("090", "A1", 0, 100, 100, 95),
+      createUnit("091", "A2", 0, 90, 85, 100),
+      createUnit("077", "A2", 0, 90, 85, 100),
+      createUnit("142", "A2", 0, 90, 85, 100),
+    ]);
+
+    expect(result.jumlahKPPN).toBe(6);
+    expect(result.jumlahBobotKPPNYangMemenuhi).toBe(100);
+    expect(result.jumlahNilaiAKKSeluruhKPPN).toBe(98.1913);
+    expect(result.nilaiAkhirAspekKinerja).toBe(98.1913);
+    expect(result.kelompok.map((group) => group.kategori)).toEqual([
+      "A1_PROVINSI",
+      "A1_NON_PROVINSI",
+      "A2",
+    ]);
+    expect(result.kelompok[1]).toMatchObject({
+      bobot: 35,
+      jumlahKPPN: 2,
+      rataRataAKK: 98.975,
+      kontribusiLHPS: 34.6413,
+    });
+    expect(result.kelompok[1].kppn[0]).toMatchObject({
+      nilaiAKK: 99.7,
+      bobotKPPN: 35,
+      nilaiPenyumbangLHPS: 34.895,
+      pb: { nilai: 100, bobot: 50, kontribusi: 50 },
+      spml: { nilai: 98, bobot: 15, kontribusi: 14.7 },
+      ck: { nilai: 100, bobot: 35, kontribusi: 35 },
+    });
+  });
+
+  it("uses a single 100 percent group for regulation 1", () => {
+    const units = [8, 6].map((nilai, index) => {
+      const pbScore: PBScoreResult = {
+        peraturan: 1,
+        nilaiKPPN: nilai,
+        nilaiKanwil: nilai,
+        detailKPPN: createPBDetail(true),
+        detailKanwil: createPBDetail(true),
+      };
+      return {
+        worksheetId: `worksheet-${index}`,
+        kppnId: `01${index}`,
+        name: `KPPN 01${index}`,
+        alias: `01${index}`,
+        tipe: null,
+        provinsi: 0,
+        periodName: "2023",
+        result: calculateAKKScoreFromWorksheetScores(1, pbScore),
+        pbScore,
+      };
+    });
+
+    const result = calculateAKKContributorLHPSFromUnits(1, units);
+
+    expect(result.kelompok).toHaveLength(1);
+    expect(result.kelompok[0]).toMatchObject({
+      kategori: "SELURUH_KPPN",
+      bobot: 100,
+      jumlahKPPN: 2,
+      rataRataAKK: 7,
+      kontribusiLHPS: 7,
+    });
+    expect(result.nilaiAkhirAspekKinerja).toBe(7);
+    expect(result.totalNilaiKPPN).toBe(14);
+    expect(result.jumlahPembagi).toBe(2);
+    expect(result.jumlahNilaiAKKSeluruhKPPN).toBe(14);
+    expect(result.kelompok[0].kppn[0]).toMatchObject({ ck: null, spml: null });
+    expect(result.kelompok[0].kppn[0].detailKomponenPB[0]).toMatchObject({
+      komponenId: 1,
+      komponenTitle: "Komponen 1",
+      nilaiTerbobot: 10,
+    });
+  });
+
+  it("rejects incomplete regulation 2 categories", () => {
+    expect(() => calculateAKKContributorLHPSFromUnits(2, [
+      createUnit("010", "A1", 1, 100, 100, 100),
+    ])).toThrow("these categories have no KPPN: A1_NON_PROVINSI, A2");
   });
 });
 

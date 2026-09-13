@@ -40,6 +40,7 @@ interface PeriodWorksheetRow {
   alias: string;
   tipe: KPPNTipe | null;
   provinsi: number;
+  period_name: string;
 }
 
 interface PeriodPBScoreRow extends PBScoreRow {
@@ -171,6 +172,7 @@ export interface AKKScoreCalculation {
   periodName: string;
   worksheetId: string;
   result: AKKScoreResult;
+  pbScore: PBScoreResult;
 }
 
 interface AKKWorksheetRow {
@@ -216,6 +218,62 @@ export interface AverageAKKScoreResult {
 export interface AverageAKKScoreCalculation extends AverageAKKScoreResult {
   periodId: number;
   peraturan: PBRegulation;
+}
+
+export type AKKContributorCategory = AKKCategory | "SELURUH_KPPN";
+
+export interface AKKContributorUnit {
+  worksheetId: string;
+  kppnId: string;
+  name: string;
+  alias: string;
+  tipe: KPPNTipe | null;
+  provinsi: number;
+  pb: AKKScoreComponentDetail;
+  ck: AKKScoreComponentDetail | null;
+  spml: AKKScoreComponentDetail | null;
+  nilaiAKK: number;
+  bobotKPPN: number;
+  nilaiPenyumbangLHPS: number;
+  detailKomponenPB: PBComponentScoreDetail[];
+}
+
+export interface AKKContributorGroup {
+  kategori: AKKContributorCategory;
+  label: string;
+  bobot: number;
+  jumlahKPPN: number;
+  rataRataAKK: number;
+  kontribusiLHPS: number;
+  kppn: AKKContributorUnit[];
+}
+
+export interface AKKContributorLHPSResult {
+  jumlahKPPN: number;
+  kelompok: AKKContributorGroup[];
+  totalNilaiKPPN: number;
+  jumlahPembagi: number;
+  jumlahNilaiAKKSeluruhKPPN: number;
+  jumlahBobotKPPNYangMemenuhi: number;
+  nilaiAkhirAspekKinerja: number;
+}
+
+export interface AKKContributorLHPSCalculation extends AKKContributorLHPSResult {
+  periodId: number;
+  periodName: string;
+  peraturan: PBRegulation;
+}
+
+export interface PeriodAKKUnitCalculation {
+  worksheetId: string;
+  kppnId: string;
+  name: string;
+  alias: string;
+  tipe: KPPNTipe | null;
+  provinsi: number;
+  periodName: string;
+  result: AKKScoreResult;
+  pbScore: PBScoreResult;
 }
 
 type WorksheetScorePair = Pick<PBScoreResult, "nilaiKPPN" | "nilaiKanwil">;
@@ -561,7 +619,9 @@ const AKK_CATEGORY_WEIGHTS: Record<AKKCategory, number> = {
   A2: 20,
 };
 
-const getAKKCategory = (unit: AKKUnitScore): AKKCategory => {
+const getAKKCategory = (
+  unit: Pick<AKKUnitScore, "kppnId" | "tipe" | "provinsi">
+): AKKCategory => {
   if (unit.provinsi !== 0 && unit.provinsi !== 1) {
     throw new ErrorDetail(
       409,
@@ -676,6 +736,122 @@ export const calculateAverageAKKScoreFromUnits = (
   throw new RangeError("Average AKK regulation must be 1 or 2");
 };
 
+const AKK_CATEGORY_LABELS: Record<AKKContributorCategory, string> = {
+  A1_PROVINSI: "KPPN Tipe A1 Provinsi",
+  A1_NON_PROVINSI: "KPPN Tipe A1 Non Provinsi",
+  A2: "KPPN Tipe A2",
+  SELURUH_KPPN: "Seluruh KPPN",
+};
+
+export const calculateAKKContributorLHPSFromUnits = (
+  peraturan: PBRegulation,
+  units: PeriodAKKUnitCalculation[]
+): AKKContributorLHPSResult => {
+  if (units.length === 0) {
+    throw new ErrorDetail(404, "No KPPN AKK scores were found");
+  }
+
+  if (peraturan !== 1 && peraturan !== 2) {
+    throw new RangeError("AKK contributor regulation must be 1 or 2");
+  }
+
+  const categoryOrder: AKKContributorCategory[] = peraturan === 1
+    ? ["SELURUH_KPPN"]
+    : ["A1_PROVINSI", "A1_NON_PROVINSI", "A2"];
+  const categoryWeights: Record<AKKContributorCategory, number> = {
+    ...AKK_CATEGORY_WEIGHTS,
+    SELURUH_KPPN: 100,
+  };
+  const groupedUnits = new Map<AKKContributorCategory, PeriodAKKUnitCalculation[]>(
+    categoryOrder.map((category) => [category, []])
+  );
+
+  units.forEach((unit) => {
+    if (unit.result.peraturan !== peraturan) {
+      throw new ErrorDetail(
+        409,
+        `AKK contributor cannot be calculated because KPPN ${unit.kppnId} uses a different regulation`
+      );
+    }
+
+    const category = peraturan === 1 ? "SELURUH_KPPN" : getAKKCategory(unit);
+    groupedUnits.get(category)!.push(unit);
+  });
+
+  const emptyCategories = categoryOrder.filter(
+    (category) => groupedUnits.get(category)?.length === 0
+  );
+  if (emptyCategories.length > 0) {
+    throw new ErrorDetail(
+      409,
+      `AKK contributor cannot be calculated because these categories have no KPPN: ${emptyCategories.join(", ")}`
+    );
+  }
+
+  const kelompok = categoryOrder.map((kategori): AKKContributorGroup => {
+    const categoryUnits = groupedUnits.get(kategori)!;
+    const bobot = categoryWeights[kategori];
+    const kppn = categoryUnits.map((unit): AKKContributorUnit => {
+      const nilaiAKK = unit.result.nilaiKanwil;
+      return {
+        worksheetId: unit.worksheetId,
+        kppnId: unit.kppnId,
+        name: unit.name,
+        alias: unit.alias,
+        tipe: unit.tipe,
+        provinsi: unit.provinsi,
+        pb: unit.result.detailKanwil.pb,
+        ck: unit.result.detailKanwil.ck,
+        spml: unit.result.detailKanwil.spml,
+        nilaiAKK,
+        bobotKPPN: bobot,
+        nilaiPenyumbangLHPS: roundToFourDecimals(nilaiAKK * (bobot / 100)),
+        detailKomponenPB: unit.pbScore.detailKanwil.detailKomponen,
+      };
+    });
+    const rataRataAKK = calculateAverage(kppn.map((unit) => unit.nilaiAKK));
+    const kontribusiLHPS = calculateAverage(
+      kppn.map((unit) => unit.nilaiPenyumbangLHPS)
+    );
+
+    return {
+      kategori,
+      label: AKK_CATEGORY_LABELS[kategori],
+      bobot,
+      jumlahKPPN: kppn.length,
+      rataRataAKK: roundToFourDecimals(rataRataAKK),
+      kontribusiLHPS: roundToFourDecimals(kontribusiLHPS),
+      kppn,
+    };
+  });
+
+  const totalNilaiKPPN = units.reduce(
+    (total, unit) => total + unit.result.nilaiKanwil,
+    0
+  );
+  const jumlahNilaiAKKSeluruhKPPN = peraturan === 1
+    ? totalNilaiKPPN
+    : kelompok.reduce((total, group) => total + group.kontribusiLHPS, 0);
+  const jumlahBobotKPPNYangMemenuhi = kelompok.reduce(
+    (total, group) => total + group.bobot,
+    0
+  );
+
+  return {
+    jumlahKPPN: units.length,
+    kelompok,
+    totalNilaiKPPN: roundToFourDecimals(totalNilaiKPPN),
+    jumlahPembagi: units.length,
+    jumlahNilaiAKKSeluruhKPPN: roundToFourDecimals(jumlahNilaiAKKSeluruhKPPN),
+    jumlahBobotKPPNYangMemenuhi,
+    nilaiAkhirAspekKinerja: peraturan === 1
+      ? roundToFourDecimals(totalNilaiKPPN / units.length)
+      : roundToFourDecimals(
+        jumlahNilaiAKKSeluruhKPPN / (jumlahBobotKPPNYangMemenuhi / 100)
+      ),
+  };
+};
+
 const groupPeriodRowsByWorksheet = <T extends { worksheet_id: string }>(rows: T[]) => {
   const groupedRows = new Map<string, T[]>();
 
@@ -688,6 +864,149 @@ const groupPeriodRowsByWorksheet = <T extends { worksheet_id: string }>(rows: T[
   return groupedRows;
 };
 
+const loadPeriodAKKUnitCalculations = async (
+  periodId: number,
+  peraturan: PBRegulation,
+  poolInstance: PoolClient | typeof pool
+): Promise<PeriodAKKUnitCalculation[] | undefined> => {
+  const worksheetQuery = `SELECT worksheet_ref.id AS worksheet_id,
+                                 worksheet_ref.kppn_id,
+                                 kppn_ref.name,
+                                 kppn_ref.alias,
+                                 kppn_ref.tipe,
+                                 kppn_ref.provinsi,
+                                 period_ref.name AS period_name
+                          FROM worksheet_ref
+                          INNER JOIN kppn_ref
+                            ON kppn_ref.id = worksheet_ref.kppn_id
+                           AND kppn_ref.level = 0
+                          INNER JOIN period_ref
+                            ON period_ref.id = worksheet_ref.period
+                          WHERE worksheet_ref.period = $1
+                          ORDER BY kppn_ref.col_order ASC`;
+  const worksheetResult = await poolInstance.query<PeriodWorksheetRow>(
+    worksheetQuery,
+    [periodId]
+  );
+
+  if (worksheetResult.rows.length === 0) return undefined;
+
+  const pbQuery = `SELECT worksheet_junction.worksheet_id,
+                          worksheet_ref.kppn_id,
+                          worksheet_junction.kppn_score,
+                          worksheet_junction.kanwil_score,
+                          worksheet_junction.excluded,
+                          checklist_ref.komponen_id,
+                          checklist_ref.standardisasi,
+                          komponen_ref.title AS komponen_title,
+                          komponen_ref.bobot AS komponen_bobot
+                   FROM worksheet_junction
+                   INNER JOIN worksheet_ref
+                     ON worksheet_ref.id = worksheet_junction.worksheet_id
+                   INNER JOIN kppn_ref
+                     ON kppn_ref.id = worksheet_ref.kppn_id
+                    AND kppn_ref.level = 0
+                   INNER JOIN checklist_ref
+                     ON checklist_ref.id = worksheet_junction.checklist_id
+                   INNER JOIN komponen_ref
+                     ON komponen_ref.id = checklist_ref.komponen_id
+                   WHERE worksheet_ref.period = $1
+                   ORDER BY worksheet_junction.worksheet_id,
+                            checklist_ref.komponen_id,
+                            worksheet_junction.junction_id`;
+  const pbResult = await poolInstance.query<PeriodPBScoreRow>(pbQuery, [periodId]);
+  const pbRowsByWorksheet = groupPeriodRowsByWorksheet(pbResult.rows);
+
+  let ckRowsByWorksheet = new Map<string, PeriodCKScoreRow[]>();
+  let spmlRowsByWorksheet = new Map<string, PeriodSPMLScoreRow[]>();
+
+  if (peraturan === 2) {
+    const ckQuery = `SELECT worksheet_ck_junction.worksheet_id,
+                            worksheet_ref.kppn_id,
+                            worksheet_ck_junction.kppn_score,
+                            worksheet_ck_junction.kanwil_score,
+                            worksheet_ck_junction.excluded
+                     FROM worksheet_ck_junction
+                     INNER JOIN worksheet_ref
+                       ON worksheet_ref.id = worksheet_ck_junction.worksheet_id
+                     INNER JOIN kppn_ref
+                       ON kppn_ref.id = worksheet_ref.kppn_id
+                      AND kppn_ref.level = 0
+                     WHERE worksheet_ref.period = $1
+                     ORDER BY worksheet_ck_junction.worksheet_id,
+                              worksheet_ck_junction.junction_id`;
+    const ckResult = await poolInstance.query<PeriodCKScoreRow>(ckQuery, [periodId]);
+    ckRowsByWorksheet = groupPeriodRowsByWorksheet(ckResult.rows);
+
+    const spmlQuery = `SELECT worksheet_spml_junction.worksheet_id,
+                              worksheet_ref.kppn_id,
+                              worksheet_spml_junction.kppn_score,
+                              worksheet_spml_junction.kanwil_score,
+                              worksheet_spml_junction.excluded
+                       FROM worksheet_spml_junction
+                       INNER JOIN worksheet_ref
+                         ON worksheet_ref.id = worksheet_spml_junction.worksheet_id
+                       INNER JOIN kppn_ref
+                         ON kppn_ref.id = worksheet_ref.kppn_id
+                        AND kppn_ref.level = 0
+                       WHERE worksheet_ref.period = $1
+                       ORDER BY worksheet_spml_junction.worksheet_id,
+                                worksheet_spml_junction.junction_id`;
+    const spmlResult = await poolInstance.query<PeriodSPMLScoreRow>(spmlQuery, [periodId]);
+    spmlRowsByWorksheet = groupPeriodRowsByWorksheet(spmlResult.rows);
+  }
+
+  return worksheetResult.rows.map((worksheet): PeriodAKKUnitCalculation => {
+    const pbRows = pbRowsByWorksheet.get(worksheet.worksheet_id);
+    if (!pbRows?.length) {
+      throw new ErrorDetail(
+        409,
+        `AKK cannot be calculated because PB assignment for KPPN ${worksheet.kppn_id} is incomplete`
+      );
+    }
+
+    const pbScore = calculatePBScoreFromRows(pbRows, peraturan);
+    let result: AKKScoreResult;
+
+    if (peraturan === 1) {
+      result = calculateAKKScoreFromWorksheetScores(peraturan, pbScore);
+    } else {
+      const ckRows = ckRowsByWorksheet.get(worksheet.worksheet_id);
+      const spmlRows = spmlRowsByWorksheet.get(worksheet.worksheet_id);
+
+      if (!ckRows?.length || !spmlRows?.length) {
+        const missingWorksheets = [
+          !ckRows?.length ? "CK" : null,
+          !spmlRows?.length ? "SPML" : null,
+        ].filter(Boolean).join(" and ");
+        throw new ErrorDetail(
+          409,
+          `AKK cannot be calculated because ${missingWorksheets} assignment for KPPN ${worksheet.kppn_id} is incomplete`
+        );
+      }
+
+      result = calculateAKKScoreFromWorksheetScores(
+        peraturan,
+        pbScore,
+        calculateCKScoreFromRows(ckRows),
+        calculateSPMLScoreFromRows(spmlRows)
+      );
+    }
+
+    return {
+      worksheetId: worksheet.worksheet_id,
+      kppnId: worksheet.kppn_id,
+      name: worksheet.name,
+      alias: worksheet.alias,
+      tipe: worksheet.tipe,
+      provinsi: worksheet.provinsi,
+      periodName: worksheet.period_name,
+      result,
+      pbScore,
+    };
+  });
+};
+
 //-----------------------------------------------------------------------------------------------------------------
 class ScoringEngine {
   async calculateAverageAKKScore(
@@ -696,143 +1015,49 @@ class ScoringEngine {
     poolTrx?: PoolClient
   ): Promise<AverageAKKScoreCalculation | undefined> {
     const poolInstance = poolTrx ?? pool;
-    const worksheetQuery = `SELECT worksheet_ref.id AS worksheet_id,
-                                   worksheet_ref.kppn_id,
-                                   kppn_ref.name,
-                                   kppn_ref.alias,
-                                   kppn_ref.tipe,
-                                   kppn_ref.provinsi
-                            FROM worksheet_ref
-                            INNER JOIN kppn_ref
-                              ON kppn_ref.id = worksheet_ref.kppn_id
-                             AND kppn_ref.level = 0
-                            WHERE worksheet_ref.period = $1
-                            ORDER BY kppn_ref.col_order ASC`;
-    const worksheetResult = await poolInstance.query<PeriodWorksheetRow>(
-      worksheetQuery,
-      [periodId]
+    const unitCalculations = await loadPeriodAKKUnitCalculations(
+      periodId,
+      peraturan,
+      poolInstance
     );
+    if (!unitCalculations) return undefined;
 
-    if (worksheetResult.rows.length === 0) return undefined;
-
-    const pbQuery = `SELECT worksheet_junction.worksheet_id,
-                            worksheet_ref.kppn_id,
-                            worksheet_junction.kppn_score,
-                            worksheet_junction.kanwil_score,
-                            worksheet_junction.excluded,
-                            checklist_ref.komponen_id,
-                            checklist_ref.standardisasi,
-                            komponen_ref.title AS komponen_title,
-                            komponen_ref.bobot AS komponen_bobot
-                     FROM worksheet_junction
-                     INNER JOIN worksheet_ref
-                       ON worksheet_ref.id = worksheet_junction.worksheet_id
-                     INNER JOIN kppn_ref
-                       ON kppn_ref.id = worksheet_ref.kppn_id
-                      AND kppn_ref.level = 0
-                     INNER JOIN checklist_ref
-                       ON checklist_ref.id = worksheet_junction.checklist_id
-                     INNER JOIN komponen_ref
-                       ON komponen_ref.id = checklist_ref.komponen_id
-                     WHERE worksheet_ref.period = $1
-                     ORDER BY worksheet_junction.worksheet_id,
-                              checklist_ref.komponen_id,
-                              worksheet_junction.junction_id`;
-    const pbResult = await poolInstance.query<PeriodPBScoreRow>(pbQuery, [periodId]);
-    const pbRowsByWorksheet = groupPeriodRowsByWorksheet(pbResult.rows);
-
-    let ckRowsByWorksheet = new Map<string, PeriodCKScoreRow[]>();
-    let spmlRowsByWorksheet = new Map<string, PeriodSPMLScoreRow[]>();
-
-    if (peraturan === 2) {
-      const ckQuery = `SELECT worksheet_ck_junction.worksheet_id,
-                              worksheet_ref.kppn_id,
-                              worksheet_ck_junction.kppn_score,
-                              worksheet_ck_junction.kanwil_score,
-                              worksheet_ck_junction.excluded
-                       FROM worksheet_ck_junction
-                       INNER JOIN worksheet_ref
-                         ON worksheet_ref.id = worksheet_ck_junction.worksheet_id
-                       INNER JOIN kppn_ref
-                         ON kppn_ref.id = worksheet_ref.kppn_id
-                        AND kppn_ref.level = 0
-                       WHERE worksheet_ref.period = $1
-                       ORDER BY worksheet_ck_junction.worksheet_id,
-                                worksheet_ck_junction.junction_id`;
-      const ckResult = await poolInstance.query<PeriodCKScoreRow>(ckQuery, [periodId]);
-      ckRowsByWorksheet = groupPeriodRowsByWorksheet(ckResult.rows);
-
-      const spmlQuery = `SELECT worksheet_spml_junction.worksheet_id,
-                                worksheet_ref.kppn_id,
-                                worksheet_spml_junction.kppn_score,
-                                worksheet_spml_junction.kanwil_score,
-                                worksheet_spml_junction.excluded
-                         FROM worksheet_spml_junction
-                         INNER JOIN worksheet_ref
-                           ON worksheet_ref.id = worksheet_spml_junction.worksheet_id
-                         INNER JOIN kppn_ref
-                           ON kppn_ref.id = worksheet_ref.kppn_id
-                          AND kppn_ref.level = 0
-                         WHERE worksheet_ref.period = $1
-                         ORDER BY worksheet_spml_junction.worksheet_id,
-                                  worksheet_spml_junction.junction_id`;
-      const spmlResult = await poolInstance.query<PeriodSPMLScoreRow>(spmlQuery, [periodId]);
-      spmlRowsByWorksheet = groupPeriodRowsByWorksheet(spmlResult.rows);
-    }
-
-    const unitScores = worksheetResult.rows.map((worksheet): AKKUnitScore => {
-      const pbRows = pbRowsByWorksheet.get(worksheet.worksheet_id);
-      if (!pbRows || pbRows.length === 0) {
-        throw new ErrorDetail(
-          409,
-          `Average AKK cannot be calculated because PB assignment for KPPN ${worksheet.kppn_id} is incomplete`
-        );
-      }
-
-      const pbScore = calculatePBScoreFromRows(pbRows, peraturan);
-      let akkScore: AKKScoreResult;
-
-      if (peraturan === 1) {
-        akkScore = calculateAKKScoreFromWorksheetScores(peraturan, pbScore);
-      } else {
-        const ckRows = ckRowsByWorksheet.get(worksheet.worksheet_id);
-        const spmlRows = spmlRowsByWorksheet.get(worksheet.worksheet_id);
-
-        if (!ckRows?.length || !spmlRows?.length) {
-          const missingWorksheets = [
-            !ckRows?.length ? "CK" : null,
-            !spmlRows?.length ? "SPML" : null,
-          ].filter(Boolean).join(" and ");
-          throw new ErrorDetail(
-            409,
-            `Average AKK cannot be calculated because ${missingWorksheets} assignment for KPPN ${worksheet.kppn_id} is incomplete`
-          );
-        }
-
-        akkScore = calculateAKKScoreFromWorksheetScores(
-          peraturan,
-          pbScore,
-          calculateCKScoreFromRows(ckRows),
-          calculateSPMLScoreFromRows(spmlRows)
-        );
-      }
-
-      return {
-        worksheetId: worksheet.worksheet_id,
-        kppnId: worksheet.kppn_id,
-        name: worksheet.name,
-        alias: worksheet.alias,
-        tipe: worksheet.tipe,
-        provinsi: worksheet.provinsi,
-        nilaiKPPN: akkScore.nilaiKPPN,
-        nilaiKanwil: akkScore.nilaiKanwil,
-      };
-    });
+    const unitScores = unitCalculations.map((unit): AKKUnitScore => ({
+      worksheetId: unit.worksheetId,
+      kppnId: unit.kppnId,
+      name: unit.name,
+      alias: unit.alias,
+      tipe: unit.tipe,
+      provinsi: unit.provinsi,
+      nilaiKPPN: unit.result.nilaiKPPN,
+      nilaiKanwil: unit.result.nilaiKanwil,
+    }));
 
     return {
       periodId,
       peraturan,
       ...calculateAverageAKKScoreFromUnits(peraturan, unitScores),
+    };
+  }
+
+  async calculateAKKContributorLHPS(
+    periodId: number,
+    peraturan: PBRegulation,
+    poolTrx?: PoolClient
+  ): Promise<AKKContributorLHPSCalculation | undefined> {
+    const poolInstance = poolTrx ?? pool;
+    const unitCalculations = await loadPeriodAKKUnitCalculations(
+      periodId,
+      peraturan,
+      poolInstance
+    );
+    if (!unitCalculations) return undefined;
+
+    return {
+      periodId,
+      periodName: unitCalculations[0].periodName,
+      peraturan,
+      ...calculateAKKContributorLHPSFromUnits(peraturan, unitCalculations),
     };
   }
 
@@ -884,6 +1109,7 @@ class ScoringEngine {
         periodName: worksheet.period_name,
         worksheetId,
         result: calculateAKKScoreFromWorksheetScores(peraturan, pbCalculation.result),
+        pbScore: pbCalculation.result,
       };
     }
 
@@ -919,6 +1145,7 @@ class ScoringEngine {
         ckCalculation.result,
         spmlCalculation.result
       ),
+      pbScore: pbCalculation.result,
     };
   }
 

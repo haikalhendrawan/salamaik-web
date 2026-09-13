@@ -44,6 +44,41 @@ const getAverageAKKScore = async (
   }
 };
 
+const getAKKContributorLHPS = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const periodId = Number(req.params.periodId);
+    const peraturan = Number(req.params.peraturanId);
+
+    if (!Number.isInteger(periodId) || periodId <= 0) {
+      throw new ErrorDetail(400, "periodId must be a positive integer");
+    }
+    if (peraturan !== 1 && peraturan !== 2) {
+      throw new ErrorDetail(400, "peraturanId must be 1 or 2");
+    }
+
+    const calculation = await scoringEngine.calculateAKKContributorLHPS(
+      periodId,
+      peraturan as PBRegulation
+    );
+
+    if (!calculation) {
+      throw new ErrorDetail(404, "No worksheets were found for this period");
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "AKK contributor LHPS score calculated successfully",
+      rows: calculation,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 const getAKKScore = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const kppnId = req.params.kppnId?.trim();
@@ -88,6 +123,8 @@ const getAKKScore = async (req: Request, res: Response, next: NextFunction) => {
         nilaiKanwil: calculation.result.nilaiKanwil,
         detailKPPN: calculation.result.detailKPPN,
         detailKanwil: calculation.result.detailKanwil,
+        detailPBKPPN: calculation.pbScore.detailKPPN,
+        detailPBKanwil: calculation.pbScore.detailKanwil,
       },
     });
   } catch (err) {
@@ -207,6 +244,7 @@ const getPBScore = async (req: Request, res: Response, next: NextFunction) => {
 
 export {
   getAverageAKKScore,
+  getAKKContributorLHPS,
   getAKKScore,
   getSPMLScore,
   getAllKPPNSPMLScoresByPeriod,
