@@ -7,6 +7,9 @@ export interface OpsiCKType {
   description: string | null;
   value: CKScoreValue;
   urut: number;
+  positive_fallback: string | null;
+  negative_fallback: string | null;
+  rekomendasi: string | null;
 }
 
 export interface WsCKJunctionType {
@@ -31,6 +34,8 @@ export interface WsCKJunctionType {
   materi: string;
   kriteria_penilaian: string;
   bukti_dukung: string | null;
+  peraturan: string | null;
+  uic: string | null;
   komponen_ck_id: number;
   komponen_urut: string;
   komponen_title: string;

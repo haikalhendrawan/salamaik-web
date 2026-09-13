@@ -13,9 +13,12 @@ import MatrixDetailHeader from './components/MatrixDetailHeader';
 import useLoading from '../../hooks/display/useLoading';
 import useSnackbar from '../../hooks/display/useSnackbar';
 import useAxiosJWT from '../../hooks/useAxiosJWT';
-import { MatrixWithWsJunctionType } from './types';
+import { MatrixWithWsJunctionType, Regulation2MatrixRow } from './types';
 import { WorksheetType } from '../worksheet/types';
 import { DialogProvider } from '../../hooks/display/useDialog';
+import { useAuth } from '../../hooks/useAuth';
+import useDictionary from '../../hooks/useDictionary';
+import MatrixTablePeraturan2 from './components/MatrixTablePeraturan2';
 // ----------------------------------------------------------------------------------
 interface MatrixResponse{
   worksheet: WorksheetType,
@@ -26,6 +29,8 @@ export default function MatrixDetail() {
   const navigate = useNavigate();
   
   const axiosJWT = useAxiosJWT();
+  const { auth } = useAuth();
+  const { kppnRef, periodRef } = useDictionary();
 
   const {openSnackbar} = useSnackbar();
 
@@ -40,16 +45,20 @@ export default function MatrixDetail() {
   const [worksheetDetail, setWorksheetDetail] = useState<WorksheetType | null>(null);
 
   const [matrix, setMatrix] = useState<MatrixWithWsJunctionType[] | []>([]);
+  const [matrixPeraturan2, setMatrixPeraturan2] = useState<Regulation2MatrixRow[]>([]);
 
   const getMatrix = async() => {
     try{
       setIsLoading(true);
-      const response = await axiosJWT.get(`/getMatrixWithWsDetailById/${kppnId}`);
+      const response = await axiosJWT.get(auth?.peraturan === 2
+        ? `/matrix/peraturan-2/${kppnId}/${auth?.period}`
+        : `/getMatrixWithWsDetailById/${kppnId}`);
       const matrixResponse: MatrixResponse = response.data.rows;
       setMatrixStatus(matrixResponse.worksheet.matrix_status);
       setWorksheetId(matrixResponse.worksheet.id);
       setWorksheetDetail(matrixResponse.worksheet);
-      setMatrix(matrixResponse.matrix);
+      if (auth?.peraturan === 2) setMatrixPeraturan2(matrixResponse.matrix as unknown as Regulation2MatrixRow[]);
+      else setMatrix(matrixResponse.matrix);
       setIsLoading(false);
     }catch(err: any){
       setIsLoading(false);
@@ -76,7 +85,13 @@ export default function MatrixDetail() {
       </Button>
 
       <MatrixDetailHeader />
-      {!matrix
+      {auth?.peraturan === 2 ? (
+        <MatrixTablePeraturan2
+          rows={matrixPeraturan2}
+          kppnName={kppnRef?.list?.find((item) => item.id === kppnId)?.alias || ''}
+          periodName={periodRef?.list?.find((item) => item.id === auth?.period)?.name || ''}
+        />
+      ) : !matrix
         ? null 
         :<DialogProvider>
             <MatrixTable matrix={matrix} matrixStatus={matrixStatus} getMatrix={getMatrix} worksheetId={worksheetId} worksheetDetail={worksheetDetail}/>

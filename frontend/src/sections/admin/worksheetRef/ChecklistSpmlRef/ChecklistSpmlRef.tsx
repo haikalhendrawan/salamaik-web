@@ -150,7 +150,7 @@ function ChecklistSpmlRefModal({ modalOpen, modalClose, addState, editID }: Chec
   const { openSnackbar } = useSnackbar();
   const axiosJWT = useAxiosJWT();
 
-  const emptyForm: ChecklistSpmlRefType = { id: 0, uraian: '', dokumen: '', komponen_spml_id: 0, subkomponen_spml_id: 0, aspek_spml_id: 0 };
+  const emptyForm: ChecklistSpmlRefType = { id: 0, uraian: '', dokumen: '', komponen_spml_id: 0, subkomponen_spml_id: 0, aspek_spml_id: 0, positive_fallback: '', negative_fallback: '', rekomendasi: '', peraturan: '', uic: '' };
   const [addValue, setAddValue] = useState<ChecklistSpmlRefType>(emptyForm);
   const [editValue, setEditValue] = useState<ChecklistSpmlRefType>(emptyForm);
 
@@ -185,6 +185,8 @@ function ChecklistSpmlRefModal({ modalOpen, modalClose, addState, editID }: Chec
         komponen_spml_id: addValue.komponen_spml_id,
         subkomponen_spml_id: addValue.subkomponen_spml_id,
         aspek_spml_id: addValue.aspek_spml_id,
+        positive_fallback: addValue.positive_fallback, negative_fallback: addValue.negative_fallback,
+        rekomendasi: addValue.rekomendasi, peraturan: addValue.peraturan, uic: addValue.uic,
       });
       openSnackbar('Checklist SPML berhasil ditambahkan', 'success');
       getDictionary(); modalClose(); handleResetAdd();
@@ -198,6 +200,8 @@ function ChecklistSpmlRefModal({ modalOpen, modalClose, addState, editID }: Chec
         komponen_spml_id: editValue.komponen_spml_id,
         subkomponen_spml_id: editValue.subkomponen_spml_id,
         aspek_spml_id: editValue.aspek_spml_id,
+        positive_fallback: editValue.positive_fallback, negative_fallback: editValue.negative_fallback,
+        rekomendasi: editValue.rekomendasi, peraturan: editValue.peraturan, uic: editValue.uic,
       });
       openSnackbar('Checklist SPML berhasil diubah', 'success');
       getDictionary(); modalClose();
@@ -228,12 +232,22 @@ function ChecklistSpmlRefModal({ modalOpen, modalClose, addState, editID }: Chec
                       onChange={addState ? handleChangeAdd : handleChangeEdit}
                     />
                   </FormControl>
+                  <StyledTextField name="positive_fallback" label="Hasil Implementasi" multiline minRows={2}
+                    value={currentVal.positive_fallback ?? ''} onChange={addState ? handleChangeAdd : handleChangeEdit} />
+                  <StyledTextField name="negative_fallback" label="Permasalahan" multiline minRows={2}
+                    value={currentVal.negative_fallback ?? ''} onChange={addState ? handleChangeAdd : handleChangeEdit} />
+                  <StyledTextField name="rekomendasi" label="Rekomendasi" multiline minRows={2}
+                    value={currentVal.rekomendasi ?? ''} onChange={addState ? handleChangeAdd : handleChangeEdit} />
                   <FormControl>
                     <StyledTextField name="dokumen" label="Dokumen" multiline minRows={2}
                       value={addState ? addValue.dokumen : editValue.dokumen}
                       onChange={addState ? handleChangeAdd : handleChangeEdit}
                     />
                   </FormControl>
+                  <StyledTextField name="peraturan" label="Peraturan/Ketentuan" multiline minRows={2}
+                    value={currentVal.peraturan ?? ''} onChange={addState ? handleChangeAdd : handleChangeEdit} />
+                  <StyledTextField name="uic" label="PIC Subbag/Seksi (UIC)"
+                    value={currentVal.uic ?? ''} onChange={addState ? handleChangeAdd : handleChangeEdit} />
                 </Stack>
                 <Stack direction="column" spacing={3} sx={{ width: '45%' }}>
                   <FormControl>

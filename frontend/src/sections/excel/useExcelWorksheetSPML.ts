@@ -99,7 +99,7 @@ function createScoreSheet(
     const komponenRows = rows.filter((item) => item.komponen_spml_id === komponen.id);
     if (komponenRows.length === 0) return;
 
-    addMergedSectionRow(sheet, formatOrderedTitle(komponen.urut, komponen.title), 'FFE0E0E0');
+    addSectionBandRow(sheet, formatOrderedTitle(komponen.urut, komponen.title), 'FFE0E0E0');
 
     subKomponenRef
       ?.filter((item) => item.komponen_spml_id === komponen.id)
@@ -109,7 +109,7 @@ function createScoreSheet(
         );
         if (subKomponenRows.length === 0) return;
 
-        addMergedSectionRow(
+        addSectionBandRow(
           sheet,
           formatOrderedTitle(subKomponen.urut, subKomponen.title),
           'FFF5F5F5'
@@ -234,20 +234,10 @@ function addHeaderRows(sheet: ExcelJS.Worksheet) {
   });
 }
 
-function addMergedSectionRow(sheet: ExcelJS.Worksheet, title: string, color: string) {
+function addSectionBandRow(sheet: ExcelJS.Worksheet, title: string, color: string) {
   const row = sheet.addRow([title]);
-  sheet.mergeCells(`A${row.number}:K${row.number}`);
   row.height = 22;
-
-  for (let columnNumber = 1; columnNumber <= 11; columnNumber += 1) {
-    const cell = row.getCell(columnNumber);
-    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: color } };
-    cell.border = BORDER;
-  }
-
-  const titleCell = sheet.getCell(`A${row.number}`);
-  titleCell.font = { bold: true, name: 'Aptos' };
-  titleCell.alignment = { vertical: 'middle', horizontal: 'left', wrapText: true };
+  styleContinuousBand(row, 1, 11, color, { bold: true, name: 'Aptos' });
 }
 
 function addChecklistRow(
@@ -363,7 +353,6 @@ function addFooterRow(
     '',
     kanwilValue ?? null,
   ]);
-  sheet.mergeCells(`A${row.number}:F${row.number}`);
   row.height = 24;
 
   for (let columnNumber = 1; columnNumber <= 11; columnNumber += 1) {
@@ -378,8 +367,39 @@ function addFooterRow(
     };
   }
 
+  styleContinuousBand(row, 1, 6, fillColor, {
+    name: 'Aptos',
+    bold: true,
+    color: { argb: fontColor },
+  });
+
   row.getCell(7).numFmt = numberFormat;
   row.getCell(11).numFmt = numberFormat;
+}
+
+function styleContinuousBand(
+  row: ExcelJS.Row,
+  startColumn: number,
+  endColumn: number,
+  fillColor: string,
+  font: Partial<ExcelJS.Font>
+) {
+  for (let columnNumber = startColumn; columnNumber <= endColumn; columnNumber += 1) {
+    const cell = row.getCell(columnNumber);
+    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: fillColor } };
+    cell.font = font;
+    cell.alignment = {
+      vertical: 'middle',
+      horizontal: 'centerContinuous',
+      wrapText: true,
+    };
+    cell.border = {
+      top: { style: 'thin' },
+      bottom: { style: 'thin' },
+      ...(columnNumber === startColumn ? { left: { style: 'thin' as const } } : {}),
+      ...(columnNumber === endColumn ? { right: { style: 'thin' as const } } : {}),
+    };
+  }
 }
 
 function createEvidenceLabel(checklistNumber: number, kppnName: string) {

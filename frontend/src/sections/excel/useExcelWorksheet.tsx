@@ -1,6 +1,5 @@
 import ExcelJS from 'exceljs';
-import { WsJunctionType } from '../worksheet/types';
-import { MatrixScoreAndProgressType } from '../matrix/types';
+import { PBScoreType, WsJunctionType } from '../worksheet/types';
 //-----------------------------------------------------------------------------------------------------------------
 interface KomponenRefType{
   id: number,
@@ -18,7 +17,7 @@ interface SubKomponenRefType{
   alias?: string,
 };
 //-----------------------------------------------------------------------------------------------------------------
-export default function useExcelWorksheet(rows: WsJunctionType[], matrixScore: MatrixScoreAndProgressType, komponenRef: KomponenRefType[] | null, subKomponenRef: SubKomponenRefType[] | null) {
+export default function useExcelWorksheet(rows: WsJunctionType[], pbScore: PBScoreType, komponenRef: KomponenRefType[] | null, subKomponenRef: SubKomponenRefType[] | null) {
   const generate = async () => {
     try{
       const workbook = new ExcelJS.Workbook();
@@ -126,52 +125,23 @@ export default function useExcelWorksheet(rows: WsJunctionType[], matrixScore: M
       
       sheetNilai.columns = columnConfig2;
   
-      sheetNilai.mergeCells("A1:G1");
-      sheetNilai.getCell("A1").value = "Nilai Berdasarkan Penilaian Kanwil"; 
-      sheetNilai.getCell("A1").alignment = { horizontal: "center" }; 
-      sheetNilai.getCell("A1").font = { bold: true, size: 12 }; 
       sheetNilai.getColumn("D").width = 20;
-      sheetNilai.getRow(1).height = 34;
-  
-      sheetNilai.getRow(2).values = columnConfig2.map((col) => col.header);
-  
-      matrixScore.scorePerKomponen.forEach((item, index) => {
-        sheetNilai.addRow({
-          no: index + 1,
-          komponen: item.komponenTitle,
-          total: item.totalNilai,
-          pembagi: item.bilanganPembagi,
-          avg: item.avgPerKomponen,
-          bobot: `${item.komponenBobot}%`,
-          weighted_avg: item.weightedScore,
-        });
-      });
-  
-      sheetNilai.getRow(8).values = ["", "Nilai Akhir", "", "", "", "", matrixScore.scoreByKanwil];
-  
-  
-      // 6a. Nilai KPPN
-      sheetNilai.mergeCells("A10:G10");
-      sheetNilai.getCell("A10").value = "Nilai Berdasarkan Penilaian Self Assessment KPPN"; 
-      sheetNilai.getCell("A10").alignment = { horizontal: "center" }; 
-      sheetNilai.getCell("A10").font = { bold: true, size: 12 }; 
-      sheetNilai.getRow(10).height = 34;
-  
-      sheetNilai.getRow(11).values = columnConfig2.map((col) => col.header);
-  
-      matrixScore.scorePerKomponenKPPN.forEach((item, index) => {
-        sheetNilai.addRow({
-          no: index + 1,
-          komponen: item.komponenTitle,
-          total: item.totalNilai,
-          pembagi: item.bilanganPembagi,
-          avg: item.avgPerKomponen,
-          bobot: `${item.komponenBobot}%`,
-          weighted_avg: item.weightedScore,
-        });
-      });
-  
-      sheetNilai.getRow(17).values = ["", "Nilai Akhir", "", "", "", "", matrixScore.scoreByKPPN];
+
+      addScoreSection(
+        sheetNilai,
+        "Nilai Berdasarkan Penilaian Kanwil",
+        columnConfig2,
+        pbScore.detailKanwil.detailKomponen,
+        pbScore.nilaiKanwil
+      );
+      sheetNilai.addRow([]);
+      addScoreSection(
+        sheetNilai,
+        "Nilai Berdasarkan Penilaian Self Assessment KPPN",
+        columnConfig2,
+        pbScore.detailKPPN.detailKomponen,
+        pbScore.nilaiKPPN
+      );
     
       // 7. Generate Excel file
       const buffer = await workbook.xlsx.writeBuffer();
@@ -189,4 +159,34 @@ export default function useExcelWorksheet(rows: WsJunctionType[], matrixScore: M
   };
 
   return { generate };
+}
+
+function addScoreSection(
+  sheet: ExcelJS.Worksheet,
+  title: string,
+  columns: { header: string }[],
+  components: PBScoreType['detailKPPN']['detailKomponen'],
+  finalScore: number
+) {
+  const titleRow = sheet.addRow([title]);
+  sheet.mergeCells(`A${titleRow.number}:G${titleRow.number}`);
+  titleRow.height = 34;
+  titleRow.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
+  titleRow.getCell(1).font = { bold: true, size: 12 };
+
+  sheet.addRow(columns.map((column) => column.header));
+
+  components.forEach((item, index) => {
+    sheet.addRow({
+      no: index + 1,
+      komponen: item.komponenTitle,
+      total: item.totalSkorKonversi,
+      pembagi: item.jumlahChecklistPembagi,
+      avg: item.nilaiRataRata,
+      bobot: `${item.komponenBobot}%`,
+      weighted_avg: item.nilaiTerbobot,
+    });
+  });
+
+  sheet.addRow(['', 'Nilai Akhir', '', '', '', '', finalScore]);
 }

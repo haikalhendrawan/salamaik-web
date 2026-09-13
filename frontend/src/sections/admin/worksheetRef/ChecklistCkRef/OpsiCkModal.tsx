@@ -44,6 +44,9 @@ interface OpsiCkForm {
   value: 0 | 5 | 10;
   label: string;
   description: string;
+  positive_fallback: string;
+  negative_fallback: string;
+  rekomendasi: string;
 }
 
 const EMPTY_FORM: OpsiCkForm = {
@@ -51,6 +54,9 @@ const EMPTY_FORM: OpsiCkForm = {
   value: 10,
   label: '',
   description: '',
+  positive_fallback: '',
+  negative_fallback: '',
+  rekomendasi: '',
 };
 
 function getErrorMessage(error: unknown, fallback: string) {
@@ -93,6 +99,9 @@ export default function OpsiCkModal({
         value: selectedOption.value,
         label: selectedOption.label,
         description: selectedOption.description ?? '',
+        positive_fallback: selectedOption.positive_fallback ?? '',
+        negative_fallback: selectedOption.negative_fallback ?? '',
+        rekomendasi: selectedOption.rekomendasi ?? '',
       });
       return;
     }
@@ -109,6 +118,9 @@ export default function OpsiCkModal({
         value: form.value,
         label: form.label,
         description: form.description,
+        positive_fallback: form.positive_fallback,
+        negative_fallback: form.negative_fallback,
+        rekomendasi: form.rekomendasi,
       };
       const response =
         mode === 'edit' && selectedOptionId
@@ -151,6 +163,9 @@ export default function OpsiCkModal({
         value: option.value,
         label: option.label,
         description: option.description ?? '',
+        positive_fallback: option.positive_fallback ?? '',
+        negative_fallback: option.negative_fallback ?? '',
+        rekomendasi: option.rekomendasi ?? '',
       });
       return;
     }
@@ -218,6 +233,18 @@ export default function OpsiCkModal({
             onChange={(event: ChangeEvent<HTMLInputElement>) =>
               setForm((current) => ({ ...current, label: event.target.value }))
             }
+          />
+          <StyledTextField fullWidth multiline minRows={2} label="Hasil Implementasi"
+            value={form.positive_fallback}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => setForm((current) => ({ ...current, positive_fallback: event.target.value }))}
+          />
+          <StyledTextField fullWidth multiline minRows={2} label="Permasalahan"
+            value={form.negative_fallback}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => setForm((current) => ({ ...current, negative_fallback: event.target.value }))}
+          />
+          <StyledTextField fullWidth multiline minRows={2} label="Rekomendasi"
+            value={form.rekomendasi}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => setForm((current) => ({ ...current, rekomendasi: event.target.value }))}
           />
           <StyledTextField
             fullWidth

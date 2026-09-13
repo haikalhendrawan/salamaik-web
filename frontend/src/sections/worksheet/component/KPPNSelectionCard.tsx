@@ -51,14 +51,21 @@ export default function KPPNSelectionCard({header, image, link, percentKanwil, p
       const response = await axiosJWT.get(
         `/getWsJunctionByWorksheetForKanwil?kppn=${kppnId}&time=${new Date().getTime()}`
       );
-      const response2 = await axiosJWT.post(`/getWsJunctionScoreAndProgress`, {kppnId, period: auth?.period});
-
       const rows = response.data.rows;
-      const matrixScore = response2.data.rows;
+      const worksheetId = rows?.[0]?.worksheet_id;
+      const peraturan = auth?.peraturan;
 
-      const excelWorksheet = useExcelWorksheet(rows, matrixScore, komponenRef, subKomponenRef);
-      const excelWorksheet2 = useExcelWorksheet2(rows, header, komponenRef, subKomponenRef);
-      const peraturan1 = auth?.peraturan === 1;
+      if (!worksheetId) throw new Error('Worksheet PB tidak ditemukan');
+      if (peraturan !== 1 && peraturan !== 2) throw new Error('Referensi peraturan tidak valid');
+
+      const scoreResponse = await axiosJWT.get(
+        `/scoringEngine/pb/${encodeURIComponent(worksheetId)}?peraturan=${peraturan}`
+      );
+      const pbScore = scoreResponse.data.rows;
+
+      const excelWorksheet = useExcelWorksheet(rows, pbScore, komponenRef, subKomponenRef);
+      const excelWorksheet2 = useExcelWorksheet2(rows, header, pbScore, komponenRef, subKomponenRef);
+      const peraturan1 = peraturan === 1;
       peraturan1 ? await excelWorksheet.generate() :await excelWorksheet2.generate();
     } catch (error) {
       console.error("Error generating Excel:", error);

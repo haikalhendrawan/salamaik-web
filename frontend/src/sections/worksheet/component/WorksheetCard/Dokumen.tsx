@@ -18,6 +18,8 @@ import useAxiosJWT from '../../../../hooks/useAxiosJWT';
 import useSnackbar from '../../../../hooks/display/useSnackbar';
 import useWsJunction from '../../useWsJunction';
 import { WsJunctionType, WorksheetType } from '../../types';
+import { useAuth } from '../../../../hooks/useAuth';
+import { canEditRegulation2Row } from '../../../../utils/worksheetPhase';
 // ----------------------------------------------------------------------------
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -53,8 +55,11 @@ export default function Dokumen({openInstruction, wsJunction, wsDetail, openLink
   const {setIsLoading} = useLoading();
 
   const {openSnackbar} = useSnackbar();
+  const { auth } = useAuth();
 
-  const isPastDue = useMemo(() => new Date().getTime() > new Date(wsDetail?.close_period || "").getTime(), [wsDetail]);
+  const isPastDue = useMemo(() => auth?.peraturan === 2
+    ? !canEditRegulation2Row(wsDetail, wsJunction?.kanwil_score ?? null, wsJunction?.excluded ?? 0)
+    : new Date().getTime() > new Date(wsDetail?.close_period || "").getTime(), [auth?.peraturan, wsDetail, wsJunction]);
 
   const handleOpenExampleFile = useCallback((option: number) => {
     const baseDir = "checklist";

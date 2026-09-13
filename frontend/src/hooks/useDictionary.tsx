@@ -86,6 +86,11 @@ export interface ChecklistSpmlRefType{
   komponen_spml_id: number,
   subkomponen_spml_id: number,
   aspek_spml_id: number,
+  positive_fallback?: string | null,
+  negative_fallback?: string | null,
+  rekomendasi?: string | null,
+  peraturan?: string | null,
+  uic?: string | null,
 };
 
 export interface KomponenCkRefType {
@@ -104,6 +109,8 @@ export interface ChecklistCkRefType {
   materi: string;
   kriteria_penilaian: string;
   bukti_dukung: string | null;
+  peraturan: string | null;
+  uic: string | null;
   komponen_title: string;
   komponen_urut: string;
 }
@@ -115,6 +122,9 @@ export interface OpsiCkRefType {
   description: string | null;
   value: 0 | 5 | 10;
   urut: number;
+  positive_fallback: string | null;
+  negative_fallback: string | null;
+  rekomendasi: string | null;
   checklist_urut: number;
   checklist_materi: string;
   komponen_ck_id: number;

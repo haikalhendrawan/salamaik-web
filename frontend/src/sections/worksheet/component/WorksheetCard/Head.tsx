@@ -19,6 +19,7 @@ import useSnackbar from '../../../../hooks/display/useSnackbar';
 import useLoading from '../../../../hooks/display/useLoading';
 import { WsJunctionType, WorksheetType } from '../../types';
 import useWsJunction from '../../useWsJunction';
+import { canEditRegulation2Row } from '../../../../utils/worksheetPhase';
 // ------------------------------------------------------------
 interface HeadPropInterface{
   num: string | undefined,
@@ -73,7 +74,9 @@ export default function Head(props: HeadPropInterface) {  // bagian atas dari ca
 
   const excludeReverse = isExcluded? 0 : 1;
 
-  const isPastDue = useMemo(() => new Date().getTime() > new Date(props.wsDetail?.close_period || "").getTime(), [props.wsDetail]);
+  const isPastDue = useMemo(() => auth?.peraturan === 2
+    ? !canEditRegulation2Row(props.wsDetail, props.wsJunction?.kanwil_score ?? null, props.wsJunction?.excluded ?? 0)
+    : new Date().getTime() > new Date(props.wsDetail?.close_period || "").getTime(), [auth?.peraturan, props.wsDetail, props.wsJunction]);
 
   const handleChangeExclude = async(exclude:number) => {
     try{

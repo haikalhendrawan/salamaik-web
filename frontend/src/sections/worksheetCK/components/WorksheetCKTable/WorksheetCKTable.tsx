@@ -19,6 +19,8 @@ import FileActionsCK from './components/FileActionsCK';
 import ScoreSelectCK from './components/ScoreSelectCK';
 import ScoreFooterCellCK from './components/ScoreFooterCellCK';
 import KanwilNoteCK from './components/KanwilNoteCK';
+import { WorksheetType } from '../../../worksheet/types';
+import { canEditRegulation2Row, getWorksheetPhase } from '../../../../utils/worksheetPhase';
 
 const HEADERS = [
   'No',
@@ -49,11 +51,13 @@ export default function WorksheetCKTable({
   isPastDue,
   ckScore,
   isScoreLoading,
+  worksheetDetail,
 }: {
   rows: WsCKJunctionType[];
   isPastDue: boolean;
   ckScore: CKScoreType | null;
   isScoreLoading: boolean;
+  worksheetDetail: WorksheetType | null;
 }) {
   const { auth } = useAuth();
   const isKanwil = auth?.kppn?.length === 5;
@@ -105,7 +109,7 @@ export default function WorksheetCKTable({
                   </TableCell>
                 </TableRow>
                 {componentRows.map((row) => (
-                  <TableRow key={row.junction_id} id={`ck-checklist-${row.junction_id}`} hover>
+                  <TableRow key={row.junction_id} id={`ck-checklist-${row.junction_id}`} hover sx={{ bgcolor: auth?.peraturan === 2 && getWorksheetPhase(worksheetDetail) === 'FOLLOW_UP' && row.excluded !== 1 && (row.kanwil_score === null || row.kanwil_score < 10) ? 'warning.lighter' : undefined }}>
                     <BodyCell align="center">{row.checklist_urut}</BodyCell>
                     <BodyCell>{row.materi}</BodyCell>
                     <BodyCell>
@@ -124,22 +128,22 @@ export default function WorksheetCKTable({
                       </Stack>
                     </BodyCell>
                     <BodyCell>
-                      <FileActionsCK checklist={row} disabled={isPastDue} />
+                      <FileActionsCK checklist={row} disabled={auth?.peraturan === 2 ? !canEditRegulation2Row(worksheetDetail, row.kanwil_score, row.excluded) : isPastDue} />
                     </BodyCell>
                     <BodyCell align="center">
-                      <ScoreSelectCK checklist={row} scoreType="kppn" disabled={isKanwil || isPastDue} />
+                      <ScoreSelectCK checklist={row} scoreType="kppn" disabled={isKanwil || (auth?.peraturan === 2 ? !canEditRegulation2Row(worksheetDetail, row.kanwil_score, row.excluded) : isPastDue)} />
                     </BodyCell>
                     <BodyCell align="center">
-                      <ScoreSelectCK checklist={row} scoreType="kanwil" disabled={!isKanwil || isPastDue} />
+                      <ScoreSelectCK checklist={row} scoreType="kanwil" disabled={!isKanwil || (auth?.peraturan === 2 ? !canEditRegulation2Row(worksheetDetail, row.kanwil_score, row.excluded) : isPastDue)} />
                     </BodyCell>
                     <BodyCell>
-                      <KanwilNoteCK checklist={row} isPastDue={isPastDue} />
+                      <KanwilNoteCK checklist={row} isPastDue={auth?.peraturan === 2 ? !canEditRegulation2Row(worksheetDetail, row.kanwil_score, row.excluded) : isPastDue} />
                     </BodyCell>
                     <BodyCell align="center">
                       <CommentActionCK
                         junctionId={row.junction_id}
                         initialCount={Number(row.comment_count) || 0}
-                        disabled={isPastDue}
+                        disabled={auth?.peraturan === 2 ? !canEditRegulation2Row(worksheetDetail, row.kanwil_score, row.excluded) : isPastDue}
                       />
                     </BodyCell>
                   </TableRow>

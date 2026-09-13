@@ -74,7 +74,9 @@ export default function WorksheetKanwil() {
 
   const [isLoading, setIsLoading] = useState(true);
 
-  const isPastDue = useMemo(() => new Date().getTime() > new Date(wsDetail?.close_period || "").getTime(), [wsDetail]);
+  const isPastDue = useMemo(() => auth?.peraturan === 2
+    ? false
+    : new Date().getTime() > new Date(wsDetail?.close_period || "").getTime(), [auth?.peraturan, wsDetail]);
 
   // const { isLoading, setIsLoading } = useLoading();
 

@@ -34,6 +34,9 @@ export default function Nav({ openNav, onCloseNav }: NavType) {
   const {auth} = useAuth() as AuthType;  
 
   const isDesktop = useResponsive('up', 'lg', 'md');
+  const supervisiMenu = auth?.peraturan === 2
+    ? navSupervisi.filter((item) => item.path !== '/followUp')
+    : navSupervisi;
 
   useEffect(() => {
     if (openNav) {
@@ -53,7 +56,7 @@ export default function Nav({ openNav, onCloseNav }: NavType) {
       </Box>
 
       <NavSection data={navHome}  />
-      <NavSection data={navSupervisi}  header={"SUPERVISI KPPN"} />
+      <NavSection data={supervisiMenu}  header={"SUPERVISI KPPN"} />
       <NavSection data={navMonitoring} header={"MONITORING"} />
       {auth?(<NavSectionNested data={navAdmin} header={"ADMIN"} />) :null}
 

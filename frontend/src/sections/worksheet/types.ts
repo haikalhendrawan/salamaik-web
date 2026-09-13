@@ -66,3 +66,32 @@ export interface WorksheetType{
     open_follow_up: string,
     close_follow_up: string
 }
+
+export interface PBComponentScoreDetail {
+    komponenId: number,
+    komponenTitle: string,
+    komponenBobot: number,
+    jumlahChecklist: number,
+    jumlahNA: number,
+    jumlahChecklistPembagi: number,
+    totalSkorKonversi: number,
+    nilaiRataRata: number,
+    nilaiTerbobot: number,
+}
+
+export interface PBScoreDetail {
+    jumlahChecklist: number,
+    jumlahChecklistDiisi: number,
+    jumlahNA: number,
+    jumlahChecklistPembagi: number,
+    totalSkorKonversi: number,
+    detailKomponen: PBComponentScoreDetail[],
+}
+
+export interface PBScoreType {
+    peraturan: 1 | 2,
+    nilaiKPPN: number,
+    nilaiKanwil: number,
+    detailKPPN: PBScoreDetail,
+    detailKanwil: PBScoreDetail,
+}

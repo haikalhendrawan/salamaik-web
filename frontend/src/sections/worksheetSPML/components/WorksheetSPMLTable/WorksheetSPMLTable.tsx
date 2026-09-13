@@ -18,6 +18,8 @@ import ScoreFooterCell from './components/ScoreFooterCell';
 import SPMLChecklistRow from './components/SPMLChecklistRow';
 import WorksheetSPMLTableSkeleton from './components/WorksheetSPMLTableSkeleton';
 import useSPMLTableViewModel from './useSPMLTableViewModel';
+import { WorksheetType } from '../../../worksheet/types';
+import { canEditRegulation2Row, getWorksheetPhase } from '../../../../utils/worksheetPhase';
 //-----------------------------------------------------------------------------------------------------------------
 const TABLE_HEAD = [
   { id: 'no', label: 'No', alignRight: false },
@@ -38,6 +40,7 @@ interface WorksheetSPMLTable{
   isScoreLoading: boolean;
   isInitialLoading: boolean;
   isPastDue: boolean;
+  worksheetDetail: WorksheetType | null;
 }
 //-----------------------------------------------------------------------------------------------------------------
 
@@ -47,6 +50,7 @@ export default function WorksheetSPMLTable({
   isScoreLoading,
   isInitialLoading,
   isPastDue,
+  worksheetDetail,
 }: WorksheetSPMLTable) {
   const {komponenSpmlRef, subKomponenSpmlRef, aspekSpmlRef } = useDictionary();
   const hierarchy = useSPMLTableViewModel(
@@ -124,7 +128,10 @@ export default function WorksheetSPMLTable({
                   aspek={index === 0 ? aspekItem : undefined}
                   aspekRowSpan={index === 0 ? checklist.length : undefined}
                   isKanwil={isKanwil}
-                  isPastDue={isPastDue}
+                  isPastDue={auth?.peraturan === 2
+                    ? !canEditRegulation2Row(worksheetDetail, item.kanwil_score, item.excluded)
+                    : isPastDue}
+                  isFinding={auth?.peraturan === 2 && getWorksheetPhase(worksheetDetail) === 'FOLLOW_UP' && item.excluded !== 1 && (item.kanwil_score === null || item.kanwil_score < 10)}
                 />
               ))}
             </Fragment>
@@ -132,7 +139,7 @@ export default function WorksheetSPMLTable({
         </Fragment>
       ))}
     </Fragment>
-  )), [hierarchy, isKanwil, isPastDue, theme.palette.background.default, theme.palette.text.main, theme.palette.text.primary]);
+  )), [auth?.peraturan, hierarchy, isKanwil, isPastDue, worksheetDetail, theme.palette.background.default, theme.palette.text.main, theme.palette.text.primary]);
 
   return (
     <>

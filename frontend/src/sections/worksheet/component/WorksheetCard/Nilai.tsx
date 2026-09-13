@@ -19,6 +19,7 @@ import { WorksheetType, WsJunctionType } from "../../types";
 import useSocket from "../../../../hooks/useSocket";
 import useWsJunction from "../../useWsJunction";
 import {useAuth} from "../../../../hooks/useAuth";
+import { canEditRegulation2Row } from '../../../../utils/worksheetPhase';
 import useLoading from "../../../../hooks/display/useLoading";
 import useSnackbar from "../../../../hooks/display/useSnackbar";
 import useAxiosJWT from '../../../../hooks/useAxiosJWT';
@@ -82,7 +83,9 @@ export default function Nilai({wsJunction, wsDetail, isExcluded}: NilaiPropsType
 
   const {openSnackbar} = useSnackbar();
 
-  const isPastDue = useMemo(() => new Date().getTime() > new Date(wsDetail?.close_period || "").getTime(), [wsDetail]);
+  const isPastDue = useMemo(() => auth?.peraturan === 2
+    ? !canEditRegulation2Row(wsDetail, wsJunction?.kanwil_score ?? null, wsJunction?.excluded ?? 0)
+    : new Date().getTime() > new Date(wsDetail?.close_period || "").getTime(), [auth?.peraturan, wsDetail, wsJunction]);
 
   const isKanwil = useMemo(() =>{
     return auth?.kppn?.length === 5;

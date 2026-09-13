@@ -44,6 +44,8 @@ interface ChecklistCkForm {
   materi: string;
   kriteria_penilaian: string;
   bukti_dukung: string;
+  peraturan: string;
+  uic: string;
 }
 
 const EMPTY_FORM: ChecklistCkForm = {
@@ -52,6 +54,8 @@ const EMPTY_FORM: ChecklistCkForm = {
   materi: '',
   kriteria_penilaian: '',
   bukti_dukung: '',
+  peraturan: '',
+  uic: '',
 };
 
 type OptionMode = 'add' | 'edit';
@@ -93,6 +97,8 @@ export default function ChecklistCkRef({
     materi: row.materi,
     kriteria_penilaian: row.kriteria_penilaian,
     bukti_dukung: row.bukti_dukung ?? '',
+    peraturan: row.peraturan ?? '',
+    uic: row.uic ?? '',
   });
 
   const closeModal = () => {
@@ -341,6 +347,16 @@ export default function ChecklistCkRef({
                 setForm((current) => ({ ...current, materi: event.target.value }))
               }
             />
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+              <StyledTextField fullWidth multiline minRows={2} label="Peraturan/Ketentuan"
+                value={form.peraturan}
+                onChange={(event: ChangeEvent<HTMLInputElement>) => setForm((current) => ({ ...current, peraturan: event.target.value }))}
+              />
+              <StyledTextField fullWidth label="PIC Subbag/Seksi (UIC)"
+                value={form.uic}
+                onChange={(event: ChangeEvent<HTMLInputElement>) => setForm((current) => ({ ...current, uic: event.target.value }))}
+              />
+            </Stack>
             <StyledTextField
               required
               fullWidth

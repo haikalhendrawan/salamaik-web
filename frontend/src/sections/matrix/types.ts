@@ -72,6 +72,25 @@ export interface MatrixWithWsJunctionType{
   opsi: OpsiType[]
 }
 
+export type Regulation2WorksheetType = 'PB' | 'SPML' | 'CK';
+
+export interface Regulation2MatrixRow {
+  worksheet_type: Regulation2WorksheetType;
+  junction_id: number;
+  checklist_id: number;
+  nomor_kertas_kerja: string;
+  komponen_supervisi: string;
+  hasil_implementasi: string | null;
+  permasalahan: string | null;
+  rekomendasi: string | null;
+  peraturan: string | null;
+  uic: string | null;
+  tindak_lanjut: string | null;
+  status_penyelesaian: string | null;
+  kanwil_score: number | null;
+  kanwil_note: string | null;
+}
+
 interface ScorePerKomponenType{
   komponenId: number,
   komponenTitle: string,

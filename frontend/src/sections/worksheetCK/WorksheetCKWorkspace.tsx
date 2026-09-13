@@ -76,11 +76,12 @@ export default function WorksheetCKWorkspace() {
         <WorksheetCKTable
           rows={wsCKJunction}
           isPastDue={isPastDue}
+          worksheetDetail={wsDetail}
           ckScore={ckScore}
           isScoreLoading={isScoreLoading}
         />
       </Card>
-      <PreviewFileCKModal disabled={isPastDue} />
+      <PreviewFileCKModal disabled={isPastDue && auth?.peraturan !== 2} />
       <NavigationDrawerCK rows={wsCKJunction} onNavigate={scrollToChecklist} />
     </>
   );

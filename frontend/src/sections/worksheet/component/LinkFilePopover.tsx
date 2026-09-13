@@ -13,6 +13,8 @@ import useWsJunction from "../useWsJunction";
 import useSnackbar from "../../../hooks/display/useSnackbar";
 import useLoading from "../../../hooks/display/useLoading";
 import Iconify from "../../../components/iconify/Iconify";
+import { useAuth } from '../../../hooks/useAuth';
+import { canEditRegulation2Row } from '../../../utils/worksheetPhase';
 //-----------------------------------------------------------------------------------------------------------------
 const style = {
   p: 2,
@@ -54,8 +56,11 @@ export default function LinkFilePopover({ open, anchorEl, handleClose, wsJunctio
   const { getWsJunctionKanwil } = useWsJunction();
   const { openSnackbar } = useSnackbar();
   const { setIsLoading } = useLoading();
+  const { auth } = useAuth();
 
-  const isPastDue = useMemo(() => new Date().getTime() > new Date(wsDetail?.close_period || "").getTime(), [wsDetail]);
+  const isPastDue = useMemo(() => auth?.peraturan === 2
+    ? !canEditRegulation2Row(wsDetail, wsJunction?.kanwil_score ?? null, wsJunction?.excluded ?? 0)
+    : new Date().getTime() > new Date(wsDetail?.close_period || "").getTime(), [auth?.peraturan, wsDetail, wsJunction]);
 
   const handleEditLinkFile = () => {
     if (socket?.connected === false) {

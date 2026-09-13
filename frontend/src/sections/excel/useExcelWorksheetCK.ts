@@ -78,14 +78,11 @@ function createSheet(
     const sectionRow = sheet.addRow([
       formatOrderedTitle(component.komponen_urut, component.komponen_title),
     ]);
-    sheet.mergeCells(`A${sectionRow.number}:K${sectionRow.number}`);
-    for (let column = 1; column <= 11; column += 1) {
-      const cell = sectionRow.getCell(column);
-      cell.border = BORDER;
-      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD9D9D9' } };
-      cell.font = { bold: true, name: 'Calibri', size: 11 };
-      cell.alignment = { vertical: 'middle', horizontal: 'left', wrapText: true };
-    }
+    styleContinuousBand(sectionRow, 1, 11, 'FFD9D9D9', {
+      bold: true,
+      name: 'Calibri',
+      size: 11,
+    });
     sectionRow.height = 23;
 
     componentRows.forEach((junction) => {
@@ -305,19 +302,48 @@ function addFooter(
     '',
     kanwilValue ?? null,
   ]);
-  sheet.mergeCells(`A${row.number}:F${row.number}`);
   for (let column = 1; column <= 11; column += 1) {
     const cell = row.getCell(column);
     cell.border = BORDER;
     cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFBFBFBF' } };
     cell.font = { bold: true, name: 'Calibri', size: 11 };
-    cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+      cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
   }
+  styleContinuousBand(row, 1, 6, 'FFBFBFBF', {
+    bold: true,
+    name: 'Calibri',
+    size: 11,
+  });
   if (numberFormat) {
     row.getCell(7).numFmt = numberFormat;
     row.getCell(11).numFmt = numberFormat;
   }
   row.height = 24;
+}
+
+function styleContinuousBand(
+  row: ExcelJS.Row,
+  startColumn: number,
+  endColumn: number,
+  fillColor: string,
+  font: Partial<ExcelJS.Font>
+) {
+  for (let column = startColumn; column <= endColumn; column += 1) {
+    const cell = row.getCell(column);
+    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: fillColor } };
+    cell.font = font;
+    cell.alignment = {
+      vertical: 'middle',
+      horizontal: 'centerContinuous',
+      wrapText: true,
+    };
+    cell.border = {
+      top: { style: 'thin' },
+      bottom: { style: 'thin' },
+      ...(column === startColumn ? { left: { style: 'thin' as const } } : {}),
+      ...(column === endColumn ? { right: { style: 'thin' as const } } : {}),
+    };
+  }
 }
 
 function createEvidenceLabel(checklistNumber: number, kppnName: string) {

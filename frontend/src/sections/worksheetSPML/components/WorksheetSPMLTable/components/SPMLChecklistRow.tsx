@@ -24,6 +24,7 @@ interface SPMLChecklistRowProps {
   aspekRowSpan?: number;
   isKanwil: boolean;
   isPastDue: boolean;
+  isFinding?: boolean;
 }
 
 function SPMLChecklistRow({
@@ -32,9 +33,10 @@ function SPMLChecklistRow({
   aspekRowSpan,
   isKanwil,
   isPastDue,
+  isFinding = false,
 }: SPMLChecklistRowProps) {
   return (
-    <TableRow id={`spml-checklist-${checklist.junction_id}`}>
+    <TableRow id={`spml-checklist-${checklist.junction_id}`} sx={{ bgcolor: isFinding ? 'warning.lighter' : undefined }}>
       {aspek && (
         <>
           <StyledTableCell rowSpan={aspekRowSpan}>{aspek.urut}</StyledTableCell>

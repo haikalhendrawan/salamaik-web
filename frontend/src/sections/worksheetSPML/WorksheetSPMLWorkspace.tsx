@@ -76,7 +76,7 @@ export default function WorksheetSPMLWorkspace() {
   useWsSPMLLiveSync(activeWorksheetId, selectedKppnId);
 
   const isPastDue = new Date().getTime() > new Date(wsDetail?.close_period || '').getTime();
-  const areActionsDisabled = isWorksheetDetailLoading || !wsDetail || isPastDue;
+  const areActionsDisabled = isWorksheetDetailLoading || !wsDetail || (auth?.peraturan !== 2 && isPastDue);
 
   const scrollToChecklist = useCallback((junctionId: number) => {
     document
@@ -152,10 +152,11 @@ export default function WorksheetSPMLWorkspace() {
           isScoreLoading={isScoreLoading}
           isInitialLoading={isInitialTableLoading}
           isPastDue={areActionsDisabled}
+          worksheetDetail={wsDetail}
         />
 
       </Card>
-      <PreviewFileModal isDisabled={areActionsDisabled} kppn={id} />
+      <PreviewFileModal isDisabled={areActionsDisabled && auth?.peraturan !== 2} kppn={id} />
       <NavigationDrawerSPML
         wsSPMLJunction={wsSPMLJunction}
         scrollToChecklist={scrollToChecklist}
