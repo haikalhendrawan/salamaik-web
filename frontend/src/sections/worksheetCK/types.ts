@@ -1,4 +1,4 @@
-export type CKScoreValue = 0 | 5 | 10;
+export type CKScoreValue = number;
 
 export interface OpsiCKType {
   id: number;

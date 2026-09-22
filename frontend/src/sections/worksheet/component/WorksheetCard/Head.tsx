@@ -3,7 +3,6 @@
  * © Kanwil DJPb Sumbar 2024
  */
 
-import { useMemo } from 'react';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
@@ -12,22 +11,12 @@ import Badge from '@mui/material/Badge';
 import Iconify from "../../../../components/iconify";
 import styled  from '@mui/material/styles/styled';
 import { parseISO, format } from 'date-fns';
-import StyledButton from '../../../../components/styledButton/StyledButton';
-import { useAuth } from '../../../../hooks/useAuth';
-import useAxiosJWT from '../../../../hooks/useAxiosJWT';
-import useSnackbar from '../../../../hooks/display/useSnackbar';
-import useLoading from '../../../../hooks/display/useLoading';
-import { WsJunctionType, WorksheetType } from '../../types';
-import useWsJunction from '../../useWsJunction';
-import { canEditRegulation2Row } from '../../../../utils/worksheetPhase';
 // ------------------------------------------------------------
 interface HeadPropInterface{
   num: string | undefined,
   title:string,
   dateUpdated: string | null,
   updatedBy: string | null,
-  wsJunction: WsJunctionType | null,
-  wsDetail: WorksheetType | null,
   openComment: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
   commentCount: number,
 };
@@ -58,43 +47,6 @@ export default function Head(props: HeadPropInterface) {  // bagian atas dari ca
 
   const isUpdate = props?.dateUpdated;
 
-  const {getWsJunctionKanwil} = useWsJunction();
-
-  const {auth} = useAuth();
-
-  const isAdmin = auth?.role===99 || auth?.role===4;
-
-  const axiosJWT = useAxiosJWT();
-
-  const {setIsLoading} = useLoading();
-
-  const {openSnackbar} = useSnackbar();
-
-  const isExcluded = props?.wsJunction?.excluded===1;
-
-  const excludeReverse = isExcluded? 0 : 1;
-
-  const isPastDue = useMemo(() => auth?.peraturan === 2
-    ? !canEditRegulation2Row(props.wsDetail, props.wsJunction?.kanwil_score ?? null, props.wsJunction?.excluded ?? 0)
-    : new Date().getTime() > new Date(props.wsDetail?.close_period || "").getTime(), [auth?.peraturan, props.wsDetail, props.wsJunction]);
-
-  const handleChangeExclude = async(exclude:number) => {
-    try{
-      setIsLoading(true);
-      const response = await axiosJWT.post("/editWsJunctionExclude", {
-        junctionId: props?.wsJunction?.junction_id,
-        exclude: exclude
-      });
-      await getWsJunctionKanwil(props?.wsJunction?.kppn_id || '');
-      setIsLoading(false);
-      openSnackbar(response.data.message, "success");
-    }catch(err:any){
-      openSnackbar(err?.response?.data?.message, "error");
-    }finally{
-      setIsLoading(false);
-    }
-  };
-
   return(
   <>
     <MainStack direction="row" spacing={2}>
@@ -105,25 +57,6 @@ export default function Head(props: HeadPropInterface) {  // bagian atas dari ca
           </Stack>
       </SubStack>
       <SubStack direction="row" spacing={0}>
-        {
-          isAdmin
-          ?
-            <Tooltip title={isExcluded?'Batal Exclude':'Exclude'}>
-              <span>
-                <StyledButton 
-                  aria-label="edit" 
-                  variant='contained' 
-                  size='small' 
-                  color={isExcluded?'warning':'white'}
-                  onClick={() => handleChangeExclude(excludeReverse)}
-                  disabled={isPastDue}
-                >
-                  <Iconify icon="solar:flag-2-bold-duotone" />
-                </StyledButton>
-              </span>
-            </Tooltip>
-          : null
-        }
         {isUpdate?
           <Tooltip title={tooltipText} placement="left-start">
             <StyledIconButton disableRipple><Iconify icon={"solar:check-circle-bold"} /></StyledIconButton>

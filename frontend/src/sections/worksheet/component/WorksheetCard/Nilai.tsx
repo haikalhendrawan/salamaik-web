@@ -29,7 +29,6 @@ import { StandardizationType } from '../../../standardization/types';
 interface NilaiPropsType{
   wsJunction: WsJunctionType | null,
   wsDetail: WorksheetType | null,
-  isExcluded: boolean
 };
 
 const StyledFormControl = styled(FormControl)(({}) => ({
@@ -64,12 +63,12 @@ const StyledNumberTextField = styled(TextField)(({}) => ({
 }));
 
 // ------------------------------------------------------------
-export default function Nilai({wsJunction, wsDetail, isExcluded}: NilaiPropsType) {
+export default function Nilai({wsJunction, wsDetail}: NilaiPropsType) {
   const [isMounted, setIsMounted] = useState(true);
 
-  const [stdScoreKanwil, setStdScoreKanwil] = useState(wsJunction?.kanwil_score || '');
+  const [stdScoreKanwil, setStdScoreKanwil] = useState(wsJunction?.kanwil_score ?? '');
   
-  const [stdScoreKPPN, setStdScoreKPPN] = useState(wsJunction?.kppn_score || '');
+  const [stdScoreKPPN, setStdScoreKPPN] = useState(wsJunction?.kppn_score ?? '');
 
   const {socket} = useSocket();
 
@@ -95,11 +94,23 @@ export default function Nilai({wsJunction, wsDetail, isExcluded}: NilaiPropsType
     <StyledMenuItem key={index+1} value={item?.value?.toString() || ''}>{item?.value}</StyledMenuItem>
   ) || null), [wsJunction]);
 
+  const maximumScore = useMemo(() => {
+    if (wsJunction?.standardisasi === 1) return 12;
+    const scores = (wsJunction?.opsi || [])
+      .map((item) => Number(item.value))
+      .filter(Number.isFinite);
+    return scores.length > 0 ? Math.max(...scores) : 10;
+  }, [wsJunction]);
+
+  const isExcluded = wsJunction?.excluded === 1;
+
   const handleChangeKanwilScore = (newScore: string) => {
     setIsLoading(true);
-    const score = parseInt(newScore);
+    const excluded = newScore === 'N/A' ? 1 : 0;
+    const score = excluded === 1 ? maximumScore : Number(newScore);
 
-    if(socket?.connected === false) {
+    if(!socket?.connected) {
+      setIsLoading(false);
       return openSnackbar("websocket failed, check your connection", "error");
     };
 
@@ -107,6 +118,7 @@ export default function Nilai({wsJunction, wsDetail, isExcluded}: NilaiPropsType
       worksheetId: wsJunction?.worksheet_id, 
       junctionId: wsJunction?.junction_id, 
       kanwilScore: score,
+      excluded,
       userName: auth?.name
     }, async(response: any) => {
       try{
@@ -125,9 +137,11 @@ export default function Nilai({wsJunction, wsDetail, isExcluded}: NilaiPropsType
 
   const handleChangeKPPNScore = (newScore: string) => {
     setIsLoading(true);
-    const score = parseInt(newScore);
+    const excluded = newScore === 'N/A' ? 1 : 0;
+    const score = excluded === 1 ? maximumScore : Number(newScore);
 
-    if(socket?.connected === false) {
+    if(!socket?.connected) {
+      setIsLoading(false);
       return openSnackbar("websocket failed, check your connection", "error");
     };
 
@@ -135,6 +149,7 @@ export default function Nilai({wsJunction, wsDetail, isExcluded}: NilaiPropsType
       worksheetId: wsJunction?.worksheet_id, 
       junctionId: wsJunction?.junction_id, 
       kppnScore: score,
+      excluded,
       userName: auth?.name
     }, async (response: any) => {
       try{
@@ -173,7 +188,8 @@ export default function Nilai({wsJunction, wsDetail, isExcluded}: NilaiPropsType
     setStdScoreKanwil(newScore);
     setIsLoading(true);
 
-    if(socket?.connected === false) {
+    if(!socket?.connected) {
+      setIsLoading(false);
       return openSnackbar("websocket failed, check your connection", "error");
     };
 
@@ -181,6 +197,7 @@ export default function Nilai({wsJunction, wsDetail, isExcluded}: NilaiPropsType
       worksheetId: wsJunction?.worksheet_id, 
       junctionId: wsJunction?.junction_id, 
       kanwilScore: score,
+      excluded: 0,
       userName: auth?.name
     }, async() => {
       try{
@@ -214,7 +231,8 @@ export default function Nilai({wsJunction, wsDetail, isExcluded}: NilaiPropsType
     setStdScoreKPPN(newScore);
     setIsLoading(true);
 
-    if(socket?.connected === false) {
+    if(!socket?.connected) {
+      setIsLoading(false);
       return openSnackbar("websocket failed, check your connection", "error");
     };
 
@@ -222,6 +240,7 @@ export default function Nilai({wsJunction, wsDetail, isExcluded}: NilaiPropsType
       worksheetId: wsJunction?.worksheet_id, 
       junctionId: wsJunction?.junction_id, 
       kppnScore: score,
+      excluded: 0,
       userName: auth?.name
     }, async () => {
       try{
@@ -244,6 +263,7 @@ export default function Nilai({wsJunction, wsDetail, isExcluded}: NilaiPropsType
         worksheetId: wsJunction?.worksheet_id, 
         junctionId: wsJunction?.junction_id, 
         kanwilScore: score,
+        excluded: 0,
         userName: auth?.name
       }, async() => {
         try{
@@ -277,6 +297,7 @@ export default function Nilai({wsJunction, wsDetail, isExcluded}: NilaiPropsType
         worksheetId: wsJunction?.worksheet_id, 
         junctionId: wsJunction?.junction_id, 
         kppnScore: score,
+        excluded: 0,
         userName: auth?.name
       }, async() => {
         try{
@@ -303,6 +324,11 @@ export default function Nilai({wsJunction, wsDetail, isExcluded}: NilaiPropsType
     setIsMounted(false);
   }, []);
 
+  useEffect(() => {
+    setStdScoreKanwil(wsJunction?.kanwil_score ?? '');
+    setStdScoreKPPN(wsJunction?.kppn_score ?? '');
+  }, [wsJunction?.kanwil_score, wsJunction?.kppn_score]);
+
   if(isMounted) {
     return (
       <>
@@ -319,115 +345,117 @@ export default function Nilai({wsJunction, wsDetail, isExcluded}: NilaiPropsType
     <Stack direction='column' spacing={2}>
       <Stack direction='column' spacing={1}>
         <Typography variant='body3' fontSize={12} textAlign={'left'}>Nilai KPPN :</Typography>
-        {
-          !isExcluded ? 
-            (
-              <StyledFormControl>
-              {
-                wsJunction?.standardisasi === 1
-                ?
-                  <Stack direction='row' spacing={2}>
-                    <StyledNumberTextField  
-                      size='small'
-                      type="text"
-                      onChange={(e) => setStdScoreKPPN(e.target.value)}
-                      onBlur={(e) => handleChangeKPPNScoreStd(e)}
-                      disabled={isKanwil || isPastDue}
-                      value={stdScoreKPPN}
-                    />
-                    <Tooltip title='Ambil nilai standardisasi'>
-                      <span>
-                        <StyledButton 
-                          aria-label="edit" 
-                          variant='contained' 
-                          size='small' 
-                          color='warning'
-                          disabled={isKanwil || isPastDue}
-                          onClick={() => handleFetchStdScoreKPPN()}
-                        >
-                          <Iconify icon="solar:refresh-bold-duotone"/>
-                        </StyledButton>
-                      </span>
-                    </Tooltip>
-                  </Stack>
-                :
-                  <StyledSelect
-                    required 
-                    name="kppnScore" 
-                    value={wsJunction?.kppn_score !== null ? String(wsJunction?.kppn_score) : ''}
-                    onChange={(e) => handleChangeKPPNScore(e.target.value as string)}
-                    size='small' 
-                    disabled={isKanwil || isPastDue}
+        <StyledFormControl>
+          {wsJunction?.standardisasi === 1 ? (
+            <Stack direction='row' spacing={1}>
+              <StyledSelect
+                value={isExcluded ? 'N/A' : 'VALUE'}
+                onChange={(e) => handleChangeKPPNScore(
+                  e.target.value === 'N/A' ? 'N/A' : String(stdScoreKPPN === '' ? maximumScore : stdScoreKPPN)
+                )}
+                size='small'
+                disabled={isKanwil || isPastDue}
+                sx={{ minWidth: 68 }}
+              >
+                <StyledMenuItem value='VALUE'>Nilai</StyledMenuItem>
+                <StyledMenuItem value='N/A'>N/A</StyledMenuItem>
+              </StyledSelect>
+              <StyledNumberTextField
+                size='small'
+                type="text"
+                onChange={(e) => setStdScoreKPPN(e.target.value)}
+                onBlur={(e) => handleChangeKPPNScoreStd(e)}
+                disabled={isKanwil || isPastDue || isExcluded}
+                value={stdScoreKPPN}
+              />
+              <Tooltip title='Ambil nilai standardisasi'>
+                <span>
+                  <StyledButton
+                    aria-label="edit"
+                    variant='contained'
+                    size='small'
+                    color='warning'
+                    disabled={isKanwil || isPastDue || isExcluded}
+                    onClick={() => handleFetchStdScoreKPPN()}
                   >
-                    {opsiSelection}
-                    <StyledMenuItem key={null} value={''}>{null}</StyledMenuItem>
-                  </StyledSelect>
-              }
-              </StyledFormControl>
-            ) 
-          : (
-              <>
-                <Typography variant='body3' fontSize={12} textAlign={'center'}>N/A</Typography>
-              </>
-            )
-        }
+                    <Iconify icon="solar:refresh-bold-duotone"/>
+                  </StyledButton>
+                </span>
+              </Tooltip>
+            </Stack>
+          ) : (
+            <StyledSelect
+              required
+              name="kppnScore"
+              value={isExcluded ? 'N/A' : wsJunction?.kppn_score !== null ? String(wsJunction?.kppn_score) : ''}
+              onChange={(e) => handleChangeKPPNScore(e.target.value as string)}
+              size='small'
+              disabled={isKanwil || isPastDue}
+            >
+              {opsiSelection}
+              <StyledMenuItem value='N/A'>N/A</StyledMenuItem>
+              <StyledMenuItem value='' disabled>&nbsp;</StyledMenuItem>
+            </StyledSelect>
+          )}
+        </StyledFormControl>
 
       </Stack>
       
       <Stack direction='column' spacing={1}>
         <Typography variant='body3' fontSize={12} textAlign={'left'}>Nilai Kanwil :</Typography>
-        {
-          !isExcluded ? 
-            (
-              <StyledFormControl>
-              {
-                wsJunction?.standardisasi === 1
-                ?
-                  <Stack direction='row' spacing={2}>
-                    <StyledNumberTextField  
-                      size='small'
-                      type="text"
-                      onChange={(e) => setStdScoreKanwil(e.target.value)}
-                      onBlur={(e) => handleChangeKanwilScoreStd(e)}
-                      disabled={!isKanwil || isPastDue}
-                      value={stdScoreKanwil}
-                    />
-                    <Tooltip title='Ambil nilai standardisasi'>
-                      <span>
-                        <StyledButton 
-                          aria-label="edit" 
-                          variant='contained' 
-                          size='small' 
-                          color='warning'
-                          disabled={!isKanwil || isPastDue}
-                          onClick={() => handleFetchStdScoreKanwil()}
-                        >
-                          <Iconify icon="solar:refresh-bold-duotone"/>
-                        </StyledButton>
-                      </span>
-                    </Tooltip>
-                  </Stack>
-                :
-                  <StyledSelect 
-                    required 
-                    name="kanwilScore" 
-                    value={wsJunction?.kanwil_score !== null ? String(wsJunction?.kanwil_score) : ''} 
-                    onChange={(e: any) => handleChangeKanwilScore(e.target.value as string)}
-                    size='small' 
-                    disabled={!isKanwil || isPastDue}
+        <StyledFormControl>
+          {wsJunction?.standardisasi === 1 ? (
+            <Stack direction='row' spacing={1}>
+              <StyledSelect
+                value={isExcluded ? 'N/A' : 'VALUE'}
+                onChange={(e) => handleChangeKanwilScore(
+                  e.target.value === 'N/A' ? 'N/A' : String(stdScoreKanwil === '' ? maximumScore : stdScoreKanwil)
+                )}
+                size='small'
+                disabled={!isKanwil || isPastDue}
+                sx={{ minWidth: 68 }}
+              >
+                <StyledMenuItem value='VALUE'>Nilai</StyledMenuItem>
+                <StyledMenuItem value='N/A'>N/A</StyledMenuItem>
+              </StyledSelect>
+              <StyledNumberTextField
+                size='small'
+                type="text"
+                onChange={(e) => setStdScoreKanwil(e.target.value)}
+                onBlur={(e) => handleChangeKanwilScoreStd(e)}
+                disabled={!isKanwil || isPastDue || isExcluded}
+                value={stdScoreKanwil}
+              />
+              <Tooltip title='Ambil nilai standardisasi'>
+                <span>
+                  <StyledButton
+                    aria-label="edit"
+                    variant='contained'
+                    size='small'
+                    color='warning'
+                    disabled={!isKanwil || isPastDue || isExcluded}
+                    onClick={() => handleFetchStdScoreKanwil()}
                   >
-                    {opsiSelection}
-                    <StyledMenuItem key={null} value={''}>{null}</StyledMenuItem>
-                  </StyledSelect>
-              }
-              </StyledFormControl>
-            ) 
-          : (
-              <>
-                <Typography variant='body3' fontSize={12} textAlign={'center'}>N/A</Typography>
-              </>
-            )
-        }
+                    <Iconify icon="solar:refresh-bold-duotone"/>
+                  </StyledButton>
+                </span>
+              </Tooltip>
+            </Stack>
+          ) : (
+            <StyledSelect
+              required
+              name="kanwilScore"
+              value={isExcluded ? 'N/A' : wsJunction?.kanwil_score !== null ? String(wsJunction?.kanwil_score) : ''}
+              onChange={(e) => handleChangeKanwilScore(e.target.value as string)}
+              size='small'
+              disabled={!isKanwil || isPastDue}
+            >
+              {opsiSelection}
+              <StyledMenuItem value='N/A'>N/A</StyledMenuItem>
+              <StyledMenuItem value='' disabled>&nbsp;</StyledMenuItem>
+            </StyledSelect>
+          )}
+        </StyledFormControl>
       </Stack>
     </Stack>    
   );

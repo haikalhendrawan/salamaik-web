@@ -120,9 +120,6 @@ export default function WorksheetCard(props: WorksheetCardProps) {
     setCommentCount(Number(props.wsJunction?.comment_count) || 0);
   }, [props.wsJunction?.comment_count]);
 
-  const isExcluded = props?.wsJunction?.excluded ===1;
-  const disableStyle = {opacity: 0.6, pointerEvents: 'none'};
-
   if (!mounted) {
     return <WorksheetCardSkeleton />;
   }
@@ -138,8 +135,6 @@ export default function WorksheetCard(props: WorksheetCardProps) {
                 title={props?.wsJunction?.title || ""}
                 dateUpdated={props?.wsJunction?.last_update || null}
                 updatedBy={props?.wsJunction?.updated_by || null}
-                wsJunction={props?.wsJunction}
-                wsDetail={props?.wsDetail} 
                 openComment={handleOpenComment}
                 commentCount={commentCount}
               />
@@ -172,7 +167,6 @@ export default function WorksheetCard(props: WorksheetCardProps) {
           <BodyGrid
             container
             spacing={1}
-            sx={isExcluded ? disableStyle : null}
           >
             <Grid item xs={6}>
               <Kriteria
@@ -195,7 +189,6 @@ export default function WorksheetCard(props: WorksheetCardProps) {
               <Nilai 
                 wsJunction={props?.wsJunction} 
                 wsDetail={props?.wsDetail} 
-                isExcluded={isExcluded}
               />}
             </Grid>
 

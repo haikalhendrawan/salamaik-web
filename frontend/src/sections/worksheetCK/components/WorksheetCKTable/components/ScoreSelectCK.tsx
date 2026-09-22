@@ -42,7 +42,10 @@ export default function ScoreSelectCK({ checklist, scoreType, disabled }: ScoreS
 
     const selected = String(event.target.value);
     if (!selected) return;
-    const selectedScore = selected === 'N/A' ? 10 : Number(selected);
+    const maximumScore = options.length > 0
+      ? Math.max(...options.map((option) => Number(option.value)))
+      : 0;
+    const selectedScore = selected === 'N/A' ? maximumScore : Number(selected);
     const eventName = scoreType === 'kppn' ? 'updateCKKPPNScore' : 'updateCKKanwilScore';
     const scorePayload = scoreType === 'kppn'
       ? { kppnScore: selectedScore }
