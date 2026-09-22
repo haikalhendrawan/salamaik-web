@@ -10,7 +10,7 @@ import { socketError } from '../model/error.model';
 import fs from 'fs';
 import path from 'path';
 import logger from '../config/logger';
-import { validateScore } from '../utils/worksheetJunction.utils';
+import { getMaximumAvailableScore, validateScore } from '../utils/worksheetJunction.utils';
 import nonBlockingCall from '../utils/nonBlockingCall';
 import activity from '../model/activity.model';
 import {
@@ -60,28 +60,38 @@ class WorksheetEvent{
       const ip = socket.handshake.address;
 
       const {name, username} = socket.data.payload;
-      const {worksheetId, junctionId, kanwilScore} = data;
+      const {worksheetId, junctionId, kanwilScore, excluded} = data;
 
       const wsJunctionDetail = await wsJunction.getWsJunctionByJunctionId(junctionId);
       if (!wsJunctionDetail || wsJunctionDetail.worksheet_id !== worksheetId) return socketError(callback, 'Worksheet junction not found');
       await assertWorksheetMutationAllowed({ worksheetId, peraturan: Number(socket.data.payload.peraturan), kanwilScore: wsJunctionDetail.kanwil_score, excluded: wsJunctionDetail.excluded });
       const availableOpsi = wsJunctionDetail?.opsi;
       const isStandardisasi = wsJunctionDetail?.standardisasi===1? true : false;
-      const isValidScore = validateScore(kanwilScore, availableOpsi, isStandardisasi);
+      if (excluded !== 0 && excluded !== 1) return socketError(callback, 'Excluded must be 0 or 1');
+      const maximumScore = getMaximumAvailableScore(availableOpsi, isStandardisasi);
+      if (maximumScore === null) return socketError(callback, 'Maximum score is not available');
+      const scoreToSave = excluded === 1 ? maximumScore : kanwilScore;
+      const isValidScore = excluded === 1 || validateScore(scoreToSave, availableOpsi, isStandardisasi);
 
       if(!isValidScore){
         return socketError(callback, 'Score invalid')
       };
 
-      const result = await wsJunction.editWsJunctionKanwilScore( junctionId, worksheetId, kanwilScore, name);
+      const result = await wsJunction.editWsJunctionKanwilScore(junctionId, worksheetId, scoreToSave, excluded, name);
 
-      socket.broadcast.emit('kanwilScoreHasUpdated', {worksheetId, junctionId, kanwilScore});
+      socket.broadcast.emit('kanwilScoreHasUpdated', {
+        worksheetId,
+        junctionId,
+        kppnScore: result?.[0]?.kppn_score,
+        kanwilScore: result?.[0]?.kanwil_score,
+        excluded: result?.[0]?.excluded,
+      });
       socket.to(getAKKWorksheetRoom(worksheetId)).emit(
         'akkScoreChanged',
         createAKKScoreChangedEvent(worksheetId, 'pb', username)
       );
 
-      nonBlockingCall(activity.createActivity(username, 85, ip, `junctionId: ${junctionId}, kanwilScore: ${kanwilScore}`));
+      nonBlockingCall(activity.createActivity(username, 85, ip, `junctionId: ${junctionId}, kanwilScore: ${scoreToSave}, excluded: ${excluded}`));
 
       return callback({success: true, rows: result, message: 'Nilai has been updated'});
     }catch(err: any){
@@ -95,28 +105,38 @@ class WorksheetEvent{
       const ip = socket.handshake.address;
 
       const {name, username} = socket.data.payload;
-      const {worksheetId, junctionId, kppnScore} = data;
+      const {worksheetId, junctionId, kppnScore, excluded} = data;
 
       const wsJunctionDetail = await wsJunction.getWsJunctionByJunctionId(junctionId);
       if (!wsJunctionDetail || wsJunctionDetail.worksheet_id !== worksheetId) return socketError(callback, 'Worksheet junction not found');
       await assertWorksheetMutationAllowed({ worksheetId, peraturan: Number(socket.data.payload.peraturan), kanwilScore: wsJunctionDetail.kanwil_score, excluded: wsJunctionDetail.excluded });
       const availableOpsi = wsJunctionDetail?.opsi;
       const isStandardisasi = wsJunctionDetail?.standardisasi===1? true : false;
-      const isValidScore = validateScore(kppnScore, availableOpsi, isStandardisasi);
+      if (excluded !== 0 && excluded !== 1) return socketError(callback, 'Excluded must be 0 or 1');
+      const maximumScore = getMaximumAvailableScore(availableOpsi, isStandardisasi);
+      if (maximumScore === null) return socketError(callback, 'Maximum score is not available');
+      const scoreToSave = excluded === 1 ? maximumScore : kppnScore;
+      const isValidScore = excluded === 1 || validateScore(scoreToSave, availableOpsi, isStandardisasi);
 
       if(!isValidScore){
         return socketError(callback, 'Score invalid')
       };
 
-      const result = await wsJunction.editWsJunctionKPPNScore( junctionId, worksheetId, kppnScore, name);
+      const result = await wsJunction.editWsJunctionKPPNScore(junctionId, worksheetId, scoreToSave, excluded, name);
 
-      socket.broadcast.emit('KPPNScoreHasUpdated', {worksheetId, junctionId, kppnScore});
+      socket.broadcast.emit('KPPNScoreHasUpdated', {
+        worksheetId,
+        junctionId,
+        kppnScore: result?.[0]?.kppn_score,
+        kanwilScore: result?.[0]?.kanwil_score,
+        excluded: result?.[0]?.excluded,
+      });
       socket.to(getAKKWorksheetRoom(worksheetId)).emit(
         'akkScoreChanged',
         createAKKScoreChangedEvent(worksheetId, 'pb', username)
       );
 
-      nonBlockingCall(activity.createActivity(username, 91, ip, `junctionId: ${junctionId}, kppnScore: ${kppnScore}`));
+      nonBlockingCall(activity.createActivity(username, 91, ip, `junctionId: ${junctionId}, kppnScore: ${scoreToSave}, excluded: ${excluded}`));
 
       return callback({success: true, rows: result, message: 'Nilai has been updated'});
     }catch(err: any){

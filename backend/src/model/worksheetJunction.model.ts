@@ -205,22 +205,36 @@ class WorksheetJunction{
     }
   }
 
-  async editWsJunctionKPPNScore(junctionID: number, worksheetId: string, kppnScore: number, userName: string){
+  async editWsJunctionKPPNScore(junctionID: number, worksheetId: string, kppnScore: number, excluded: 0 | 1, userName: string){
     try{
       const updateTime = new Date(Date.now()).toISOString();
-      const q = "UPDATE worksheet_junction SET kppn_score = $1, last_update = $2, updated_by = $3 WHERE junction_id = $4 AND worksheet_id = $5 RETURNING *";
-      const result = await pool.query(q, [kppnScore, updateTime, userName, junctionID, worksheetId]);
+      const q = `UPDATE worksheet_junction
+                 SET kppn_score = $1,
+                     kanwil_score = CASE WHEN $2 = 1 THEN $1 ELSE kanwil_score END,
+                     excluded = $2,
+                     last_update = $3,
+                     updated_by = $4
+                 WHERE junction_id = $5 AND worksheet_id = $6
+                 RETURNING *`;
+      const result = await pool.query(q, [kppnScore, excluded, updateTime, userName, junctionID, worksheetId]);
       return result.rows
     }catch(err){
       throw err
     }
   }
 
-  async editWsJunctionKanwilScore(junctionID: number, worksheetId: string, kanwilScore: number, userName: string){
+  async editWsJunctionKanwilScore(junctionID: number, worksheetId: string, kanwilScore: number, excluded: 0 | 1, userName: string){
     try{
       const updateTime = new Date(Date.now()).toISOString();
-      const q = "UPDATE worksheet_junction SET kanwil_score = $1, last_update = $2, updated_by = $3 WHERE junction_id = $4 AND worksheet_id = $5 RETURNING *";
-      const result = await pool.query(q, [kanwilScore, updateTime, userName, junctionID, worksheetId]);
+      const q = `UPDATE worksheet_junction
+                 SET kanwil_score = $1,
+                     kppn_score = CASE WHEN $2 = 1 THEN $1 ELSE kppn_score END,
+                     excluded = $2,
+                     last_update = $3,
+                     updated_by = $4
+                 WHERE junction_id = $5 AND worksheet_id = $6
+                 RETURNING *`;
+      const result = await pool.query(q, [kanwilScore, excluded, updateTime, userName, junctionID, worksheetId]);
       return result.rows
     }catch(err){
       throw err

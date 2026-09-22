@@ -5,14 +5,14 @@
 
 import { PoolClient } from 'pg';
 import pool from '../config/db';
-import { CkScoreValue, OpsiCkType } from './ckRef.model';
+import { OpsiCkType } from './ckRef.model';
 
 export interface WsCKJunctionType {
   junction_id: number;
   worksheet_id: string;
   checklist_ck_id: number;
-  kppn_score: CkScoreValue | null;
-  kanwil_score: CkScoreValue | null;
+  kppn_score: number | null;
+  kanwil_score: number | null;
   excluded: number;
   file_1: string | null;
   link_file: string | null;
@@ -167,15 +167,15 @@ class WsCKJunction {
   async updateKPPNScore(
     junctionId: number,
     worksheetId: string,
-    score: CkScoreValue,
+    score: number,
     excluded: 0 | 1,
     updatedBy: string,
     poolTrx?: PoolClient
   ): Promise<WsCKJunctionType | undefined> {
     const result = await getPoolInstance(poolTrx).query<WsCKJunctionType>(
       `UPDATE worksheet_ck_junction
-          SET kppn_score = CASE WHEN $2 = 1 THEN 10 ELSE $1 END,
-              kanwil_score = CASE WHEN $2 = 1 THEN 10 ELSE kanwil_score END,
+          SET kppn_score = $1,
+              kanwil_score = CASE WHEN $2 = 1 THEN $1 ELSE kanwil_score END,
               excluded = $2,
               last_update = CURRENT_TIMESTAMP,
               updated_by = $3
@@ -190,15 +190,15 @@ class WsCKJunction {
   async updateKanwilScore(
     junctionId: number,
     worksheetId: string,
-    score: CkScoreValue,
+    score: number,
     excluded: 0 | 1,
     updatedBy: string,
     poolTrx?: PoolClient
   ): Promise<WsCKJunctionType | undefined> {
     const result = await getPoolInstance(poolTrx).query<WsCKJunctionType>(
       `UPDATE worksheet_ck_junction
-          SET kanwil_score = CASE WHEN $2 = 1 THEN 10 ELSE $1 END,
-              kppn_score = CASE WHEN $2 = 1 THEN 10 ELSE kppn_score END,
+          SET kanwil_score = $1,
+              kppn_score = CASE WHEN $2 = 1 THEN $1 ELSE kppn_score END,
               excluded = $2,
               last_update = CURRENT_TIMESTAMP,
               updated_by = $3

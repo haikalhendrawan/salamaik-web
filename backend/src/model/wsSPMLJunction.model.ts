@@ -168,7 +168,9 @@ class WsSPMLJunction {
   ): Promise<WsSPMLJunctionType[]> {
     try {
       const q = `UPDATE worksheet_spml_junction
-                 SET kppn_score = $1, excluded = $2, last_update = CURRENT_TIMESTAMP, updated_by = $3
+                 SET kppn_score = $1,
+                     kanwil_score = CASE WHEN $2 = 1 THEN 10 ELSE kanwil_score END,
+                     excluded = $2, last_update = CURRENT_TIMESTAMP, updated_by = $3
                  WHERE junction_id = $4 AND worksheet_id = $5
                  RETURNING *`;
       const result = await pool.query(q, [kppnScore, excluded, userName, junctionId, worksheetId]);
@@ -187,7 +189,9 @@ class WsSPMLJunction {
   ): Promise<WsSPMLJunctionType[]> {
     try {
       const q = `UPDATE worksheet_spml_junction
-                 SET kanwil_score = $1, excluded = $2, last_update = CURRENT_TIMESTAMP, updated_by = $3
+                 SET kanwil_score = $1,
+                     kppn_score = CASE WHEN $2 = 1 THEN 10 ELSE kppn_score END,
+                     excluded = $2, last_update = CURRENT_TIMESTAMP, updated_by = $3
                  WHERE junction_id = $4 AND worksheet_id = $5
                  RETURNING *`;
       const result = await pool.query(q, [kanwilScore, excluded, userName, junctionId, worksheetId]);

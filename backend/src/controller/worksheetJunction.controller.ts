@@ -16,7 +16,7 @@ import { uploadWsJunctionFile } from '../config/multer';
 import fs from 'fs';
 import path from 'path';
 import { sanitizeMimeType } from '../utils/mimeTypeSanitizer';
-import { validateScore } from '../utils/worksheetJunction.utils';
+import { getMaximumAvailableScore, validateScore } from '../utils/worksheetJunction.utils';
 import { getScoreForMatrix } from '../utils/getScorePembinaan';
 import {UnitType} from '../model/unit.model';
 import { assertWorksheetMutationAllowed, createWorksheetReadState } from '../utils/worksheetPhase.utils';
@@ -231,20 +231,25 @@ const getWsJunctionScoreAllPeriodSingleKPPN = async(req: Request, res: Response,
 const editWsJunctionKPPNScore = async(req: Request, res: Response, next: NextFunction) => {
   try{
     const username = req.payload.username;                
-    const {worksheetId, junctionId, kppnScore} = req.body;
+    const {worksheetId, junctionId, kppnScore, excluded: requestedExcluded = 0} = req.body;
 
     const wsJunctionDetail = await wsJunction.getWsJunctionByJunctionId(junctionId);
     if (!wsJunctionDetail || wsJunctionDetail.worksheet_id !== worksheetId) throw new ErrorDetail(404, 'Worksheet junction not found');
     await assertWorksheetMutationAllowed({ worksheetId, peraturan: Number(req.payload.peraturan), kanwilScore: wsJunctionDetail.kanwil_score, excluded: wsJunctionDetail.excluded });
     const availableOpsi = wsJunctionDetail?.opsi;
     const isStandardisasi = wsJunctionDetail?.standardisasi===1? true : false;
-    const isValidScore = validateScore(kppnScore, availableOpsi, isStandardisasi);
+    if (requestedExcluded !== 0 && requestedExcluded !== 1) return next(new ErrorDetail(400, 'Excluded must be 0 or 1'));
+    const excluded = requestedExcluded as 0 | 1;
+    const maximumScore = getMaximumAvailableScore(availableOpsi, isStandardisasi);
+    if (maximumScore === null) return next(new ErrorDetail(400, 'Maximum score is not available'));
+    const scoreToSave = excluded === 1 ? maximumScore : kppnScore;
+    const isValidScore = excluded === 1 || validateScore(scoreToSave, availableOpsi, isStandardisasi);
 
     if(!isValidScore){
       return next(new ErrorDetail(400, 'Score Invalid'));
     };
 
-    const result = await wsJunction.editWsJunctionKPPNScore(worksheetId, junctionId, kppnScore, username);
+    const result = await wsJunction.editWsJunctionKPPNScore(junctionId, worksheetId, scoreToSave, excluded, username);
 
     return res.status(200).json({sucess: true, message: 'Edit worksheet junction success', rows: result})
   }catch(err){
@@ -257,20 +262,25 @@ const editWsJunctionKanwilScore = async(req: Request, res: Response, next: NextF
   try{
     const username = req.payload.username;
 
-    const {worksheetId, junctionId, kanwilScore} = req.body;
+    const {worksheetId, junctionId, kanwilScore, excluded: requestedExcluded = 0} = req.body;
 
     const wsJunctionDetail = await wsJunction.getWsJunctionByJunctionId(junctionId);
     if (!wsJunctionDetail || wsJunctionDetail.worksheet_id !== worksheetId) throw new ErrorDetail(404, 'Worksheet junction not found');
     await assertWorksheetMutationAllowed({ worksheetId, peraturan: Number(req.payload.peraturan), kanwilScore: wsJunctionDetail.kanwil_score, excluded: wsJunctionDetail.excluded });
     const availableOpsi = wsJunctionDetail?.opsi;
     const isStandardisasi = wsJunctionDetail?.standardisasi===1? true : false;
-    const isValidScore = validateScore(kanwilScore, availableOpsi, isStandardisasi);
+    if (requestedExcluded !== 0 && requestedExcluded !== 1) return next(new ErrorDetail(400, 'Excluded must be 0 or 1'));
+    const excluded = requestedExcluded as 0 | 1;
+    const maximumScore = getMaximumAvailableScore(availableOpsi, isStandardisasi);
+    if (maximumScore === null) return next(new ErrorDetail(400, 'Maximum score is not available'));
+    const scoreToSave = excluded === 1 ? maximumScore : kanwilScore;
+    const isValidScore = excluded === 1 || validateScore(scoreToSave, availableOpsi, isStandardisasi);
 
     if(!isValidScore){
       return next(new ErrorDetail(400, 'Score Invalid'));
     };
 
-    const result = await wsJunction.editWsJunctionKanwilScore(worksheetId, junctionId, kanwilScore, username);
+    const result = await wsJunction.editWsJunctionKanwilScore(junctionId, worksheetId, scoreToSave, excluded, username);
 
     return res.status(200).json({sucess: true, message: 'Edit worksheet junction success', rows: result})
   }catch(err){

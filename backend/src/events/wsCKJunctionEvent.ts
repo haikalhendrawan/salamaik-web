@@ -7,7 +7,6 @@ import fs from 'fs';
 import path from 'path';
 import { Socket } from 'socket.io';
 import activity from '../model/activity.model';
-import { CkScoreValue } from '../model/ckRef.model';
 import { socketError } from '../model/error.model';
 import wsCKJunction, { WsCKJunctionWithDetailType } from '../model/wsCKJunction.model';
 import logger from '../config/logger';
@@ -59,8 +58,7 @@ interface DeleteFileEventData {
   fileName: string;
 }
 
-const isValidScore = (score: number): score is CkScoreValue =>
-  Number.isFinite(score) && (score === 0 || score === 5 || score === 10);
+const isValidScore = (score: number) => Number.isFinite(score);
 
 const isValidExcluded = (excluded: number): excluded is 0 | 1 =>
   excluded === 0 || excluded === 1;
@@ -143,7 +141,7 @@ class WsCKJunctionEvent {
         return socketError(callback, `Not authorized to update CK ${scoreOwner} score`);
       }
       if (typeof score !== 'number' || !isValidScore(score)) {
-        return socketError(callback, 'CK score must be 0, 5, or 10');
+        return socketError(callback, 'CK score must be a finite number');
       }
       if (!isValidExcluded(excluded)) {
         return socketError(callback, 'CK excluded must be 0 or 1');
@@ -151,7 +149,10 @@ class WsCKJunctionEvent {
 
       const junction = await this.getAccessibleJunction(socket, worksheetId, junctionId);
       if (!junction) return socketError(callback, 'CK worksheet junction not found or inaccessible');
-      if (excluded === 0 && !junction.opsi.some((option) => option.value === score)) {
+      const optionScores = junction.opsi.map((option) => Number(option.value)).filter(Number.isFinite);
+      if (optionScores.length === 0) return socketError(callback, 'Opsi nilai checklist CK tidak tersedia');
+      const scoreToSave = excluded === 1 ? Math.max(...optionScores) : score;
+      if (excluded === 0 && !optionScores.includes(scoreToSave)) {
         return socketError(callback, 'Nilai tidak tersedia pada opsi checklist CK');
       }
 
@@ -161,14 +162,14 @@ class WsCKJunctionEvent {
           ? await wsCKJunction.updateKPPNScore(
               junctionId,
               worksheetId,
-              score,
+              scoreToSave,
               excluded,
               updatedBy
             )
           : await wsCKJunction.updateKanwilScore(
               junctionId,
               worksheetId,
-              score,
+              scoreToSave,
               excluded,
               updatedBy
             );

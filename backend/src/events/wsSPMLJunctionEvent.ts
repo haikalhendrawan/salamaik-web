@@ -126,10 +126,12 @@ class WsSPMLJunctionEvent {
         return socketError(callback, "Not authorized to update this SPML worksheet");
       }
 
+      const scoreToSave = excluded === 1 ? 10 : kanwilScore;
+
       const result = await wsSPMLJunction.editWsSPMLJunctionKanwilScore(
         junctionId,
         worksheetId,
-        kanwilScore,
+        scoreToSave,
         excluded,
         name
       );
@@ -142,8 +144,9 @@ class WsSPMLJunctionEvent {
       socket.to(room).emit("spmlKanwilScoreHasUpdated", {
         worksheetId,
         junctionId,
-        kanwilScore,
-        excluded,
+        kppnScore: result[0].kppn_score,
+        kanwilScore: result[0].kanwil_score,
+        excluded: result[0].excluded,
       });
       socket.to(room).emit(
         "spmlWorksheetChanged",
@@ -159,7 +162,7 @@ class WsSPMLJunctionEvent {
           username,
           85,
           socket.handshake.address,
-          `SPML junctionId: ${junctionId}, kanwilScore: ${kanwilScore}, excluded: ${excluded}`
+          `SPML junctionId: ${junctionId}, kanwilScore: ${scoreToSave}, excluded: ${excluded}`
         )
       );
 
@@ -196,10 +199,12 @@ class WsSPMLJunctionEvent {
         return socketError(callback, "Not authorized to update this SPML worksheet");
       }
 
+      const scoreToSave = excluded === 1 ? 10 : kppnScore;
+
       const result = await wsSPMLJunction.editWsSPMLJunctionKPPNScore(
         junctionId,
         worksheetId,
-        kppnScore,
+        scoreToSave,
         excluded,
         name
       );
@@ -212,8 +217,9 @@ class WsSPMLJunctionEvent {
       socket.to(room).emit("spmlKPPNScoreHasUpdated", {
         worksheetId,
         junctionId,
-        kppnScore,
-        excluded,
+        kppnScore: result[0].kppn_score,
+        kanwilScore: result[0].kanwil_score,
+        excluded: result[0].excluded,
       });
       socket.to(room).emit(
         "spmlWorksheetChanged",
@@ -229,7 +235,7 @@ class WsSPMLJunctionEvent {
           username,
           91,
           socket.handshake.address,
-          `SPML junctionId: ${junctionId}, kppnScore: ${kppnScore}, excluded: ${excluded}`
+          `SPML junctionId: ${junctionId}, kppnScore: ${scoreToSave}, excluded: ${excluded}`
         )
       );
 

@@ -40,27 +40,27 @@ describe('WsCKJunction model', () => {
     expect(params).toEqual([4]);
   });
 
-  it('updates both scores to 10 atomically when KPPN selects N/A', async () => {
+  it('updates both scores to the supplied maximum atomically when KPPN selects N/A', async () => {
     queryMock.mockResolvedValueOnce({
-      rows: [{ kppn_score: 10, kanwil_score: 10, excluded: 1 }],
+      rows: [{ kppn_score: 15, kanwil_score: 15, excluded: 1 }],
     } as never);
 
     const result = await wsCKJunction.updateKPPNScore(
       12,
       'worksheet-id',
-      10,
+      15,
       1,
       'User KPPN'
     );
 
     const [query, params] = queryMock.mock.calls[0];
-    expect(query).toContain('kppn_score = CASE WHEN $2 = 1 THEN 10 ELSE $1 END');
-    expect(query).toContain('kanwil_score = CASE WHEN $2 = 1 THEN 10 ELSE kanwil_score END');
-    expect(params).toEqual([10, 1, 'User KPPN', 12, 'worksheet-id']);
-    expect(result).toMatchObject({ kppn_score: 10, kanwil_score: 10, excluded: 1 });
+    expect(query).toContain('SET kppn_score = $1');
+    expect(query).toContain('kanwil_score = CASE WHEN $2 = 1 THEN $1 ELSE kanwil_score END');
+    expect(params).toEqual([15, 1, 'User KPPN', 12, 'worksheet-id']);
+    expect(result).toMatchObject({ kppn_score: 15, kanwil_score: 15, excluded: 1 });
   });
 
-  it('updates both scores to 10 atomically when Kanwil selects N/A', async () => {
+  it('updates both scores to the supplied maximum atomically when Kanwil selects N/A', async () => {
     queryMock.mockResolvedValueOnce({
       rows: [{ kppn_score: 10, kanwil_score: 10, excluded: 1 }],
     } as never);
@@ -68,8 +68,8 @@ describe('WsCKJunction model', () => {
     await wsCKJunction.updateKanwilScore(13, 'worksheet-id', 10, 1, 'User Kanwil');
 
     const [query] = queryMock.mock.calls[0];
-    expect(query).toContain('kanwil_score = CASE WHEN $2 = 1 THEN 10 ELSE $1 END');
-    expect(query).toContain('kppn_score = CASE WHEN $2 = 1 THEN 10 ELSE kppn_score END');
+    expect(query).toContain('SET kanwil_score = $1');
+    expect(query).toContain('kppn_score = CASE WHEN $2 = 1 THEN $1 ELSE kppn_score END');
   });
 
   it('assigns active CK checklists using the selected regulation', async () => {
