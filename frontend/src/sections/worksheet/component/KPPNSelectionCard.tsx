@@ -29,7 +29,7 @@ export default function KPPNSelectionCard({header, image, link, percentKanwil, p
 
   const axiosJWT = useAxiosJWT();
 
-  const {komponenRef, subKomponenRef} = useDictionary();
+  const {komponenRef, subKomponenRef, subSubKomponenRef} = useDictionary();
 
   const {auth} = useAuth();
 
@@ -64,7 +64,14 @@ export default function KPPNSelectionCard({header, image, link, percentKanwil, p
       const pbScore = scoreResponse.data.rows;
 
       const excelWorksheet = useExcelWorksheet(rows, pbScore, komponenRef, subKomponenRef);
-      const excelWorksheet2 = useExcelWorksheet2(rows, header, pbScore, komponenRef, subKomponenRef);
+      const excelWorksheet2 = useExcelWorksheet2(
+        rows,
+        header,
+        pbScore,
+        komponenRef,
+        subKomponenRef,
+        subSubKomponenRef
+      );
       const peraturan1 = peraturan === 1;
       peraturan1 ? await excelWorksheet.generate() :await excelWorksheet2.generate();
     } catch (error) {

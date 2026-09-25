@@ -11,10 +11,13 @@ import PreviewFileModal from './component/PreviewFileModal';
 import useWsJunction from './useWsJunction';
 import usePreviewFileModal from './usePreviewFileModal';
 import { useAuth } from '../../hooks/useAuth';
+import useAxiosJWT from '../../hooks/useAxiosJWT';
 //sections
 import WorksheetCard from './component/WorksheetCard/WorksheetCard';
 import NavigationDrawer from "./component/NavigationDrawer";
 import PageLoading from '../../components/pageLoading/PageLoading';
+import useExcelWorksheet from '../excel/useExcelWorksheet';
+import useExcelWorksheet2 from '../excel/useExcelWorksheet2';
 // @mui
 import Container from '@mui/material/Container';
 import Stack from '@mui/material/Stack';
@@ -54,11 +57,13 @@ const KOMPONEN_ICON = ["solar:safe-2-bold-duotone", "solar:buildings-2-bold-duot
 export default function WorksheetKanwil() {
   const { wsJunction, getWsJunctionKanwil, wsDetail, getWorksheet } = useWsJunction();
 
-  const { komponenRef, subKomponenRef } = useDictionary();
+  const { komponenRef, subKomponenRef, subSubKomponenRef } = useDictionary();
 
   const { modalOpen, modalClose } = usePreviewFileModal();
 
   const {auth} = useAuth();
+
+  const axiosJWT = useAxiosJWT();
 
   const navigate = useNavigate();
 
@@ -77,6 +82,36 @@ export default function WorksheetKanwil() {
   const isPastDue = useMemo(() => auth?.peraturan === 2
     ? false
     : new Date().getTime() > new Date(wsDetail?.close_period || "").getTime(), [auth?.peraturan, wsDetail]);
+
+  const handleExportExcel = async () => {
+    try {
+      const worksheetId = wsDetail?.id || wsJunction[0]?.worksheet_id;
+      const peraturan = auth?.peraturan;
+      if (!worksheetId) throw new Error('Worksheet PB tidak ditemukan');
+      if (peraturan !== 1 && peraturan !== 2) throw new Error('Referensi peraturan tidak valid');
+
+      const scoreResponse = await axiosJWT.get(
+        `/scoringEngine/pb/${encodeURIComponent(worksheetId)}?peraturan=${peraturan}`
+      );
+      const pbScore = scoreResponse.data.rows;
+      const kppnName = `KPPN ${SELECT_KPPN[id] || wsDetail?.alias || id}`;
+
+      if (peraturan === 1) {
+        await useExcelWorksheet(wsJunction, pbScore, komponenRef, subKomponenRef).generate();
+      } else {
+        await useExcelWorksheet2(
+          wsJunction,
+          kppnName,
+          pbScore,
+          komponenRef,
+          subKomponenRef,
+          subSubKomponenRef
+        ).generate();
+      }
+    } catch (error: any) {
+      console.error('Error generating PB worksheet Excel:', error);
+    }
+  };
 
   // const { isLoading, setIsLoading } = useLoading();
 
@@ -156,6 +191,9 @@ export default function WorksheetKanwil() {
                 <Typography variant="h4">
                   {`KPPN ${id!==null ? SELECT_KPPN[id]:null}`}
                 </Typography>
+                  <IconButton onClick={handleExportExcel}>
+                    <Iconify icon="vscode-icons:file-type-excel"/>
+                  </IconButton>
               </Stack>
 
             </Stack>

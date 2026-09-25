@@ -17,6 +17,15 @@ interface SubKomponenRefType {
   alias?: string;
 }
 
+interface SubSubKomponenRefType {
+  id: number;
+  komponen_id: number;
+  subkomponen_id: number;
+  title: string;
+  detail?: string;
+  alias?: string;
+}
+
 const COLUMN_COUNT = 13;
 const HEADER_FILL = 'FFBFBFBF';
 const SECTION_FILL = 'FFD9D9D9';
@@ -35,7 +44,8 @@ export default function useExcelWorksheet2(
   kppnName: string,
   pbScore: PBScoreType,
   komponenRef: KomponenRefType[] | null,
-  subKomponenRef: SubKomponenRefType[] | null
+  subKomponenRef: SubKomponenRefType[] | null,
+  subSubKomponenRef: SubSubKomponenRefType[] | null
 ) {
   const generate = async () => {
     try {
@@ -57,16 +67,49 @@ export default function useExcelWorksheet2(
       komponenRef?.forEach((komponen) => {
         addSectionRow(sheet, komponen.title, true);
 
-        subKomponenRef
-          ?.filter((item) => item.komponen_id === komponen.id)
-          .forEach((subKomponen) => {
-            addSectionRow(sheet, subKomponen.title);
+        const componentSubKomponen = subKomponenRef?.filter(
+          (item) => item.komponen_id === komponen.id
+        ) || [];
+        const componentSubSubKomponen = subSubKomponenRef?.filter(
+          (item) => item.komponen_id === komponen.id
+        ) || [];
+        const hasSubSubKomponen = componentSubSubKomponen.length > 0;
+        let alphabeticOrder = 0;
+
+        componentSubKomponen.forEach((subKomponen, subKomponenIndex) => {
+          const subSubKomponen = componentSubSubKomponen.filter(
+            (item) => item.subkomponen_id === subKomponen.id
+          );
+          const subKomponenTitle = hasSubSubKomponen
+            ? `${toRomanNumeral(subKomponenIndex + 1)}. ${subKomponen.title}`
+            : `${toAlphabeticOrder(++alphabeticOrder)}. ${subKomponen.title}`;
+
+          addSectionRow(sheet, subKomponenTitle);
+
+          checklist
+            .filter((item) => item.subkomponen_id === subKomponen.id && !item.subsubkomponen_id)
+            .sort(compareChecklistOrder)
+            .forEach((item) => addChecklistRow(sheet, item));
+
+          subSubKomponen.forEach((subSub) => {
+            addSectionRow(
+              sheet,
+              `${toAlphabeticOrder(++alphabeticOrder)}. ${subSub.title}`
+            );
 
             checklist
-              .filter((item) => item.subkomponen_id === subKomponen.id)
-              .sort((left, right) => (left.urut ?? 0) - (right.urut ?? 0))
+              .filter((item) => item.subsubkomponen_id === subSub.id)
+              .sort(compareChecklistOrder)
               .forEach((item) => addChecklistRow(sheet, item));
           });
+
+          if (subSubKomponen.length === 0) {
+            checklist
+              .filter((item) => item.subkomponen_id === subKomponen.id && Boolean(item.subsubkomponen_id))
+              .sort(compareChecklistOrder)
+              .forEach((item) => addChecklistRow(sheet, item));
+          }
+        });
       });
 
       addScoreFooter(sheet, pbScore);
@@ -165,7 +208,8 @@ function addSectionRow(sheet: ExcelJS.Worksheet, title: string, bold = false) {
     bold: true,
     name: 'Aptos Narrow',
     size: bold ? 11 : 10,
-  });
+  }, 'left');
+  sheet.mergeCells(row.number, 1, row.number, 8);
   row.height = 21;
 }
 
@@ -178,7 +222,7 @@ function addChecklistRow(sheet: ExcelJS.Worksheet, row: WsJunctionType) {
   const excluded = row.excluded === 1;
 
   const addedRow = sheet.addRow({
-    no: row.urut ?? '',
+    no: formatChecklistNumber(row.urut, row.urut_huruf),
     title: row.title || '',
     kriteria_penilaian: kriteriaText,
     critical_point: row.critical_point || '',
@@ -222,6 +266,7 @@ function addScoreFooter(
     'RATA-RATA TOTAL NILAI', '', '', '', '', '', '', '', pbScore.nilaiKPPN, '', '',
     'RATA-RATA TOTAL NILAI', pbScore.nilaiKanwil,
   ]);
+  sheet.mergeCells(`A${finalRow.number}:H${finalRow.number}`);
 
   [totalRow, finalRow].forEach((row) => {
     row.height = 25;
@@ -258,6 +303,11 @@ function convertScore(score: number | null) {
   return score === null ? '' : score * 10;
 }
 
+function formatChecklistNumber(urut: number | null, urutHuruf: string | null) {
+  if (urut === null) return '';
+  return `${urut}${urutHuruf?.trim() || ''}`;
+}
+
 function estimateRowHeight(row: ExcelJS.Row) {
   let maxLines = 1;
 
@@ -276,7 +326,8 @@ function styleContinuousBand(
   startColumn: number,
   endColumn: number,
   fillColor: string,
-  font: Partial<ExcelJS.Font>
+  font: Partial<ExcelJS.Font>,
+  horizontal: 'left' | 'centerContinuous' = 'centerContinuous'
 ) {
   for (let columnNumber = startColumn; columnNumber <= endColumn; columnNumber += 1) {
     const cell = row.getCell(columnNumber);
@@ -284,7 +335,7 @@ function styleContinuousBand(
     cell.font = font;
     cell.alignment = {
       vertical: 'middle',
-      horizontal: 'centerContinuous',
+      horizontal,
       wrapText: true,
     };
     cell.border = {
@@ -294,6 +345,45 @@ function styleContinuousBand(
       ...(columnNumber === endColumn ? { right: { style: 'thin' as const } } : {}),
     };
   }
+}
+
+function compareChecklistOrder(left: WsJunctionType, right: WsJunctionType) {
+  const urutDifference = (left.urut ?? 0) - (right.urut ?? 0);
+  if (urutDifference !== 0) return urutDifference;
+  return (left.urut_huruf || '').localeCompare(right.urut_huruf || '', undefined, {
+    numeric: true,
+    sensitivity: 'base',
+  });
+}
+
+function toAlphabeticOrder(index: number) {
+  let current = index;
+  let label = '';
+  while (current > 0) {
+    current -= 1;
+    label = String.fromCharCode(65 + (current % 26)) + label;
+    current = Math.floor(current / 26);
+  }
+  return label;
+}
+
+function toRomanNumeral(value: number) {
+  const romanNumerals: Array<[number, string]> = [
+    [1000, 'M'], [900, 'CM'], [500, 'D'], [400, 'CD'],
+    [100, 'C'], [90, 'XC'], [50, 'L'], [40, 'XL'],
+    [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I'],
+  ];
+  let remaining = value;
+  let result = '';
+
+  romanNumerals.forEach(([number, numeral]) => {
+    while (remaining >= number) {
+      result += numeral;
+      remaining -= number;
+    }
+  });
+
+  return result;
 }
 
 function solidFill(argb: string): ExcelJS.Fill {
