@@ -29,6 +29,7 @@ interface KomponenRefType{
   id: number,
   title: string,
   bobot: number,
+  peraturan?: number,
   detail?: string,
   alias?: string,
 };

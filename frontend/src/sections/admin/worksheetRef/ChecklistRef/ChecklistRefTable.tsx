@@ -168,10 +168,12 @@ export default function ChecklistRefTable({tab, handleOpen, fileOpen,  setFile}:
 
                   <TableCell align="center">
                     <Stack direction='row' spacing={1} alignContent="center" alignItems="center" justifyContent="center">
-                      {row?.opsi?.map((item, index) => 
+                      {[...(row?.opsi || [])]
+                        .sort((left, right) => Number(right.value) - Number(left.value))
+                        .map((item, index) =>
                         <Label
                           key={index} 
-                          color={item.value===10?'success':item.value===0?'pink':'warning'} 
+                          color={item.value>=10?'success':item.value===0?'pink':'warning'}
                           sx={{cursor: 'pointer'}} 
                           onClick={() => handleEditOpsi(row.id, item.id)}>
                           {item.value}

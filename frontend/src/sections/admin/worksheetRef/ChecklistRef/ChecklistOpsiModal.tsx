@@ -13,6 +13,7 @@ import useAxiosJWT from '../../../../hooks/useAxiosJWT';
 import useSnackbar from '../../../../hooks/display/useSnackbar';
 import useChecklist, {ChecklistType ,OpsiType} from './useChecklist';
 import useDialog from '../../../../hooks/display/useDialog';
+import useDictionary from '../../../../hooks/useDictionary';
 // -------------------------------------------------------------------------------------------
 const style = {
   position: 'absolute',
@@ -69,6 +70,16 @@ export default function ChecklistOpsiModal({
   const {getChecklist} = useChecklist();
 
   const {openDialog} = useDialog();
+
+  const {komponenRef} = useDictionary();
+
+  const selectedChecklist = checklist.find((item) => item.id === editID);
+  const canUseScore15 = komponenRef?.some(
+    (item) => item.id === selectedChecklist?.komponen_id && item.peraturan === 2
+  ) || false;
+  const sortedOptions = [...(opsi || [])].sort(
+    (left, right) => Number(right.value) - Number(left.value)
+  );
 
   const [title, setTitle] = useState<TitleType>({
     checklistTitle: '',
@@ -284,6 +295,7 @@ export default function ChecklistOpsiModal({
                         <MenuItem key={2} sx={{fontSize:14}} value={7}>7</MenuItem>
                         <MenuItem key={3} sx={{fontSize:14}} value={8}>8</MenuItem>
                         <MenuItem key={4} sx={{fontSize:14}} value={10}>10</MenuItem>
+                        {canUseScore15 && <MenuItem key={5} sx={{fontSize:14}} value={15}>15</MenuItem>}
                       </Select>
                     </FormControl>
 
@@ -361,7 +373,7 @@ export default function ChecklistOpsiModal({
                   Opsi Eksisting
                 </Typography>
 
-                {opsi?.map((row, index) => (
+                {sortedOptions.map((row, index) => (
                   <Grid 
                     container
                     key={index} 
