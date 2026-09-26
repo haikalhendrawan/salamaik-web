@@ -238,12 +238,16 @@ const editWsJunctionKPPNScore = async(req: Request, res: Response, next: NextFun
     await assertWorksheetMutationAllowed({ worksheetId, peraturan: Number(req.payload.peraturan), kanwilScore: wsJunctionDetail.kanwil_score, excluded: wsJunctionDetail.excluded });
     const availableOpsi = wsJunctionDetail?.opsi;
     const isStandardisasi = wsJunctionDetail?.standardisasi===1? true : false;
+    const peraturan = Number(req.payload.peraturan);
     if (requestedExcluded !== 0 && requestedExcluded !== 1) return next(new ErrorDetail(400, 'Excluded must be 0 or 1'));
     const excluded = requestedExcluded as 0 | 1;
     const maximumScore = getMaximumAvailableScore(availableOpsi, isStandardisasi);
     if (maximumScore === null) return next(new ErrorDetail(400, 'Maximum score is not available'));
+    if (!isStandardisasi && maximumScore > 10 && peraturan !== 2) {
+      return next(new ErrorDetail(400, 'Scores above 10 are only allowed for regulation 2'));
+    }
     const scoreToSave = excluded === 1 ? maximumScore : kppnScore;
-    const isValidScore = excluded === 1 || validateScore(scoreToSave, availableOpsi, isStandardisasi);
+    const isValidScore = excluded === 1 || validateScore(scoreToSave, availableOpsi, isStandardisasi, peraturan);
 
     if(!isValidScore){
       return next(new ErrorDetail(400, 'Score Invalid'));
@@ -269,12 +273,16 @@ const editWsJunctionKanwilScore = async(req: Request, res: Response, next: NextF
     await assertWorksheetMutationAllowed({ worksheetId, peraturan: Number(req.payload.peraturan), kanwilScore: wsJunctionDetail.kanwil_score, excluded: wsJunctionDetail.excluded });
     const availableOpsi = wsJunctionDetail?.opsi;
     const isStandardisasi = wsJunctionDetail?.standardisasi===1? true : false;
+    const peraturan = Number(req.payload.peraturan);
     if (requestedExcluded !== 0 && requestedExcluded !== 1) return next(new ErrorDetail(400, 'Excluded must be 0 or 1'));
     const excluded = requestedExcluded as 0 | 1;
     const maximumScore = getMaximumAvailableScore(availableOpsi, isStandardisasi);
     if (maximumScore === null) return next(new ErrorDetail(400, 'Maximum score is not available'));
+    if (!isStandardisasi && maximumScore > 10 && peraturan !== 2) {
+      return next(new ErrorDetail(400, 'Scores above 10 are only allowed for regulation 2'));
+    }
     const scoreToSave = excluded === 1 ? maximumScore : kanwilScore;
-    const isValidScore = excluded === 1 || validateScore(scoreToSave, availableOpsi, isStandardisasi);
+    const isValidScore = excluded === 1 || validateScore(scoreToSave, availableOpsi, isStandardisasi, peraturan);
 
     if(!isValidScore){
       return next(new ErrorDetail(400, 'Score Invalid'));

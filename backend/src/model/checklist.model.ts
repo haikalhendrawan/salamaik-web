@@ -176,6 +176,19 @@ class Checklist{
     }
   }
 
+  async getChecklistScoringContext(checklistId: number): Promise<{ peraturan: number; standardisasi: number } | null> {
+    try {
+      const q = `SELECT komponen_ref.peraturan, checklist_ref.standardisasi
+                 FROM checklist_ref
+                 INNER JOIN komponen_ref ON komponen_ref.id = checklist_ref.komponen_id
+                 WHERE checklist_ref.id = $1`;
+      const result = await pool.query(q, [checklistId]);
+      return result.rows[0] ?? null;
+    } catch (err) {
+      throw err;
+    }
+  }
+
   async editOpsiById(id: number, title: string, value: number, checklistId: number, positiveFallback: string, negativeFallback: string, rekomendasi: string){
     try{
       const q = "UPDATE opsi_ref SET title = $1, value = $2, checklist_id = $3, positive_fallback = $4, negative_fallback = $5, rekomendasi = $6 WHERE id = $7 RETURNING *";

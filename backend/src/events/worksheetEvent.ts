@@ -67,11 +67,15 @@ class WorksheetEvent{
       await assertWorksheetMutationAllowed({ worksheetId, peraturan: Number(socket.data.payload.peraturan), kanwilScore: wsJunctionDetail.kanwil_score, excluded: wsJunctionDetail.excluded });
       const availableOpsi = wsJunctionDetail?.opsi;
       const isStandardisasi = wsJunctionDetail?.standardisasi===1? true : false;
+      const peraturan = Number(socket.data.payload.peraturan);
       if (excluded !== 0 && excluded !== 1) return socketError(callback, 'Excluded must be 0 or 1');
       const maximumScore = getMaximumAvailableScore(availableOpsi, isStandardisasi);
       if (maximumScore === null) return socketError(callback, 'Maximum score is not available');
+      if (!isStandardisasi && maximumScore > 10 && peraturan !== 2) {
+        return socketError(callback, 'Scores above 10 are only allowed for regulation 2');
+      }
       const scoreToSave = excluded === 1 ? maximumScore : kanwilScore;
-      const isValidScore = excluded === 1 || validateScore(scoreToSave, availableOpsi, isStandardisasi);
+      const isValidScore = excluded === 1 || validateScore(scoreToSave, availableOpsi, isStandardisasi, peraturan);
 
       if(!isValidScore){
         return socketError(callback, 'Score invalid')
@@ -112,11 +116,15 @@ class WorksheetEvent{
       await assertWorksheetMutationAllowed({ worksheetId, peraturan: Number(socket.data.payload.peraturan), kanwilScore: wsJunctionDetail.kanwil_score, excluded: wsJunctionDetail.excluded });
       const availableOpsi = wsJunctionDetail?.opsi;
       const isStandardisasi = wsJunctionDetail?.standardisasi===1? true : false;
+      const peraturan = Number(socket.data.payload.peraturan);
       if (excluded !== 0 && excluded !== 1) return socketError(callback, 'Excluded must be 0 or 1');
       const maximumScore = getMaximumAvailableScore(availableOpsi, isStandardisasi);
       if (maximumScore === null) return socketError(callback, 'Maximum score is not available');
+      if (!isStandardisasi && maximumScore > 10 && peraturan !== 2) {
+        return socketError(callback, 'Scores above 10 are only allowed for regulation 2');
+      }
       const scoreToSave = excluded === 1 ? maximumScore : kppnScore;
-      const isValidScore = excluded === 1 || validateScore(scoreToSave, availableOpsi, isStandardisasi);
+      const isValidScore = excluded === 1 || validateScore(scoreToSave, availableOpsi, isStandardisasi, peraturan);
 
       if(!isValidScore){
         return socketError(callback, 'Score invalid')

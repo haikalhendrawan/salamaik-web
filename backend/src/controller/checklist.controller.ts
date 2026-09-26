@@ -153,11 +153,17 @@ const deleteChecklist = async (req: Request, res: Response, next: NextFunction) 
 const editOpsiById = async (req: Request, res: Response, next: NextFunction) => {
   try{
     const {id, title, value, checklistId, positiveFallback, negativeFallback, rekomendasi} = req.body;
-    const validValue = [0, 5, 7, 8, 10];
-    if(validValue.includes(value) === false){
-      return next(new ErrorDetail(400, 'Nilai dari opsi harus 0, 5, 7, 8, atau 10'));
+    const numericValue = Number(value);
+    const validValue = [0, 5, 7, 8, 10, 15];
+    if(validValue.includes(numericValue) === false){
+      return next(new ErrorDetail(400, 'Nilai dari opsi harus 0, 5, 7, 8, 10, atau 15'));
     };
-    const result = await checklist.editOpsiById(id, title, value, checklistId, positiveFallback, negativeFallback, rekomendasi);
+    const scoringContext = await checklist.getChecklistScoringContext(Number(checklistId));
+    if (!scoringContext) return next(new ErrorDetail(404, 'Checklist not found'));
+    if (numericValue === 15 && (Number(scoringContext.peraturan) !== 2 || Number(scoringContext.standardisasi) === 1)) {
+      return next(new ErrorDetail(400, 'Nilai 15 hanya tersedia untuk checklist non-standardisasi peraturan 2'));
+    }
+    const result = await checklist.editOpsiById(id, title, numericValue, checklistId, positiveFallback, negativeFallback, rekomendasi);
 
     return res.status(200).json({sucess: true, message: 'Opsi updated successfully', rows: result});
   }catch(err){
@@ -178,11 +184,17 @@ const getAllOpsi = async (req: Request, res: Response, next: NextFunction) => {
 const createOpsi = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const {checklistId, title, value, positiveFallback, negativeFallback, rekomendasi} = req.body;
-    const validValue = [0, 5, 7, 8, 10];
-    if(validValue.includes(value) === false){
-      return next(new ErrorDetail(400, 'Nilai dari opsi harus 0, 5, 7, 8, atau 10'));
+    const numericValue = Number(value);
+    const validValue = [0, 5, 7, 8, 10, 15];
+    if(validValue.includes(numericValue) === false){
+      return next(new ErrorDetail(400, 'Nilai dari opsi harus 0, 5, 7, 8, 10, atau 15'));
     };
-    const result = await checklist.createOpsi(checklistId, title, value, positiveFallback, negativeFallback, rekomendasi);
+    const scoringContext = await checklist.getChecklistScoringContext(Number(checklistId));
+    if (!scoringContext) return next(new ErrorDetail(404, 'Checklist not found'));
+    if (numericValue === 15 && (Number(scoringContext.peraturan) !== 2 || Number(scoringContext.standardisasi) === 1)) {
+      return next(new ErrorDetail(400, 'Nilai 15 hanya tersedia untuk checklist non-standardisasi peraturan 2'));
+    }
+    const result = await checklist.createOpsi(checklistId, title, numericValue, positiveFallback, negativeFallback, rekomendasi);
 
     return res.status(200).json({sucess: true, message: 'Opsi created successfully', rows: result});
   } catch (err) {

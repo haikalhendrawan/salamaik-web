@@ -504,11 +504,12 @@ const calculatePBScoreND635 = (rows: PBScoreCalculationRow[]): PBScoreResult => 
       (total, row) => total + ((row[scoreKey] ?? 0) / 10) * 100,
       0
     );
+    const rataRataMentah = statistics.jumlahChecklistPembagi === 0
+      ? 0
+      : totalSkorKonversi / statistics.jumlahChecklistPembagi;
 
     return {
-      nilai: statistics.jumlahChecklistPembagi === 0
-        ? 0
-        : roundToFourDecimals(totalSkorKonversi / statistics.jumlahChecklistPembagi),
+      nilai: roundToFourDecimals(Math.min(rataRataMentah, 100)),
       detail: {
         jumlahChecklist: statistics.jumlahChecklist,
         jumlahChecklistDiisi: statistics.jumlahChecklistDiisi,
