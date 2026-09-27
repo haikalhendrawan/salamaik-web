@@ -3,13 +3,14 @@
  * © Kanwil DJPb Sumbar 2024
  */
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import Divider from '@mui/material/Divider';
 import Skeleton from '@mui/material/Skeleton';
+import { alpha } from '@mui/material/styles';
 import InstructionPopover from "../InstructionPopover";
 import styled from '@mui/material/styles/styled';
 import Head from "./Head";
@@ -21,6 +22,8 @@ import CommentPopover from "../CommentPopover";
 import { WsJunctionType, WorksheetType } from "../../types";
 import { debounce } from 'lodash';
 import LinkFilePopover from "../LinkFilePopover";
+import { useAuth } from '../../../../hooks/useAuth';
+import { getWorksheetPhase } from '../../../../utils/worksheetPhase';
 // ------------------------------------------------------------
 interface WorksheetCardProps {
   modalOpen: () => void,
@@ -60,6 +63,7 @@ const StyledDivider = styled(Divider)(({ theme }) => ({
 
 // ------------------------------------------------------------
 export default function WorksheetCard(props: WorksheetCardProps) {
+  const { auth } = useAuth();
   const [mounted, setIsMounted] = useState(false);
 
   const [renderNilai, setRenderNilai] = useState(false);
@@ -77,6 +81,24 @@ export default function WorksheetCard(props: WorksheetCardProps) {
   const [anchorElLinkFile, setAnchorElLinkFile] = useState<EventTarget & HTMLButtonElement | null>(null);
 
   const [commentCount, setCommentCount] = useState(Number(props.wsJunction?.comment_count) || 0);
+
+  const maximumScore = useMemo(() => {
+    if (props.wsJunction?.standardisasi === 1) return 12;
+
+    const scores = (props.wsJunction?.opsi || [])
+      .map((option) => Number(option.value))
+      .filter(Number.isFinite);
+
+    return scores.length > 0 ? Math.max(...scores) : 10;
+  }, [props.wsJunction?.opsi, props.wsJunction?.standardisasi]);
+
+  const isFinding = Boolean(
+    auth?.peraturan === 2 &&
+    props.wsJunction &&
+    getWorksheetPhase(props.wsDetail) === 'FOLLOW_UP' &&
+    props.wsJunction.excluded !== 1 &&
+    (props.wsJunction.kanwil_score === null || props.wsJunction.kanwil_score < maximumScore)
+  );
 
   const handleOpenInstruction = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     setOpenInstruction(true);
@@ -127,7 +149,18 @@ export default function WorksheetCard(props: WorksheetCardProps) {
   return (
     <>
       <Grid item xs={12} sm={12} md={12}>
-        <Card sx={{minHeigth:'300px'}} id={props.id} key={props.wsJunction?.checklist_id}>
+        <Card
+          sx={(theme) => ({
+            minHeigth: '300px',
+            bgcolor: isFinding
+              ? theme.palette.mode === 'dark'
+                ? alpha(theme.palette.warning.main, 0.2)
+                : 'warning.lighter'
+              : undefined,
+          })}
+          id={props.id}
+          key={props.wsJunction?.checklist_id}
+        >
           <StyledCardHeader
             title={
               <Head

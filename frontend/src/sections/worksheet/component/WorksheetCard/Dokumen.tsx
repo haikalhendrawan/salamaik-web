@@ -123,6 +123,10 @@ export default function Dokumen({openInstruction, wsJunction, wsDetail, openLink
     return wsJunction?.file_1 && wsJunction?.file_2 && wsJunction?.file_3;
   }, [wsJunction]);
 
+  // A stored link remains readable after the worksheet phase closes. The phase
+  // restriction should only block creating a link when none exists yet.
+  const isLinkButtonDisabled = isPastDue && !wsJunction?.link_file;
+
   useEffect(() => {
     setIsMounted(false);
   }, []);
@@ -295,7 +299,7 @@ export default function Dokumen({openInstruction, wsJunction, wsDetail, openLink
                   aria-label="delete" 
                   size='small' 
                   color={wsJunction?.link_file ? 'primary' : 'white'} 
-                  disabled={isPastDue}
+                  disabled={isLinkButtonDisabled}
                   onClick={(e) => openLinkFile(e)}
                 >
                   <Iconify 
