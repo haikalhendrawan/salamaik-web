@@ -209,7 +209,7 @@ function addSectionRow(sheet: ExcelJS.Worksheet, title: string, bold = false) {
     name: 'Aptos Narrow',
     size: bold ? 11 : 10,
   }, 'left');
-  sheet.mergeCells(row.number, 1, row.number, 8);
+  sheet.mergeCells(row.number, 1, row.number, 7);
   row.height = 21;
 }
 

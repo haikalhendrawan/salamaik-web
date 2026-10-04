@@ -12,5 +12,9 @@ export function getWorksheetPhase(worksheet: WorksheetType | null, now = Date.no
 
 export function canEditRegulation2Row(worksheet: WorksheetType | null, kanwilScore: number | null, excluded: number): boolean {
   const phase = getWorksheetPhase(worksheet);
-  return phase === 'FILLING' || (phase === 'FOLLOW_UP' && excluded !== 1 && (kanwilScore === null || kanwilScore < 10));
+  // Peraturan 2 memakai menu Tindak Lanjut terpisah; worksheet asli hanya dapat
+  // diedit pada periode pengisian, termasuk untuk checklist yang kemudian menjadi temuan.
+  void kanwilScore;
+  void excluded;
+  return phase === 'FILLING';
 }

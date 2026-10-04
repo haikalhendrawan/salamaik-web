@@ -16,7 +16,7 @@ import Scrollbar from '../../../components/scrollbar';
 import NavSection from '../../../components/nav-section';
 import NavSectionNested from '../../../components/nav-section/NavSectionNested';
 //
-import {navSupervisi, navHome, navMonitoring, navAdmin} from './config';
+import {navSupervisi, navHome,  navAdmin} from './config';
 
 // ----------------------------------------------------------------------
 

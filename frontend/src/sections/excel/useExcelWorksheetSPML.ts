@@ -134,7 +134,9 @@ function createScoreSheet(
             const endRow = sheet.rowCount;
 
             sheet.getCell(`A${startRow}`).value = aspek.urut;
-            sheet.getCell(`B${startRow}`).value = aspek.title;
+            sheet.getCell(`B${startRow}`).value = aspek.keterangan_tambahan
+              ? `${aspek.title}\n\n${aspek.keterangan_tambahan}`
+              : aspek.title;
 
             if (endRow > startRow) {
               sheet.mergeCells(`A${startRow}:A${endRow}`);
@@ -238,6 +240,8 @@ function addSectionBandRow(sheet: ExcelJS.Worksheet, title: string, color: strin
   const row = sheet.addRow([title]);
   row.height = 22;
   styleContinuousBand(row, 1, 11, color, { bold: true, name: 'Aptos' });
+  sheet.mergeCells(row.number, 1, row.number, 5);
+  row.getCell(1).alignment = { vertical: 'middle', horizontal: 'left', wrapText: true };
 }
 
 function addChecklistRow(
@@ -372,6 +376,8 @@ function addFooterRow(
     bold: true,
     color: { argb: fontColor },
   });
+  sheet.mergeCells(row.number, 1, row.number, 6);
+  row.getCell(1).alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
 
   row.getCell(7).numFmt = numberFormat;
   row.getCell(11).numFmt = numberFormat;

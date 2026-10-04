@@ -83,6 +83,8 @@ function createSheet(
       name: 'Calibri',
       size: 11,
     });
+    sheet.mergeCells(sectionRow.number, 1, sectionRow.number, 5);
+    sectionRow.getCell(1).alignment = { vertical: 'middle', horizontal: 'left', wrapText: true };
     sectionRow.height = 23;
 
     componentRows.forEach((junction) => {
@@ -314,6 +316,8 @@ function addFooter(
     name: 'Calibri',
     size: 11,
   });
+  sheet.mergeCells(row.number, 1, row.number, 6);
+  row.getCell(1).alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
   if (numberFormat) {
     row.getCell(7).numFmt = numberFormat;
     row.getCell(11).numFmt = numberFormat;

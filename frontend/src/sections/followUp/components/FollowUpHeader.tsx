@@ -25,6 +25,7 @@ export default function FollowUpHeader({selectedFindings}: FollowUpHeaderProps) 
   const theme = useTheme();
   const isRegulation2Finding = selectedFindings?.matrix_id == null && Boolean(selectedFindings?.worksheet_type);
   const checklist = selectedFindings?.matrixDetail?.[0]?.checklist?.[0] as unknown as { materi?: string; title?: string; uraian?: string } | undefined;
+  const matrix = selectedFindings?.matrixDetail?.[0];
   const isCK = selectedFindings?.worksheet_type === 'CK';
   const finding = selectedFindings;
 
@@ -32,10 +33,10 @@ export default function FollowUpHeader({selectedFindings}: FollowUpHeaderProps) 
     const rows = [
       ['Kertas Kerja', `Kertas Kerja ${selectedFindings?.worksheet_type}`],
       [isCK ? 'Materi' : 'Aspek / Kegiatan', isCK ? (checklist?.materi || checklist?.title) : (checklist?.uraian || checklist?.title)],
-      ['Permasalahan', finding?.finding_description],
-      ['Rekomendasi', finding?.rekomendasi_snapshot],
-      ['Peraturan Terkait', finding?.peraturan_snapshot],
-      ['UIC', finding?.uic_snapshot],
+      ['Permasalahan', matrix?.permasalahan ?? finding?.finding_description],
+      ['Rekomendasi', matrix?.rekomendasi ?? finding?.rekomendasi_snapshot],
+      ['Peraturan Terkait', matrix?.peraturan ?? finding?.peraturan_snapshot],
+      ['UIC', matrix?.uic ?? finding?.uic_snapshot],
     ];
     return (
       <Card sx={{ overflow: 'auto', mb: 1 }}>

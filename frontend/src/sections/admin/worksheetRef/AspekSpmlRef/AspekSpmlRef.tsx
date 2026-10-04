@@ -22,6 +22,7 @@ import formatOrderedTitle from '../../../../utils/formatOrderedTitle';
 const TABLE_HEAD = [
   { id: 'urut', label: 'Urut', alignRight: false },
   { id: 'title', label: 'Judul Aspek', alignRight: false },
+  { id: 'keterangan_tambahan', label: 'Keterangan Tambahan', alignRight: false },
   { id: 'subkomponen', label: 'Sub Komponen', alignRight: false },
   { id: 'komponen', label: 'Komponen', alignRight: false },
   { id: 'action', label: 'Action', alignRight: false },
@@ -83,6 +84,7 @@ export default function AspekSpmlRef({ section, addState, resetAddState }: Aspek
                 <TableRow hover key={row.id} tabIndex={-1}>
                   <TableCell align="left">{row.urut}{row.urut_huruf ? `.${row.urut_huruf}` : ''}</TableCell>
                   <TableCell align="left">{row.title}</TableCell>
+                  <TableCell align="left" sx={{ whiteSpace: 'pre-line' }}>{row.keterangan_tambahan || '-'}</TableCell>
                   <TableCell align="left">
                     {(() => {
                       const subKomponen = subKomponenSpmlRef?.find((s) => s.id === row.subkomponen_spml_id);
@@ -159,7 +161,7 @@ function AspekSpmlRefModal({ modalOpen, modalClose, addState, editID }: AspekSpm
   const { openSnackbar } = useSnackbar();
   const axiosJWT = useAxiosJWT();
 
-  const emptyForm: AspekSpmlRefType = { id: 0, urut: 0, urut_huruf: '', komponen_spml_id: 0, subkomponen_spml_id: 0, title: '' };
+  const emptyForm: AspekSpmlRefType = { id: 0, urut: 0, urut_huruf: '', komponen_spml_id: 0, subkomponen_spml_id: 0, title: '', keterangan_tambahan: '' };
   const [addValue, setAddValue] = useState<AspekSpmlRefType>(emptyForm);
   const [editValue, setEditValue] = useState<AspekSpmlRefType>(emptyForm);
 
@@ -182,7 +184,7 @@ function AspekSpmlRefModal({ modalOpen, modalClose, addState, editID }: AspekSpm
   const handleResetAdd = () => setAddValue(emptyForm);
   const handleResetEdit = () => {
     const row = aspekSpmlRef?.find((r) => r.id === editID);
-    if (row) setEditValue({ id: row.id, urut: row.urut, urut_huruf: row.urut_huruf ?? '', komponen_spml_id: row.komponen_spml_id, subkomponen_spml_id: row.subkomponen_spml_id, title: row.title, detail: row.detail });
+    if (row) setEditValue({ id: row.id, urut: row.urut, urut_huruf: row.urut_huruf ?? '', komponen_spml_id: row.komponen_spml_id, subkomponen_spml_id: row.subkomponen_spml_id, title: row.title, detail: row.detail, keterangan_tambahan: row.keterangan_tambahan ?? '' });
   };
 
   const handleAdd = async () => {
@@ -192,6 +194,7 @@ function AspekSpmlRefModal({ modalOpen, modalClose, addState, editID }: AspekSpm
         komponen_spml_id: addValue.komponen_spml_id,
         subkomponen_spml_id: addValue.subkomponen_spml_id,
         title: addValue.title, detail: addValue.detail,
+        keterangan_tambahan: addValue.keterangan_tambahan?.trim() || null,
       });
       openSnackbar('Aspek SPML berhasil ditambahkan', 'success');
       getDictionary(); modalClose(); handleResetAdd();
@@ -205,6 +208,7 @@ function AspekSpmlRefModal({ modalOpen, modalClose, addState, editID }: AspekSpm
         komponen_spml_id: editValue.komponen_spml_id,
         subkomponen_spml_id: editValue.subkomponen_spml_id,
         title: editValue.title, detail: editValue.detail,
+        keterangan_tambahan: editValue.keterangan_tambahan?.trim() || null,
       });
       openSnackbar('Aspek SPML berhasil diubah', 'success');
       getDictionary(); modalClose();
@@ -214,7 +218,7 @@ function AspekSpmlRefModal({ modalOpen, modalClose, addState, editID }: AspekSpm
   useEffect(() => {
     if (aspekSpmlRef && editID) {
       const row = aspekSpmlRef.find((r) => r.id === editID);
-      if (row) setEditValue({ id: row.id, urut: row.urut, urut_huruf: row.urut_huruf ?? '', komponen_spml_id: row.komponen_spml_id, subkomponen_spml_id: row.subkomponen_spml_id, title: row.title, detail: row.detail });
+      if (row) setEditValue({ id: row.id, urut: row.urut, urut_huruf: row.urut_huruf ?? '', komponen_spml_id: row.komponen_spml_id, subkomponen_spml_id: row.subkomponen_spml_id, title: row.title, detail: row.detail, keterangan_tambahan: row.keterangan_tambahan ?? '' });
     }
   }, [aspekSpmlRef, editID]);
 
@@ -232,6 +236,12 @@ function AspekSpmlRefModal({ modalOpen, modalClose, addState, editID }: AspekSpm
                   <FormControl>
                     <StyledTextField name="title" label="Judul Aspek" multiline minRows={3}
                       value={addState ? addValue.title : editValue.title}
+                      onChange={addState ? handleChangeAdd : handleChangeEdit}
+                    />
+                  </FormControl>
+                  <FormControl>
+                    <StyledTextField name="keterangan_tambahan" label="Keterangan Tambahan (opsional)" multiline minRows={3}
+                      value={addState ? addValue.keterangan_tambahan || '' : editValue.keterangan_tambahan || ''}
                       onChange={addState ? handleChangeAdd : handleChangeEdit}
                     />
                   </FormControl>

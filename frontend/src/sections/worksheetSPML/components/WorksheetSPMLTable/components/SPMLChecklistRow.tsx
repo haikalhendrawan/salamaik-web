@@ -1,6 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { memo } from 'react';
-import { styled, TableCell, TableRow } from '@mui/material';
+import { Stack, styled, TableCell, TableRow, Typography } from '@mui/material';
 import { AspekSpmlRefType } from '../../../../../hooks/useDictionary';
 import formatNumberedList from '../../../../../utils/formatNumberedList';
 import { WsSPMLJunctionType } from '../../../types';
@@ -40,7 +40,16 @@ function SPMLChecklistRow({
       {aspek && (
         <>
           <StyledTableCell rowSpan={aspekRowSpan}>{aspek.urut}</StyledTableCell>
-          <StyledTableCell rowSpan={aspekRowSpan}>{aspek.title}</StyledTableCell>
+          <StyledTableCell rowSpan={aspekRowSpan}>
+            <Stack spacing={aspek.keterangan_tambahan ? 1 : 0}>
+              <Typography component="span" sx={{ fontSize: 12, color: 'inherit' }}>{aspek.title}</Typography>
+              {aspek.keterangan_tambahan && (
+                <Typography component="span" sx={{ fontSize: 11, color: 'text.secondary', whiteSpace: 'pre-line' }}>
+                  {aspek.keterangan_tambahan}
+                </Typography>
+              )}
+            </Stack>
+          </StyledTableCell>
         </>
       )}
       <StyledTableCell>{formatNumberedList(checklist.uraian)}</StyledTableCell>

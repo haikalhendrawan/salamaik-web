@@ -77,6 +77,7 @@ export interface AspekSpmlRefType{
   subkomponen_spml_id: number,
   title: string,
   detail?: string | null,
+  keterangan_tambahan?: string | null,
 };
 
 export interface ChecklistSpmlRefType{
