@@ -32,7 +32,7 @@ const TABLE_HEAD = [
   {id: 'comment', label: 'Comment', alignRight: false},
 ];
 
-const COLUMN_WIDTHS = ['4%', '13%', '28%', '7%', '7%', '15%', '20%', '6%'];
+const COLUMN_WIDTHS = ['6%', '13%', '26%', '7%', '7%', '15%', '20%', '6%'];
 
 interface WorksheetSPMLTable{
   wsSPMLJunction: WsSPMLJunctionType[];

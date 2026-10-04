@@ -3,7 +3,7 @@
  * © Kanwil DJPb Sumbar 2024
  */
 
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {Stack, Typography, Table, Card, CardHeader, TableSortLabel,
         TableHead, Grow, TableBody, TableRow, TableCell, Button} from '@mui/material';
@@ -13,7 +13,7 @@ import Iconify from '../../../components/iconify/Iconify';
 import ExcelPrintout from './ExcelPrintout';
 import { DerivedFindingsType } from '../../../types/findings.type';
 // ---------------------------------------------------
-const StyledButton = styled(Button)(({  }) => ({
+const StyledButton = styled(Button)(() => ({
   height: '30px', 
   width: '90px', 
   fontSize:'12px', 
@@ -56,7 +56,13 @@ export default function FollowUpTable({findings, kppnId, isFinal, nonFinalFindin
 
   const allowFinalState = isFinal && showFinal;
 
-  const findingsToShow = allowFinalState ? findings : nonFinalFindings;
+  const sourceFindings = allowFinalState ? findings : nonFinalFindings;
+  const isRegulation2 = Boolean(sourceFindings?.some((item) => item.worksheet_type));
+  const worksheetOrder: Record<string, number> = { PB: 0, SPML: 1, CK: 2 };
+  const findingsToShow = isRegulation2
+    ? [...(sourceFindings || [])].sort((a, b) =>
+        (worksheetOrder[a.worksheet_type || ''] ?? 3) - (worksheetOrder[b.worksheet_type || ''] ?? 3) || a.id - b.id)
+    : sourceFindings;
 
   return (
     <>
@@ -88,17 +94,45 @@ export default function FollowUpTable({findings, kppnId, isFinal, nonFinalFindin
               </TableRow>
             </TableHead>
             <TableBody>
-              {findingsToShow?.map((item, index) => 
+              {findingsToShow?.map((item, index) => {
+                const firstInWorksheetGroup = isRegulation2 && (index === 0 || findingsToShow[index - 1].worksheet_type !== item.worksheet_type);
+                const worksheetChecklist = item.checklist as unknown as { materi?: string; uraian?: string; title?: string };
+                const checklistTitle = item.worksheet_type === 'CK'
+                  ? worksheetChecklist?.materi || item.checklist?.title
+                  : item.worksheet_type === 'SPML'
+                    ? worksheetChecklist?.uraian || item.checklist?.title
+                    : item.checklist?.title;
+                return (
+                  <Fragment key={item.id}>
+                    {firstInWorksheetGroup && (
+                      <TableRow>
+                        <TableCell
+                          colSpan={TABLE_HEAD.length}
+                          sx={{ fontSize: 13, fontWeight: 700, bgcolor: 'action.hover', color: 'text.primary' }}
+                        >
+                          Kertas Kerja {item.worksheet_type}
+                        </TableCell>
+                      </TableRow>
+                    )}
                 <TableRow hover key={item.id} tabIndex={-1}>
                   <TableCell align="justify" sx={{fontSize: '13px'}}>{index+1}</TableCell>
 
                   <TableCell align="left" sx={{fontSize: '13px'}}>
-                    <Typography variant='body2' fontWeight={'bold'} fontSize={'13px'}>Komponen {item.komponen.title}</Typography>
-                    <Typography variant='body2' fontSize={'13px'}>Subkomponen {item.subkomponen.title}</Typography>
+                    {isRegulation2 ? (
+                      <>
+                        <Typography variant='body2' fontWeight={'bold'} fontSize={'13px'}>{item.komponen?.title}</Typography>
+                        {item.worksheet_type === 'PB' && <Typography variant='body2' fontSize={'13px'}>{item.subkomponen?.title}</Typography>}
+                      </>
+                    ) : (
+                      <>
+                        <Typography variant='body2' fontWeight={'bold'} fontSize={'13px'}>Komponen {item.komponen.title}</Typography>
+                        <Typography variant='body2' fontSize={'13px'}>Subkomponen {item.subkomponen.title}</Typography>
+                      </>
+                    )}
                   </TableCell>
 
                   <TableCell align="left" sx={{fontSize: '13px'}}>
-                    {item.checklist.title}
+                    {checklistTitle}
                   </TableCell>
 
                   <TableCell align="left" sx={{fontSize: '13px'}}>{item.matrix.permasalahan}</TableCell>
@@ -132,7 +166,8 @@ export default function FollowUpTable({findings, kppnId, isFinal, nonFinalFindin
                     </Stack>
                   </TableCell> 
                 </TableRow>
-              )}
+                  </Fragment>
+              )})}
 
             </TableBody>
           </Table>

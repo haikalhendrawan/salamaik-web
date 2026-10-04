@@ -42,6 +42,7 @@ import StandardizationPage from "./pages/StandardizationPage";
 import NotifInterfacePage from "./pages/admin/NotifInterfacePage";
 import GalleryInterfacePage from "./pages/admin/GalleryInterfacePage";
 import ActivityLogPage from "./pages/admin/ActivityLogPage";
+import { DialogProvider } from "./hooks/display/useDialog";
 // ----------------------------------------------------
 
 export default function Router() {
@@ -94,7 +95,7 @@ export default function Router() {
           <Route index element={<MatrixPage />} />
         </Route>
         <Route element={<RequireAuthHorizontalLayout allowedRoles={[0, 1, 2, 3, 4, 99]}/> }>
-          <Route path="detail" element={<MatrixDetail />} />
+          <Route path="detail" element={<DialogProvider><MatrixDetail /></DialogProvider>} />
         </Route>
       </Route>
     </Route>

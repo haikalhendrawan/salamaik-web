@@ -95,7 +95,7 @@ export default function FollowUpCard(props: FollowUpCardProps) {
           <StyledCardHeader
             title={
               <Head
-                num={checklist?.id || 0}
+                num={checklist?.urut ?? '-'}
                 title={checklist?.title || ""}
                 dateUpdated={wsJunction?.last_update || null}
                 updatedBy={wsJunction?.updated_by || null}
@@ -147,7 +147,7 @@ export default function FollowUpCard(props: FollowUpCardProps) {
           <BodyGrid container spacing={1}>
             <Grid item xs={4.5}>
               <Kriteria
-                kriteria={checklist?.header || ""}
+                kriteria={checklist?.header || checklist?.uraian || checklist?.kriteria_penilaian || ""}
                 opsi={matrixDetail?.opsi || []}
               />
             </Grid>

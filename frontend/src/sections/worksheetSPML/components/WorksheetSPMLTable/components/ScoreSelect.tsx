@@ -105,7 +105,7 @@ export default function ScoreSelect({ checklist, scoreType, disabled }: ScoreSel
         <StyledMenuItem value="N/A">N/A</StyledMenuItem>
         <StyledMenuItem value="" disabled>&nbsp;</StyledMenuItem>
       </StyledSelect>
-      {isLiveSyncing && (
+      {(isSaving || isLiveSyncing) && (
         <CircularProgress
           size={14}
           sx={{ position: 'absolute', right: 8, top: 'calc(50% - 7px)', zIndex: 1 }}

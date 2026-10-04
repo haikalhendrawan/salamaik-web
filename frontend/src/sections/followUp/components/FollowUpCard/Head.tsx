@@ -12,7 +12,7 @@ import styled  from '@mui/material/styles/styled';
 import { parseISO, format } from 'date-fns';
 // ------------------------------------------------------------
 interface HeadPropInterface{
-  num: number | undefined,
+  num: number | string | undefined,
   title:string,
   dateUpdated: string | null,
   updatedBy: string | null

@@ -17,7 +17,8 @@ import useAxiosJWT from "../../../../hooks/useAxiosJWT";
 interface CatatanPropsType{
   findingResponse: FindingsResponseType | null,
   getData: () => Promise<void>,
-  isDisabled: boolean
+  isDisabled: boolean,
+  responseSide?: 'kppn' | 'kanwil'
 };
 
 const StyledFormControl = styled(FormControl)(({theme}) => ({
@@ -28,7 +29,7 @@ const StyledFormControl = styled(FormControl)(({theme}) => ({
 }));
 
 // ------------------------------------------------------------
-export default function Catatan({findingResponse, getData, isDisabled}: CatatanPropsType) {
+export default function Catatan({findingResponse, getData, isDisabled, responseSide}: CatatanPropsType) {
   const [isMounted, setIsMounted] = useState(true);
 
   const initialNoteRefKanwil = useRef(findingResponse?.kanwil_response || '');
@@ -96,7 +97,7 @@ export default function Catatan({findingResponse, getData, isDisabled}: CatatanP
         kanwilResponse: kanwilNote,
         kppnResponse: kppnNote,
         userName: auth?.name,
-        matrixId: findingResponse?.matrix_id
+        matrixId: findingResponse?.matrix_peraturan_2_id ?? findingResponse?.matrix_id
       });
       getData();
       openSnackbar(response.data.message, "success");
@@ -112,6 +113,26 @@ export default function Catatan({findingResponse, getData, isDisabled}: CatatanP
   if(isMounted) {
     return <Box marginRight={2}> <Skeleton variant="rounded" height={'150px'} width={'100%'} /> </Box>;
   ;}
+
+  if (responseSide) {
+    const isKPPNResponse = responseSide === 'kppn';
+    return (
+      <StyledFormControl>
+        <TextField
+          name={isKPPNResponse ? 'kppnResponse' : 'kanwilResponse'}
+          size="small"
+          defaultValue={isKPPNResponse ? initialNoteRefKPPN.current : initialNoteRefKanwil.current}
+          onBlur={isKPPNResponse ? handleEditKPPNNote : handleEditKanwilNote}
+          multiline
+          minRows={6}
+          maxRows={6}
+          fullWidth
+          inputProps={{ sx: { fontSize: 12, width: '100%', height: '100%' }, spellCheck: false }}
+          disabled={isKPPNResponse ? isKanwil || isDisabled : !isKanwil || isDisabled}
+        />
+      </StyledFormControl>
+    );
+  }
 
   return (
     <>

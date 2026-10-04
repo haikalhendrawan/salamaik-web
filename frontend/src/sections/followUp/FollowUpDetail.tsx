@@ -10,6 +10,7 @@ import Iconify from '../../components/iconify/Iconify';
 import {IconButton, Container, Grid, Stack, Typography} from '@mui/material';
 // sections
 import FollowUpCard from './components/FollowUpCard/FollowUpCard';
+import FollowUpWorksheetTable from './components/FollowUpWorksheetTable';
 import FollowUpHeader from './components/FollowUpHeader';
 import useAxiosJWT from '../../hooks/useAxiosJWT';
 import useSnackbar from '../../hooks/display/useSnackbar';
@@ -90,6 +91,10 @@ export default function FollowUpDetail() {
 
   const today = new Date();
   const isPastClosePeriod = new Date(worksheet?.close_follow_up || '').getTime() < today?.getTime();
+  const isBeforeFollowUpPeriod = new Date(worksheet?.open_follow_up || '').getTime() > today?.getTime();
+  const isDisabled = selectedFindings?.matrix_id == null
+    ? isPastClosePeriod || isBeforeFollowUpPeriod
+    : isPastClosePeriod;
 
   return (
     <>
@@ -114,12 +119,14 @@ export default function FollowUpDetail() {
               </Grid>
 
               <Grid item xs={12}>
-                <FollowUpCard findingResponse={selectedFindings} getData={getFindings} isDisabled={isPastClosePeriod}/>
+                {selectedFindings?.matrix_id == null && (selectedFindings?.worksheet_type === 'CK' || selectedFindings?.worksheet_type === 'SPML')
+                  ? <FollowUpWorksheetTable finding={selectedFindings} getData={getFindings} isDisabled={isDisabled} />
+                  : <FollowUpCard findingResponse={selectedFindings} getData={getFindings} isDisabled={isDisabled} />}
               </Grid>
               
             </Grid>
 
-            <PreviewFileModal getData={getFindings} isDisabled={isPastClosePeriod}/>
+            <PreviewFileModal getData={getFindings} isDisabled={isDisabled}/>
 
           </Container>
         </DialogProvider>

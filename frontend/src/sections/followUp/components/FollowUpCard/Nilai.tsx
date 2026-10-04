@@ -28,7 +28,8 @@ import { FindingsResponseType } from '../../types';
 interface NilaiPropsType{
   findingResponse: FindingsResponseType | null,
   getData: () => Promise<void>,
-  isDisabled: boolean
+  isDisabled: boolean,
+  scoreSide?: 'kppn' | 'kanwil',
 };
 
 const StyledFormControl = styled(FormControl)(({}) => ({
@@ -63,7 +64,7 @@ const StyledNumberTextField = styled(TextField)(({}) => ({
 }));
 
 // ------------------------------------------------------------
-export default function Nilai({findingResponse, getData, isDisabled}: NilaiPropsType) {
+export default function Nilai({findingResponse, getData, isDisabled, scoreSide}: NilaiPropsType) {
   const [isMounted, setIsMounted] = useState(true);
 
   const matrixDetail = findingResponse?.matrixDetail[0] || null;
@@ -98,7 +99,19 @@ export default function Nilai({findingResponse, getData, isDisabled}: NilaiProps
 
   const handleChangeKanwilScore = async(newScore: string) => {
     setIsLoading(true);
-    const score = parseInt(newScore);
+    const score = newScore === '' ? null : parseInt(newScore);
+
+    if (findingResponse?.matrix_id == null && findingResponse?.worksheet_type) {
+      try {
+        await axiosJWT.post('/updateFindingsScore', { id: findingResponse.id, scoreAfter: score, userName: auth?.name });
+        await getData();
+      } catch (err: any) {
+        openSnackbar(err?.response?.data?.message || 'Gagal memperbarui nilai', 'error');
+      } finally {
+        setIsLoading(false);
+      }
+      return;
+    }
 
     if(socket?.connected === false) {
       return openSnackbar("websocket failed, check your connection", "error");
@@ -133,7 +146,15 @@ export default function Nilai({findingResponse, getData, isDisabled}: NilaiProps
 
   const handleChangeKPPNScore = (newScore: string) => {
     setIsLoading(true);
-    const score = parseInt(newScore);
+    const score = newScore === '' ? null : parseInt(newScore);
+
+    if (findingResponse?.matrix_id == null && findingResponse?.worksheet_type) {
+      void axiosJWT.post('/updateFindingsScore', { id: findingResponse.id, scoreAfter: score, userName: auth?.name })
+        .then(() => getData())
+        .catch((err: any) => openSnackbar(err?.response?.data?.message || 'Gagal memperbarui nilai', 'error'))
+        .finally(() => setIsLoading(false));
+      return;
+    }
 
     if(socket?.connected === false) {
       return openSnackbar("websocket failed, check your connection", "error");
@@ -182,6 +203,14 @@ export default function Nilai({findingResponse, getData, isDisabled}: NilaiProps
     setStdScoreKanwil(newScore);
     setIsLoading(true);
 
+    if (findingResponse?.matrix_id == null && findingResponse?.worksheet_type) {
+      void axiosJWT.post('/updateFindingsScore', { id: findingResponse.id, scoreAfter: score, userName: auth?.name })
+        .then(() => getData())
+        .catch((err: any) => openSnackbar(err?.response?.data?.message || 'Gagal memperbarui nilai', 'error'))
+        .finally(() => setIsLoading(false));
+      return;
+    }
+
     if(socket?.connected === false) {
       return openSnackbar("websocket failed, check your connection", "error");
     };
@@ -222,6 +251,14 @@ export default function Nilai({findingResponse, getData, isDisabled}: NilaiProps
 
     setStdScoreKPPN(newScore);
     setIsLoading(true);
+
+    if (findingResponse?.matrix_id == null && findingResponse?.worksheet_type) {
+      void axiosJWT.post('/updateFindingsScore', { id: findingResponse.id, scoreAfter: score, userName: auth?.name })
+        .then(() => getData())
+        .catch((err: any) => openSnackbar(err?.response?.data?.message || 'Gagal memperbarui nilai', 'error'))
+        .finally(() => setIsLoading(false));
+      return;
+    }
 
     if(socket?.connected === false) {
       return openSnackbar("websocket failed, check your connection", "error");
@@ -324,6 +361,33 @@ export default function Nilai({findingResponse, getData, isDisabled}: NilaiProps
         <br/>
         <Skeleton variant="rounded" height={'1.4375em'} width={'100%'} />
       </>
+    );
+  }
+
+  if (scoreSide) {
+    const score = scoreSide === 'kppn' ? wsJunction?.kppn_score : wsJunction?.kanwil_score;
+    const isScoreDisabled = isDisabled || (scoreSide === 'kppn' ? isKanwil : !isKanwil);
+    const scoreOptions = findingResponse?.worksheet_type === 'SPML'
+      ? [10, 0]
+      : matrixDetail?.opsi?.map((option) => option.value).sort((left, right) => right - left) || [];
+    return (
+      <StyledFormControl size="small">
+        <StyledSelect
+          required
+          name={`${scoreSide}Score`}
+          value={score === null || score === undefined ? '' : String(score)}
+          onChange={(event) => {
+            const value = event.target.value as string;
+            if (scoreSide === 'kppn') handleChangeKPPNScore(value);
+            else void handleChangeKanwilScore(value);
+          }}
+          disabled={isScoreDisabled}
+          size="small"
+        >
+          {scoreOptions.map((option) => <StyledMenuItem key={option} value={String(option)}>{option}</StyledMenuItem>)}
+          <StyledMenuItem value="">Belum dinilai</StyledMenuItem>
+        </StyledSelect>
+      </StyledFormControl>
     );
   }
 

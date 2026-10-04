@@ -52,11 +52,11 @@ const navSupervisi = [
 ];
 
 const navMonitoring = [
-  {
-    title: 'Standardisasi KPPN',
-    path: '/standard',
-    icon: icon('solar--palette-round-bold-duotone'),
-  },
+  // {
+  //   title: 'Standardisasi KPPN',
+  //   path: '/standard',
+  //   icon: icon('solar--palette-round-bold-duotone'),
+  // },
   // {
   //   title: "Data Pembinaan",
   //   path: '/history',

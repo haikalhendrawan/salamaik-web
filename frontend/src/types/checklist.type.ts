@@ -2,6 +2,8 @@ export interface ChecklistType{
   id: number,
   title: string | null, 
   header: string | null,
+  uraian?: string | null,
+  kriteria_penilaian?: string | null,
   komponen_id: number,
   subkomponen_id: number,
   subsubkomponen_id: number,

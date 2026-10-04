@@ -19,6 +19,11 @@ import useSnackbar from '../../../../hooks/display/useSnackbar';
 import { WsJunctionType } from "../../../worksheet/types";
 import useWsJunction from "../../../worksheet/useWsJunction";
 import { FindingsResponseType } from '../../types';
+import LinkFilePopoverPB from '../../../worksheet/component/LinkFilePopover';
+import LinkFilePopoverCK from '../../../worksheetCK/components/LinkFilePopoverCK';
+import LinkFilePopoverSPML from '../../../worksheetSPML/components/LinkFilePopover';
+import { WsCKJunctionType } from '../../../worksheetCK/types';
+import { WsSPMLJunctionType } from '../../../worksheetSPML/types';
 // ----------------------------------------------------------------------------
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -42,6 +47,7 @@ interface DokumenProps{
 // ----------------------------------------------------------------------------
 export default function Dokumen({openInstruction, findingResponse, getData, isDisabled}: DokumenProps){
   const [isMounted, setIsMounted] = useState(true);
+  const [linkAnchor, setLinkAnchor] = useState<HTMLButtonElement | null>(null);
 
   const theme = useTheme();
 
@@ -119,6 +125,56 @@ export default function Dokumen({openInstruction, findingResponse, getData, isDi
     return wsJunction?.file_1 && wsJunction?.file_2 && wsJunction?.file_3;
   }, [wsJunction]);
 
+  const isRegulation2Finding = findingResponse?.matrix_id == null && Boolean(findingResponse?.worksheet_type);
+
+  const handleChangeRegulation2File = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file || !wsJunction || !findingResponse || isDisabled) return;
+
+    const formData = new FormData();
+    formData.append('worksheetId', wsJunction.worksheet_id);
+    formData.append('junctionId', String(wsJunction.junction_id));
+    formData.append('kppnId', String(wsJunction.kppn_id));
+    let endpoint: string;
+
+    if (findingResponse.worksheet_type === 'CK') {
+      const checklistCkId = (wsJunction as unknown as { checklist_ck_id?: number }).checklist_ck_id;
+      if (!checklistCkId) return;
+      formData.append('checklistCkId', String(checklistCkId));
+      formData.append('wsCKJunctionFile', file);
+      endpoint = '/wsCKJunction/editWsCKJunctionFile';
+    } else if (findingResponse.worksheet_type === 'SPML') {
+      const checklistSpmlId = (wsJunction as unknown as { checklist_spml_id?: number }).checklist_spml_id;
+      if (!checklistSpmlId) return;
+      formData.append('checklistSpmlId', String(checklistSpmlId));
+      formData.append('wsSPMLJunctionFile', file);
+      endpoint = '/wsSPMLJunction/editWsSPMLJunctionFile';
+    } else {
+      const fileCount = [wsJunction.file_1, wsJunction.file_2, wsJunction.file_3].filter(Boolean).length;
+      if (fileCount >= 3) return;
+      formData.append('checklistId', String(wsJunction.checklist_id));
+      formData.append('option', String(fileCount + 1));
+      formData.append('wsJunctionFile', file);
+      endpoint = '/editWsJunctionFile';
+    }
+
+    try {
+      setIsLoading(true);
+      await axiosJWT.post(endpoint, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+      await getData();
+    } catch (err: any) {
+      openSnackbar(err?.response?.data?.message || 'Gagal mengunggah bukti dukung', 'error');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const closeSourceLinkPopover = () => {
+    setLinkAnchor(null);
+    void getData();
+  };
+
   useEffect(() => {
     setIsMounted(false);
   }, []);
@@ -132,6 +188,59 @@ export default function Dokumen({openInstruction, findingResponse, getData, isDi
         <Skeleton variant="rounded" height={'3em'} width={'50%'} />
       </>
     )
+  }
+
+  if (isRegulation2Finding) {
+    const sourceFiles = [wsJunction?.file_1, wsJunction?.file_2, wsJunction?.file_3].filter(Boolean) as string[];
+    const maxFiles = findingResponse?.worksheet_type === 'PB' ? 3 : 1;
+    const canAddFile = sourceFiles.length < maxFiles;
+    const ckJunction = wsJunction as unknown as WsCKJunctionType;
+    const spmlJunction = wsJunction as unknown as WsSPMLJunctionType;
+
+    return (
+      <Stack direction="column" spacing={1}>
+        <Stack spacing={1}>
+          <Typography variant="body3" fontSize={12} textAlign="left">Bukti Dukung :</Typography>
+          <Stack direction="row" spacing={1} alignItems="center">
+            {sourceFiles.map((file, index) => (
+              <Tooltip title={`Buka file ${index + 1}`} key={file}>
+                <span>
+                  <StyledButton aria-label={`Buka file ${index + 1}`} variant="contained" size="small" color="secondary" onClick={() => window.open(`${import.meta.env.VITE_API_URL}/worksheet/${file}`, '_blank', 'noopener,noreferrer')}>
+                    <Iconify icon="solar:file-bold-duotone" />
+                  </StyledButton>
+                </span>
+              </Tooltip>
+            ))}
+            {canAddFile && (
+            <Tooltip title="Tambah file">
+              <span>
+                <StyledButton component="label" aria-label="Tambah file" variant="contained" size="small" color="white" disabled={isDisabled}>
+                  <Iconify color={theme.palette.grey[500]} icon="solar:add-circle-bold" />
+                  <VisuallyHiddenInput type="file" accept="image/*,.pdf,.zip" onChange={handleChangeRegulation2File} disabled={isDisabled} />
+                </StyledButton>
+              </span>
+            </Tooltip>
+            )}
+            <Tooltip title={wsJunction?.link_file ? 'Lihat atau edit link' : 'Tambah link'}>
+              <span>
+                <StyledButton aria-label="Kelola link bukti dukung" variant="contained" size="small" color={wsJunction?.link_file ? 'primary' : 'white'} disabled={isDisabled && !wsJunction?.link_file} onClick={(event) => setLinkAnchor(event.currentTarget)}>
+                  <Iconify color={wsJunction?.link_file ? theme.palette.common.white : theme.palette.grey[500]} icon="solar:link-bold-duotone" />
+                </StyledButton>
+              </span>
+            </Tooltip>
+          </Stack>
+          {findingResponse?.worksheet_type === 'PB' && (
+            <LinkFilePopoverPB open={Boolean(linkAnchor)} anchorEl={linkAnchor} handleClose={closeSourceLinkPopover} wsJunction={wsJunction} wsDetail={findingResponse.worksheet || null} />
+          )}
+          {findingResponse?.worksheet_type === 'CK' && (
+            <LinkFilePopoverCK anchorEl={linkAnchor} onClose={closeSourceLinkPopover} checklist={ckJunction} disabled={isDisabled} />
+          )}
+          {findingResponse?.worksheet_type === 'SPML' && (
+            <LinkFilePopoverSPML open={Boolean(linkAnchor)} anchorEl={linkAnchor} handleClose={closeSourceLinkPopover} wsJunction={spmlJunction} isPastDue={isDisabled} />
+          )}
+        </Stack>
+      </Stack>
+    );
   }
 
   return(

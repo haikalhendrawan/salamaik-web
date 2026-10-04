@@ -75,6 +75,7 @@ export interface MatrixWithWsJunctionType{
 export type Regulation2WorksheetType = 'PB' | 'SPML' | 'CK';
 
 export interface Regulation2MatrixRow {
+  matrix_id: number;
   worksheet_type: Regulation2WorksheetType;
   junction_id: number;
   checklist_id: number;

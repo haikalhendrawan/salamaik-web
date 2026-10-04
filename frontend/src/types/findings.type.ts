@@ -11,6 +11,7 @@ export interface DerivedFindingsType {
   worksheet_id: string,
   checklist_id: number,
   matrix_id: number, 
+  worksheet_type?: 'PB' | 'CK' | 'SPML',
   kppn_reponse: string,
   kanwil_response: string,
   score_before: number,
