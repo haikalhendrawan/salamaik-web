@@ -25,7 +25,9 @@ export function createWorksheetReadState<T extends { kanwil_score: number | null
   const isKanwil = [3, 4, 99].includes(role);
   const mappedRows = rows.map((row) => {
     const isFinding = peraturan === 2 && isRegulation2Finding(row.kanwil_score, row.excluded);
-    const editable = phase === 'FILLING' || (phase === 'FOLLOW_UP' && isFinding);
+    // Peraturan 2 tindak lanjut dikerjakan melalui menu Findings terpisah.
+    // Worksheet junction hanya dapat diedit pada periode pengisian awal.
+    const editable = phase === 'FILLING';
     return {
       ...row,
       isFinding,
@@ -53,7 +55,9 @@ export async function assertWorksheetMutationAllowed({
   if (!worksheetRows.length) throw new ErrorDetail(404, 'Worksheet not found');
   const phase = getWorksheetPhase(worksheetRows[0]);
   if (phase === 'FILLING') return phase;
-  if (phase === 'FOLLOW_UP' && isRegulation2Finding(kanwilScore, excluded)) return phase;
+  if (phase === 'FOLLOW_UP' && isRegulation2Finding(kanwilScore, excluded)) {
+    throw new ErrorDetail(409, 'Tindak lanjut harus dilakukan melalui menu Tindak Lanjut');
+  }
   if (phase === 'FOLLOW_UP') throw new ErrorDetail(409, 'Checklist ini bukan lagi temuan dan sudah dikunci');
   throw new ErrorDetail(409, 'Worksheet tidak dapat diedit pada periode ini');
 }

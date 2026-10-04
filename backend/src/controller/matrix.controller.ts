@@ -11,6 +11,7 @@ import pool from '../config/db';
 import findings from "../model/findings.model";
 import ErrorDetail from "../model/error.model";
 import logger from "../config/logger";
+import { getWorksheetPhase } from "../utils/worksheetPhase.utils";
 // ------------------------------------------------------------------------
 const getMatrixByWorksheetId = async(req: Request, res: Response, next: NextFunction) => {
   try{
@@ -72,7 +73,6 @@ const getRegulation2Matrix = async(req: Request, res: Response, next: NextFuncti
 const createMatrix = async(req: Request, res: Response, next: NextFunction) => {
   const connection = await pool.connect();
   try{
-    if (Number(req.payload.peraturan) === 2) throw new ErrorDetail(400, 'Matriks peraturan 2 dibuat otomatis dari temuan aktif');
     await connection.query('BEGIN');
     const {kppnId} = req.body;
     const {period} = req.payload;
@@ -80,15 +80,39 @@ const createMatrix = async(req: Request, res: Response, next: NextFunction) => {
     // query #1 dapatkan worksheet Id
     const worksheetProfile: WorksheetType[] = await worksheet.getWorksheetByPeriodAndKPPN(period, kppnId); 
     const worksheetId = worksheetProfile[0]?.id || null;
-    const matrixStatus = worksheetProfile[0]?.matrix_status || 0;
 
     if(!worksheetId) {
       throw new ErrorDetail(404, 'Worksheet not found');
     };
 
-    if(matrixStatus === 1){
+    const lockedWorksheet = await connection.query(
+      'SELECT matrix_status FROM worksheet_ref WHERE id = $1 FOR UPDATE',
+      [worksheetId]
+    );
+    const matrixStatus = Number(lockedWorksheet.rows[0]?.matrix_status || 0);
+
+    const isRegulation2 = Number(req.payload.peraturan) === 2;
+    if(matrixStatus === 1 && !isRegulation2){
       throw new ErrorDetail(400, 'Matrix sudah dibuat');
     };
+
+    if (isRegulation2) {
+      const phase = getWorksheetPhase(worksheetProfile[0]);
+      if (phase !== 'FILLING' && phase !== 'WAITING_FOLLOW_UP') {
+        throw new ErrorDetail(409, 'Temuan dapat diposting selama periode pengisian atau masa tunggu sebelum tindak lanjut dimulai');
+      }
+      const counts = await findings.postRegulation2Findings(worksheetId, connection);
+      await matrix.syncRegulation2Matrix(worksheetId, connection);
+      if (matrixStatus !== 1) await worksheet.editWorksheetMatrixStatus(worksheetId, 1, connection);
+      await connection.query('COMMIT');
+      return res.status(200).json({
+        success: true,
+        message: matrixStatus === 1
+          ? 'Temuan peraturan 2 berhasil disinkronkan'
+          : 'Temuan peraturan 2 berhasil diposting ke menu Tindak Lanjut',
+        rows: counts,
+      });
+    }
 
     // query #2 dapatkan list wsjunction
     const worksheetData = await wsJunction.getWsJunctionByWorksheetId(worksheetId);
@@ -263,7 +287,21 @@ const reAssignMatrix = async(req: Request, res: Response, next: NextFunction) =>
 
 const updateMatrix = async(req: Request, res: Response, next: NextFunction) => {
   try{
-    if (Number(req.payload.peraturan) === 2) throw new ErrorDetail(400, 'Matriks peraturan 2 bersifat read-only');
+    if (Number(req.payload.peraturan) === 2) {
+      const matrixId = Number(req.body.id);
+      if (!Number.isInteger(matrixId) || matrixId <= 0) throw new ErrorDetail(400, 'ID matriks tidak valid');
+      const current = await matrix.getRegulation2MatrixById(matrixId);
+      if (!current) throw new ErrorDetail(404, 'Matriks tidak ditemukan');
+      const worksheetRows = await worksheet.getById(current.worksheet_id);
+      const worksheetDetail = worksheetRows[0];
+      if (!worksheetDetail) throw new ErrorDetail(404, 'Worksheet tidak ditemukan');
+      if (![3, 4, 99].includes(req.payload.role)) throw new ErrorDetail(403, 'Hanya user Kanwil yang dapat mengedit matriks');
+      if (Date.now() > new Date(worksheetDetail.close_follow_up).getTime()) {
+        throw new ErrorDetail(409, 'Masa edit matriks telah berakhir');
+      }
+      const result = await matrix.updateRegulation2Matrix(matrixId, current.worksheet_id, req.body);
+      return res.status(200).json({ success: true, message: 'Matriks berhasil diperbarui', rows: result });
+    }
     // const {id, hasilImplementasi, permasalahan, rekomendasi, peraturan, uic, tindakLanjut, isFinding} = req.body;
     const result = await matrix.updateMatrix(req.body);
 

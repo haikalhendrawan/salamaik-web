@@ -22,5 +22,8 @@ router.post('/createFindings', authenticate, authorize([99, 4]), logActivity(25)
 router.post('/updateFindingsScore', authenticate, authorize([99, 4, 2]), logActivity(26), findingsController.updateFindingsScore);
 router.post('/updateFindingsResponse', authenticate, authorize([99, 4, 2]), logActivity(27), findingsController.updateFindingsResponse);
 router.post('/updateFindingStatus', authenticate, authorize([99, 4, 2]), logActivity(28), findingsController.updateFindingStatus);
+router.post('/updateFindingFile', authenticate, authorize([99, 4, 2]), findingsController.updateFindingFile);
+router.post('/deleteFindingFile', authenticate, authorize([99, 4, 2]), findingsController.deleteFindingFile);
+router.post('/updateFindingLink', authenticate, authorize([99, 4, 2]), findingsController.updateFindingLink);
 
 export default router

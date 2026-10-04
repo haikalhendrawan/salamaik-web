@@ -68,6 +68,7 @@ export interface MatrixWithWsJunctionType{
 export type Regulation2WorksheetType = 'PB' | 'SPML' | 'CK';
 
 export interface Regulation2MatrixRow {
+  matrix_id: number;
   worksheet_type: Regulation2WorksheetType;
   junction_id: number;
   checklist_id: number;
@@ -87,51 +88,117 @@ export interface Regulation2MatrixRow {
 // --------------------------------------------------
 class Matrix{
   async getRegulation2Findings(worksheetId: string): Promise<Regulation2MatrixRow[]> {
-    const result = await pool.query<Regulation2MatrixRow>(
-      `WITH pb AS (
-         SELECT 'PB'::text AS worksheet_type, junction.junction_id, checklist.id AS checklist_id,
-                COALESCE(checklist.urut::text, checklist.id::text) AS nomor_kertas_kerja,
-                CONCAT_WS(' - ', komponen.title, subkomponen.title) AS komponen_supervisi,
-                COALESCE(selected_option.positive_fallback, checklist.matrix_title, checklist.title) AS hasil_implementasi,
-                COALESCE(NULLIF(junction.kanwil_note, ''), selected_option.negative_fallback, minimum_option.negative_fallback) AS permasalahan,
-                COALESCE(selected_option.rekomendasi, minimum_option.rekomendasi) AS rekomendasi,
-                checklist.peraturan, checklist.uic, NULL::text AS tindak_lanjut,
-                NULL::text AS status_penyelesaian, junction.kanwil_score, junction.kanwil_note
-           FROM worksheet_junction junction
-           JOIN checklist_ref checklist ON checklist.id = junction.checklist_id
-           LEFT JOIN komponen_ref komponen ON komponen.id = checklist.komponen_id
-           LEFT JOIN subkomponen_ref subkomponen ON subkomponen.id = checklist.subkomponen_id
-           LEFT JOIN LATERAL (SELECT opsi.* FROM opsi_ref opsi WHERE opsi.checklist_id = checklist.id AND opsi.deleted IS NULL AND opsi.value = junction.kanwil_score LIMIT 1) selected_option ON TRUE
-           LEFT JOIN LATERAL (SELECT opsi.* FROM opsi_ref opsi WHERE opsi.checklist_id = checklist.id AND opsi.deleted IS NULL ORDER BY opsi.value ASC LIMIT 1) minimum_option ON TRUE
-          WHERE junction.worksheet_id = $1 AND junction.excluded <> 1 AND (junction.kanwil_score IS NULL OR junction.kanwil_score < 10)
-       ), ck AS (
-         SELECT 'CK'::text, junction.junction_id, checklist.id, checklist.urut::text,
-                CONCAT_WS(' - ', komponen.title, checklist.materi),
-                COALESCE(selected_option.positive_fallback, checklist.kriteria_penilaian),
-                COALESCE(NULLIF(junction.kanwil_note, ''), selected_option.negative_fallback, minimum_option.negative_fallback),
-                COALESCE(selected_option.rekomendasi, minimum_option.rekomendasi), checklist.peraturan, checklist.uic,
-                NULL::text, NULL::text, junction.kanwil_score, junction.kanwil_note
-           FROM worksheet_ck_junction junction
-           JOIN checklist_ck_ref checklist ON checklist.id = junction.checklist_ck_id
-           JOIN komponen_ck_ref komponen ON komponen.id = checklist.komponen_ck_id
-           LEFT JOIN LATERAL (SELECT opsi.* FROM opsi_ck_ref opsi WHERE opsi.checklist_ck_id = checklist.id AND opsi.deleted IS NULL AND opsi.value = junction.kanwil_score LIMIT 1) selected_option ON TRUE
-           LEFT JOIN LATERAL (SELECT opsi.* FROM opsi_ck_ref opsi WHERE opsi.checklist_ck_id = checklist.id AND opsi.deleted IS NULL ORDER BY opsi.value ASC LIMIT 1) minimum_option ON TRUE
-          WHERE junction.worksheet_id = $1 AND junction.excluded <> 1 AND (junction.kanwil_score IS NULL OR junction.kanwil_score < 10)
-       ), spml AS (
-         SELECT 'SPML'::text, junction.junction_id, checklist.id, COALESCE(checklist.title, checklist.id::text),
-                CONCAT_WS(' - ', komponen.title, subkomponen.title, aspek.title), COALESCE(checklist.positive_fallback, checklist.uraian),
-                COALESCE(NULLIF(junction.kanwil_note, ''), checklist.negative_fallback), checklist.rekomendasi,
-                checklist.peraturan, checklist.uic, NULL::text, NULL::text, junction.kanwil_score, junction.kanwil_note
-           FROM worksheet_spml_junction junction
-           JOIN checklist_spml_ref checklist ON checklist.id = junction.checklist_spml_id
-           LEFT JOIN komponen_spml_ref komponen ON komponen.id = checklist.komponen_spml_id
-           LEFT JOIN subkomponen_spml_ref subkomponen ON subkomponen.id = checklist.subkomponen_spml_id
-           LEFT JOIN aspek_spml_ref aspek ON aspek.id = checklist.aspek_spml_id
-          WHERE junction.worksheet_id = $1 AND junction.excluded <> 1 AND (junction.kanwil_score IS NULL OR junction.kanwil_score < 10)
-       ) SELECT * FROM pb UNION ALL SELECT * FROM spml UNION ALL SELECT * FROM ck`,
-      [worksheetId]
+    const { rows } = await pool.query<Regulation2MatrixRow>(
+      `SELECT m.id AS matrix_id, m.worksheet_type, j.junction_id, c.id AS checklist_id,
+              COALESCE(c.urut::text, c.id::text) AS nomor_kertas_kerja,
+              CONCAT_WS(' - ', k.title, s.title) AS komponen_supervisi,
+              m.hasil_implementasi, m.permasalahan, m.rekomendasi, m.peraturan, m.uic,
+              m.tindak_lanjut,
+              CASE f.status WHEN 0 THEN 'Perlu tindak lanjut' WHEN 1 THEN 'Proses' WHEN 2 THEN 'Ditolak' WHEN 3 THEN 'Disetujui' ELSE NULL END AS status_penyelesaian,
+              j.kanwil_score, j.kanwil_note
+         FROM matrix_data_peraturan_2 m
+         JOIN worksheet_junction j ON m.worksheet_type = 'PB' AND j.junction_id = m.ws_junction_id
+         JOIN checklist_ref c ON c.id = j.checklist_id
+         LEFT JOIN komponen_ref k ON k.id = c.komponen_id
+         LEFT JOIN subkomponen_ref s ON s.id = c.subkomponen_id
+         LEFT JOIN findings_data f ON f.matrix_peraturan_2_id = m.id
+        WHERE m.worksheet_id = $1 AND m.worksheet_type = 'PB' AND j.worksheet_id::text = $1
+       UNION ALL
+       SELECT m.id, m.worksheet_type, j.junction_id, c.id, c.urut::text,
+              CONCAT_WS(' - ', k.title, c.materi), m.hasil_implementasi, m.permasalahan,
+              m.rekomendasi, m.peraturan, m.uic, m.tindak_lanjut,
+              CASE f.status WHEN 0 THEN 'Perlu tindak lanjut' WHEN 1 THEN 'Proses' WHEN 2 THEN 'Ditolak' WHEN 3 THEN 'Disetujui' ELSE NULL END,
+              j.kanwil_score, j.kanwil_note
+         FROM matrix_data_peraturan_2 m
+         JOIN worksheet_ck_junction j ON m.worksheet_type = 'CK' AND j.junction_id = m.ws_ck_junction_id
+         JOIN checklist_ck_ref c ON c.id = j.checklist_ck_id
+         JOIN komponen_ck_ref k ON k.id = c.komponen_ck_id
+         LEFT JOIN findings_data f ON f.matrix_peraturan_2_id = m.id
+        WHERE m.worksheet_id = $1 AND m.worksheet_type = 'CK' AND j.worksheet_id::text = $1
+       UNION ALL
+       SELECT m.id, m.worksheet_type, j.junction_id, c.id, COALESCE(c.title, c.id::text),
+              CONCAT_WS(' - ', k.title, s.title, a.title), m.hasil_implementasi, m.permasalahan,
+              m.rekomendasi, m.peraturan, m.uic, m.tindak_lanjut,
+              CASE f.status WHEN 0 THEN 'Perlu tindak lanjut' WHEN 1 THEN 'Proses' WHEN 2 THEN 'Ditolak' WHEN 3 THEN 'Disetujui' ELSE NULL END,
+              j.kanwil_score, j.kanwil_note
+         FROM matrix_data_peraturan_2 m
+         JOIN worksheet_spml_junction j ON m.worksheet_type = 'SPML' AND j.junction_id = m.ws_spml_junction_id
+         JOIN checklist_spml_ref c ON c.id = j.checklist_spml_id
+         LEFT JOIN komponen_spml_ref k ON k.id = c.komponen_spml_id
+         LEFT JOIN subkomponen_spml_ref s ON s.id = c.subkomponen_spml_id
+         LEFT JOIN aspek_spml_ref a ON a.id = c.aspek_spml_id
+         LEFT JOIN findings_data f ON f.matrix_peraturan_2_id = m.id
+        WHERE m.worksheet_id = $1 AND m.worksheet_type = 'SPML' AND j.worksheet_id::text = $1
+       ORDER BY 2, 4`, [worksheetId]
     );
-    return result.rows;
+    const order = { PB: 0, SPML: 1, CK: 2 } as const;
+    return rows.sort((a, b) => order[a.worksheet_type] - order[b.worksheet_type]);
+  }
+
+  async syncRegulation2Matrix(worksheetId: string, poolTrx: PoolClient) {
+    const statements = [
+      `INSERT INTO matrix_data_peraturan_2
+         (worksheet_id, worksheet_type, ws_junction_id, checklist_id, hasil_implementasi,
+          permasalahan, rekomendasi, peraturan, uic, tindak_lanjut)
+       SELECT worksheet_id::text, 'PB', ws_junction_id, checklist_id, finding_title,
+              finding_description, rekomendasi_snapshot, peraturan_snapshot, uic_snapshot, NULL
+         FROM findings_data WHERE worksheet_id = $1 AND worksheet_type = 'PB'
+       ON CONFLICT (ws_junction_id) WHERE ws_junction_id IS NOT NULL DO NOTHING`,
+      `INSERT INTO matrix_data_peraturan_2
+         (worksheet_id, worksheet_type, ws_ck_junction_id, checklist_ck_id, hasil_implementasi,
+          permasalahan, rekomendasi, peraturan, uic, tindak_lanjut)
+       SELECT worksheet_id::text, 'CK', ws_ck_junction_id, checklist_ck_id, finding_title,
+              finding_description, rekomendasi_snapshot, peraturan_snapshot, uic_snapshot, NULL
+         FROM findings_data WHERE worksheet_id = $1 AND worksheet_type = 'CK'
+       ON CONFLICT (ws_ck_junction_id) WHERE ws_ck_junction_id IS NOT NULL DO NOTHING`,
+      `INSERT INTO matrix_data_peraturan_2
+         (worksheet_id, worksheet_type, ws_spml_junction_id, checklist_spml_id, hasil_implementasi,
+          permasalahan, rekomendasi, peraturan, uic, tindak_lanjut)
+       SELECT worksheet_id::text, 'SPML', ws_spml_junction_id, checklist_spml_id, finding_title,
+              finding_description, rekomendasi_snapshot, peraturan_snapshot, uic_snapshot, NULL
+         FROM findings_data WHERE worksheet_id = $1 AND worksheet_type = 'SPML'
+       ON CONFLICT (ws_spml_junction_id) WHERE ws_spml_junction_id IS NOT NULL DO NOTHING`,
+    ];
+    for (const sql of statements) await poolTrx.query(sql, [worksheetId]);
+    await poolTrx.query(
+      `UPDATE findings_data f SET matrix_peraturan_2_id = m.id
+         FROM matrix_data_peraturan_2 m
+        WHERE f.worksheet_id = $1 AND m.worksheet_id = f.worksheet_id::text
+          AND f.worksheet_type = m.worksheet_type
+          AND ((f.worksheet_type = 'PB' AND f.ws_junction_id = m.ws_junction_id)
+            OR (f.worksheet_type = 'CK' AND f.ws_ck_junction_id = m.ws_ck_junction_id)
+            OR (f.worksheet_type = 'SPML' AND f.ws_spml_junction_id = m.ws_spml_junction_id))`, [worksheetId]
+    );
+    await poolTrx.query(
+      `DELETE FROM matrix_data_peraturan_2 m WHERE m.worksheet_id = $1 AND NOT EXISTS (
+         SELECT 1 FROM findings_data f WHERE f.worksheet_id::text = m.worksheet_id AND f.matrix_peraturan_2_id = m.id
+       )`, [worksheetId]
+    );
+  }
+
+  async updateRegulation2Matrix(id: number, worksheetId: string, body: MatrixBodyType, poolTrx?: PoolClient) {
+    const db = poolTrx ?? pool;
+    const { rows } = await db.query(
+      `UPDATE matrix_data_peraturan_2 SET hasil_implementasi = $1, permasalahan = $2,
+          rekomendasi = $3, peraturan = $4, uic = $5, tindak_lanjut = $6, updated_at = NOW()
+        WHERE id = $7 AND worksheet_id = $8 RETURNING *`,
+      [body.hasilImplementasi, body.permasalahan, body.rekomendasi, body.peraturan, body.uic, body.tindakLanjut, id, worksheetId]
+    );
+    return rows[0];
+  }
+
+  async getRegulation2MatrixById(id: number) {
+    const { rows } = await pool.query('SELECT * FROM matrix_data_peraturan_2 WHERE id = $1', [id]);
+    return rows[0];
+  }
+
+  async updateRegulation2TindakLanjut(id: number, text: string, poolTrx?: PoolClient) {
+    const db = poolTrx ?? pool;
+    const { rows } = await db.query(
+      'UPDATE matrix_data_peraturan_2 SET tindak_lanjut = $1, updated_at = NOW() WHERE id = $2 RETURNING *',
+      [text, id]
+    );
+    return rows[0];
   }
 
   async addMatrix(body: MatrixBodyType, poolTrx?: PoolClient){

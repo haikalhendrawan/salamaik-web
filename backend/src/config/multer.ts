@@ -209,6 +209,25 @@ const uploadWsCKJunctionFile = multer({
 
 export { uploadWsCKJunctionFile };
 
+// Follow-up evidence is stored on findings, not on the source worksheet row,
+// so the initial-period document remains an immutable snapshot.
+const findingFileStorage = multer.diskStorage({
+  destination: (_req, _file, callback) => callback(null, `${__dirname}/../uploads/worksheet`),
+  filename: (req, file, callback) => {
+    const fileExt = sanitizeMimeType(file.mimetype);
+    const findingId = String(req.body.id ?? '').replace(/[^0-9]/g, '');
+    callback(null, `finding_${findingId}_${Date.now()}.${fileExt}`);
+  },
+});
+
+const uploadFindingFile = multer({
+  storage: findingFileStorage,
+  limits: wsJunctionFileLimit,
+  fileFilter: wsJunctionFileFilter,
+}).single('findingFile');
+
+export { uploadFindingFile };
+
 // ----------------------------------------------------------------------------------------------------------
 // Gallery File Upload
 const galleryStorage= multer.diskStorage(
