@@ -34,6 +34,7 @@ export interface AspekSpmlType {
   subkomponen_spml_id: number;
   title: string;
   detail: string | null;
+  keterangan_tambahan?: string | null;
   deleted?: Date | string | null;
 }
 
@@ -182,10 +183,10 @@ class AspekSpml {
 
   async createAspekSpml(body: Omit<AspekSpmlType, 'id'>) {
     try {
-      const { urut, urut_huruf, komponen_spml_id, subkomponen_spml_id, title, detail } = body;
-      const q = `INSERT INTO aspek_spml_ref (urut, urut_huruf, komponen_spml_id, subkomponen_spml_id, title, detail) 
-                 VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`;
-      const result = await pool.query(q, [urut, urut_huruf ?? null, komponen_spml_id, subkomponen_spml_id, title, detail ?? null]);
+      const { urut, urut_huruf, komponen_spml_id, subkomponen_spml_id, title, detail, keterangan_tambahan } = body;
+      const q = `INSERT INTO aspek_spml_ref (urut, urut_huruf, komponen_spml_id, subkomponen_spml_id, title, detail, keterangan_tambahan) 
+                 VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
+      const result = await pool.query(q, [urut, urut_huruf ?? null, komponen_spml_id, subkomponen_spml_id, title, detail ?? null, keterangan_tambahan ?? null]);
       return result.rows;
     } catch (err) {
       throw err;
@@ -194,11 +195,11 @@ class AspekSpml {
 
   async editAspekSpml(body: Partial<AspekSpmlType> & { id: number }) {
     try {
-      const { id, urut, urut_huruf, komponen_spml_id, subkomponen_spml_id, title, detail } = body;
+      const { id, urut, urut_huruf, komponen_spml_id, subkomponen_spml_id, title, detail, keterangan_tambahan } = body;
       const q = `UPDATE aspek_spml_ref 
-                 SET urut = $1, urut_huruf = $2, komponen_spml_id = $3, subkomponen_spml_id = $4, title = $5, detail = $6 
-                 WHERE id = $7 RETURNING *`;
-      const result = await pool.query(q, [urut, urut_huruf, komponen_spml_id, subkomponen_spml_id, title, detail, id]);
+                 SET urut = $1, urut_huruf = $2, komponen_spml_id = $3, subkomponen_spml_id = $4, title = $5, detail = $6, keterangan_tambahan = $7
+                 WHERE id = $8 RETURNING *`;
+      const result = await pool.query(q, [urut, urut_huruf, komponen_spml_id, subkomponen_spml_id, title, detail, keterangan_tambahan ?? null, id]);
       return result.rows;
     } catch (err) {
       throw err;

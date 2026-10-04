@@ -110,6 +110,11 @@ const getFindingsById = async (req: Request, res: Response, next: NextFunction) 
           ...item,
           matrixDetail: [{
             id: null,
+            hasil_implementasi: item.matrix?.hasil_implementasi ?? item.finding_title ?? null,
+            permasalahan: item.matrix?.permasalahan ?? item.finding_description ?? null,
+            rekomendasi: item.matrix?.rekomendasi ?? item.rekomendasi_snapshot ?? null,
+            peraturan: item.matrix?.peraturan ?? item.peraturan_snapshot ?? null,
+            uic: item.matrix?.uic ?? item.uic_snapshot ?? null,
             ws_junction: [item.ws_junction],
             checklist: [item.checklist],
             opsi: item.opsi || [],

@@ -174,9 +174,12 @@ export const getAllAspekSpml = async (req: Request, res: Response, next: NextFun
 
 export const createAspekSpml = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { urut, urut_huruf, komponen_spml_id, subkomponen_spml_id, title, detail } = req.body;
+    const { urut, urut_huruf, komponen_spml_id, subkomponen_spml_id, title, detail, keterangan_tambahan } = req.body;
     if (urut === undefined || !komponen_spml_id || !subkomponen_spml_id || !title) {
       throw new ErrorDetail(400, 'Urut, Komponen SPML ID, SubKomponen SPML ID, dan Judul aspek wajib diisi');
+    }
+    if (keterangan_tambahan !== undefined && keterangan_tambahan !== null && typeof keterangan_tambahan !== 'string') {
+      throw new ErrorDetail(400, 'Keterangan tambahan aspek harus berupa teks');
     }
 
     const result = await aspekSpml.createAspekSpml({
@@ -186,6 +189,7 @@ export const createAspekSpml = async (req: Request, res: Response, next: NextFun
       subkomponen_spml_id: Number(subkomponen_spml_id),
       title,
       detail: detail ?? null,
+      keterangan_tambahan: keterangan_tambahan?.trim() || null,
     });
 
     return res.status(200).json({ success: true, message: 'Aspek SPML created successfully', rows: result });
@@ -196,9 +200,12 @@ export const createAspekSpml = async (req: Request, res: Response, next: NextFun
 
 export const editAspekSpml = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { id, urut, urut_huruf, komponen_spml_id, subkomponen_spml_id, title, detail } = req.body;
+    const { id, urut, urut_huruf, komponen_spml_id, subkomponen_spml_id, title, detail, keterangan_tambahan } = req.body;
     if (!id || urut === undefined || !komponen_spml_id || !subkomponen_spml_id || !title) {
       throw new ErrorDetail(400, 'ID, Urut, Komponen SPML ID, SubKomponen SPML ID, dan Judul aspek wajib diisi');
+    }
+    if (keterangan_tambahan !== undefined && keterangan_tambahan !== null && typeof keterangan_tambahan !== 'string') {
+      throw new ErrorDetail(400, 'Keterangan tambahan aspek harus berupa teks');
     }
 
     const result = await aspekSpml.editAspekSpml({
@@ -209,6 +216,7 @@ export const editAspekSpml = async (req: Request, res: Response, next: NextFunct
       subkomponen_spml_id: Number(subkomponen_spml_id),
       title,
       detail,
+      keterangan_tambahan: keterangan_tambahan?.trim() || null,
     });
 
     return res.status(200).json({ success: true, message: 'Aspek SPML updated successfully', rows: result });
