@@ -28,13 +28,12 @@ BEGIN
 
   WITH komponen_source (urut, title, alias, detail) AS (
     VALUES
-      ('A', 'Perbendaharaan Negara yang efisien dan akuntabel', NULL::TEXT, NULL::TEXT),
+      ('A', 'Penganggaran dan belanja yang berkualitas', NULL::TEXT, NULL::TEXT),
       ('B', 'Dukungan manajemen yang efektif', NULL::TEXT, NULL::TEXT),
       ('C', 'Pelaksanaan anggaran yang optimal', NULL::TEXT, NULL::TEXT),
-      ('D', 'Pengelolaan kas yang prudent, efektif dan efisien', NULL::TEXT, NULL::TEXT),
-      ('E', 'Pertanggungjawaban keuangan negara yang akuntabel', NULL::TEXT, NULL::TEXT),
-      ('F', 'Pengelolaan organisasi dan SDM yang adaptif serta pengendalian internal yang efektif', NULL::TEXT, NULL::TEXT),
-      ('G', 'Pengelolaan keuangan yang akuntabel, BMN yang produktif serta teknologi dan informasi yang berkualitas', NULL::TEXT, NULL::TEXT)
+      ('D', 'Pertanggungjawaban keuangan negara yang akuntabel ', NULL::TEXT, NULL::TEXT),
+      ('E', 'Pengelolaan organisasi dan SDM yang adaptif serta pengendalian internal yang efektif', NULL::TEXT, NULL::TEXT),
+      ('F', 'Pengelolaan keuangan yang akuntabel, BMN yang produktif serta teknologi dan informasi yang berkualitas', NULL::TEXT, NULL::TEXT)
   ),
   updated AS (
     UPDATE komponen_ck_ref AS target
@@ -82,91 +81,73 @@ BEGIN
         'A',
         1,
         'Indeks Kualitas Nilai IKPA K/L',
-        'Laporan Capaian IKI Indeks Kualitas Nilai IKPA K/L Periode (Triwulanan/ Semesteran/ Tahunan) Tahun XXXX'
+        'Laporan Capaian IKI Indeks Kualitas Nilai IKPA K/L Periode Triwulan III dan Triwulan IV 2026'
       ),
       (
-        'A',
+        'B',
         2,
-        'Indeks Kualitas LK Kuasa BUN KPPN',
-        'Laporan Capaian IKI Indeks Kualitas LK Kuasa BUN KPPN Periode (Semesteran/ Triwulanan/ Tahunan) Tahun XXXX'
+        'Indeks kepuasan terhadap layanan KPPN',
+        'Laporan Capaian IKI Indeks kepuasan terhadap layanan KPPN Periode Triwulan III dan Triwulan IV 2026'
       ),
       (
         'B',
         3,
-        'Indeks kepuasan terhadap layanan KPPN',
-        'Laporan Capaian IKI Indeks kepuasan terhadap layanan KPPN Periode (Semesteran/ Triwulanan/ Tahunan) Tahun XXXX'
+        'Tingkat implementasi penajaman tugas Financial Advisory',
+        'Laporan Capaian IKI Tingkat implementasi penajaman tugas Financial Advisory Periode Triwulan III dan Triwulan IV 2026'
       ),
       (
-        'B',
+        'C',
         4,
-        'Tingkat implementasi penajaman tugas Financial Advisory',
-        'Laporan Capaian IKI Tingkat implementasi penajaman tugas Financial Advisory Periode (Semesteran/ Triwulanan/ Tahunan) Tahun XXXX'
+        'Indeks kinerja penyaluran Dana Transfer ke Daerah pada KPPN',
+        'Laporan Capaian IKI Indeks kepuasan terhadap layanan KPPN Periode Triwulan III dan Triwulan IV 2026'
       ),
       (
         'C',
         5,
-        'Indeks kinerja penyaluran Dana Transfer ke Daerah pada KPPN',
-        'Laporan Capaian IKI Indeks kepuasan terhadap layanan KPPN Periode (Semesteran/ Triwulanan/ Tahunan) Tahun XXXX'
+        'Indeks kualitas penyelesaian SP2D dan Akurasi Perencanaan Kas',
+        'Laporan Capaian IKI Indeks kualitas penyelesaian SP2D dan Akurasi Perencanaan Kas Periode Triwulan III dan Triwulan IV 2026'
       ),
       (
         'C',
         6,
         'Indeks Digitalisasi Pengelolaan Keuangan',
-        'Laporan Capaian IKI Tingkat implementasi penajaman tugas Financial Advisory Periode (Semesteran/ Triwulanan/ Tahunan) Tahun XXXX'
+        'Laporan Capaian IKI Digitalisasi Pengelolaan Keuangan Periode Triwulan III dan Triwulan IV 2026'
       ),
       (
         'D',
         7,
-        'Persentase akurasi perencanaan kas',
-        'Laporan Capaian IKI Persentase akurasi perencanaan kas Periode (Semesteran/ Triwulanan/ Tahunan) Tahun XXXX'
+        'Indeks Akuntabilitas Pelaporan Keuangan Satker',
+        'Laporan Capaian IKI Indeks Akuntabilitas Pelaporan Keuangan Satker Periode Triwulan III dan Triwulan IV Tahun 2026'
       ),
       (
-        'D',
+        'E',
         8,
-        'Indeks kualitas penyelesaian SP2D',
-        'Laporan Capaian IKI Indeks kualitas penyelesaian SP2D Periode (Semesteran/ Triwulanan/ Tahunan) Tahun XXXX'
+        'Tingkat kualitas pengelolaan kinerja organisasi',
+        'Laporan Capaian IKI Tingkat kualitas pengelolaan kinerja organisasi Periode Triwulan III dan Triwulan IV 2026'
       ),
       (
         'E',
         9,
-        'Indeks Kualitas LPJ Bendahara Satker K/L',
-        E'Laporan Capaian IKI Indeks Kualitas LPJ Bendahara Satker K/L\nPeriode (Semesteran/ Triwulanan/ Tahunan) Tahun XXXX'
+        'Nilai kualitas pengelolaan SDM',
+        'Laporan Capaian IKI Nilai kualitas pengelolaan SDM Periode Triwulan III dan Triwulan IV 2026'
       ),
       (
-        'F',
+        'E',
         10,
-        'Tingkat kualitas pengelolaan kinerja organisasi',
-        'Laporan Capaian IKI Tingkat kualitas pengelolaan kinerja organisasi Periode (Semesteran/ Triwulanan/ Tahunan) Tahun XXXX'
+        'Nilai Evaluasi Pelaksanaan Tugas Kepatuhan Internal',
+        'Laporan Capaian IKI Nilai Evaluasi Pelaksanaan Tugas Kepatuhan Internal Periode Triwulan III dan Triwulan IV 2026'
       ),
       (
         'F',
         11,
-        'Nilai kualitas pengelolaan SDM',
-        'Laporan Capaian IKI Nilai kualitas pengelolaan SDM Periode (Semesteran/ Triwulanan/ Tahunan) Tahun XXXX'
+        'Indeks kualitas pengelolaan keuangan, BMN, Pengadaan, dan Arsip',
+        'Laporan Capaian IKI Indeks kualitas pengelolaan keuangan, BMN, Pengadaan, dan Arsip  Periode Triwulan III dan Triwulan IV 2026'
       ),
       (
         'F',
         12,
-        'Nilai Evaluasi Pelaksanaan Tugas Kepatuhan Internal',
-        'Laporan Capaian IKI Nilai Evaluasi Pelaksanaan Tugas Kepatuhan Internal Periode (Semesteran/ Triwulanan/ Tahunan) Tahun XXXX'
-      ),
-      (
-        'G',
-        13,
-        'Indeks kualitas pengelolaan keuangan KPPN',
-        'Laporan Capaian IKI Indeks kualitas pengelolaan keuangan KPPN Periode (Semesteran/ Triwulanan/ Tahunan) Tahun XXXX'
-      ),
-      (
-        'G',
-        14,
-        'Persentase Kualitas Pengelolaan BMN dan Pengadaan',
-        'Laporan Capaian IKI Persentase Kualitas Pengelolaan BMN dan Pengadaan Periode (Semesteran/ Triwulanan/ Tahunan) Tahun XXXX'
-      ),
-      (
-        'G',
-        15,
         'Nilai Kinerja TIK KPPN',
-        'Laporan Capaian IKI Nilai Kinerja TIK KPPN'
+        'Laporan Capaian IKI Nilai Kinerja TIK KPPN Periode Triwulan III dan Triwulan IV 2026'
       )
   ),
   resolved AS (
@@ -278,8 +259,8 @@ BEGIN
     FROM komponen_ck_ref
     WHERE peraturan = v_peraturan_id
       AND deleted IS NULL
-  ) < 7 THEN
-    RAISE EXCEPTION 'Seed CK gagal: jumlah komponen aktif kurang dari 7.';
+  ) < 6 THEN
+    RAISE EXCEPTION 'Seed CK gagal: jumlah komponen aktif kurang dari 6.';
   END IF;
 
   IF (
@@ -290,8 +271,8 @@ BEGIN
     WHERE komponen.peraturan = v_peraturan_id
       AND komponen.deleted IS NULL
       AND checklist.deleted IS NULL
-  ) < 15 THEN
-    RAISE EXCEPTION 'Seed CK gagal: jumlah checklist aktif kurang dari 15.';
+  ) < 12 THEN
+    RAISE EXCEPTION 'Seed CK gagal: jumlah checklist aktif kurang dari 12.';
   END IF;
 END
 $seed$;

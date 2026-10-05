@@ -27,6 +27,10 @@ BEGIN
 END
 $$;
 
+UPDATE kppn_ref SET provinsi = 1 WHERE id IN ('010', '03010');
+UPDATE kppn_ref SET tipe = 'A1' WHERE id IN ('010', '011', '090');
+UPDATE kppn_ref SET tipe = 'A2' WHERE id IN ('091', '077', '142');
+
 COMMENT ON COLUMN kppn_ref.tipe IS
   'Tipe KPPN: A1, A2, Kh, K1, K2, atau K3';
 
