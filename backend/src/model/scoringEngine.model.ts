@@ -7,6 +7,7 @@ import pool from "../config/db";
 import { PoolClient } from "pg";
 import ErrorDetail from "./error.model";
 import type { KPPNTipe } from "./unit.model";
+import type { WorksheetReferenceData } from "./worksheetReferenceSnapshot.model";
 //-----------------------------------------------------------------------------------------------------------------
 interface SPMLScoreRow {
   kppn_id: string;
@@ -45,6 +46,18 @@ interface PeriodWorksheetRow {
 
 interface PeriodPBScoreRow extends PBScoreRow {
   worksheet_id: string;
+}
+
+interface PBJunctionSnapshotRow {
+  worksheet_id: string;
+  kppn_id: string;
+  checklist_id: number;
+  kppn_score: number | null;
+  kanwil_score: number | null;
+  excluded: number;
+  regulation_id: number;
+  formula_version: string;
+  reference_data: WorksheetReferenceData;
 }
 
 interface PeriodCKScoreRow extends CKScoreRow {
@@ -182,6 +195,8 @@ interface AKKWorksheetRow {
   kppn_alias: string;
   period_id: number;
   period_name: string;
+  regulation_id: number;
+  formula_version: string;
 }
 
 export type AKKCategory = "A1_PROVINSI" | "A1_NON_PROVINSI" | "A2";
@@ -280,6 +295,12 @@ type WorksheetScorePair = Pick<PBScoreResult, "nilaiKPPN" | "nilaiKanwil">;
 
 const roundToFourDecimals = (value: number) =>
   Math.round((value + Number.EPSILON) * 10000) / 10000;
+
+const getRegulationFromFormulaVersion = (formulaVersion: string): PBRegulation => {
+  if (formulaVersion === 'PER1_V1') return 1;
+  if (formulaVersion === 'PER2_V1') return 2;
+  throw new ErrorDetail(409, `Unsupported worksheet scoring formula version: ${formulaVersion}`);
+};
 
 //-----------------------------------------------------------------------------------------------------------------
 export const calculateSPMLScoreFromRows = (
@@ -865,11 +886,53 @@ const groupPeriodRowsByWorksheet = <T extends { worksheet_id: string }>(rows: T[
   return groupedRows;
 };
 
+const applyPBReferenceSnapshot = <T extends PBJunctionSnapshotRow>(rows: T[]): (T & PBScoreCalculationRow)[] => {
+  return rows.map((row) => {
+    const checklist = row.reference_data.pb.checklist.find((item) => Number(item.id) === Number(row.checklist_id));
+    if (!checklist) {
+      throw new ErrorDetail(409, `Checklist ${row.checklist_id} is missing from its period reference snapshot`);
+    }
+    const component = row.reference_data.pb.komponen.find(
+      (item) => Number(item.id) === Number(checklist.komponen_id)
+    );
+    if (!component) {
+      throw new ErrorDetail(409, `Component for checklist ${row.checklist_id} is missing from its period reference snapshot`);
+    }
+
+    return {
+      ...row,
+      komponen_id: Number(component.id),
+      komponen_title: String(component.title ?? ''),
+      komponen_bobot: Number(component.bobot ?? 0),
+      standardisasi: Number(checklist.standardisasi ?? 0),
+    };
+  });
+};
+
 const loadPeriodAKKUnitCalculations = async (
   periodId: number,
-  peraturan: PBRegulation,
+  _requestedPeraturan: PBRegulation,
   poolInstance: PoolClient | typeof pool
 ): Promise<PeriodAKKUnitCalculation[] | undefined> => {
+  const snapshotResult = await poolInstance.query<{
+    regulation_id: number;
+    formula_version: string;
+    reference_data: WorksheetReferenceData;
+  }>(
+    `SELECT regulation_id, formula_version, reference_data
+     FROM worksheet_reference_snapshot
+     WHERE period_id = $1`,
+    [periodId]
+  );
+  const referenceSnapshot = snapshotResult.rows[0];
+  if (!referenceSnapshot) {
+    throw new ErrorDetail(409, `Reference snapshot for period ${periodId} is missing`);
+  }
+  const effectivePeraturan = getRegulationFromFormulaVersion(referenceSnapshot.formula_version);
+  if (effectivePeraturan !== Number(referenceSnapshot.regulation_id)) {
+    throw new ErrorDetail(409, `Period ${periodId} has inconsistent regulation and formula metadata`);
+  }
+
   const worksheetQuery = `SELECT worksheet_ref.id AS worksheet_id,
                                  worksheet_ref.kppn_id,
                                  kppn_ref.name,
@@ -894,34 +957,32 @@ const loadPeriodAKKUnitCalculations = async (
 
   const pbQuery = `SELECT worksheet_junction.worksheet_id,
                           worksheet_ref.kppn_id,
+                          worksheet_junction.checklist_id,
                           worksheet_junction.kppn_score,
                           worksheet_junction.kanwil_score,
-                          worksheet_junction.excluded,
-                          checklist_ref.komponen_id,
-                          checklist_ref.standardisasi,
-                          komponen_ref.title AS komponen_title,
-                          komponen_ref.bobot AS komponen_bobot
+                          worksheet_junction.excluded
                    FROM worksheet_junction
                    INNER JOIN worksheet_ref
                      ON worksheet_ref.id = worksheet_junction.worksheet_id
                    INNER JOIN kppn_ref
                      ON kppn_ref.id = worksheet_ref.kppn_id
                     AND kppn_ref.level = 0
-                   INNER JOIN checklist_ref
-                     ON checklist_ref.id = worksheet_junction.checklist_id
-                   INNER JOIN komponen_ref
-                     ON komponen_ref.id = checklist_ref.komponen_id
                    WHERE worksheet_ref.period = $1
                    ORDER BY worksheet_junction.worksheet_id,
-                            checklist_ref.komponen_id,
                             worksheet_junction.junction_id`;
-  const pbResult = await poolInstance.query<PeriodPBScoreRow>(pbQuery, [periodId]);
-  const pbRowsByWorksheet = groupPeriodRowsByWorksheet(pbResult.rows);
+  const pbResult = await poolInstance.query<Omit<PBJunctionSnapshotRow, 'regulation_id' | 'formula_version' | 'reference_data'>>(pbQuery, [periodId]);
+  const snapshotPBRows: PBJunctionSnapshotRow[] = pbResult.rows.map((row) => ({
+    ...row,
+    regulation_id: Number(referenceSnapshot.regulation_id),
+    formula_version: referenceSnapshot.formula_version,
+    reference_data: referenceSnapshot.reference_data,
+  }));
+  const pbRowsByWorksheet = groupPeriodRowsByWorksheet(applyPBReferenceSnapshot(snapshotPBRows));
 
   let ckRowsByWorksheet = new Map<string, PeriodCKScoreRow[]>();
   let spmlRowsByWorksheet = new Map<string, PeriodSPMLScoreRow[]>();
 
-  if (peraturan === 2) {
+  if (effectivePeraturan === 2) {
     const ckQuery = `SELECT worksheet_ck_junction.worksheet_id,
                             worksheet_ref.kppn_id,
                             worksheet_ck_junction.kppn_score,
@@ -966,11 +1027,11 @@ const loadPeriodAKKUnitCalculations = async (
       );
     }
 
-    const pbScore = calculatePBScoreFromRows(pbRows, peraturan);
+    const pbScore = calculatePBScoreFromRows(pbRows, effectivePeraturan);
     let result: AKKScoreResult;
 
-    if (peraturan === 1) {
-      result = calculateAKKScoreFromWorksheetScores(peraturan, pbScore);
+    if (effectivePeraturan === 1) {
+      result = calculateAKKScoreFromWorksheetScores(effectivePeraturan, pbScore);
     } else {
       const ckRows = ckRowsByWorksheet.get(worksheet.worksheet_id);
       const spmlRows = spmlRowsByWorksheet.get(worksheet.worksheet_id);
@@ -987,7 +1048,7 @@ const loadPeriodAKKUnitCalculations = async (
       }
 
       result = calculateAKKScoreFromWorksheetScores(
-        peraturan,
+        effectivePeraturan,
         pbScore,
         calculateCKScoreFromRows(ckRows),
         calculateSPMLScoreFromRows(spmlRows)
@@ -1022,6 +1083,7 @@ class ScoringEngine {
       poolInstance
     );
     if (!unitCalculations) return undefined;
+    const effectivePeraturan = unitCalculations[0].pbScore.peraturan;
 
     const unitScores = unitCalculations.map((unit): AKKUnitScore => ({
       worksheetId: unit.worksheetId,
@@ -1036,8 +1098,8 @@ class ScoringEngine {
 
     return {
       periodId,
-      peraturan,
-      ...calculateAverageAKKScoreFromUnits(peraturan, unitScores),
+      peraturan: effectivePeraturan,
+      ...calculateAverageAKKScoreFromUnits(effectivePeraturan, unitScores),
     };
   }
 
@@ -1053,12 +1115,13 @@ class ScoringEngine {
       poolInstance
     );
     if (!unitCalculations) return undefined;
+    const effectivePeraturan = unitCalculations[0].pbScore.peraturan;
 
     return {
       periodId,
       periodName: unitCalculations[0].periodName,
-      peraturan,
-      ...calculateAKKContributorLHPSFromUnits(peraturan, unitCalculations),
+      peraturan: effectivePeraturan,
+      ...calculateAKKContributorLHPSFromUnits(effectivePeraturan, unitCalculations),
     };
   }
 
@@ -1074,12 +1137,16 @@ class ScoringEngine {
                                    kppn_ref.name AS kppn_name,
                                    kppn_ref.alias AS kppn_alias,
                                    period_ref.id AS period_id,
-                                   period_ref.name AS period_name
+                                   period_ref.name AS period_name,
+                                   snapshot.regulation_id,
+                                   snapshot.formula_version
                             FROM worksheet_ref
                             INNER JOIN kppn_ref
                               ON kppn_ref.id = worksheet_ref.kppn_id
                             INNER JOIN period_ref
                               ON period_ref.id = worksheet_ref.period
+                            INNER JOIN worksheet_reference_snapshot snapshot
+                              ON snapshot.period_id = worksheet_ref.period
                             WHERE worksheet_ref.kppn_id = $1
                               AND worksheet_ref.period = $2
                             LIMIT 1`;
@@ -1092,9 +1159,13 @@ class ScoringEngine {
 
     const worksheet = worksheetResult.rows[0];
     const worksheetId = worksheet.id;
+    const effectivePeraturan = getRegulationFromFormulaVersion(worksheet.formula_version);
+    if (effectivePeraturan !== Number(worksheet.regulation_id)) {
+      throw new ErrorDetail(409, `Period ${periodId} has inconsistent regulation and formula metadata`);
+    }
 
-    if (peraturan === 1) {
-      const pbCalculation = await this.calculatePBScore(worksheetId, peraturan, poolTrx);
+    if (effectivePeraturan === 1) {
+      const pbCalculation = await this.calculatePBScore(worksheetId, effectivePeraturan, poolTrx);
       if (!pbCalculation) {
         throw new ErrorDetail(
           409,
@@ -1109,13 +1180,13 @@ class ScoringEngine {
         periodId,
         periodName: worksheet.period_name,
         worksheetId,
-        result: calculateAKKScoreFromWorksheetScores(peraturan, pbCalculation.result),
+        result: calculateAKKScoreFromWorksheetScores(effectivePeraturan, pbCalculation.result),
         pbScore: pbCalculation.result,
       };
     }
 
     const [pbCalculation, ckCalculation, spmlCalculation] = await Promise.all([
-      this.calculatePBScore(worksheetId, peraturan, poolTrx),
+      this.calculatePBScore(worksheetId, effectivePeraturan, poolTrx),
       this.calculateCKScore(worksheetId, poolTrx),
       this.calculateSPMLScore(worksheetId, poolTrx),
     ]);
@@ -1141,7 +1212,7 @@ class ScoringEngine {
       periodName: worksheet.period_name,
       worksheetId,
       result: calculateAKKScoreFromWorksheetScores(
-        peraturan,
+        effectivePeraturan,
         pbCalculation.result,
         ckCalculation.result,
         spmlCalculation.result
@@ -1224,35 +1295,53 @@ class ScoringEngine {
 
   async calculatePBScore(
     worksheetPBId: string,
-    peraturan: PBRegulation,
+    _requestedPeraturan?: PBRegulation,
     poolTrx?: PoolClient
   ): Promise<PBScoreCalculation | undefined> {
     const poolInstance = poolTrx ?? pool;
-    const query = `SELECT worksheet_ref.kppn_id,
+    const snapshotResult = await poolInstance.query<{
+      regulation_id: number;
+      formula_version: string;
+      reference_data: WorksheetReferenceData;
+    }>(
+      `SELECT snapshot.regulation_id, snapshot.formula_version, snapshot.reference_data
+       FROM worksheet_ref
+       INNER JOIN worksheet_reference_snapshot snapshot ON snapshot.period_id = worksheet_ref.period
+       WHERE worksheet_ref.id = $1`,
+      [worksheetPBId]
+    );
+    const referenceSnapshot = snapshotResult.rows[0];
+    if (!referenceSnapshot) throw new ErrorDetail(409, 'Worksheet reference snapshot not found');
+
+    const query = `SELECT worksheet_junction.worksheet_id,
+                          worksheet_ref.kppn_id,
+                          worksheet_junction.checklist_id,
                           worksheet_junction.kppn_score,
                           worksheet_junction.kanwil_score,
-                          worksheet_junction.excluded,
-                          checklist_ref.komponen_id,
-                          checklist_ref.standardisasi,
-                          komponen_ref.title AS komponen_title,
-                          komponen_ref.bobot AS komponen_bobot
+                          worksheet_junction.excluded
                    FROM worksheet_junction
                    INNER JOIN worksheet_ref
                      ON worksheet_ref.id = worksheet_junction.worksheet_id
-                   INNER JOIN checklist_ref
-                     ON checklist_ref.id = worksheet_junction.checklist_id
-                   INNER JOIN komponen_ref
-                     ON komponen_ref.id = checklist_ref.komponen_id
                    WHERE worksheet_junction.worksheet_id = $1
-                   ORDER BY checklist_ref.komponen_id ASC,
-                            worksheet_junction.junction_id ASC`;
-    const queryResult = await poolInstance.query<PBScoreRow>(query, [worksheetPBId]);
+                   ORDER BY worksheet_junction.junction_id ASC`;
+    const queryResult = await poolInstance.query<Omit<PBJunctionSnapshotRow, 'regulation_id' | 'formula_version' | 'reference_data'>>(query, [worksheetPBId]);
 
     if (queryResult.rows.length === 0) return undefined;
 
+    const savedPeraturan = getRegulationFromFormulaVersion(referenceSnapshot.formula_version);
+    if (_requestedPeraturan !== undefined && _requestedPeraturan !== savedPeraturan) {
+      throw new ErrorDetail(409, `Worksheet uses saved regulation ${savedPeraturan}; requested regulation ${_requestedPeraturan} does not match`);
+    }
+    const rows = applyPBReferenceSnapshot(queryResult.rows.map((row) => ({
+      ...row,
+      regulation_id: Number(referenceSnapshot.regulation_id),
+      formula_version: referenceSnapshot.formula_version,
+      reference_data: referenceSnapshot.reference_data,
+    })));
+
     return {
       kppnId: queryResult.rows[0].kppn_id,
-      result: calculatePBScoreFromRows(queryResult.rows, peraturan),
+      result: calculatePBScoreFromRows(rows, savedPeraturan),
     };
   }
 }

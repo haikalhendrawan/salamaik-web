@@ -373,8 +373,8 @@ class Findings{
          JOIN worksheet_ref w ON w.id = f.worksheet_id
          CROSS JOIN LATERAL (
            SELECT to_jsonb(j) || jsonb_build_object(
-                    'kppn_score', COALESCE(f.follow_up_kppn_score, f.initial_kppn_score, j.kppn_score),
-                    'kanwil_score', COALESCE(f.score_after, f.score_before, j.kanwil_score)
+                    'kppn_score', j.kppn_score,
+                    'kanwil_score', j.kanwil_score
                   ) AS ws_junction, to_jsonb(c) AS checklist,
                   COALESCE(to_jsonb(m2), jsonb_build_object('permasalahan', f.finding_description, 'uic', f.uic_snapshot)) AS matrix,
                   to_jsonb(k) AS komponen,
@@ -388,8 +388,8 @@ class Findings{
             WHERE f.worksheet_type = 'PB' AND j.junction_id = f.ws_junction_id
            UNION ALL
            SELECT to_jsonb(j) || jsonb_build_object(
-                    'kppn_score', COALESCE(f.follow_up_kppn_score, f.initial_kppn_score, j.kppn_score),
-                    'kanwil_score', COALESCE(f.score_after, f.score_before, j.kanwil_score)
+                    'kppn_score', j.kppn_score,
+                    'kanwil_score', j.kanwil_score
                   ), to_jsonb(c) || jsonb_build_object(
                     'title', COALESCE(to_jsonb(c)->>'materi', 'Checklist CK'),
                     'header', COALESCE(to_jsonb(c)->>'kriteria_penilaian', '')
@@ -404,8 +404,8 @@ class Findings{
             WHERE f.worksheet_type = 'CK' AND j.junction_id = f.ws_ck_junction_id
            UNION ALL
            SELECT to_jsonb(j) || jsonb_build_object(
-                    'kppn_score', COALESCE(f.follow_up_kppn_score, f.initial_kppn_score, j.kppn_score),
-                    'kanwil_score', COALESCE(f.score_after, f.score_before, j.kanwil_score)
+                    'kppn_score', j.kppn_score,
+                    'kanwil_score', j.kanwil_score
                   ), to_jsonb(c),
                   COALESCE(to_jsonb(m2), jsonb_build_object('permasalahan', f.finding_description, 'uic', f.uic_snapshot)),
                   to_jsonb(k), COALESCE(to_jsonb(s), jsonb_build_object('title', '')),
@@ -426,14 +426,63 @@ class Findings{
   }
 
   async updateRegulation2FollowUpScore(id: number, score: number | null, side: 'KPPN' | 'KANWIL', userName: string) {
-    const column = side === 'KPPN' ? 'follow_up_kppn_score' : 'score_after';
-    const { rows } = await pool.query(
-      `UPDATE findings_data SET ${column} = $1, updated_by = $2, last_update = NOW()
-        WHERE id = $3 AND matrix_id IS NULL AND worksheet_type IN ('PB', 'CK', 'SPML')
-        RETURNING *`,
-      [score, userName, id]
-    );
-    return rows[0];
+    const client = await pool.connect();
+    const findingScoreColumn = side === 'KPPN' ? 'follow_up_kppn_score' : 'score_after';
+    const junctionScoreColumn = side === 'KPPN' ? 'kppn_score' : 'kanwil_score';
+
+    try {
+      await client.query('BEGIN');
+      const { rows: findingRows } = await client.query(
+        `SELECT id, worksheet_id, worksheet_type, ws_junction_id,
+                ws_ck_junction_id, ws_spml_junction_id
+           FROM findings_data
+          WHERE id = $1 AND matrix_id IS NULL
+          FOR UPDATE`,
+        [id]
+      );
+      const finding = findingRows[0];
+      if (!finding || !['PB', 'CK', 'SPML'].includes(finding.worksheet_type)) {
+        await client.query('ROLLBACK');
+        return undefined;
+      }
+
+      const junctionConfig = {
+        PB: { table: 'worksheet_junction', id: finding.ws_junction_id },
+        CK: { table: 'worksheet_ck_junction', id: finding.ws_ck_junction_id },
+        SPML: { table: 'worksheet_spml_junction', id: finding.ws_spml_junction_id },
+      }[finding.worksheet_type as 'PB' | 'CK' | 'SPML'];
+      if (!junctionConfig.id) {
+        await client.query('ROLLBACK');
+        return undefined;
+      }
+
+      const { rows: junctionRows } = await client.query(
+        `UPDATE ${junctionConfig.table}
+            SET ${junctionScoreColumn} = $1, updated_by = $2, last_update = NOW()
+          WHERE worksheet_id = $3 AND junction_id = $4
+          RETURNING junction_id, worksheet_id, kppn_score, kanwil_score, excluded`,
+        [score, userName, finding.worksheet_id, junctionConfig.id]
+      );
+      if (junctionRows.length === 0) {
+        await client.query('ROLLBACK');
+        return undefined;
+      }
+
+      const { rows } = await client.query(
+        `UPDATE findings_data
+            SET ${findingScoreColumn} = $1, updated_by = $2, last_update = NOW()
+          WHERE id = $3
+          RETURNING *`,
+        [score, userName, id]
+      );
+      await client.query('COMMIT');
+      return { ...rows[0], junction: junctionRows[0] };
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
   }
 
   async isRegulation2ScoreAllowed(finding: FindingsType, score: number | null): Promise<boolean> {

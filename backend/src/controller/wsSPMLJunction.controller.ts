@@ -16,6 +16,7 @@ import wsSPMLJunction, {
 } from "../model/wsSPMLJunction.model";
 import { createSPMLChangedEvent, getSPMLWorksheetRoom } from "../utils/wsSPMLSocket.utils";
 import { assertWorksheetMutationAllowed, createWorksheetReadState } from "../utils/worksheetPhase.utils";
+import worksheetReferenceSnapshot, { hydrateSPMLRowsFromSnapshot } from "../model/worksheetReferenceSnapshot.model";
 //-----------------------------------------------------------------------------------------------------------------
 const getWsSPMLJunctionByWorksheetForKPPN = async (
   req: Request,
@@ -31,12 +32,15 @@ const getWsSPMLJunctionByWorksheetForKPPN = async (
       throw new ErrorDetail(404, "Worksheet not found");
     }
 
-    const result: WsSPMLJunctionJoinChecklistSPMLType[] =
+    const liveRows: WsSPMLJunctionJoinChecklistSPMLType[] =
       await wsSPMLJunction.getWsSPMLJunctionByWorksheetId(worksheetId);
 
-    if (result.length === 0) {
+    if (liveRows.length === 0) {
       throw new ErrorDetail(404, "SPML worksheet not assigned");
     }
+    const snapshot = await worksheetReferenceSnapshot.getByWorksheetId(worksheetId);
+    if (!snapshot) throw new ErrorDetail(409, 'Worksheet reference snapshot not found');
+    const result = hydrateSPMLRowsFromSnapshot(liveRows, snapshot) as WsSPMLJunctionJoinChecklistSPMLType[];
     const state = createWorksheetReadState(result, worksheetData[0], Number(req.payload.peraturan), req.payload.role);
 
     return res.status(200).json({
@@ -69,12 +73,15 @@ const getWsSPMLJunctionByWorksheetForKanwil = async (
       throw new ErrorDetail(404, "Worksheet not found");
     }
 
-    const result: WsSPMLJunctionJoinChecklistSPMLType[] =
+    const liveRows: WsSPMLJunctionJoinChecklistSPMLType[] =
       await wsSPMLJunction.getWsSPMLJunctionByWorksheetId(worksheetId);
 
-    if (result.length === 0) {
+    if (liveRows.length === 0) {
       throw new ErrorDetail(404, "SPML worksheet not assigned");
     }
+    const snapshot = await worksheetReferenceSnapshot.getByWorksheetId(worksheetId);
+    if (!snapshot) throw new ErrorDetail(409, 'Worksheet reference snapshot not found');
+    const result = hydrateSPMLRowsFromSnapshot(liveRows, snapshot) as WsSPMLJunctionJoinChecklistSPMLType[];
     const state = createWorksheetReadState(result, worksheetData[0], Number(req.payload.peraturan), req.payload.role);
 
     return res.status(200).json({

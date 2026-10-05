@@ -5,11 +5,12 @@
 
 import {Request, Response, NextFunction} from 'express';
 import worksheet, { WorksheetType } from '../model/worksheet.model';
-import checklist, { ChecklistType } from '../model/checklist.model';
-import { checklistSpml, komponenSpml } from '../model/spmlRef.model';
+import { ChecklistType } from '../model/checklist.model';
+import { checklistSpml } from '../model/spmlRef.model';
 import wsJunction from '../model/worksheetJunction.model';
 import wsSPMLJunction from '../model/wsSPMLJunction.model';
 import wsCKJunction from '../model/wsCKJunction.model';
+import worksheetReferenceSnapshot from '../model/worksheetReferenceSnapshot.model';
 import pool from '../config/db';
 import dayjs from 'dayjs';
 import ErrorDetail from '../model/error.model';
@@ -78,21 +79,43 @@ const assignWorksheet = async(req: Request, res: Response, next: NextFunction) =
   const client = await pool.connect();
   const {peraturan} = req.payload;
   try {
+    if (peraturan !== 1 && peraturan !== 2) throw new ErrorDetail(400, 'Peraturan must be 1 or 2');
     let result: any = [];
     let mapChecklist: any = [];
 
     await client.query('BEGIN');
 
+    const { worksheetId } = req.body;
+    if (!worksheetId) throw new ErrorDetail(400, 'Worksheet id is required');
+    const worksheetRows = await worksheet.getById(worksheetId);
+    if (!worksheetRows[0]) throw new ErrorDetail(404, 'Worksheet not found');
+    const referenceSnapshot = await worksheetReferenceSnapshot.createForAssignment(
+      client,
+      Number(worksheetRows[0].period),
+      peraturan,
+      req.payload.id || null
+    );
+
     if(peraturan === 1){ // PER 1 2023
-      const assignPB = await assignWorksheetPB(client, peraturan, req.body);
+      const assignPB = await assignWorksheetPB(client, peraturan, req.body, referenceSnapshot.reference_data.pb.checklist as unknown as ChecklistType[]);
       result = assignPB.result;
       mapChecklist = assignPB.mapChecklist;
     }else{
-      const assignPB = await assignWorksheetPB(client, peraturan, req.body);
+      const assignPB = await assignWorksheetPB(client, peraturan, req.body, referenceSnapshot.reference_data.pb.checklist as unknown as ChecklistType[]);
       result = assignPB.result;
       mapChecklist = assignPB.mapChecklist;
-      await assignWorksheetSPML(client, peraturan, req.body);
-      await assignWorksheetCK(client, peraturan, req.body);
+      await assignWorksheetSPML(
+        client,
+        peraturan,
+        req.body,
+        (referenceSnapshot.reference_data.spml?.checklist || []) as unknown as Awaited<ReturnType<typeof checklistSpml.getAllChecklistSpml>>
+      );
+      await assignWorksheetCK(
+        client,
+        peraturan,
+        req.body,
+        (referenceSnapshot.reference_data.ck?.checklist || []).map((item) => Number(item.id))
+      );
     }
 
     await client.query('COMMIT');
@@ -136,6 +159,7 @@ const deleteWorksheet = async(req: Request, res: Response, next: NextFunction) =
 export {
   getAllWorksheet,
   getWorksheetByPeriodAndKPPN,
+  getWorksheetReferenceSnapshot,
   addWorksheet,
   assignWorksheet,
   editWorksheetPeriod,
@@ -168,10 +192,10 @@ function validateDates (startDateStr: string, closeDateStr: string, openFollowUp
   return { success: true };
 };
 
-async function assignWorksheetPB (client: PoolClient, peraturan: number, body: any) {
+async function assignWorksheetPB (client: PoolClient, peraturan: number, body: any, snapshotChecklist: ChecklistType[]) {
   try {
     const { worksheetId, kppnId, period } = body;
-    const allChecklist: ChecklistType[]  = await checklist.getAllChecklist(peraturan, client);
+    const allChecklist: ChecklistType[]  = snapshotChecklist;
 
     const mapChecklist = await Promise.all (allChecklist.map(async(item) => {
         const isExcluded = item.standardisasi;
@@ -189,10 +213,14 @@ async function assignWorksheetPB (client: PoolClient, peraturan: number, body: a
   }
 };
 
-async function assignWorksheetSPML (client: PoolClient, peraturan: number, body: any) {
+async function assignWorksheetSPML (
+  client: PoolClient,
+  peraturan: number,
+  body: any,
+  allChecklistSpml: Awaited<ReturnType<typeof checklistSpml.getAllChecklistSpml>>
+) {
   try {
     const { worksheetId, kppnId, period } = body;
-    const allChecklistSpml  = await checklistSpml.getAllChecklistSpml();
 
     const mapChecklist = await Promise.all (allChecklistSpml.map(async(item) => {
       await wsSPMLJunction.addWsSPMLJunction(worksheetId, item.id, kppnId, 0, client);
@@ -209,11 +237,36 @@ async function assignWorksheetSPML (client: PoolClient, peraturan: number, body:
   }
 };
 
-async function assignWorksheetCK(client: PoolClient, peraturan: number, body: any) {
+async function assignWorksheetCK(client: PoolClient, peraturan: number, body: any, checklistIds: number[]) {
   try {
     const { worksheetId } = body;
-    return await wsCKJunction.assignWorksheet(worksheetId, peraturan, client);
+    return await wsCKJunction.assignWorksheet(worksheetId, checklistIds, client);
   } catch (err) {
     throw err;
   }
 }
+
+const getWorksheetReferenceSnapshot = async(req: Request, res: Response, next: NextFunction) => {
+  try {
+    const worksheetId = req.params.worksheetId?.trim();
+    if (!worksheetId) throw new ErrorDetail(400, 'Worksheet id is required');
+    const worksheetRows = await worksheet.getById(worksheetId);
+    const worksheetData = worksheetRows[0];
+    if (!worksheetData) throw new ErrorDetail(404, 'Worksheet not found');
+
+    const role = Number(req.payload.role);
+    const isPrivileged = [99, 4].includes(role);
+    if (!isPrivileged && Number(worksheetData.period) !== Number(req.payload.period)) {
+      throw new ErrorDetail(403, 'Not authorized to access this worksheet snapshot');
+    }
+    if ([1, 2].includes(role) && worksheetData.kppn_id !== req.payload.kppn) {
+      throw new ErrorDetail(403, 'Not authorized to access this worksheet snapshot');
+    }
+
+    const snapshot = await worksheetReferenceSnapshot.getByWorksheetId(worksheetId);
+    if (!snapshot) throw new ErrorDetail(404, 'Worksheet reference snapshot not found');
+    return res.status(200).json({ success: true, message: 'Worksheet reference snapshot retrieved', rows: snapshot });
+  } catch (error) {
+    next(error);
+  }
+};

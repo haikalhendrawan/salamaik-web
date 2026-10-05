@@ -7,6 +7,8 @@ import {Request, Response, NextFunction} from 'express';
 import multer from 'multer';
 import io from '../config/io';
 import wsJunction, {WorksheetJunctionType, WsJunctionJoinChecklistType} from '../model/worksheetJunction.model';
+import worksheetReferenceSnapshot, { hydratePBRowsFromSnapshot } from '../model/worksheetReferenceSnapshot.model';
+import scoringEngine from '../model/scoringEngine.model';
 import worksheet, { WorksheetType } from '../model/worksheet.model';
 import { komponen } from '../model/komponen.model';
 import ErrorDetail from '../model/error.model';
@@ -48,7 +50,10 @@ const getWsJunctionByWorksheetForKPPN = async(req: Request, res: Response, next:
       throw new ErrorDetail(404, 'Worksheet not found');
     };
 
-    const result: WsJunctionJoinChecklistType[] = await wsJunction.getWsJunctionByWorksheetId(worksheetId);
+    const liveRows: WsJunctionJoinChecklistType[] = await wsJunction.getWsJunctionByWorksheetId(worksheetId);
+    const snapshot = await worksheetReferenceSnapshot.getByWorksheetId(worksheetId);
+    if (!snapshot) throw new ErrorDetail(409, 'Worksheet reference snapshot not found');
+    const result = hydratePBRowsFromSnapshot(liveRows, snapshot) as WsJunctionJoinChecklistType[];
     const state = createWorksheetReadState(result, worksheetData[0], Number(req.payload.peraturan), req.payload.role);
     return res.status(200).json({sucess: true, message: 'Get worksheet junction success', ...state})
   }catch(err){
@@ -68,7 +73,10 @@ const getWsJunctionByWorksheetForKanwil = async(req: Request, res: Response, nex
       throw new ErrorDetail(404, 'Worksheet not found');
     };
 
-    const result: WsJunctionJoinChecklistType[] = await wsJunction.getWsJunctionByWorksheetId(worksheetId);
+    const liveRows: WsJunctionJoinChecklistType[] = await wsJunction.getWsJunctionByWorksheetId(worksheetId);
+    const snapshot = await worksheetReferenceSnapshot.getByWorksheetId(worksheetId);
+    if (!snapshot) throw new ErrorDetail(409, 'Worksheet reference snapshot not found');
+    const result = hydratePBRowsFromSnapshot(liveRows, snapshot) as WsJunctionJoinChecklistType[];
 
     if(!result || result.length===0) {
       throw new ErrorDetail(404, 'Worksheet not assigned');
@@ -115,7 +123,10 @@ const getByPeriodAndKPPN = async(req: Request, res: Response, next: NextFunction
       throw new ErrorDetail(404, 'Worksheet not found');
     };
 
-    const result: WsJunctionJoinChecklistType[] = await wsJunction.getWsJunctionByWorksheetId(worksheetId);
+    const liveRows: WsJunctionJoinChecklistType[] = await wsJunction.getWsJunctionByWorksheetId(worksheetId);
+    const snapshot = await worksheetReferenceSnapshot.getByWorksheetId(worksheetId);
+    if (!snapshot) throw new ErrorDetail(409, 'Worksheet reference snapshot not found');
+    const result = hydratePBRowsFromSnapshot(liveRows, snapshot) as WsJunctionJoinChecklistType[];
 
     if(!result || result.length===0) {
       throw new ErrorDetail(404, 'Worksheet not assigned');
@@ -444,8 +455,12 @@ export async function getScoreProgressResponseBody(mainWorksheet: WorksheetType[
       }
     };
 
-    const komponenAll = await komponen.getAllKomponenWithSubKomponen(peraturan);
-    const wsJunctionDetail = await wsJunction.getWsJunctionWithKomponenDetail(worksheetId || '');
+    const [referenceSnapshot, wsJunctionDetail, pbScore] = await Promise.all([
+      worksheetReferenceSnapshot.getByWorksheetId(worksheetId),
+      wsJunction.getWsJunctionWithKomponenDetail(worksheetId),
+      scoringEngine.calculatePBScore(worksheetId),
+    ]);
+    if (!referenceSnapshot) throw new ErrorDetail(409, 'Worksheet reference snapshot not found');
 
     if(!wsJunctionDetail || wsJunctionDetail.length===0) {
       return {
@@ -464,15 +479,28 @@ export async function getScoreProgressResponseBody(mainWorksheet: WorksheetType[
     const closeFollowUp = new Date(mainWorksheet?.[0]?.close_follow_up).getTime();
     const isPastDue = today > closeFollowUp;
 
+    const componentDetails = (side: 'detailKanwil' | 'detailKPPN') => pbScore?.result[side].detailKomponen.map((detail) => ({
+      komponenId: detail.komponenId,
+      komponenTitle: detail.komponenTitle,
+      komponenBobot: detail.komponenBobot,
+      totalNilai: detail.totalSkorKonversi,
+      bilanganPembagi: detail.jumlahChecklistPembagi,
+      avgPerKomponen: detail.nilaiRataRata,
+      weightedScore: detail.nilaiTerbobot,
+      wsJunction: [],
+    })) || [];
+
     return {
-      scoreByKanwil : getScoreForMatrix(komponenAll, wsJunctionDetail, true)?.reduce((a, c) => a+c.weightedScore, 0) || 0,
-      scoreByKPPN: getScoreForMatrix(komponenAll, wsJunctionDetail, false)?.reduce((a, c) => a+c.weightedScore, 0) || 0,
+      scoreByKanwil: pbScore?.result.nilaiKanwil || 0,
+      scoreByKPPN: pbScore?.result.nilaiKPPN || 0,
       isFinal: isPastDue,
       totalChecklist: wsJunctionDetail?.filter((item) => item?.excluded !== 1).length,
       totalProgressKanwil: wsJunctionDetail?.filter((item) => (item?.kanwil_score !== null) && (item?.excluded !== 1)).length,
       totalProgressKPPN: wsJunctionDetail?.filter((item) => (item?.kppn_score !== null) && (item?.excluded !== 1)).length,
-      scorePerKomponen: scoreOnly ? null : getScoreForMatrix(komponenAll, wsJunctionDetail, true),
-      scorePerKomponenKPPN: scoreOnly ? null : getScoreForMatrix(komponenAll, wsJunctionDetail, false)
+      scorePerKomponen: scoreOnly ? null : componentDetails('detailKanwil'),
+      scorePerKomponenKPPN: scoreOnly ? null : componentDetails('detailKPPN'),
+      regulation: referenceSnapshot.regulation_id,
+      formulaVersion: referenceSnapshot.formula_version,
     };
   }catch(err){
     throw err
@@ -499,8 +527,12 @@ export async function getScoreProgressResponseBodyAllKPPN(mainWorksheet: Workshe
       }
     };
 
-    const komponenAll = await komponen.getAllKomponenWithSubKomponen(peraturan);
-    const wsJunctionDetail = await wsJunction.getWsJunctionWithKomponenDetail(worksheetId);
+    const [referenceSnapshot, wsJunctionDetail, pbScore] = await Promise.all([
+      worksheetReferenceSnapshot.getByWorksheetId(worksheetId),
+      wsJunction.getWsJunctionWithKomponenDetail(worksheetId),
+      scoringEngine.calculatePBScore(worksheetId),
+    ]);
+    if (!referenceSnapshot) throw new ErrorDetail(409, 'Worksheet reference snapshot not found');
 
     if(!wsJunctionDetail || wsJunctionDetail.length===0) {
       return {
@@ -525,14 +557,24 @@ export async function getScoreProgressResponseBodyAllKPPN(mainWorksheet: Workshe
     return {
       ...kppn,
       scoreProgressDetail:{
-        scoreByKanwil : getScoreForMatrix(komponenAll, wsJunctionDetail, true)?.reduce((a, c) => a+c.weightedScore, 0) || 0,
-        scoreByKPPN: getScoreForMatrix(komponenAll, wsJunctionDetail, false)?.reduce((a, c) => a+c.weightedScore, 0) || 0,
+        scoreByKanwil: pbScore?.result.nilaiKanwil || 0,
+        scoreByKPPN: pbScore?.result.nilaiKPPN || 0,
         isFinal: isPastDue,
         totalChecklist: wsJunctionDetail?.filter((item) => item?.excluded !== 1).length,
         totalProgressKanwil: wsJunctionDetail?.filter((item) => (item?.kanwil_score !== null) && (item?.excluded !== 1)).length,
         totalProgressKPPN: wsJunctionDetail?.filter((item) => (item?.kppn_score !== null) && (item?.excluded !== 1)).length,
-        scorePerKomponen: scoreOnly ? null : getScoreForMatrix(komponenAll, wsJunctionDetail, true),
-        scorePerKomponenKPPN: scoreOnly ? null : getScoreForMatrix(komponenAll, wsJunctionDetail, false)
+        scorePerKomponen: scoreOnly ? null : pbScore?.result.detailKanwil.detailKomponen.map((item) => ({
+          komponenId: item.komponenId, komponenTitle: item.komponenTitle, komponenBobot: item.komponenBobot,
+          totalNilai: item.totalSkorKonversi, bilanganPembagi: item.jumlahChecklistPembagi,
+          avgPerKomponen: item.nilaiRataRata, weightedScore: item.nilaiTerbobot, wsJunction: [],
+        })),
+        scorePerKomponenKPPN: scoreOnly ? null : pbScore?.result.detailKPPN.detailKomponen.map((item) => ({
+          komponenId: item.komponenId, komponenTitle: item.komponenTitle, komponenBobot: item.komponenBobot,
+          totalNilai: item.totalSkorKonversi, bilanganPembagi: item.jumlahChecklistPembagi,
+          avgPerKomponen: item.nilaiRataRata, weightedScore: item.nilaiTerbobot, wsJunction: [],
+        })),
+        regulation: referenceSnapshot.regulation_id,
+        formulaVersion: referenceSnapshot.formula_version,
       }
     };
   }catch(err){

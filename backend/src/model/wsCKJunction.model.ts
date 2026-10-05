@@ -144,22 +144,17 @@ class WsCKJunction {
 
   async assignWorksheet(
     worksheetId: string,
-    peraturan: number,
+    checklistIds: number[],
     poolTrx: PoolClient
   ): Promise<WsCKJunctionType[]> {
+    if (checklistIds.length === 0) return [];
     const result = await poolTrx.query<WsCKJunctionType>(
       `INSERT INTO worksheet_ck_junction (worksheet_id, checklist_ck_id)
-       SELECT $1, checklist.id
-         FROM checklist_ck_ref AS checklist
-         INNER JOIN komponen_ck_ref AS komponen
-           ON komponen.id = checklist.komponen_ck_id
-          AND komponen.deleted IS NULL
-        WHERE komponen.peraturan = $2
-          AND checklist.deleted IS NULL
-        ORDER BY komponen.id ASC, checklist.urut ASC, checklist.id ASC
+       SELECT $1, checklist_id
+         FROM unnest($2::integer[]) AS checklist_id
        ON CONFLICT (worksheet_id, checklist_ck_id) DO NOTHING
        RETURNING *`,
-      [worksheetId, peraturan]
+      [worksheetId, checklistIds]
     );
     return result.rows;
   }

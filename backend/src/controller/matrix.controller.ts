@@ -12,6 +12,7 @@ import findings from "../model/findings.model";
 import ErrorDetail from "../model/error.model";
 import logger from "../config/logger";
 import { getWorksheetPhase } from "../utils/worksheetPhase.utils";
+import worksheetReferenceSnapshot, { hydratePBMatrixRowsFromSnapshot, hydratePBRowsFromSnapshot } from "../model/worksheetReferenceSnapshot.model";
 // ------------------------------------------------------------------------
 const getMatrixByWorksheetId = async(req: Request, res: Response, next: NextFunction) => {
   try{
@@ -43,7 +44,12 @@ const getMatrixWithWsDetailById = async(req: Request, res: Response, next: NextF
     };
 
     const mainWorksheet = result[0];
-    const result2 = await matrix.getMatrixWithWsJunction(mainWorksheet.id); 
+    const [matrixRows, referenceSnapshot] = await Promise.all([
+      matrix.getMatrixWithWsJunction(mainWorksheet.id),
+      worksheetReferenceSnapshot.getByWorksheetId(mainWorksheet.id),
+    ]);
+    if (!referenceSnapshot) throw new ErrorDetail(409, 'Worksheet reference snapshot not found');
+    const result2 = hydratePBMatrixRowsFromSnapshot(matrixRows, referenceSnapshot);
 
     return res.status(200).json({sucess: true, message: 'Get matrix success', rows: {matrix: result2, worksheet: mainWorksheet}})
   }catch(err){
@@ -115,13 +121,19 @@ const createMatrix = async(req: Request, res: Response, next: NextFunction) => {
     }
 
     // query #2 dapatkan list wsjunction
-    const worksheetData = await wsJunction.getWsJunctionByWorksheetId(worksheetId);
+    const [junctionRows, referenceSnapshot] = await Promise.all([
+      wsJunction.getWsJunctionByWorksheetId(worksheetId),
+      worksheetReferenceSnapshot.getByWorksheetId(worksheetId),
+    ]);
+    if (!referenceSnapshot) throw new ErrorDetail(409, 'Worksheet reference snapshot not found');
+    const worksheetData: any[] = hydratePBRowsFromSnapshot(junctionRows, referenceSnapshot) as any[];
 
     const matrixBody = worksheetData.map((item) => {
-      const minimalScoreItem = item.opsi?.reduce((min, op) => {
+      const options: any[] = item.opsi || [];
+      const minimalScoreItem = options.reduce((min: any, op: any) => {
         return op?.value < min?.value ? op : min;
-      }, item.opsi[0]);
-      const equalScoreItem = item?.opsi?.filter((op) => op?.value === item?.kanwil_score)?.[0] || null;
+      }, options[0]);
+      const equalScoreItem = options.filter((op: any) => op?.value === item?.kanwil_score)?.[0] || null;
       
       const positiveFallback = equalScoreItem?.positive_fallback || item?.title || '';
       const negativeFallback = equalScoreItem?.negative_fallback || minimalScoreItem?.negative_fallback || '';

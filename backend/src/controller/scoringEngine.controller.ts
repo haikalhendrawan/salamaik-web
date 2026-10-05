@@ -210,20 +210,22 @@ const getCKScore = async (req: Request, res: Response, next: NextFunction) => {
 
 const getPBScore = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const worksheetPBId = req.params.worksheetPBId?.trim();
-    const peraturan = Number(req.query.peraturan);
+      const worksheetPBId = req.params.worksheetPBId?.trim();
+      const requestedPeraturan = req.query.peraturan === undefined
+        ? undefined
+        : Number(req.query.peraturan);
 
     if (!worksheetPBId) {
       throw new ErrorDetail(400, "worksheetPBId is required");
     }
-    if (peraturan !== 1 && peraturan !== 2) {
-      throw new ErrorDetail(400, "peraturan must be 1 or 2");
-    }
+      if (requestedPeraturan !== undefined && requestedPeraturan !== 1 && requestedPeraturan !== 2) {
+        throw new ErrorDetail(400, "peraturan must be 1 or 2 when provided");
+      }
 
-    const calculation = await scoringEngine.calculatePBScore(
-      worksheetPBId,
-      peraturan as PBRegulation
-    );
+      const calculation = await scoringEngine.calculatePBScore(
+        worksheetPBId,
+        requestedPeraturan as PBRegulation | undefined
+      );
     if (!calculation) {
       throw new ErrorDetail(404, "PB worksheet not found");
     }

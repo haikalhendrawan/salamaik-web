@@ -18,6 +18,7 @@ import {
   getCKWorksheetRoom,
 } from '../utils/wsCKSocket.utils';
 import { assertWorksheetMutationAllowed, createWorksheetReadState } from '../utils/worksheetPhase.utils';
+import worksheetReferenceSnapshot, { hydrateCKRowsFromSnapshot } from '../model/worksheetReferenceSnapshot.model';
 
 const getWsCKJunctionByWorksheetForKPPN = async (
   req: Request,
@@ -31,8 +32,11 @@ const getWsCKJunctionByWorksheetForKPPN = async (
 
     if (!worksheetId) throw new ErrorDetail(404, 'Worksheet not found');
 
-    const result = await wsCKJunction.getByWorksheetId(worksheetId);
-    if (result.length === 0) throw new ErrorDetail(404, 'CK worksheet not assigned');
+    const liveRows = await wsCKJunction.getByWorksheetId(worksheetId);
+    if (liveRows.length === 0) throw new ErrorDetail(404, 'CK worksheet not assigned');
+    const snapshot = await worksheetReferenceSnapshot.getByWorksheetId(worksheetId);
+    if (!snapshot) throw new ErrorDetail(409, 'Worksheet reference snapshot not found');
+    const result = hydrateCKRowsFromSnapshot(liveRows, snapshot) as typeof liveRows;
 
     const state = createWorksheetReadState(result, worksheetData[0], Number(req.payload.peraturan), req.payload.role);
     return res.status(200).json({
@@ -61,8 +65,11 @@ const getWsCKJunctionByWorksheetForKanwil = async (
 
     if (!worksheetId) throw new ErrorDetail(404, 'Worksheet not found');
 
-    const result = await wsCKJunction.getByWorksheetId(worksheetId);
-    if (result.length === 0) throw new ErrorDetail(404, 'CK worksheet not assigned');
+    const liveRows = await wsCKJunction.getByWorksheetId(worksheetId);
+    if (liveRows.length === 0) throw new ErrorDetail(404, 'CK worksheet not assigned');
+    const snapshot = await worksheetReferenceSnapshot.getByWorksheetId(worksheetId);
+    if (!snapshot) throw new ErrorDetail(409, 'Worksheet reference snapshot not found');
+    const result = hydrateCKRowsFromSnapshot(liveRows, snapshot) as typeof liveRows;
 
     const state = createWorksheetReadState(result, worksheetData[0], Number(req.payload.peraturan), req.payload.role);
     return res.status(200).json({
