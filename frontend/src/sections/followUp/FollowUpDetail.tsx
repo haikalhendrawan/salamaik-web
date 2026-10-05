@@ -126,7 +126,7 @@ export default function FollowUpDetail() {
               
             </Grid>
 
-            <PreviewFileModal getData={getFindings} isDisabled={isDisabled}/>
+            <PreviewFileModal getData={getFindings} isDisabled={isDisabled} findingId={selectedFindings?.id}/>
 
           </Container>
         </DialogProvider>

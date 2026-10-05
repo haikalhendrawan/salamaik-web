@@ -18,6 +18,7 @@ import useSocket from '../../../hooks/useSocket';
 import useSnackbar from '../../../hooks/display/useSnackbar';
 import useWsCKJunction from '../useWsCKJunction';
 import { WsCKJunctionType } from '../types';
+import useAxiosJWT from '../../../hooks/useAxiosJWT';
 
 const popoverStyle = {
   p: 2,
@@ -42,6 +43,7 @@ interface LinkFilePopoverCKProps {
   onClose: () => void;
   checklist: WsCKJunctionType;
   disabled: boolean;
+  followUpFindingId?: number;
 }
 
 export default function LinkFilePopoverCK({
@@ -49,11 +51,13 @@ export default function LinkFilePopoverCK({
   onClose,
   checklist,
   disabled,
+  followUpFindingId,
 }: LinkFilePopoverCKProps) {
   const theme = useTheme();
   const { socket } = useSocket();
   const { openSnackbar } = useSnackbar();
   const { getWsCKJunction, isJunctionSyncing } = useWsCKJunction();
+  const axiosJWT = useAxiosJWT();
   const [value, setValue] = useState(checklist.link_file || '');
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -65,7 +69,26 @@ export default function LinkFilePopoverCK({
     setEditing(false);
   }, [checklist.link_file, anchorEl]);
 
-  const save = (nextValue: string) => {
+  const save = async (nextValue: string) => {
+    if (followUpFindingId !== undefined) {
+      if (disabled || nextValue.length > 2048) {
+        if (nextValue.length > 2048) openSnackbar('Link maksimal 2048 karakter', 'error');
+        return;
+      }
+      setSaving(true);
+      try {
+        await axiosJWT.post('/updateFindingSourceLink', { id: followUpFindingId, link: nextValue || null });
+        setValue(nextValue);
+        setEditing(false);
+        openSnackbar(nextValue ? 'Link berhasil disimpan' : 'Link berhasil dihapus', 'success');
+        onClose();
+      } catch (error: any) {
+        openSnackbar(error?.response?.data?.message || 'Gagal menyimpan link CK', 'error');
+      } finally {
+        setSaving(false);
+      }
+      return;
+    }
     if (disabled || !socket?.connected) {
       if (!socket?.connected) openSnackbar('WebSocket tidak terhubung', 'error');
       return;

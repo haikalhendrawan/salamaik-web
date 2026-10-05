@@ -25,7 +25,7 @@ interface WsSPMLJunctionContextType {
   setWsSPMLJunction: React.Dispatch<React.SetStateAction<WsSPMLJunctionType[]>>;
   getWsSPMLJunctionKanwil: (kppnId: string, options?: WsSPMLRefreshOptions) => Promise<void>;
   getWsSPMLJunctionKPPN: (options?: WsSPMLRefreshOptions) => Promise<void>;
-  getWorksheet: (kppnId: string, options?: WsSPMLWorksheetRequestOptions) => Promise<void>;
+  getWorksheet: (kppnId: string, options?: WsSPMLWorksheetRequestOptions) => Promise<WorksheetType | null>;
   getSPMLScore: (worksheetSPMLId: string) => Promise<void>;
   resetSPMLScore: () => void;
   setLastLiveChange: React.Dispatch<React.SetStateAction<SPMLWorksheetChangedEvent | null>>;
@@ -46,7 +46,7 @@ const WsSPMLJunctionContext = createContext<WsSPMLJunctionContextType>({
   setWsSPMLJunction: () => {},
   getWsSPMLJunctionKanwil: async () => {},
   getWsSPMLJunctionKPPN: async () => {},
-  getWorksheet: async () => {},
+  getWorksheet: async () => null,
   getSPMLScore: async () => {},
   resetSPMLScore: () => {},
   setLastLiveChange: () => {},
@@ -232,15 +232,17 @@ const WsSPMLJunctionProvider = ({ children }: WsSPMLJunctionProviderProps) => {
   async function getWorksheet(
     kppnId: string,
     options: WsSPMLWorksheetRequestOptions = {}
-  ) {
+  ): Promise<WorksheetType | null> {
     const { showOverlay = true } = options;
     if (showOverlay) setIsLoading(true);
     try {
       const response = await axiosJWT.get(`/getWorksheetByPeriodAndKPPN/${kppnId}`);
       setWsDetail(response.data.rows);
+      return response.data.rows;
     } catch (err: unknown) {
       setWsDetail(null);
       showRequestError(err);
+      return null;
     } finally {
       if (showOverlay) setIsLoading(false);
     }

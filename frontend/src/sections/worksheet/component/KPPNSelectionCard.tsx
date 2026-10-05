@@ -12,7 +12,6 @@ import useExcelWorksheet2 from '../../excel/useExcelWorksheet2';
 import {Card, Box, CardHeader, Grow, Button,  Grid,  Skeleton, Stack, Typography, Tooltip, IconButton} from '@mui/material';
 import Iconify from '../../../components/iconify';
 import useDictionary from '../../../hooks/useDictionary';
-import { useAuth } from '../../../hooks/useAuth';
 // -----------------------------------------------------------------------
 interface KPPNSelectionCardProps{
   header: string;
@@ -29,9 +28,7 @@ export default function KPPNSelectionCard({header, image, link, percentKanwil, p
 
   const axiosJWT = useAxiosJWT();
 
-  const {komponenRef, subKomponenRef, subSubKomponenRef} = useDictionary();
-
-  const {auth} = useAuth();
+  const {loadWorksheetReferenceSnapshot} = useDictionary();
 
   const handleImageLoad = () => {
     setImageLoaded(true);
@@ -53,24 +50,26 @@ export default function KPPNSelectionCard({header, image, link, percentKanwil, p
       );
       const rows = response.data.rows;
       const worksheetId = rows?.[0]?.worksheet_id;
-      const peraturan = auth?.peraturan;
 
       if (!worksheetId) throw new Error('Worksheet PB tidak ditemukan');
-      if (peraturan !== 1 && peraturan !== 2) throw new Error('Referensi peraturan tidak valid');
+      const snapshot = await loadWorksheetReferenceSnapshot(worksheetId);
+      if (!snapshot) throw new Error('Snapshot referensi periode tidak ditemukan');
+      const peraturan = snapshot.regulation_id;
 
       const scoreResponse = await axiosJWT.get(
-        `/scoringEngine/pb/${encodeURIComponent(worksheetId)}?peraturan=${peraturan}`
+        `/scoringEngine/pb/${encodeURIComponent(worksheetId)}`
       );
       const pbScore = scoreResponse.data.rows;
+      const { komponen, subkomponen, subsubkomponen } = snapshot.reference_data.pb;
 
-      const excelWorksheet = useExcelWorksheet(rows, pbScore, komponenRef, subKomponenRef);
+      const excelWorksheet = useExcelWorksheet(rows, pbScore, komponen, subkomponen);
       const excelWorksheet2 = useExcelWorksheet2(
         rows,
         header,
         pbScore,
-        komponenRef,
-        subKomponenRef,
-        subSubKomponenRef
+        komponen,
+        subkomponen,
+        subsubkomponen
       );
       const peraturan1 = peraturan === 1;
       peraturan1 ? await excelWorksheet.generate() :await excelWorksheet2.generate();

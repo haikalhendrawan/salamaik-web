@@ -16,7 +16,7 @@ interface WsJunctionContextType{
   setWsJunction: React.Dispatch<React.SetStateAction<[] | WsJunctionType[]>>, 
   getWsJunctionKanwil: (kppnId: string) => Promise<void>,
   getWsJunctionKPPN: () => Promise<void>,
-  getWorksheet : (worksheetId: string) => Promise<void>,
+  getWorksheet : (worksheetId: string) => Promise<WorksheetType | null>,
 };
 
 type WsJunctionProviderProps = {
@@ -30,7 +30,7 @@ const WsJunctionContext = createContext<WsJunctionContextType>({
   setWsJunction: () => {}, 
   getWsJunctionKanwil: async() => {},
   getWsJunctionKPPN: async() => {},
-  getWorksheet : async() => {}
+  getWorksheet : async() => null
 });
 
 const WsJunctionProvider = ({children}: WsJunctionProviderProps) => {
@@ -80,10 +80,11 @@ const WsJunctionProvider = ({children}: WsJunctionProviderProps) => {
     }
   };
 
-  async function getWorksheet(kppnId: string){
+  async function getWorksheet(kppnId: string): Promise<WorksheetType | null>{
     try{
       const response = await axiosJWT.get(`/getWorksheetByPeriodAndKPPN/${kppnId}`);
       setWsDetail(response.data.rows);
+      return response.data.rows;
     }catch(err: any){
       setWsDetail(null);
       if(err.response){
@@ -91,6 +92,7 @@ const WsJunctionProvider = ({children}: WsJunctionProviderProps) => {
       }else{
         openSnackbar(err.message, "error");
       }
+      return null;
     }
   };
 

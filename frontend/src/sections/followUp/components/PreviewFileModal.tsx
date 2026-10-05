@@ -10,6 +10,7 @@ import useLoading from '../../../hooks/display/useLoading';
 import useSnackbar from '../../../hooks/display/useSnackbar';
 import usePreviewFileModal from '../usePreviewFileModal';
 import useSocket from '../../../hooks/useSocket';
+import useAxiosJWT from '../../../hooks/useAxiosJWT';
 // -------------------------------------------------------------------------------------------
 const style = {
   position: 'absolute',
@@ -21,7 +22,7 @@ const style = {
 };
 
 // -------------------------------------------------------------------------------------------
-export default function PreviewFileModal({getData, isDisabled}: {getData: () => void, isDisabled: boolean}) {
+export default function PreviewFileModal({getData, isDisabled, findingId}: {getData: () => void | Promise<void>, isDisabled: boolean, findingId?: number}) {
   const {
     open, 
     file, 
@@ -36,6 +37,7 @@ export default function PreviewFileModal({getData, isDisabled}: {getData: () => 
   const {setIsLoading} = useLoading();
 
   const {socket} = useSocket();
+  const axiosJWT = useAxiosJWT();
 
   const {openSnackbar} = useSnackbar();
 
@@ -47,10 +49,25 @@ export default function PreviewFileModal({getData, isDisabled}: {getData: () => 
     window.location.href=`${currentFileURL}/${file}`;
   };
 
-  const deleteFile = () => {
+  const deleteFile = async () => {
       if(isExampleFile){
         return
       };
+
+      if (findingId !== undefined) {
+        try {
+          setIsLoading(true);
+          await axiosJWT.post('/deleteFindingSourceFile', { id: findingId, option: fileOption });
+          await getData();
+          modalClose();
+          openSnackbar('File bukti dukung berhasil dihapus', 'success');
+        }catch(err: any){
+          openSnackbar(err?.response?.data?.message || err?.message || 'Gagal menghapus file', 'error');
+        }finally{
+          setIsLoading(false);
+        }
+        return;
+      }
 
       socket?.emit("deleteWsJunctionFile", {
         id: selectedId,

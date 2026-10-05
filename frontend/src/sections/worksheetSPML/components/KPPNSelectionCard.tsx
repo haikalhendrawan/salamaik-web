@@ -43,7 +43,7 @@ export default function KPPNSelectionCard({
 
   const axiosJWT = useAxiosJWT();
 
-  const {komponenSpmlRef, subKomponenSpmlRef, aspekSpmlRef} = useDictionary();
+  const {loadWorksheetReferenceSnapshot} = useDictionary();
 
   const {openSnackbar} = useSnackbar();
 
@@ -61,11 +61,6 @@ export default function KPPNSelectionCard({
   );
 
   async function handleGenerateExcel() {
-    if (!komponenSpmlRef || !subKomponenSpmlRef || !aspekSpmlRef) {
-      openSnackbar('Referensi worksheet SPML belum tersedia', 'error');
-      return;
-    }
-
     try {
       setIsExporting(true);
       const [junctionResponse, scoreResponse] = await Promise.all([
@@ -79,13 +74,17 @@ export default function KPPNSelectionCard({
         openSnackbar('Data worksheet SPML belum tersedia', 'error');
         return;
       }
+      const snapshot = await loadWorksheetReferenceSnapshot(worksheetSPMLId);
+      if (!snapshot?.reference_data.spml) {
+        throw new Error('Snapshot referensi SPML periode tidak ditemukan');
+      }
 
       await generateExcelWorksheetSPML({
         rows,
         kppnName: header,
-        komponenRef: komponenSpmlRef,
-        subKomponenRef: subKomponenSpmlRef,
-        aspekRef: aspekSpmlRef,
+        komponenRef: snapshot.reference_data.spml.komponen,
+        subKomponenRef: snapshot.reference_data.spml.subkomponen,
+        aspekRef: snapshot.reference_data.spml.aspek,
         spmlScore: scoreResponse.data.rows,
       });
       openSnackbar('Worksheet SPML berhasil diexport', 'success');

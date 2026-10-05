@@ -23,7 +23,7 @@ interface WsCKJunctionContextType {
   lastRefreshedAt: Date | null;
   setWsCKJunction: React.Dispatch<React.SetStateAction<WsCKJunctionType[]>>;
   getWsCKJunction: (kppnId: string, options?: WsCKRefreshOptions) => Promise<void>;
-  getWorksheet: (kppnId: string) => Promise<void>;
+  getWorksheet: (kppnId: string) => Promise<WorksheetType | null>;
   getCKScore: (worksheetCKId: string) => Promise<void>;
   resetCKScore: () => void;
   setLastLiveChange: React.Dispatch<React.SetStateAction<CKWorksheetChangedEvent | null>>;
@@ -39,7 +39,7 @@ const WsCKJunctionContext = createContext<WsCKJunctionContextType>({
   lastRefreshedAt: null,
   setWsCKJunction: () => {},
   getWsCKJunction: async () => {},
-  getWorksheet: async () => {},
+  getWorksheet: async () => null,
   getCKScore: async () => {},
   resetCKScore: () => {},
   setLastLiveChange: () => {},
@@ -176,14 +176,16 @@ function WsCKJunctionProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  async function getWorksheet(kppnId: string) {
+  async function getWorksheet(kppnId: string): Promise<WorksheetType | null> {
     setIsLoading(true);
     try {
       const response = await axiosJWT.get(`/getWorksheetByPeriodAndKPPN/${kppnId}`);
       setWsDetail(response.data.rows);
+      return response.data.rows;
     } catch (error: unknown) {
       setWsDetail(null);
       showError(error);
+      return null;
     } finally {
       setIsLoading(false);
     }

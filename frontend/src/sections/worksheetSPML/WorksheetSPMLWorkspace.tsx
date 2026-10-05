@@ -15,6 +15,8 @@ import PreviewFileModal from './components/PreviewFileModal';
 import WorksheetSPMLToolbar from './components/WorksheetSPMLToolbar';
 import NavigationDrawerSPML from './components/NavigationDrawerSPML';
 import useWsSPMLLiveSync from './useWsSPMLLiveSync';
+import useDictionary from '../../hooks/useDictionary';
+import useSnackbar from '../../hooks/display/useSnackbar';
 //-----------------------------------------------------------------------------------------------------------------
 const SELECT_KPPN: {[key: string]: string} = {
   '010': 'Padang',
@@ -31,6 +33,8 @@ export default function WorksheetSPMLWorkspace() {
   const [isWorksheetDetailLoading, setIsWorksheetDetailLoading] = useState(true);
 
   const {auth} = useAuth();
+  const { loadWorksheetReferenceSnapshot, resetWorksheetReferenceSnapshot } = useDictionary();
+  const { openSnackbar } = useSnackbar();
 
   const navigate = useNavigate();
 
@@ -62,6 +66,8 @@ export default function WorksheetSPMLWorkspace() {
     getWsSPMLJunctionKanwil,
     resetSPMLScore,
     setWsSPMLJunction,
+    loadWorksheetReferenceSnapshot,
+    resetWorksheetReferenceSnapshot,
   });
 
   useEffect(() => {
@@ -70,8 +76,10 @@ export default function WorksheetSPMLWorkspace() {
       getWsSPMLJunctionKanwil,
       resetSPMLScore,
       setWsSPMLJunction,
+      loadWorksheetReferenceSnapshot,
+      resetWorksheetReferenceSnapshot,
     };
-  }, [getWorksheet, getWsSPMLJunctionKanwil, resetSPMLScore, setWsSPMLJunction]);
+  }, [getWorksheet, getWsSPMLJunctionKanwil, resetSPMLScore, setWsSPMLJunction, loadWorksheetReferenceSnapshot, resetWorksheetReferenceSnapshot]);
 
   useWsSPMLLiveSync(activeWorksheetId, selectedKppnId);
 
@@ -92,15 +100,31 @@ export default function WorksheetSPMLWorkspace() {
     actions.setWsSPMLJunction([]);
     actions.resetSPMLScore();
 
-    actions.getWorksheet(selectedKppnId, { showOverlay: false }).finally(() => {
-      if (isActive) setIsWorksheetDetailLoading(false);
-    });
-    actions.getWsSPMLJunctionKanwil(selectedKppnId, { showOverlay: false }).finally(() => {
-      if (isActive) setIsInitialTableLoading(false);
-    });
+    void (async () => {
+      try {
+        const worksheet = await actions.getWorksheet(selectedKppnId, { showOverlay: false });
+        if (!worksheet?.id) return;
+        try {
+          await actions.loadWorksheetReferenceSnapshot(worksheet.id);
+        } catch (error) {
+          console.error('Unable to load worksheet reference snapshot:', error);
+          openSnackbar('Referensi snapshot worksheet SPML tidak tersedia.', 'error');
+          return;
+        }
+        await actions.getWsSPMLJunctionKanwil(selectedKppnId, { showOverlay: false });
+      } catch (error) {
+        console.error('Unable to load SPML worksheet:', error);
+      } finally {
+        if (isActive) {
+          setIsWorksheetDetailLoading(false);
+          setIsInitialTableLoading(false);
+        }
+      }
+    })();
 
     return () => {
       isActive = false;
+      void actions.resetWorksheetReferenceSnapshot();
     };
   }, [selectedKppnId]);
 

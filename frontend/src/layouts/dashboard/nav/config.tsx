@@ -51,18 +51,18 @@ const navSupervisi = [
   },
 ];
 
-// const navMonitoring = [
-//   // {
-//   //   title: 'Standardisasi KPPN',
-//   //   path: '/standard',
-//   //   icon: icon('solar--palette-round-bold-duotone'),
-//   // },
-//   // {
-//   //   title: "Data Pembinaan",
-//   //   path: '/history',
-//   //   icon: icon('solar--database-bold-duotone'),
-//   // }
-// ];
+const navMonitoring = [
+  // {
+  //   title: 'Standardisasi KPPN',
+  //   path: '/standard',
+  //   icon: icon('solar--palette-round-bold-duotone'),
+  // },
+  {
+    title: "Data Pembinaan",
+    path: '/history',
+    icon: icon('solar--database-bold-duotone'),
+  }
+];
 
 const navAdmin = [
   {
@@ -116,4 +116,4 @@ const navHome = [
   },
 ];
 
-export {navSupervisi, navHome,  navAdmin};
+export {navSupervisi, navHome, navMonitoring, navAdmin};

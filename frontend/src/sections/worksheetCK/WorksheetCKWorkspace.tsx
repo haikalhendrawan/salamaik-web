@@ -10,6 +10,8 @@ import WorksheetCKTable from './components/WorksheetCKTable';
 import WorksheetCKToolbar from './components/WorksheetCKToolbar';
 import NavigationDrawerCK from './components/NavigationDrawerCK';
 import PreviewFileCKModal from './components/PreviewFileCKModal';
+import useDictionary from '../../hooks/useDictionary';
+import useSnackbar from '../../hooks/display/useSnackbar';
 
 const KPPN_NAMES: Record<string, string> = {
   '010': 'Padang', '011': 'Bukittinggi', '090': 'Solok', '091': 'Lubuk Sikaping',
@@ -18,6 +20,8 @@ const KPPN_NAMES: Record<string, string> = {
 
 export default function WorksheetCKWorkspace() {
   const { auth } = useAuth();
+  const { loadWorksheetReferenceSnapshot, resetWorksheetReferenceSnapshot } = useDictionary();
+  const { openSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const params = new URLSearchParams(useLocation().search);
   const requestedId = params.get('id') || '';
@@ -41,10 +45,29 @@ export default function WorksheetCKWorkspace() {
   useWsCKLiveSync(activeWorksheetId, selectedKppnId);
 
   useEffect(() => {
+    let active = true;
     resetCKScore();
     setWsCKJunction([]);
-    void getWorksheet(selectedKppnId);
-    void getWsCKJunction(selectedKppnId);
+    void (async () => {
+      try {
+        const worksheet = await getWorksheet(selectedKppnId);
+        if (!worksheet?.id) return;
+        try {
+          await loadWorksheetReferenceSnapshot(worksheet.id);
+        } catch (error) {
+          console.error('Unable to load worksheet reference snapshot:', error);
+          openSnackbar('Referensi snapshot worksheet CK tidak tersedia.', 'error');
+          return;
+        }
+        if (active) await getWsCKJunction(selectedKppnId);
+      } catch (error) {
+        console.error('Unable to load CK worksheet:', error);
+      }
+    })();
+    return () => {
+      active = false;
+      void resetWorksheetReferenceSnapshot();
+    };
     // Context functions are not memoized.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedKppnId]);

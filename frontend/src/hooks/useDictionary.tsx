@@ -132,6 +132,20 @@ export interface OpsiCkRefType {
   komponen_ck_id: number;
 }
 
+export interface WorksheetReferenceSnapshotData {
+  id: string;
+  period_id: number;
+  regulation_id: 1 | 2;
+  formula_version: string;
+  reference_version: string;
+  status: 'SNAPSHOTTED' | 'MIGRATED_VERIFIED';
+  reference_data: {
+    pb: { komponen: KomponenRefType[]; subkomponen: SubKomponenRefType[]; subsubkomponen: SubSubKomponenRefType[]; checklist: any[]; opsi: any[] };
+    ck: { komponen: KomponenCkRefType[]; checklist: ChecklistCkRefType[]; opsi: OpsiCkRefType[] } | null;
+    spml: { komponen: KomponenSpmlRefType[]; subkomponen: SubKomponenSpmlRefType[]; aspek: AspekSpmlRefType[]; checklist: ChecklistSpmlRefType[] } | null;
+  };
+}
+
 export type KPPNTipe = 'A1' | 'A2' | 'Kh' | 'K1' | 'K2' | 'K3';
 
 interface UnitType{
@@ -179,6 +193,8 @@ interface DictionaryContextType{
   opsiCkRef: OpsiCkRefType[] | null,
   getDictionary: () => Promise<void>,
   getCkDictionary: () => Promise<void>,
+  loadWorksheetReferenceSnapshot: (worksheetId: string) => Promise<WorksheetReferenceSnapshotData | null>,
+  resetWorksheetReferenceSnapshot: () => Promise<void>,
 };
 
 type DictionaryProviderProps = {
@@ -204,6 +220,8 @@ const DictionaryContext = createContext<DictionaryContextType>({
   opsiCkRef: null,
   getDictionary: async () => {},
   getCkDictionary: async () => {},
+  loadWorksheetReferenceSnapshot: async () => null,
+  resetWorksheetReferenceSnapshot: async () => {},
 });
 
 const DictionaryProvider = ({children}: DictionaryProviderProps) => {
@@ -223,21 +241,21 @@ const DictionaryProvider = ({children}: DictionaryProviderProps) => {
 
   const [kppnRef, setKPPNRef] = useState(null);
 
-  const [komponenRef, setKomponenRef] = useState(null);
+  const [komponenRef, setKomponenRef] = useState<KomponenRefType[] | null>(null);
 
-  const [subKomponenRef, setSubKomponenRef] = useState(null);
+  const [subKomponenRef, setSubKomponenRef] = useState<SubKomponenRefType[] | null>(null);
 
-  const [subSubKomponenRef, setSubSubKomponenRef] = useState(null);
+  const [subSubKomponenRef, setSubSubKomponenRef] = useState<SubSubKomponenRefType[] | null>(null);
 
   const [peraturanRef, setPeraturanRef] = useState(null);
 
-  const [komponenSpmlRef, setKomponenSpmlRef] = useState(null);
+  const [komponenSpmlRef, setKomponenSpmlRef] = useState<KomponenSpmlRefType[] | null>(null);
 
-  const [subKomponenSpmlRef, setSubKomponenSpmlRef] = useState(null);
+  const [subKomponenSpmlRef, setSubKomponenSpmlRef] = useState<SubKomponenSpmlRefType[] | null>(null);
 
-  const [aspekSpmlRef, setAspekSpmlRef] = useState(null);
+  const [aspekSpmlRef, setAspekSpmlRef] = useState<AspekSpmlRefType[] | null>(null);
 
-  const [checklistSpmlRef, setChecklistSpmlRef] = useState(null);
+  const [checklistSpmlRef, setChecklistSpmlRef] = useState<ChecklistSpmlRefType[] | null>(null);
 
   const [komponenCkRef, setKomponenCkRef] = useState<KomponenCkRefType[] | null>(null);
 
@@ -374,6 +392,44 @@ const DictionaryProvider = ({children}: DictionaryProviderProps) => {
     }
   };
 
+  const loadWorksheetReferenceSnapshot = async (worksheetId: string): Promise<WorksheetReferenceSnapshotData | null> => {
+    if (!worksheetId) return null;
+    const response = await axiosJWT.get(`/getWorksheetReferenceSnapshot/${encodeURIComponent(worksheetId)}`);
+    const snapshot: WorksheetReferenceSnapshotData = response.data.rows;
+    const referenceData = snapshot.reference_data;
+
+    setKomponenRef(referenceData.pb?.komponen || []);
+    setSubKomponenRef(referenceData.pb?.subkomponen || []);
+    setSubSubKomponenRef(referenceData.pb?.subsubkomponen || []);
+
+    if (referenceData.spml) {
+      setKomponenSpmlRef(referenceData.spml.komponen || []);
+      setSubKomponenSpmlRef(referenceData.spml.subkomponen || []);
+      setAspekSpmlRef(referenceData.spml.aspek || []);
+      setChecklistSpmlRef(referenceData.spml.checklist || []);
+    } else {
+      setKomponenSpmlRef(null);
+      setSubKomponenSpmlRef(null);
+      setAspekSpmlRef(null);
+      setChecklistSpmlRef(null);
+    }
+
+    if (referenceData.ck) {
+      setKomponenCkRef(referenceData.ck.komponen || []);
+      setChecklistCkRef(referenceData.ck.checklist || []);
+      setOpsiCkRef(referenceData.ck.opsi || []);
+    } else {
+      setKomponenCkRef([]);
+      setChecklistCkRef([]);
+      setOpsiCkRef([]);
+    }
+    return snapshot;
+  };
+
+  const resetWorksheetReferenceSnapshot = async (): Promise<void> => {
+    await getDictionary();
+  };
+
   const getDictionary = async (): Promise<void> => {
     await Promise.all([
       getPeriod(),
@@ -413,7 +469,9 @@ const DictionaryProvider = ({children}: DictionaryProviderProps) => {
       checklistCkRef,
       opsiCkRef,
       getDictionary,
-      getCkDictionary
+      getCkDictionary,
+      loadWorksheetReferenceSnapshot,
+      resetWorksheetReferenceSnapshot,
     }}>
       {children}
     </DictionaryContext.Provider>

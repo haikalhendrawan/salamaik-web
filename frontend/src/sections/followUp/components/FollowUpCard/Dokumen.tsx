@@ -24,6 +24,7 @@ import LinkFilePopoverCK from '../../../worksheetCK/components/LinkFilePopoverCK
 import LinkFilePopoverSPML from '../../../worksheetSPML/components/LinkFilePopover';
 import { WsCKJunctionType } from '../../../worksheetCK/types';
 import { WsSPMLJunctionType } from '../../../worksheetSPML/types';
+import SourceEvidenceActions from './SourceEvidenceActions';
 // ----------------------------------------------------------------------------
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -188,6 +189,50 @@ export default function Dokumen({openInstruction, findingResponse, getData, isDi
         <Skeleton variant="rounded" height={'3em'} width={'50%'} />
       </>
     )
+  }
+
+  if (findingResponse && wsJunction) {
+    const isRegulation2Finding = findingResponse.matrix_id == null && Boolean(findingResponse.worksheet_type);
+    return (
+      <Stack direction="column" spacing={1}>
+        {!isRegulation2Finding && (
+          <Stack direction="column" spacing={1}>
+            <Typography variant="body3" fontSize={12} textAlign="left">Petunjuk :</Typography>
+            <Stack direction="row" spacing={1}>
+              <Tooltip title="Instruksi">
+                <span>
+                  <StyledButton aria-label="instruksi" variant="contained" size="small" color="white" onClick={openInstruction}>
+                    <Iconify color={theme.palette.grey[500]} icon="solar:info-circle-bold" />
+                  </StyledButton>
+                </span>
+              </Tooltip>
+              {wsJunction.file1 && (
+                <Tooltip title="Contoh Bukti Dukung 1">
+                  <span>
+                    <StyledButton aria-label="contoh bukti dukung 1" variant="contained" size="small" color="warning" onClick={() => handleOpenExampleFile(1)}>
+                      <Iconify icon="solar:file-bold-duotone" />
+                    </StyledButton>
+                  </span>
+                </Tooltip>
+              )}
+              {wsJunction.file2 && (
+                <Tooltip title="Contoh Bukti Dukung 2">
+                  <span>
+                    <StyledButton aria-label="contoh bukti dukung 2" variant="contained" size="small" color="warning" onClick={() => handleOpenExampleFile(2)}>
+                      <Iconify icon="solar:file-bold-duotone" />
+                    </StyledButton>
+                  </span>
+                </Tooltip>
+              )}
+            </Stack>
+          </Stack>
+        )}
+        <Stack direction="column" spacing={1}>
+          <Typography variant="body3" fontSize={12} textAlign="left">Bukti Dukung :</Typography>
+          <SourceEvidenceActions finding={findingResponse} disabled={isDisabled} getData={getData} />
+        </Stack>
+      </Stack>
+    );
   }
 
   if (isRegulation2Finding) {

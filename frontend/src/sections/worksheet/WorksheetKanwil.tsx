@@ -29,6 +29,7 @@ import Paper from '@mui/material/Paper';
 import IconButton from '@mui/material/IconButton';
 import styled from '@mui/material/styles/styled';
 import useDictionary from '../../hooks/useDictionary';
+import useSnackbar from '../../hooks/display/useSnackbar';
 // import useLoading from '../../hooks/display/useLoading';
 // -----------------------------------------------------------------------
 const SubkomponenDivider = styled(Paper)(({theme}) => ({
@@ -57,9 +58,16 @@ const KOMPONEN_ICON = ["solar:safe-2-bold-duotone", "solar:buildings-2-bold-duot
 export default function WorksheetKanwil() {
   const { wsJunction, getWsJunctionKanwil, wsDetail, getWorksheet } = useWsJunction();
 
-  const { komponenRef, subKomponenRef, subSubKomponenRef } = useDictionary();
+  const {
+    komponenRef,
+    subKomponenRef,
+    subSubKomponenRef,
+    loadWorksheetReferenceSnapshot,
+    resetWorksheetReferenceSnapshot,
+  } = useDictionary();
 
   const { modalOpen, modalClose } = usePreviewFileModal();
+  const { openSnackbar } = useSnackbar();
 
   const {auth} = useAuth();
 
@@ -116,10 +124,30 @@ export default function WorksheetKanwil() {
   // const { isLoading, setIsLoading } = useLoading();
 
   useEffect(() => {
-    getWsJunctionKanwil(id);
-    getWorksheet(id);
-    setIsLoading(false);
-  }, []);
+    let active = true;
+    setIsLoading(true);
+    void (async () => {
+      const detail = await getWorksheet(id);
+      if (!detail?.id) {
+        if (active) setIsLoading(false);
+        return;
+      }
+      try {
+        await loadWorksheetReferenceSnapshot(detail.id);
+      } catch (error) {
+        console.error('Unable to load worksheet reference snapshot:', error);
+        openSnackbar('Referensi snapshot worksheet tidak tersedia. Data tidak dapat ditampilkan dengan aman.', 'error');
+        if (active) setIsLoading(false);
+        return;
+      }
+      await getWsJunctionKanwil(id);
+      if (active) setIsLoading(false);
+    })();
+    return () => {
+      active = false;
+      void resetWorksheetReferenceSnapshot();
+    };
+  }, [id]);
 
   const scrollToElement = useCallback((id: string) => {
     const element = document.getElementById(id);

@@ -11,6 +11,7 @@ import useSocket from "../../../hooks/useSocket";
 import useWsSPMLJunction from "../useWsSPMLJunction";
 import useSnackbar from "../../../hooks/display/useSnackbar";
 import useLoading from "../../../hooks/display/useLoading";
+import useAxiosJWT from '../../../hooks/useAxiosJWT';
 import Iconify from "../../../components/iconify/Iconify";
 import { WsSPMLJunctionType } from "../types";
 //-----------------------------------------------------------------------------------------------------------------
@@ -31,6 +32,7 @@ interface LinkFilePopoverProps {
   handleClose: () => void,
   wsJunction: WsSPMLJunctionType,
   isPastDue: boolean,
+  followUpFindingId?: number,
 }
 
 interface SocketResponse {
@@ -45,7 +47,7 @@ const StyledFormControl = styled(FormControl)(({ theme }) => ({
   height: '100%',
 }));
 //-----------------------------------------------------------------------------------------------------------------
-export default function LinkFilePopover({ open, anchorEl, handleClose, wsJunction, isPastDue }: LinkFilePopoverProps) {
+export default function LinkFilePopover({ open, anchorEl, handleClose, wsJunction, isPastDue, followUpFindingId }: LinkFilePopoverProps) {
   const [linkFile, setLinkFile] = useState(wsJunction?.link_file || '');
   const [isEditing, setIsEditing] = useState(false);
 
@@ -54,13 +56,29 @@ export default function LinkFilePopover({ open, anchorEl, handleClose, wsJunctio
   const { getWsSPMLJunctionKanwil } = useWsSPMLJunction();
   const { openSnackbar } = useSnackbar();
   const { setIsLoading } = useLoading();
+  const axiosJWT = useAxiosJWT();
 
-  const handleEditLinkFile = () => {
+  const handleEditLinkFile = async () => {
     if (isPastDue) return;
 
     const normalizedLink = linkFile.trim();
     if (!normalizedLink || normalizedLink.length > 2048) {
       openSnackbar("Link wajib diisi dan maksimal 2048 karakter", "error");
+      return;
+    }
+    if (followUpFindingId !== undefined) {
+      setIsLoading(true);
+      try {
+        await axiosJWT.post('/updateFindingSourceLink', { id: followUpFindingId, link: normalizedLink });
+        setLinkFile(normalizedLink);
+        setIsEditing(false);
+        openSnackbar('Link bukti dukung berhasil disimpan', 'success');
+        handleClose();
+      } catch (error: any) {
+        openSnackbar(error?.response?.data?.message || 'Gagal menyimpan link bukti dukung', 'error');
+      } finally {
+        setIsLoading(false);
+      }
       return;
     }
     if (!socket?.connected) {
@@ -90,8 +108,24 @@ export default function LinkFilePopover({ open, anchorEl, handleClose, wsJunctio
       });
   };
 
-  const handleDeleteLinkFile = () => {
+  const handleDeleteLinkFile = async () => {
     if (isPastDue) return;
+
+    if (followUpFindingId !== undefined) {
+      setIsLoading(true);
+      try {
+        await axiosJWT.post('/updateFindingSourceLink', { id: followUpFindingId, link: null });
+        setLinkFile('');
+        setIsEditing(false);
+        openSnackbar('Link bukti dukung berhasil dihapus', 'success');
+        handleClose();
+      } catch (error: any) {
+        openSnackbar(error?.response?.data?.message || 'Gagal menghapus link bukti dukung', 'error');
+      } finally {
+        setIsLoading(false);
+      }
+      return;
+    }
 
     if (!socket?.connected) {
       return openSnackbar("websocket failed, check your connection", "error");
