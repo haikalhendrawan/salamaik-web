@@ -222,10 +222,18 @@ const updateFindingsScore = async (req: Request, res: Response, next: NextFuncti
       const isKanwil = [3, 4, 99].includes(role);
       const isKPPN = [1, 2].includes(role);
       if (!isKanwil && (!isKPPN || worksheetDetail.kppn_id !== req.payload.kppn)) throw new ErrorDetail(403, 'Not authorized');
-      const score = scoreAfter === '' || scoreAfter === undefined || scoreAfter === null ? null : Number(scoreAfter);
-      if (score !== null && (!Number.isFinite(score) || score < 0 || score > 15)) throw new ErrorDetail(400, 'Nilai tidak valid');
-      if (!(await findings.isRegulation2ScoreAllowed(current, score))) throw new ErrorDetail(400, 'Nilai tidak tersedia pada checklist ini');
-      const result = await findings.updateRegulation2FollowUpScore(Number(id), score, isKanwil ? 'KANWIL' : 'KPPN', req.payload.username || userName);
+      const isNA = typeof scoreAfter === 'string' && scoreAfter.trim().toUpperCase() === 'N/A';
+      let result;
+      if (isNA) {
+        const maximumScore = await findings.getRegulation2MaximumScore(current);
+        if (maximumScore === undefined) throw new ErrorDetail(409, 'Nilai maksimum checklist tidak ditemukan pada snapshot periode');
+        result = await findings.updateRegulation2FollowUpNA(Number(id), maximumScore, req.payload.username || userName);
+      } else {
+        const score = scoreAfter === '' || scoreAfter === undefined || scoreAfter === null ? null : Number(scoreAfter);
+        if (score !== null && (!Number.isFinite(score) || score < 0 || score > 15)) throw new ErrorDetail(400, 'Nilai tidak valid');
+        if (!(await findings.isRegulation2ScoreAllowed(current, score))) throw new ErrorDetail(400, 'Nilai tidak tersedia pada checklist ini');
+        result = await findings.updateRegulation2FollowUpScore(Number(id), score, isKanwil ? 'KANWIL' : 'KPPN', req.payload.username || userName);
+      }
       if (!result?.junction) throw new ErrorDetail(404, 'Worksheet junction not found');
 
       const source = current.worksheet_type;
@@ -253,7 +261,7 @@ const updateFindingsScore = async (req: Request, res: Response, next: NextFuncti
         'akkScoreChanged',
         createAKKScoreChangedEvent(current.worksheet_id, source === 'PB' ? 'pb' : source === 'CK' ? 'ck' : 'spml', req.payload.username)
       );
-      return res.status(200).json({ success: true, message: 'Nilai tindak lanjut diperbarui', rows: result });
+      return res.status(200).json({ success: true, message: isNA ? 'Nilai tindak lanjut disetel ke N/A' : 'Nilai tindak lanjut diperbarui', rows: result });
     }
     const result = await findings.updateFindingsScore(id, scoreBefore, scoreAfter, userName);
 
