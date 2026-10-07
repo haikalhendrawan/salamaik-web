@@ -51,7 +51,7 @@ export default function useExcelMatrixPeraturan2(data: Regulation2MatrixRow[], k
     const buffer = await workbook.xlsx.writeBuffer();
     const link = document.createElement('a');
     link.href = URL.createObjectURL(new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
-    link.download = `Matriks_PER2_${kppnName}.xlsx`;
+    link.download = `Matriks_V2_${kppnName}.xlsx`;
     link.click();
     URL.revokeObjectURL(link.href);
   };

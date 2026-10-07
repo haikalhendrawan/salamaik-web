@@ -18,6 +18,7 @@ import Dokumen from "./Dokumen";
 import Nilai from "./Nilai";
 import Catatan from "./Catatan";
 import Approval from "./Approval";
+import CommentPopover from '../../../worksheet/component/CommentPopover';
 import { FindingsResponseType } from "../../types";
 // ------------------------------------------------------------
 interface FollowUpCardProps{
@@ -70,6 +71,20 @@ export default function FollowUpCard(props: FollowUpCardProps) {
   const [openInstruction, setOpenInstruction] = useState<boolean>(false);
 
   const [anchorEl, setAnchorEl] = useState<EventTarget & HTMLButtonElement | null>(null);
+  const [openComment, setOpenComment] = useState(false);
+  const [commentAnchor, setCommentAnchor] = useState<EventTarget & HTMLButtonElement | null>(null);
+  const [commentCount, setCommentCount] = useState(Number(wsJunction?.comment_count) || 0);
+
+  useEffect(() => {
+    setCommentCount(Number(wsJunction?.comment_count) || 0);
+  }, [wsJunction?.comment_count]);
+
+  const handleOpenComment = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+    setCommentAnchor(event.currentTarget);
+    setOpenComment(true);
+  }, []);
+
+  const handleCloseComment = useCallback(() => setOpenComment(false), []);
 
   const handleOpenInstruction = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     setOpenInstruction(true);
@@ -99,6 +114,8 @@ export default function FollowUpCard(props: FollowUpCardProps) {
                 title={checklist?.title || ""}
                 dateUpdated={wsJunction?.last_update || null}
                 updatedBy={wsJunction?.updated_by || null}
+                openComment={handleOpenComment}
+                commentCount={commentCount}
               />
             }
           />
@@ -196,6 +213,13 @@ export default function FollowUpCard(props: FollowUpCardProps) {
         handleClose={handleCloseInstruction}
         instruction={checklist?.instruksi || null}
         fileExample={checklist?.contoh_file || null}
+      />
+      <CommentPopover
+        open={openComment}
+        anchorEl={commentAnchor}
+        handleClose={handleCloseComment}
+        wsJunctionId={wsJunction?.junction_id || 0}
+        onCommentCountChange={setCommentCount}
       />
     </>
   );

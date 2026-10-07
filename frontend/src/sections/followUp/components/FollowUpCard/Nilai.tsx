@@ -88,6 +88,7 @@ export default function Nilai({findingResponse, getData, isDisabled, scoreSide}:
   const {openSnackbar} = useSnackbar();
 
   const isStandardisasi = findingResponse?.matrixDetail[0]?.standardisasi || 0;
+  const isRegulation2Finding = findingResponse?.matrix_id == null && Boolean(findingResponse?.worksheet_type);
 
   const isKanwil = useMemo(() =>{
     return auth?.kppn?.length===5;
@@ -99,11 +100,12 @@ export default function Nilai({findingResponse, getData, isDisabled, scoreSide}:
 
   const handleChangeKanwilScore = async(newScore: string) => {
     setIsLoading(true);
-    const score = newScore === '' ? null : parseInt(newScore);
+    const isNA = newScore === 'N/A';
+    const score = newScore === '' || isNA ? null : parseInt(newScore);
 
-    if (findingResponse?.matrix_id == null && findingResponse?.worksheet_type) {
+    if (isRegulation2Finding) {
       try {
-        await axiosJWT.post('/updateFindingsScore', { id: findingResponse.id, scoreAfter: score, userName: auth?.name });
+        await axiosJWT.post('/updateFindingsScore', { id: findingResponse?.id, scoreAfter: isNA ? 'N/A' : score, userName: auth?.name });
         await getData();
       } catch (err: any) {
         openSnackbar(err?.response?.data?.message || 'Gagal memperbarui nilai', 'error');
@@ -146,10 +148,11 @@ export default function Nilai({findingResponse, getData, isDisabled, scoreSide}:
 
   const handleChangeKPPNScore = (newScore: string) => {
     setIsLoading(true);
-    const score = newScore === '' ? null : parseInt(newScore);
+    const isNA = newScore === 'N/A';
+    const score = newScore === '' || isNA ? null : parseInt(newScore);
 
-    if (findingResponse?.matrix_id == null && findingResponse?.worksheet_type) {
-      void axiosJWT.post('/updateFindingsScore', { id: findingResponse.id, scoreAfter: score, userName: auth?.name })
+    if (isRegulation2Finding) {
+      void axiosJWT.post('/updateFindingsScore', { id: findingResponse?.id, scoreAfter: isNA ? 'N/A' : score, userName: auth?.name })
         .then(() => getData())
         .catch((err: any) => openSnackbar(err?.response?.data?.message || 'Gagal memperbarui nilai', 'error'))
         .finally(() => setIsLoading(false));
@@ -367,6 +370,9 @@ export default function Nilai({findingResponse, getData, isDisabled, scoreSide}:
   if (scoreSide) {
     const score = scoreSide === 'kppn' ? wsJunction?.kppn_score : wsJunction?.kanwil_score;
     const isScoreDisabled = isDisabled || (scoreSide === 'kppn' ? isKanwil : !isKanwil);
+    const selectedScore = isRegulation2Finding && wsJunction?.excluded === 1
+      ? 'N/A'
+      : score === null || score === undefined ? '' : String(score);
     const scoreOptions = findingResponse?.worksheet_type === 'SPML'
       ? [10, 0]
       : matrixDetail?.opsi?.map((option) => option.value).sort((left, right) => right - left) || [];
@@ -375,7 +381,7 @@ export default function Nilai({findingResponse, getData, isDisabled, scoreSide}:
         <StyledSelect
           required
           name={`${scoreSide}Score`}
-          value={score === null || score === undefined ? '' : String(score)}
+          value={selectedScore}
           onChange={(event) => {
             const value = event.target.value as string;
             if (scoreSide === 'kppn') handleChangeKPPNScore(value);
@@ -385,6 +391,7 @@ export default function Nilai({findingResponse, getData, isDisabled, scoreSide}:
           size="small"
         >
           {scoreOptions.map((option) => <StyledMenuItem key={option} value={String(option)}>{option}</StyledMenuItem>)}
+          {isRegulation2Finding && <StyledMenuItem value="N/A">N/A</StyledMenuItem>}
           <StyledMenuItem value="">Belum dinilai</StyledMenuItem>
         </StyledSelect>
       </StyledFormControl>
@@ -399,40 +406,56 @@ export default function Nilai({findingResponse, getData, isDisabled, scoreSide}:
           {
             isStandardisasi === 1
             ?
-              <Stack direction='row' spacing={2}>
-                <StyledNumberTextField  
-                  size='small'
-                  type="text"
-                  onChange={(e) => setStdScoreKPPN(e.target.value)}
-                  onBlur={(e) => handleChangeKPPNScoreStd(e)}
-                  disabled={isKanwil || isDisabled}
-                  value={stdScoreKPPN}
-                />
-                <Tooltip title='Ambil nilai standardisasi'>
-                  <span>
-                    <StyledButton 
-                      aria-label="edit" 
-                      variant='contained' 
-                      size='small' 
-                      color='warning'
-                      disabled={isKanwil}
-                      onClick={() => handleFetchStdScoreKPPN()}
-                    >
-                      <Iconify icon="solar:refresh-bold-duotone"/>
-                    </StyledButton>
-                  </span>
-                </Tooltip>
+              <Stack direction='column' spacing={1}>
+                <Stack direction='row' spacing={2}>
+                  <StyledNumberTextField
+                    size='small'
+                    type="text"
+                    onChange={(e) => setStdScoreKPPN(e.target.value)}
+                    onBlur={(e) => handleChangeKPPNScoreStd(e)}
+                    disabled={isKanwil || isDisabled}
+                    value={stdScoreKPPN}
+                  />
+                  <Tooltip title='Ambil nilai standardisasi'>
+                    <span>
+                      <StyledButton
+                        aria-label="edit"
+                        variant='contained'
+                        size='small'
+                        color='warning'
+                        disabled={isKanwil || isDisabled}
+                        onClick={() => handleFetchStdScoreKPPN()}
+                      >
+                        <Iconify icon="solar:refresh-bold-duotone"/>
+                      </StyledButton>
+                    </span>
+                  </Tooltip>
+                </Stack>
+                {isRegulation2Finding && (
+                  <StyledSelect
+                    size="small"
+                    displayEmpty
+                    value={wsJunction?.excluded === 1 ? 'N/A' : ''}
+                    onChange={(event) => handleChangeKPPNScore(event.target.value as string)}
+                    disabled={isKanwil || isDisabled}
+                    sx={{ width: '100%' }}
+                  >
+                    <StyledMenuItem value="" disabled>Nilai normal</StyledMenuItem>
+                    <StyledMenuItem value="N/A">N/A</StyledMenuItem>
+                  </StyledSelect>
+                )}
               </Stack>
             :
               <StyledSelect
                 required 
                 name="kppnScore" 
-                value={wsJunction?.kppn_score !== null ? String(wsJunction?.kppn_score) : ''}
+                value={isRegulation2Finding && wsJunction?.excluded === 1 ? 'N/A' : wsJunction?.kppn_score == null ? '' : String(wsJunction.kppn_score)}
                 onChange={(e) => handleChangeKPPNScore(e.target.value as string)}
                 size='small' 
                 disabled={isKanwil || isDisabled}
               >
                 {opsiSelection}
+                {isRegulation2Finding && <StyledMenuItem value="N/A">N/A</StyledMenuItem>}
                 <StyledMenuItem key={null} value={''}>{null}</StyledMenuItem>
               </StyledSelect>
           }
@@ -445,40 +468,56 @@ export default function Nilai({findingResponse, getData, isDisabled, scoreSide}:
           {
             isStandardisasi === 1
             ?
-              <Stack direction='row' spacing={2}>
-                <StyledNumberTextField  
-                  size='small'
-                  type="text"
-                  onChange={(e) => setStdScoreKanwil(e.target.value)}
-                  onBlur={(e) => handleChangeKanwilScoreStd(e)}
-                  disabled={!isKanwil || isDisabled}
-                  value={stdScoreKanwil}
-                />
-                <Tooltip title='Ambil nilai standardisasi'>
-                  <span>
-                    <StyledButton 
-                      aria-label="edit" 
-                      variant='contained' 
-                      size='small' 
-                      color='warning'
-                      disabled={!isKanwil || isDisabled}
-                      onClick={() => handleFetchStdScoreKanwil()}
-                    >
-                      <Iconify icon="solar:refresh-bold-duotone"/>
-                    </StyledButton>
-                  </span>
-                </Tooltip>
+              <Stack direction='column' spacing={1}>
+                <Stack direction='row' spacing={2}>
+                  <StyledNumberTextField
+                    size='small'
+                    type="text"
+                    onChange={(e) => setStdScoreKanwil(e.target.value)}
+                    onBlur={(e) => handleChangeKanwilScoreStd(e)}
+                    disabled={!isKanwil || isDisabled}
+                    value={stdScoreKanwil}
+                  />
+                  <Tooltip title='Ambil nilai standardisasi'>
+                    <span>
+                      <StyledButton
+                        aria-label="edit"
+                        variant='contained'
+                        size='small'
+                        color='warning'
+                        disabled={!isKanwil || isDisabled}
+                        onClick={() => handleFetchStdScoreKanwil()}
+                      >
+                        <Iconify icon="solar:refresh-bold-duotone"/>
+                      </StyledButton>
+                    </span>
+                  </Tooltip>
+                </Stack>
+                {isRegulation2Finding && (
+                  <StyledSelect
+                    size="small"
+                    displayEmpty
+                    value={wsJunction?.excluded === 1 ? 'N/A' : ''}
+                    onChange={(event) => handleChangeKanwilScore(event.target.value as string)}
+                    disabled={!isKanwil || isDisabled}
+                    sx={{ width: '100%' }}
+                  >
+                    <StyledMenuItem value="" disabled>Nilai normal</StyledMenuItem>
+                    <StyledMenuItem value="N/A">N/A</StyledMenuItem>
+                  </StyledSelect>
+                )}
               </Stack>
             :
               <StyledSelect 
                 required 
                 name="kanwilScore" 
-                value={wsJunction?.kanwil_score !== null ? String(wsJunction?.kanwil_score) : ''} 
+                value={isRegulation2Finding && wsJunction?.excluded === 1 ? 'N/A' : wsJunction?.kanwil_score == null ? '' : String(wsJunction.kanwil_score)}
                 onChange={(e) => handleChangeKanwilScore(e.target.value as string)}
                 size='small' 
                 disabled={!isKanwil || isDisabled}
               >
                 {opsiSelection}
+                {isRegulation2Finding && <StyledMenuItem value="N/A">N/A</StyledMenuItem>}
                 <StyledMenuItem key={null} value={''}>{null}</StyledMenuItem>
               </StyledSelect>
           }

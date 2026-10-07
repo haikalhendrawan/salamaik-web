@@ -8,6 +8,7 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import Iconify from "../../../../components/iconify";
+import Badge from '@mui/material/Badge';
 import styled  from '@mui/material/styles/styled';
 import { parseISO, format } from 'date-fns';
 // ------------------------------------------------------------
@@ -15,7 +16,9 @@ interface HeadPropInterface{
   num: number | string | undefined,
   title:string,
   dateUpdated: string | null,
-  updatedBy: string | null
+  updatedBy: string | null,
+  openComment: (event: React.MouseEvent<HTMLButtonElement>) => void,
+  commentCount: number
 };
 
 const StyledIconButton = styled(IconButton)(({}) => ({
@@ -47,12 +50,20 @@ export default function Head(props: HeadPropInterface) {  // bagian atas dari ca
             <Typography variant="body1" fontSize={15} >{props.title}</Typography>
           </Stack>
       </SubStack>
-      {isUpdate?
-        <Tooltip title={tooltipText} placement="left-start">
-          <StyledIconButton disableRipple><Iconify icon={"solar:check-circle-bold"} /></StyledIconButton>
-        </Tooltip>:
-        null
-      }
+      <SubStack direction="row" spacing={0}>
+        {isUpdate ?
+          <Tooltip title={tooltipText} placement="left-start">
+            <StyledIconButton disableRipple><Iconify icon={"solar:check-circle-bold"} /></StyledIconButton>
+          </Tooltip> : null
+        }
+        <Tooltip title="Comment" placement="left-start">
+          <StyledIconButton onClick={props.openComment} disableRipple>
+            <Badge badgeContent={props.commentCount} color="primary" max={99} invisible={props.commentCount === 0}>
+              <Iconify icon="solar:chat-round-dots-bold" />
+            </Badge>
+          </StyledIconButton>
+        </Tooltip>
+      </SubStack>
 
     </MainStack>
   </>

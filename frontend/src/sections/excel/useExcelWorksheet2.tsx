@@ -89,7 +89,7 @@ export default function useExcelWorksheet2(
           checklist
             .filter((item) => item.subkomponen_id === subKomponen.id && !item.subsubkomponen_id)
             .sort(compareChecklistOrder)
-            .forEach((item) => addChecklistRow(sheet, item));
+            .forEach((item) => addChecklistRow(sheet, item, kppnName));
 
           subSubKomponen.forEach((subSub) => {
             addSectionRow(
@@ -100,14 +100,14 @@ export default function useExcelWorksheet2(
             checklist
               .filter((item) => item.subsubkomponen_id === subSub.id)
               .sort(compareChecklistOrder)
-              .forEach((item) => addChecklistRow(sheet, item));
+              .forEach((item) => addChecklistRow(sheet, item, kppnName));
           });
 
           if (subSubKomponen.length === 0) {
             checklist
               .filter((item) => item.subkomponen_id === subKomponen.id && Boolean(item.subsubkomponen_id))
               .sort(compareChecklistOrder)
-              .forEach((item) => addChecklistRow(sheet, item));
+              .forEach((item) => addChecklistRow(sheet, item, kppnName));
           }
         });
       });
@@ -213,7 +213,7 @@ function addSectionRow(sheet: ExcelJS.Worksheet, title: string, bold = false) {
   row.height = 21;
 }
 
-function addChecklistRow(sheet: ExcelJS.Worksheet, row: WsJunctionType) {
+function addChecklistRow(sheet: ExcelJS.Worksheet, row: WsJunctionType, kppnName: string) {
   const isStandardisasi = row.standardisasi === 1;
   const opsiText = !isStandardisasi
     ? row.opsi?.map((item) => `- Nilai ${item.value}\n${item.title}`).join('\n\n') || ''
@@ -228,7 +228,7 @@ function addChecklistRow(sheet: ExcelJS.Worksheet, row: WsJunctionType) {
     critical_point: row.critical_point || '',
     dasar_hukum: row.peraturan || '',
     contoh_file: row.contoh_file || '',
-    link_file: row.link_file || '',
+    link_file: '',
     kppn_score: excluded ? 'N/A' : row.kppn_score ?? '',
     kppn_conversion: excluded ? 'N/A' : convertScore(row.kppn_score),
     kanwil_note: row.kanwil_note || '',
@@ -250,6 +250,56 @@ function addChecklistRow(sheet: ExcelJS.Worksheet, row: WsJunctionType) {
     if ([8, 9, 10].includes(columnNumber)) cell.fill = solidFill(KPPN_FILL);
     if ([12, 13].includes(columnNumber)) cell.fill = solidFill(KANWIL_FILL);
   });
+
+  setEvidenceLinkCell(addedRow, row, kppnName);
+  addedRow.height = estimateRowHeight(addedRow);
+}
+
+function setEvidenceLinkCell(addedRow: ExcelJS.Row, junction: WsJunctionType, kppnName: string) {
+  const cell = addedRow.getCell(7);
+  const apiUrl = import.meta.env.VITE_API_URL.replace(/\/+$/, '');
+  const baseLabel = createEvidenceLabel(formatChecklistNumber(junction.urut, junction.urut_huruf), kppnName);
+  const links: { url: string; label: string }[] = [];
+
+  [junction.file_1, junction.file_2, junction.file_3].forEach((fileName, index) => {
+    if (fileName) {
+      links.push({
+        url: `${apiUrl}/worksheet/${fileName}`,
+        label: `${baseLabel}_File_Server_${index + 1}`,
+      });
+    }
+  });
+  if (junction.link_file?.trim()) {
+    const externalLink = junction.link_file.trim();
+    links.push({
+      url: /^https?:\/\//i.test(externalLink) ? externalLink : `https://${externalLink}`,
+      label: `${baseLabel}_Link_Eksternal`,
+    });
+  }
+
+  if (links.length === 0) {
+    cell.value = '';
+    return;
+  }
+
+  cell.value = {
+    text: links.length === 1 ? baseLabel : links.map((link) => link.label).join('\n\n'),
+    hyperlink: links[0].url,
+    tooltip: links.map((link) => link.url).join('\n\n'),
+  };
+  cell.font = { name: 'Aptos Narrow', size: 10, color: { argb: 'FF0563C1' }, underline: true };
+  cell.alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
+}
+
+function createEvidenceLabel(checklistNumber: string, kppnName: string) {
+  const normalizedKppnName = (kppnName || 'KPPN')
+    .trim()
+    .replace(/^KPPN[\s_-]*/i, '')
+    .replace(/[_-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim() || 'KPPN';
+  const formattedNumber = checklistNumber.padStart(2, '0');
+  return `PB${formattedNumber}_KPPN ${normalizedKppnName}`;
 }
 
 function addScoreFooter(
