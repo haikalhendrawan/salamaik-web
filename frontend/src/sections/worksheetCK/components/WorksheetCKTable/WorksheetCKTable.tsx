@@ -128,7 +128,11 @@ export default function WorksheetCKTable({
                       </Stack>
                     </BodyCell>
                     <BodyCell>
-                      <FileActionsCK checklist={row} disabled={auth?.peraturan === 2 ? !canEditRegulation2Row(worksheetDetail, row.kanwil_score, row.excluded) : isPastDue} />
+                      <FileActionsCK
+                        checklist={row}
+                        disabled={auth?.peraturan === 2 ? !canEditRegulation2Row(worksheetDetail, row.kanwil_score, row.excluded) : isPastDue}
+                        canUploadServer={auth?.peraturan !== 2 || isKanwil}
+                      />
                     </BodyCell>
                     <BodyCell align="center">
                       <ScoreSelectCK checklist={row} scoreType="kppn" disabled={isKanwil || (auth?.peraturan === 2 ? !canEditRegulation2Row(worksheetDetail, row.kanwil_score, row.excluded) : isPastDue)} />

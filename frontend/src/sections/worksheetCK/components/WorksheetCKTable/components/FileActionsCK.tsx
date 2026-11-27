@@ -25,9 +25,10 @@ const VisuallyHiddenInput = styled('input')({
 interface FileActionsCKProps {
   checklist: WsCKJunctionType;
   disabled: boolean;
+  canUploadServer: boolean;
 }
 
-export default function FileActionsCK({ checklist, disabled }: FileActionsCKProps) {
+export default function FileActionsCK({ checklist, disabled, canUploadServer }: FileActionsCKProps) {
   const theme = useTheme();
   const axiosJWT = useAxiosJWT();
   const { openSnackbar } = useSnackbar();
@@ -93,7 +94,7 @@ export default function FileActionsCK({ checklist, disabled }: FileActionsCKProp
             </span>
           </Tooltip>
         )}
-        {!checklist.file_1 && (
+        {canUploadServer && !checklist.file_1 && (
           <Tooltip title={disabled ? 'Periode telah ditutup' : 'Upload file'}>
             <span>
               <StyledButton

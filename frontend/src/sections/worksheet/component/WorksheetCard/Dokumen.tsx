@@ -56,6 +56,8 @@ export default function Dokumen({openInstruction, wsJunction, wsDetail, openLink
 
   const {openSnackbar} = useSnackbar();
   const { auth } = useAuth();
+  const isKanwil = auth?.kppn?.length === 5;
+  const canUploadServer = auth?.peraturan !== 2 || isKanwil;
 
   const isPastDue = useMemo(() => auth?.peraturan === 2
     ? !canEditRegulation2Row(wsDetail, wsJunction?.kanwil_score ?? null, wsJunction?.excluded ?? 0)
@@ -263,7 +265,7 @@ export default function Dokumen({openInstruction, wsJunction, wsDetail, openLink
                 null
             }
             {
-              !isMaxFile
+              canUploadServer && !isMaxFile
               ?
                 <Tooltip title='Add file'>
                   <span>

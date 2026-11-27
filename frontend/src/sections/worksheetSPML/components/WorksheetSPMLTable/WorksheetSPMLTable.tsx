@@ -85,6 +85,7 @@ export default function WorksheetSPMLTable({
   const {auth} = useAuth();
 
   const isKanwil = auth?.kppn?.length === 5;
+  const canUploadServer = auth?.peraturan !== 2 || isKanwil;
 
   const tableRows = useMemo(() => hierarchy.map(({ komponen, subKomponen }) => (
     <Fragment key={komponen.id}>
@@ -128,6 +129,7 @@ export default function WorksheetSPMLTable({
                   aspek={index === 0 ? aspekItem : undefined}
                   aspekRowSpan={index === 0 ? checklist.length : undefined}
                   isKanwil={isKanwil}
+                  canUploadServer={canUploadServer}
                   isPastDue={auth?.peraturan === 2
                     ? !canEditRegulation2Row(worksheetDetail, item.kanwil_score, item.excluded)
                     : isPastDue}
@@ -139,7 +141,7 @@ export default function WorksheetSPMLTable({
         </Fragment>
       ))}
     </Fragment>
-  )), [auth?.peraturan, hierarchy, isKanwil, isPastDue, worksheetDetail, theme.palette.background.default, theme.palette.text.main, theme.palette.text.primary]);
+  )), [auth?.peraturan, hierarchy, isKanwil, canUploadServer, isPastDue, worksheetDetail, theme.palette.background.default, theme.palette.text.main, theme.palette.text.primary]);
 
   return (
     <>

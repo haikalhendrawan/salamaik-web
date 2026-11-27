@@ -24,6 +24,7 @@ interface SPMLChecklistRowProps {
   aspekRowSpan?: number;
   isKanwil: boolean;
   isPastDue: boolean;
+  canUploadServer: boolean;
   isFinding?: boolean;
 }
 
@@ -33,6 +34,7 @@ function SPMLChecklistRow({
   aspekRowSpan,
   isKanwil,
   isPastDue,
+  canUploadServer,
   isFinding = false,
 }: SPMLChecklistRowProps) {
   return (
@@ -60,7 +62,7 @@ function SPMLChecklistRow({
         <ScoreSelect checklist={checklist} scoreType="kanwil" disabled={!isKanwil || isPastDue} />
       </StyledTableCell>
       <StyledTableCell>
-        <FileActions checklist={checklist} isPastDue={isPastDue} />
+        <FileActions checklist={checklist} isPastDue={isPastDue} canUploadServer={canUploadServer} />
       </StyledTableCell>
       <StyledTableCell>
         <KanwilNote checklist={checklist} isPastDue={isPastDue} />

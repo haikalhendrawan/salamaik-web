@@ -26,9 +26,10 @@ const VisuallyHiddenInput = styled('input')({
 interface FileActionsProps {
   checklist: WsSPMLJunctionType;
   isPastDue: boolean;
+  canUploadServer: boolean;
 }
 //-----------------------------------------------------------------------------------------------------------------
-export default function FileActions({ checklist, isPastDue }: FileActionsProps) {
+export default function FileActions({ checklist, isPastDue, canUploadServer }: FileActionsProps) {
   const theme = useTheme();
   const axiosJWT = useAxiosJWT();
   const { setIsLoading } = useLoading();
@@ -94,7 +95,7 @@ export default function FileActions({ checklist, isPastDue }: FileActionsProps) 
             </span>
           </Tooltip>
         )}
-        {!checklist.file_1 && (
+        {canUploadServer && !checklist.file_1 && (
           <Tooltip title="Upload file">
             <span>
               <StyledButton component="label" aria-label="Upload dokumen dukung" color="white" size="small" variant="contained" disabled={isPastDue || isFileSyncing}>
